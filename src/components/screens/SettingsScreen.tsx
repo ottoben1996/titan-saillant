@@ -1,8 +1,9 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import type { ProfileId } from '../../domain/types';
 import { exportProfileData, importProfileData } from '../../storage/backup';
 import { deleteProfileData } from '../../storage/sessionRepository';
 import { ArrowLeft, ArrowRight, DownloadSimple, Timer, Trash } from '../ui/Icons';
+import { isSoundEnabled, playTimerChime, setSoundEnabled } from '../../workout/alerts';
 import { profileLabels } from './HomeScreen';
 
 interface SettingsScreenProps {
@@ -46,6 +47,8 @@ export function SettingsScreen({
     URL.revokeObjectURL(url);
     onNotice('Sauvegarde exportée.');
   };
+
+  const [soundOn, setSoundOn] = useState(() => isSoundEnabled());
 
   const importFile = async (file: File) => {
     try {
@@ -94,6 +97,26 @@ export function SettingsScreen({
       </div>
 
       <div className="settings-list">
+        <button
+          className="toggle-row"
+          aria-pressed={soundOn}
+          onClick={() => {
+            const next = !soundOn;
+            setSoundOn(next);
+            setSoundEnabled(next);
+            if (next) playTimerChime('rest');
+            onNotice(next ? 'Signal sonore activé.' : 'Signal sonore coupé.');
+          }}
+        >
+          <Timer size={21} />
+          <span>
+            <strong>Signal sonore de fin de repos</strong>
+            <small>{soundOn ? 'Activé · bip à la fin du chrono' : 'Coupé · vibration seulement'}</small>
+          </span>
+          <span className={`toggle-pill${soundOn ? ' on' : ''}`} aria-hidden="true">
+            <i />
+          </span>
+        </button>
         <button onClick={download}>
           <DownloadSimple size={21} />
           <span>

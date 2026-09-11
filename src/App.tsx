@@ -511,8 +511,6 @@ export default function App() {
           activeSession={session}
           onStart={handleInitiateStart}
           onResume={resumeWorkout}
-          onHistory={() => setScreen('history')}
-          onProgression={() => setScreen('progression')}
         />
       )}
 

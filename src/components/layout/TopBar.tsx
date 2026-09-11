@@ -19,6 +19,8 @@ export function TopBar({ onBack, backLabel, isOnline, onOpenSettings }: TopBarPr
         </span>
         <span>COACH</span>
       </div>
+      {/* L'état « en ligne » est la situation normale : l'afficher en permanence
+          ajoute du bruit. Seul le passage hors ligne mérite d'être signalé. */}
       <div
         className={`connection-pill ${isOnline ? 'online' : 'offline'}`}
         role="status"

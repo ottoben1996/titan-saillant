@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ProfileId, SessionTimerState, WorkoutDay, WorkoutSession } from '../../domain/types';
 import { equipmentAlternatives } from '../../domain/alternatives';
 import { tutorials } from '../../domain/tutorials';
+import { exerciseMedia } from '../../domain/media';
 import { getProgram } from '../../domain/programs';
 import { getNextStep, getWorkoutExercises, getWorkoutSteps } from '../../workout/runner';
 import { computeProgressiveOverload } from '../../workout/progressionEngine';
@@ -214,6 +215,7 @@ export function WorkoutScreen({
       ? activeTimer
       : undefined;
   const tempoReady = !prescription?.durationSeconds || tempoSkipped || matchingTimer?.remainingSeconds === 0;
+  const movementMedia = exercise ? exerciseMedia[exercise.id] : undefined;
 
   // Calcul de la surcharge progressive & performance précédente (Ghost Data) - mémoïsé
   const progression = useMemo(() => (exercise ? computeProgressiveOverload(exercise, history) : null), [exercise?.id, history]);
@@ -311,8 +313,8 @@ export function WorkoutScreen({
 
       {exercise && prescription && (
         <>
+          {(tutorials[exercise.id] || (equipmentAlternatives[exercise.id] && !activeAlternative)) && (
           <div className="workout-actions">
-            <span className="exercise-kind">{prescription.durationSeconds ? 'TEMPS' : 'RÉPÉTITIONS'}</span>
             {tutorials[exercise.id] && (
               <button type="button" className="tutorial-link" onClick={() => onTutorial(exercise.id)}>
                 <Video size={18} /> Tutoriel
@@ -324,8 +326,34 @@ export function WorkoutScreen({
               </button>
             )}
           </div>
+          )}
 
           <div className="prescription-card compact">
+            {movementMedia && (
+              <div className={`exercise-illustration${movementMedia.start ? '' : ' single'}`}>
+                {movementMedia.start ? (
+                  <>
+                    <img
+                      src={movementMedia.start}
+                      alt={`Position de départ : ${exercise.name}`}
+                      decoding="async"
+                    />
+                    <ArrowRight size={16} className="illustration-arrow" />
+                    <img
+                      src={movementMedia.peak ?? movementMedia.start}
+                      alt={`Position finale : ${exercise.name}`}
+                      decoding="async"
+                    />
+                  </>
+                ) : (
+                  <img
+                    src={movementMedia.main ?? movementMedia.start ?? ''}
+                    alt={`Illustration : ${exercise.name}`}
+                    decoding="async"
+                  />
+                )}
+              </div>
+            )}
             <span className="eyebrow">
               {phaseLabel} · SÉRIE {step.setIndex! + 1}
             </span>

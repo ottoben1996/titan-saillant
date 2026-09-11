@@ -1,7 +1,7 @@
 import type { ProfileId, WorkoutDay, WorkoutSession } from '../../domain/types';
 import { getProgram } from '../../domain/programs';
 import { getWorkoutSteps } from '../../workout/runner';
-import { ArrowRight, ChartLine, Clock, Play } from '../ui/Icons';
+import { ArrowRight, Bolt, Clock, Play } from '../ui/Icons';
 
 export const profileLabels: Record<ProfileId, string> = { ottman: 'Ottman', laura: 'Laura' };
 
@@ -12,8 +12,6 @@ interface HomeScreenProps {
   activeSession: WorkoutSession | null;
   onStart: (day: WorkoutDay) => void;
   onResume: () => void;
-  onHistory: () => void;
-  onProgression: () => void;
 }
 
 export function HomeScreen({
@@ -23,8 +21,6 @@ export function HomeScreen({
   activeSession,
   onStart,
   onResume,
-  onHistory,
-  onProgression,
 }: HomeScreenProps) {
   const completedCount = history.filter((item) => item.completedAt).length;
   const weekStart = new Date();
@@ -32,6 +28,7 @@ export function HomeScreen({
   const dayOfWeek = weekStart.getDay();
   weekStart.setDate(weekStart.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
   const weekCount = history.filter((item) => item.completedAt && new Date(item.startedAt) >= weekStart).length;
+  const lastSession = history.find((item) => item.completedAt) ?? null;
 
   return (
     <section className="content home-content">
@@ -45,6 +42,24 @@ export function HomeScreen({
         </div>
         <div className={`avatar avatar-${profile}`}>{profileLabels[profile][0]}</div>
       </div>
+
+      {lastSession && (
+        <div className="last-session-strip">
+          <div>
+            <p className="eyebrow">DERNIÈRE SÉANCE</p>
+            <strong>{program.days.find((day) => day.id === lastSession.dayId)?.name ?? 'Séance'}</strong>
+            <small>
+              {new Date(lastSession.completedAt ?? lastSession.startedAt).toLocaleDateString('fr-FR', {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long',
+              })}
+              {` · ${lastSession.loggedSets.length} séries`}
+              {lastSession.perceivedExertion ? ` · RPE ${lastSession.perceivedExertion}/10` : ''}
+            </small>
+          </div>
+        </div>
+      )}
 
       <div className="metric-grid">
         <div className="metric-card">
@@ -81,14 +96,6 @@ export function HomeScreen({
           <p className="eyebrow">PROGRAMME PRESCRIT</p>
           <h2>Choisis ta séance</h2>
         </div>
-        <div className="section-heading-actions">
-          <button className="text-button" onClick={onProgression}>
-            Progression <ChartLine size={16} />
-          </button>
-          <button className="text-button" onClick={onHistory}>
-            Historique <ArrowRight size={16} />
-          </button>
-        </div>
       </div>
 
       <div className="workout-grid">
@@ -117,7 +124,9 @@ export function HomeScreen({
       </div>
 
       <div className="coach-note">
-        <div className="coach-symbol">✦</div>
+        <div className="coach-symbol">
+          <Bolt size={20} />
+        </div>
         <div>
           <strong>Le conseil du coach</strong>
           <p>La qualité de chaque répétition compte plus que la vitesse. Respire, contrôle, progresse.</p>

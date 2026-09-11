@@ -352,6 +352,22 @@ body {
   box-shadow: none;
 }
 
+/* Le badge « en ligne » reste masqué : seule la perte de connexion s'affiche. */
+.connection-pill.online {
+  display: none;
+}
+
+.connection-pill.offline {
+  display: inline-flex;
+  color: var(--rest);
+  background: rgba(243, 189, 107, .12);
+}
+
+.connection-pill.offline .connection-dot {
+  background: var(--rest);
+  box-shadow: none;
+}
+
 .status-dot {
   background: var(--text-3);
   box-shadow: none;
@@ -390,6 +406,115 @@ body {
    la barre de navigation basse. Masqués en attendant la simplification de l'IA. */
 .section-heading .text-button {
   display: none;
+}
+
+.toggle-row .toggle-pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: 42px;
+  height: 24px;
+  padding: 2px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .12);
+  border: 1px solid var(--line);
+  transition: background var(--t-mid) var(--ease), border-color var(--t-mid) var(--ease);
+}
+
+.toggle-row .toggle-pill i {
+  display: block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--text-2);
+  transition: transform var(--t-mid) var(--ease), background var(--t-mid) var(--ease);
+}
+
+.toggle-row .toggle-pill.on {
+  background: rgba(184, 243, 107, .25);
+  border-color: rgba(184, 243, 107, .45);
+}
+
+.toggle-row .toggle-pill.on i {
+  background: var(--accent);
+  transform: translateX(18px);
+}
+
+.last-session-strip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3, 12px);
+  margin-top: 16px;
+  padding: 12px 14px;
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-left: 2px solid var(--accent);
+  border-radius: var(--r-lg);
+}
+
+.last-session-strip strong {
+  display: block;
+  margin-top: 2px;
+  font-size: .9375rem;
+  font-weight: 590;
+}
+
+.last-session-strip small {
+  display: block;
+  margin-top: 2px;
+  color: var(--text-2);
+  font-size: .75rem;
+}
+
+/* L'illustration du mouvement occupe l'espace laissé vide par la prescription :
+   plus de zone morte de 300 px au milieu de l'écran de séance. */
+.prescription-card.compact {
+  justify-content: flex-start;
+  gap: .35rem;
+}
+
+.exercise-illustration {
+  flex: 1 1 auto;
+  min-height: 6rem;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: .5rem;
+  margin: .25rem 0 .5rem;
+}
+
+.exercise-illustration.single {
+  grid-template-columns: 1fr;
+}
+
+.exercise-illustration img {
+  width: 100%;
+  height: 100%;
+  max-height: 26dvh;
+  min-height: 5.5rem;
+  object-fit: contain;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+}
+
+.exercise-illustration .illustration-arrow {
+  color: var(--text-3);
+}
+
+/* Bandeau duo : information secondaire, traitée comme telle */
+.duo-switcher-bar {
+  max-width: 20rem;
+}
+
+.duo-pill-btn {
+  padding: .35rem .6rem;
+  font-size: .75rem;
+  min-height: 32px;
+}
+
+.duo-pill-badge {
+  font-size: .6875rem;
 }
 
 .chip-tempo {
