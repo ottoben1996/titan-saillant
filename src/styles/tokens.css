@@ -402,14 +402,10 @@ body {
   min-height: 44px;
 }
 
-/* Navigation en doublon : les liens de l'en-tête de section font doublon avec
-   la barre de navigation basse. Masqués en attendant la simplification de l'IA. */
-.section-heading .text-button {
-  display: none;
-}
-
 .toggle-row .toggle-pill {
   position: relative;
+  flex: none;
+  margin-left: auto;
   display: inline-flex;
   align-items: center;
   width: 42px;
@@ -422,6 +418,7 @@ body {
 }
 
 .toggle-row .toggle-pill i {
+  flex: none;
   display: block;
   width: 18px;
   height: 18px;

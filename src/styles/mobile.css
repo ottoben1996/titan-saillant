@@ -123,6 +123,29 @@
     padding-top: .25rem;
   }
 
+  /* Sélecteur de profil en séance et accès secondaires : cibles de 44 px.
+     La spécificité doit égaler les règles de la feuille principale. */
+  .workout-actions .tutorial-link,
+  .workout-actions .alternative-link {
+    min-height: 44px;
+    padding: .6rem .8rem;
+  }
+
+  .duo-pill-btn {
+    min-height: 44px;
+    padding: .55rem .8rem;
+  }
+
+  .duo-switcher-bar {
+    max-width: 100%;
+  }
+
+  /* Lien d'attribution : lien de texte en ligne, simple confort de tap. */
+  .asset-credits a,
+  .settings-footnote a {
+    padding: .4rem 0;
+  }
+
   /* Modales en feuille basse : elles respectent la zone sûre inférieure. */
   .modal-backdrop {
     padding-bottom: calc(1rem + env(safe-area-inset-bottom));

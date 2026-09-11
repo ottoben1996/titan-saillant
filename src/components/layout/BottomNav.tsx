@@ -13,6 +13,7 @@ export function BottomNav({ currentScreen, onNavigate }: BottomNavProps) {
       <button
         type="button"
         aria-label="Séances"
+        aria-current={currentScreen === 'home' ? 'page' : undefined}
         className={currentScreen === 'home' ? 'active' : ''}
         onClick={() => onNavigate('home')}
       >
@@ -22,6 +23,7 @@ export function BottomNav({ currentScreen, onNavigate }: BottomNavProps) {
       <button
         type="button"
         aria-label="Progression"
+        aria-current={currentScreen === 'progression' ? 'page' : undefined}
         className={currentScreen === 'progression' ? 'active' : ''}
         onClick={() => onNavigate('progression')}
       >
@@ -31,6 +33,7 @@ export function BottomNav({ currentScreen, onNavigate }: BottomNavProps) {
       <button
         type="button"
         aria-label="Historique"
+        aria-current={currentScreen === 'history' ? 'page' : undefined}
         className={currentScreen === 'history' ? 'active' : ''}
         onClick={() => onNavigate('history')}
       >
@@ -40,6 +43,7 @@ export function BottomNav({ currentScreen, onNavigate }: BottomNavProps) {
       <button
         type="button"
         aria-label="Profil"
+        aria-current={currentScreen === 'settings' ? 'page' : undefined}
         className={currentScreen === 'settings' ? 'active' : ''}
         onClick={() => onNavigate('settings')}
       >
