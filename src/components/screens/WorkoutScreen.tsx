@@ -8,6 +8,7 @@ import { getNextStep, getWorkoutExercises, getWorkoutSteps } from '../../workout
 import { computeProgressiveOverload } from '../../workout/progressionEngine';
 import { generateWarmupRamp } from '../../workout/warmupRamp';
 import { calculatePlateDelta } from '../../workout/duoManager';
+import { formatLoadKg } from '../../workout/summary';
 import { parseSafeFloat, parseSafeInt } from '../../workout/sanitizer';
 import { RestTimer, formatDuration } from '../timers/RestTimer';
 import { ExerciseTimer } from '../timers/ExerciseTimer';
@@ -429,7 +430,7 @@ export function WorkoutScreen({
                 </>
               )}
               {prescription.loadKg !== undefined && (
-                <b>{activeAlternative?.suggestedLoadKg?.(prescription.loadKg) ?? prescription.loadKg} kg</b>
+                <b>{formatLoadKg(activeAlternative?.suggestedLoadKg?.(prescription.loadKg) ?? prescription.loadKg)} kg</b>
               )}
             </div>
 
@@ -476,7 +477,7 @@ export function WorkoutScreen({
                       <div key={ws.stepIndex} className="warmup-ramp-step">
                         <div className="warmup-ramp-info">
                           <span className="warmup-ramp-badge">Palier {ws.stepIndex} · {ws.percentage}%</span>
-                          <strong>{ws.loadKg} kg × {ws.repetitions} réps</strong>
+                          <strong>{formatLoadKg(ws.loadKg)} kg × {ws.repetitions} réps</strong>
                           <small>{ws.purpose} · Repos {ws.restSeconds}s</small>
                         </div>
                         <button
@@ -539,7 +540,7 @@ export function WorkoutScreen({
                   {prescription.loadKg !== undefined && (
                     <div className="rest-next-prep">
                       <span className="rest-next-load">
-                        Charge prévue : <strong>{prescription.loadKg} kg</strong>
+                        Charge prévue : <strong>{formatLoadKg(prescription.loadKg)} kg</strong>
                       </span>
                       {prescription.loadKg >= 20 && (
                         <PlateBadge

@@ -7,6 +7,7 @@ import {
   formatMinutes,
   formatSignedInt,
   formatSignedKg,
+  formatLoadKg,
   formatSignedPercent,
   formatVolume,
   historyTotals,
@@ -191,7 +192,7 @@ export function ProgressionScreen({ history, profile, onBack }: ProgressionScree
             </div>
             <div className="metric-cell">
               <span>Meilleure charge</span>
-              <strong>{totals.bestLoadKg > 0 ? totals.bestLoadKg : '—'}</strong>
+              <strong>{totals.bestLoadKg > 0 ? formatLoadKg(totals.bestLoadKg) : '—'}</strong>
               <small>{totals.bestLoadKg > 0 ? 'kg' : 'à renseigner'}</small>
             </div>
             <div className="metric-cell">
@@ -290,11 +291,11 @@ export function ProgressionScreen({ history, profile, onBack }: ProgressionScree
                       <strong>{record.name}</strong>
                       <small>
                         {record.loadKg > 0
-                          ? `${record.loadKg} kg × ${record.repetitions} rép.`
+                          ? `${formatLoadKg(record.loadKg)} kg × ${record.repetitions} rép.`
                           : `${record.repetitions} s tenues`}
                       </small>
                     </div>
-                    <span className="record-value">{record.loadKg > 0 ? `${record.loadKg} kg` : '—'}</span>
+                    <span className="record-value">{record.loadKg > 0 ? `${formatLoadKg(record.loadKg)} kg` : '—'}</span>
                   </div>
                 ))}
               </div>

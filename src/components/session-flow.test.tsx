@@ -340,9 +340,13 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
     // --- Bascule vers Ottman via l'interface : sa séance apparaît.
     fireEvent.click(screen.getByRole('button', { name: /retour à l’accueil/i }));
     await flush();
-    // jsdom n'implémente pas window.confirm : on simule le « Oui » de l'utilisateur.
-    Object.defineProperty(window, 'confirm', { value: () => true, configurable: true, writable: true });
+    // La confirmation est désormais un dialogue DE L'APPLICATION (plus de
+    // window.confirm natif) : on le pilote comme un utilisateur.
     fireEvent.click(screen.getByRole('button', { name: /changer de profil/i }));
+    await flush();
+    const confirmDialog = screen.getByRole('alertdialog');
+    expect(within(confirmDialog).getByRole('heading', { name: /changer de profil/i })).toBeInTheDocument();
+    fireEvent.click(within(confirmDialog).getByRole('button', { name: /changer de profil/i }));
     await flush();
     fireEvent.click(screen.getByRole('button', { name: /ottman/i }));
     await flush();

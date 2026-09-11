@@ -1,7 +1,20 @@
 import { describe, expect, it } from 'vitest';
+
+describe('formatLoadKg', () => {
+  it('écrit les charges au format français, sans décimale inutile', () => {
+    expect(formatLoadKg(40)).toBe('40');
+    expect(formatLoadKg(22.5)).toBe('22,5');
+    expect(formatLoadKg(0)).toBe('0');
+  });
+
+  it('reste lisible sur une valeur invalide', () => {
+    expect(formatLoadKg(Number.NaN)).toBe('—');
+  });
+});
 import type { WorkoutDay, WorkoutSession } from '../domain/types';
 import {
   addDays,
+  formatLoadKg,
   formatMinutes,
   formatSignedInt,
   formatSignedKg,

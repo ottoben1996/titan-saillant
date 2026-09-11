@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import type { WorkoutSession } from '../../domain/types';
-import { formatMinutes, formatVolume, summarizeSession, workoutDayLabel } from '../../workout/summary';
+import { formatLoadKg, formatMinutes, formatVolume, summarizeSession, workoutDayLabel } from '../../workout/summary';
 import { ArrowRight, Check, Clock } from '../ui/Icons';
 
 interface CompletionFeedbackProps {
@@ -66,7 +66,7 @@ export function CompletionFeedback({ session, onFinish }: CompletionFeedbackProp
         </div>
         <div className="bilan-cell">
           <span>Meilleure charge</span>
-          <strong>{summary.bestLoadKg > 0 ? `${summary.bestLoadKg} kg` : '—'}</strong>
+          <strong>{summary.bestLoadKg > 0 ? `${formatLoadKg(summary.bestLoadKg)} kg` : '—'}</strong>
         </div>
       </div>
 

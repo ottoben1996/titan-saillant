@@ -22,6 +22,7 @@ import { TutorialModal } from './components/modals/TutorialModal';
 import { AlternativeModal } from './components/modals/AlternativeModal';
 import { ExitWorkoutDialog } from './components/modals/ExitWorkoutDialog';
 import { EnergyCheckinModal, type EnergyLevel } from './components/modals/EnergyCheckinModal';
+import { ConfirmDialog } from './components/ui/ConfirmDialog';
 import { Check } from './components/ui/Icons';
 
 const profileKey = 'coach-active-profile';
@@ -64,6 +65,7 @@ export default function App() {
 
   const [storageMessage, setStorageMessage] = useState('');
   const [updateReady, setUpdateReady] = useState(false);
+  const [confirmSwitchOpen, setConfirmSwitchOpen] = useState(false);
 
   const onStorageFailure = () => setStorageMessage(STORAGE_UNAVAILABLE_MESSAGE);
 
@@ -507,7 +509,9 @@ export default function App() {
     if (alternativeId) return setAlternativeId(null);
     if (screen === 'workout') return setExitPromptOpen(true);
     if (screen === 'home') {
-      if (window.confirm('Changer de profil ? Tes données resteront séparées.')) leaveProfile();
+      // Confirmation dans l'application : le dialogue natif du navigateur sort du
+      // design system et bloque la page sur mobile.
+      setConfirmSwitchOpen(true);
       return;
     }
     setScreen('home');
@@ -630,6 +634,21 @@ export default function App() {
       )}
 
       {exitPromptOpen && <ExitWorkoutDialog onCancel={() => setExitPromptOpen(false)} onPause={pauseWorkout} />}
+
+      {confirmSwitchOpen && (
+        <ConfirmDialog
+          eyebrow="ESPACE PERSONNEL"
+          title="Changer de profil ?"
+          description="Tes données resteront séparées : chaque profil garde son historique sur cet appareil."
+          confirmLabel="Changer de profil"
+          cancelLabel="Rester ici"
+          onConfirm={() => {
+            setConfirmSwitchOpen(false);
+            leaveProfile();
+          }}
+          onCancel={() => setConfirmSwitchOpen(false)}
+        />
+      )}
 
       {pendingDay && (
         <EnergyCheckinModal

@@ -366,6 +366,12 @@ export function personalRecords(
 
 const nbsp = '\u202F';
 
+/** Charge en kilogrammes au format français, au plus une décimale (« 22,5 »). */
+export function formatLoadKg(kg: number): string {
+  if (!Number.isFinite(kg)) return '—';
+  return kg.toLocaleString('fr-FR', { maximumFractionDigits: 1 });
+}
+
 export function formatVolume(kg: number): string {
   return Math.round(kg).toLocaleString('fr-FR');
 }
