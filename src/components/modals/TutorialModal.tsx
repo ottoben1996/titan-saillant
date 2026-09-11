@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { Tutorial } from '../../domain/types';
 import { exerciseMedia } from '../../domain/media';
-import { ArrowLeft, Barbell, Play, Video } from '../ui/Icons';
+import { ArrowLeft, ArrowRight, ArrowUpRight, Barbell, Bolt, Play, Repeat, Timer, Video, Warning } from '../ui/Icons';
 import { Sheet, SheetContent, SheetTitle } from '../ui/Sheet';
 import { MuscleMap } from '../ui/MuscleMap';
 
@@ -95,7 +95,7 @@ export function TutorialModal({ tutorial, onClose }: TutorialModalProps) {
                 </div>
                 <div className="tutorial-short-meta">
                   <span className="tutorial-short-hint">
-                    ✦ Boucle continue · Mute automatique en salle
+                    <Repeat size={13} /> Boucle continue · Mute automatique en salle
                   </span>
                   <a
                     href={`https://www.youtube.com/shorts/${tutorial.youtubeShortId}`}
@@ -104,7 +104,7 @@ export function TutorialModal({ tutorial, onClose }: TutorialModalProps) {
                     className="tutorial-yt-link"
                     title="Ouvrir dans l’application YouTube"
                   >
-                    Ouvrir sur YouTube ↗
+                    Ouvrir sur YouTube <ArrowUpRight size={16} />
                   </a>
                 </div>
               </>
@@ -157,7 +157,7 @@ export function TutorialModal({ tutorial, onClose }: TutorialModalProps) {
                 }}
               >
                 <img src={media.start} alt={`Départ : ${tutorial.title}`} style={frameStyle} />
-                <span style={{ color: '#b8f36b', fontSize: '1.3rem' }}>→</span>
+                <ArrowRight size={20} className="tutorial-arrow" />
                 <img src={media.peak ?? media.main ?? media.start} alt={`Fin : ${tutorial.title}`} style={frameStyle} />
               </div>
             ) : media?.main ? (
@@ -179,8 +179,8 @@ export function TutorialModal({ tutorial, onClose }: TutorialModalProps) {
             <span key={muscle}>{muscle}</span>
           ))}
           {tutorial.tempoRecommended && (
-            <span style={{ borderColor: '#b8f36b', color: '#b8f36b', fontWeight: 800 }}>
-              ⏱ Tempo : {tutorial.tempoRecommended}
+            <span className="chip-tempo">
+              <Timer size={14} /> Tempo : {tutorial.tempoRecommended}
             </span>
           )}
         </div>
@@ -190,15 +190,15 @@ export function TutorialModal({ tutorial, onClose }: TutorialModalProps) {
             style={{
               padding: '.6rem .85rem',
               borderRadius: '.85rem',
-              background: '#b8f36b14',
-              border: '1px solid #b8f36b44',
-              color: '#dcfce7',
+              background: 'var(--surface-2)',
+              border: '1px solid var(--line)',
+              color: 'var(--text-1)',
               fontSize: '.75rem',
               fontWeight: 700,
               margin: '.6rem 0',
             }}
           >
-            ✦ Repère clé du coach : {tutorial.keyCue}
+            <Bolt size={14} /> Repère clé du coach : {tutorial.keyCue}
           </div>
         )}
 
@@ -220,9 +220,11 @@ export function TutorialModal({ tutorial, onClose }: TutorialModalProps) {
 
           <h3>À éviter</h3>
           <p>{tutorial.commonMistakes.join(' · ')}</p>
-          <div className="safety-callout">⚠ {tutorial.safety[0]}</div>
+          <div className="safety-callout">
+            <Warning size={16} /> {tutorial.safety[0]}
+          </div>
           {media && (
-            <p style={{ marginTop: '1rem', color: '#71857a', fontSize: '.68rem' }}>
+            <p style={{ marginTop: '1rem', color: 'var(--text-3)', fontSize: '0.75rem' }}>
               Illustrations : Exercise data by RepDB (repdb.co) · attribution conservée.
             </p>
           )}

@@ -4,6 +4,7 @@ import { getProgram } from './domain/programs';
 import { tutorials } from './domain/tutorials';
 import { equipmentAlternatives } from './domain/alternatives';
 import { createRunner, completeSet, getNextStep, getWorkoutExercises } from './workout/runner';
+import { playTimerChime, timerTitle, vibrateTimer } from './workout/alerts';
 import { restoreRemainingSeconds } from './workout/timer';
 import { getActiveSession, listSessions, saveSession } from './storage/sessionRepository';
 import MustaphaApp from './mustapha/MustaphaApp';
@@ -398,9 +399,8 @@ export default function App() {
     const message =
       kind === 'tempo' ? 'Temps terminé. Tu peux valider la série.' : 'Repos terminé. Tu peux reprendre la prochaine série.';
 
-    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
-      navigator.vibrate?.([120, 80, 120]);
-    }
+    vibrateTimer(kind);
+    playTimerChime(kind);
 
     if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
       try {
@@ -415,9 +415,10 @@ export default function App() {
     }
 
     const previousTitle = document.title;
-    document.title = kind === 'tempo' ? '⏱ Tempo terminé · Coach' : '⏱ Repos terminé · Coach';
+    const alertTitle = timerTitle(kind);
+    document.title = alertTitle;
     window.setTimeout(() => {
-      if (document.title === (kind === 'tempo' ? '⏱ Tempo terminé · Coach' : '⏱ Repos terminé · Coach')) {
+      if (document.title === alertTitle) {
         document.title = previousTitle;
       }
     }, 3500);

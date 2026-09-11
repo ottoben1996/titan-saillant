@@ -11,7 +11,7 @@ import { parseSafeFloat, parseSafeInt } from '../../workout/sanitizer';
 import { RestTimer, formatDuration } from '../timers/RestTimer';
 import { ExerciseTimer } from '../timers/ExerciseTimer';
 import { PlateBadge } from '../ui/PlateBadge';
-import { ArrowRight, Barbell, Check, Clock, Repeat, Undo, Video } from '../ui/Icons';
+import { ArrowRight, Barbell, Bolt, Check, Clock, Person, Repeat, Undo, Video } from '../ui/Icons';
 import { CompletionFeedback } from './CompletionFeedback';
 
 function findGhostPerformance(
@@ -252,7 +252,7 @@ export function WorkoutScreen({
               className={`duo-pill-btn ${profile === 'ottman' ? 'active' : ''}`}
               onClick={() => onSwitchDuoProfile('ottman')}
             >
-              <span>⚡ Ottman</span>
+              <span><Bolt size={15} /> Ottman</span>
               {profile === 'ottman' && <span className="duo-pill-badge">en cours</span>}
             </button>
             <button
@@ -260,14 +260,14 @@ export function WorkoutScreen({
               className={`duo-pill-btn ${profile === 'laura' ? 'active' : ''}`}
               onClick={() => onSwitchDuoProfile('laura')}
             >
-              <span>🌸 Laura</span>
+              <span><Person size={15} /> Laura</span>
               {profile === 'laura' && <span className="duo-pill-badge">en cours</span>}
             </button>
           </div>
           {partnerDelta && partnerDelta.action !== 'keep' && (
             <div className="duo-delta-banner" aria-label="Différentiel disques partagés">
               <span>
-                🤝 Vers <strong>{partnerProfile === 'ottman' ? 'Ottman' : 'Laura'}</strong> : {partnerDelta.summaryLabel}
+                Vers <strong>{partnerProfile === 'ottman' ? 'Ottman' : 'Laura'}</strong> : {partnerDelta.summaryLabel}
               </span>
             </div>
           )}
@@ -357,7 +357,7 @@ export function WorkoutScreen({
             {/* Surcharge progressive conseillée */}
             {progression && prescription.phase !== 'warmup' && (
               <div className="progression-hint-banner">
-                <span className="prog-pill">✦ Défi Coach</span>
+                <span className="prog-pill">Défi coach</span>
                 <span>
                   Objectif suggéré : <strong>{progression.suggestedLoadKg} kg</strong> (+{progression.incrementKg} kg)
                 </span>
@@ -380,8 +380,8 @@ export function WorkoutScreen({
                   onClick={() => setShowWarmupRamp((v) => !v)}
                   aria-expanded={showWarmupRamp}
                 >
-                  <span>⚡ Montée en gamme conseillée ({warmupSteps.length} paliers)</span>
-                  <small>{showWarmupRamp ? 'Masquer ▲' : 'Afficher ▼'}</small>
+                  <span><Bolt size={16} /> Montée en gamme conseillée ({warmupSteps.length} paliers)</span>
+                  <small>{showWarmupRamp ? 'Masquer' : 'Afficher'}</small>
                 </button>
                 {showWarmupRamp && (
                   <div className="warmup-ramp-list">

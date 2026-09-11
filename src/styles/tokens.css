@@ -1,0 +1,461 @@
+/* ============================================================================
+   Coach Ottman & Laura — couche de tokens et de discipline visuelle
+   ----------------------------------------------------------------------------
+   Chargée APRÈS styles.css : elle ne remplace aucune structure, elle corrige
+   les valeurs. Objectifs :
+     1. un seul jeu de tokens (couleurs, rayons, typo, mouvement) ;
+     2. hiérarchie typographique bornée (aucun titre au-delà de 40 px) ;
+     3. une seule couleur d'accent utilisée comme action ;
+     4. surfaces à bordure plutôt qu'ombres empilées ;
+     5. suppression des dégradés décoratifs ;
+     6. chiffres tabulaires pour tous les chronos et charges.
+   Périmètre : application Ottman/Laura. L'espace MUSTAPHA (sélecteurs
+   .mustapha-*) conserve ses propres tokens.
+   ========================================================================== */
+
+/* Police auto-hébergée : deux sous-ensembles, aucune requête externe */
+@font-face {
+  font-family: 'Inter Variable';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/inter-latin-var.woff2') format('woff2-variations');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
+    U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Inter Variable';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/inter-latin-ext-var.woff2') format('woff2-variations');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304,
+    U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0,
+    U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+:root {
+  /* Surfaces */
+  --surface-0: #0B0F0E;
+  --surface-1: #121715;
+  --surface-2: #18201D;
+  --line: rgba(255, 255, 255, .09);
+  --line-strong: rgba(255, 255, 255, .16);
+
+  /* Texte */
+  --text-1: #F1F5F2;
+  --text-2: #A9B7AE;
+  --text-3: #78877E;
+
+  /* Accents */
+  --accent: #B8F36B;
+  --accent-ink: #0E1710;
+  --rest: #F3BD6B;
+  --danger: #E79292;
+  --profile-laura: #E0A9EE;
+
+  /* Rayons */
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 14px;
+
+  /* Mouvement */
+  --ease: cubic-bezier(.2, .8, .2, 1);
+  --t-fast: 120ms;
+  --t-mid: 180ms;
+  --t-slow: 240ms;
+
+  /* Élévation unique, réservée aux surfaces flottantes */
+  --elevation: 0 1px 0 rgba(255, 255, 255, .04) inset, 0 8px 24px rgba(0, 0, 0, .35);
+
+  /* Typographie : Inter auto-hébergée (voir les @font-face ci-dessus) */
+  font-family: 'Inter Variable', Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+
+/* ---------------------------------------------------------------- base ---- */
+body {
+  background: var(--surface-0);
+  color: var(--text-1);
+  font-family: 'Inter Variable', Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: rgba(184, 243, 107, .25);
+  color: var(--text-1);
+}
+
+.app-shell button,
+.app-shell input,
+.app-shell select {
+  touch-action: manipulation;
+}
+
+.app-shell button:focus-visible,
+.app-shell input:focus-visible,
+.app-shell select:focus-visible {
+  outline: 2px solid rgba(184, 243, 107, .75);
+  outline-offset: 2px;
+}
+
+/* Largeur utile : éviter la colonne étroite sur écran large */
+.content,
+.topbar {
+  width: min(100%, 72rem);
+}
+
+/* ------------------------------------------------ hiérarchie typographique - */
+.profile-card h1,
+.hero-row h1,
+.completion-screen h1 {
+  font-size: clamp(1.75rem, 7vw, 2.5rem);
+  line-height: 1.1;
+  letter-spacing: -.02em;
+}
+
+.page-heading h1 {
+  font-size: clamp(1.5rem, 6vw, 2rem);
+  line-height: 1.15;
+  letter-spacing: -.01em;
+}
+
+.workout-heading h1,
+.workout-content .workout-heading h1 {
+  font-size: clamp(1.25rem, 5.5vw, 1.875rem);
+  line-height: 1.15;
+  letter-spacing: -.01em;
+}
+
+.section-heading h2 {
+  font-size: 1.125rem;
+  letter-spacing: -.01em;
+}
+
+.tutorial-modal h2 {
+  font-size: 1.375rem;
+  letter-spacing: -.01em;
+}
+
+.tutorial-modal h3 {
+  font-size: .75rem;
+  letter-spacing: .12em;
+}
+
+/* Chiffres de prescription : 40 px maximum, comme le chrono */
+.prescription-main strong {
+  font-size: 2.5rem;
+  letter-spacing: -.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.prescription-card.compact .prescription-main strong {
+  font-size: clamp(2rem, 9vw, 2.5rem);
+}
+
+.rest-orbit strong {
+  font-size: 2.5rem;
+  letter-spacing: -.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.workout-content .rest-orbit strong {
+  font-size: 2rem;
+}
+
+/* Indicateurs : compacts, lisibles, sans surdimensionnement */
+.metric-card strong {
+  font-size: 1.5rem;
+  letter-spacing: -.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.day-number {
+  font-size: 1.125rem;
+  color: var(--text-3);
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Chronos et charges : largeur stable pendant le décompte */
+.session-elapsed,
+.rest-orbit strong,
+.exercise-timer strong,
+.progress-pill,
+.history-date,
+.prescription-main b,
+.plate-badge,
+.mustapha-progress + * {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ------------------------------------------------------- surfaces etcartes - */
+.workout-card,
+.metric-card,
+.prescription-card,
+.log-card,
+.rest-card,
+.history-item,
+.settings-profile,
+.settings-list button,
+.profile-choice,
+.coach-note,
+.resume-banner {
+  border: 1px solid var(--line);
+  box-shadow: none;
+}
+
+.workout-card,
+.metric-card,
+.prescription-card,
+.log-card,
+.rest-card {
+  border-radius: var(--r-lg);
+}
+
+.history-item,
+.settings-profile,
+.settings-list button,
+.profile-choice,
+.coach-note,
+.resume-banner {
+  border-radius: var(--r-lg);
+}
+
+/* Une seule carte accentuée par écran : la métrique de volume */
+.metric-card.accent {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-color: transparent;
+}
+
+.metric-card.accent span,
+.metric-card.accent small {
+  color: rgba(14, 23, 16, .72);
+}
+
+/* Tint par index : sans signification, on neutralise */
+.card-1,
+.card-2 {
+  background: var(--surface-1);
+}
+
+.workout-card:hover,
+.profile-choice:hover {
+  background: var(--surface-2);
+  transform: none;
+}
+
+/* Pastilles et étiquettes : neutres, l'accent reste l'action */
+.tag,
+.chip-row span {
+  background: var(--surface-2);
+  color: var(--text-2);
+  border: 1px solid var(--line);
+}
+
+.text-button,
+.tutorial-link {
+  color: var(--accent);
+  font-weight: 590;
+}
+
+.alternative-link {
+  background: var(--surface-2);
+  color: var(--text-2);
+  border: 1px solid var(--line);
+  font-weight: 510;
+}
+
+.alternative-link:hover {
+  color: var(--text-1);
+  border-color: var(--line-strong);
+}
+
+.alternative-link svg {
+  color: var(--text-3);
+}
+
+/* Alertes de tempo et de repos : une seule couleur d'alerte */
+.warmup-ramp-badge,
+.rest-circle-alert .rest-circle-progress {
+  color: var(--rest);
+}
+
+.rest-circle-alert .rest-circle-progress {
+  stroke: var(--rest);
+  filter: none;
+}
+
+.legend-dot.secondary {
+  background: var(--text-3);
+}
+
+.barbell-collar {
+  background: #55606A;
+}
+
+/* Boutons : rayons et transitions homogènes */
+.primary-button,
+.round-action,
+.tutorial-link,
+.icon-button,
+.timer-actions button,
+.rest-actions button,
+.settings-list button,
+.input-row input {
+  border-radius: var(--r-md);
+}
+
+.round-action,
+.icon-button {
+  border-radius: var(--r-pill, 999px);
+}
+
+.primary-button,
+.round-action,
+.tutorial-link,
+.icon-button,
+.text-button,
+.profile-choice,
+.workout-card,
+.history-item {
+  transition: background var(--t-mid) var(--ease), border-color var(--t-mid) var(--ease),
+    color var(--t-mid) var(--ease), transform var(--t-fast) var(--ease);
+}
+
+.primary-button:hover {
+  transform: none;
+  box-shadow: none;
+  background: #C4F884;
+}
+
+.round-action:hover {
+  transform: none;
+}
+
+/* ------------------------------------ discipline d'accent et de densité ---- */
+/* Une seule couleur d'action par écran : le titre de marque et les libellés
+   secondaires restent neutres, l'accent est réservé à l'action et à l'état actif. */
+.topbar-brand {
+  color: var(--text-2);
+}
+
+.eyebrow {
+  color: var(--text-3);
+}
+
+.brand-mark {
+  box-shadow: none;
+}
+
+.status-dot {
+  background: var(--text-3);
+  box-shadow: none;
+}
+
+/* La métrique mise en avant n'est plus un aplat saturé : elle reste une surface,
+   seule sa valeur porte l'accent. */
+.metric-card.accent {
+  background: var(--surface-1);
+  border-color: rgba(184, 243, 107, .28);
+  color: var(--text-1);
+}
+
+.metric-card.accent strong {
+  color: var(--accent);
+}
+
+.metric-card.accent span,
+.metric-card.accent small {
+  color: var(--text-2);
+}
+
+/* Barre de progression : discrète, plus de rail lumineux décoratif */
+.progress-track {
+  height: 3px;
+  background: rgba(255, 255, 255, .07);
+}
+
+/* Cible tactile minimale de l'action de lancement */
+.round-action {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+/* Navigation en doublon : les liens de l'en-tête de section font doublon avec
+   la barre de navigation basse. Masqués en attendant la simplification de l'IA. */
+.section-heading .text-button {
+  display: none;
+}
+
+.chip-tempo {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-color: rgba(184, 243, 107, .35) !important;
+  color: var(--accent) !important;
+  font-weight: 590;
+}
+
+.tutorial-arrow {
+  color: var(--accent);
+}
+
+.best-item svg:last-child {
+  color: var(--text-3);
+}
+
+/* ------------------------------------------- suppression des décorations --- */
+.exercise-visual {
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  color: var(--text-3);
+}
+
+.tutorial-cover {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  color: var(--accent);
+}
+
+.toast {
+  background: var(--accent);
+  color: var(--accent-ink);
+  box-shadow: var(--elevation);
+}
+
+.modal-backdrop {
+  background: rgba(0, 0, 0, .68);
+}
+
+.tutorial-modal {
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+}
+
+.safety-callout {
+  background: rgba(243, 189, 107, .10);
+  color: #E7CFA9;
+  border: 1px solid rgba(243, 189, 107, .22);
+  border-radius: var(--r-md);
+}
+
+.settings-list .danger-row,
+.settings-list .danger-row > svg:first-child {
+  color: var(--danger);
+}
+
+.empty-state {
+  color: var(--text-3);
+}
+
+.empty-state h2 {
+  color: var(--text-1);
+}

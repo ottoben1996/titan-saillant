@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { WorkoutDay } from '../../domain/types';
-import { ArrowRight, Clock } from '../ui/Icons';
+import { ArrowRight, Bolt, Clock, Feather, Leaf } from '../ui/Icons';
 
 export type EnergyLevel = 'high' | 'normal' | 'low';
 
@@ -34,7 +34,7 @@ export function EnergyCheckinModal({ day, profileName, onConfirm, onSkip }: Ener
             className={`energy-option ${selectedLevel === 'high' ? 'selected' : ''}`}
             onClick={() => setSelectedLevel('high')}
           >
-            <span className="energy-icon">🔥</span>
+            <Bolt className="energy-icon" size={24} />
             <strong>Plein d’énergie</strong>
             <small>Rythme soutenu & repos stricts du coach</small>
           </button>
@@ -44,7 +44,7 @@ export function EnergyCheckinModal({ day, profileName, onConfirm, onSkip }: Ener
             className={`energy-option ${selectedLevel === 'normal' ? 'selected' : ''}`}
             onClick={() => setSelectedLevel('normal')}
           >
-            <span className="energy-icon">⚡</span>
+            <Feather className="energy-icon" size={24} />
             <strong>Forme normale</strong>
             <small>Temps de repos standards prescrits</small>
           </button>
@@ -54,7 +54,7 @@ export function EnergyCheckinModal({ day, profileName, onConfirm, onSkip }: Ener
             className={`energy-option ${selectedLevel === 'low' ? 'selected' : ''}`}
             onClick={() => setSelectedLevel('low')}
           >
-            <span className="energy-icon">🧘</span>
+            <Leaf className="energy-icon" size={24} />
             <strong>Fatigue / Récupération</strong>
             <small>Repos allongés (+20%) pour garder un contrôle parfait</small>
           </button>
@@ -63,7 +63,7 @@ export function EnergyCheckinModal({ day, profileName, onConfirm, onSkip }: Ener
         {selectedLevel === 'low' && (
           <div className="energy-notice">
             <Clock size={16} />
-            <span>Les temps de repos seront majorés de 20% (ex: 120s → 145s) pour préserver ta fraîcheur.</span>
+            <span>Les temps de repos seront majorés de 20 % (par exemple, 120 s passent à 145 s) pour préserver ta fraîcheur.</span>
           </div>
         )}
 

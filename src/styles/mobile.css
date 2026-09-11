@@ -1,0 +1,141 @@
+/* ============================================================================
+   Couche mobile — Coach Ottman & Laura
+   ----------------------------------------------------------------------------
+   Encoches et barre d'accueil (iPhone 13), écrans hauts Android (Xiaomi),
+   cibles tactiles, prévention du zoom automatique sur les champs.
+   Chargée après styles.css et tokens.css.
+   ========================================================================== */
+
+/* --- zones sûres --------------------------------------------------------- */
+.app-shell {
+  padding-left: max(1rem, env(safe-area-inset-left));
+  padding-right: max(1rem, env(safe-area-inset-right));
+  padding-bottom: calc(6.5rem + env(safe-area-inset-bottom));
+}
+
+.topbar {
+  padding-top: calc(1.25rem + env(safe-area-inset-top));
+}
+
+/* La séance doit tenir dans la hauteur réellement visible du téléphone. */
+.workout-shell {
+  height: 100dvh;
+  padding-left: max(.75rem, env(safe-area-inset-left));
+  padding-right: max(.75rem, env(safe-area-inset-right));
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.workout-shell .topbar {
+  padding-top: calc(.65rem + env(safe-area-inset-top));
+}
+
+/* --- barre de navigation ------------------------------------------------- */
+.bottom-nav {
+  bottom: calc(.5rem + env(safe-area-inset-bottom));
+  width: min(calc(100% - 1.5rem), 30rem);
+}
+
+.bottom-nav button {
+  color: var(--text-2);
+  min-height: 48px;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.bottom-nav button.active {
+  color: var(--accent-ink);
+}
+
+/* --- cibles tactiles (44 px minimum) ------------------------------------- */
+.app-shell button,
+.app-shell a,
+.app-shell input,
+.app-shell select {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.app-shell button {
+  touch-action: manipulation;
+}
+
+.icon-button {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.timer-actions button,
+.rest-actions button,
+.text-button,
+.tutorial-link,
+.alternative-link,
+.settings-list button,
+.add-rest-btn,
+.skip-tempo-btn {
+  min-height: 44px;
+}
+
+/* --- saisie : pas de zoom automatique iOS (16 px minimum) ---------------- */
+.app-shell input,
+.app-shell select,
+.app-shell textarea,
+.input-row input {
+  font-size: 16px;
+}
+
+/* --- défilement ---------------------------------------------------------- */
+.content,
+.tutorial-modal,
+.alternative-modal,
+.sheet-content {
+  overscroll-behavior: contain;
+}
+
+/* --- téléphones --------------------------------------------------------- */
+@media (max-width: 700px) {
+  /* Libellés de navigation toujours visibles : une icône seule n'est pas
+     identifiable en salle, et l'accessibilité repose sur le texte. */
+  .bottom-nav {
+    justify-content: space-around;
+    padding: .35rem .4rem;
+  }
+
+  .bottom-nav button {
+    flex: 1;
+    flex-direction: column;
+    gap: 2px;
+    min-height: 56px;
+    padding: .45rem .25rem;
+    font-size: .75rem;
+    line-height: 1.1;
+  }
+
+  .bottom-nav button span {
+    display: inline;
+  }
+
+  .bottom-nav button svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  /* La zone de séance garde ses marges internes cohérentes. */
+  .workout-content {
+    padding-top: .25rem;
+  }
+
+  /* Modales en feuille basse : elles respectent la zone sûre inférieure. */
+  .modal-backdrop {
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+  }
+}
+
+/* --- très grands écrans Android ----------------------------------------- */
+@media (min-width: 431px) and (max-width: 700px) {
+  .metric-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .content {
+    padding-top: 2rem;
+  }
+}

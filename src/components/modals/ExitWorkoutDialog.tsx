@@ -23,7 +23,7 @@ export function ExitWorkoutDialog({ onCancel, onPause }: ExitWorkoutDialogProps)
             Mettre en pause
           </button>
           <button type="button" className="secondary-button full" onClick={onCancel}>
-            Reprendre la séance
+            Continuer la séance
           </button>
         </div>
       </div>

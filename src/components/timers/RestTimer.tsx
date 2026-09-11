@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { SessionTimerState } from '../../domain/types';
 import { createCountdown, type CountdownController } from '../../workout/timer';
+import { getTimerAnnouncement } from '../../workout/timerAnnouncements';
 import { Play, Timer, X } from '../ui/Icons';
 
 export const formatDuration = (seconds: number) =>
@@ -167,6 +168,9 @@ export function RestTimer({
 
   return (
     <div className="rest-card">
+      <span className="sr-only" role="status" aria-live="polite">
+        {getTimerAnnouncement(remaining) ?? ''}
+      </span>
       <div className={`rest-orbit-svg-container ${isAlert ? 'rest-circle-alert' : ''}`}>
         <svg className="rest-circle-svg" viewBox="0 0 120 120" aria-hidden="true">
           <circle className="rest-circle-bg" cx="60" cy="60" r={radius} />
@@ -180,7 +184,7 @@ export function RestTimer({
           />
         </svg>
         <div className="rest-orbit-content">
-          <span style={{ color: isAlert ? '#facc15' : '#b8f36b', marginBottom: '0.2rem', display: 'flex' }}>
+          <span style={{ color: isAlert ? 'var(--rest)' : 'var(--accent)', marginBottom: '0.2rem', display: 'flex' }}>
             <Timer size={20} />
           </span>
           <strong>{formatDuration(remaining)}</strong>

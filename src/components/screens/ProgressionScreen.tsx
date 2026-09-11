@@ -1,7 +1,8 @@
 import type { ProfileId, WorkoutSession } from '../../domain/types';
 import { getProgram } from '../../domain/programs';
 import { getAdaptiveAdvice, type AdaptiveAdvice } from '../../workout/coaching';
-import { ArrowLeft, ChartLine, Check } from '../ui/Icons';
+import { ArrowLeft, ArrowRight, ChartLine, Check, TrendDown, TrendUp, Warning } from '../ui/Icons';
+import { exerciseLabel } from '../../domain/labels';
 import { profileLabels } from './HomeScreen';
 
 type ProgressionPoint = { label: string; volume: number; series: number };
@@ -80,7 +81,15 @@ function AdaptiveAdviceCard({ advice }: { advice: AdaptiveAdvice }) {
         <p>{advice.message}</p>
       </div>
       <span className="adaptive-icon">
-        {advice.safety ? '⚠' : advice.recommendation === 'increase' ? '↗' : advice.recommendation === 'reduce' ? '↘' : '→'}
+        {advice.safety ? (
+          <Warning size={22} />
+        ) : advice.recommendation === 'increase' ? (
+          <TrendUp size={22} />
+        ) : advice.recommendation === 'reduce' ? (
+          <TrendDown size={22} />
+        ) : (
+          <ArrowRight size={22} />
+        )}
       </span>
     </div>
   );
@@ -220,7 +229,7 @@ export function ProgressionScreen({ history, profile, onBack }: ProgressionScree
                   <div className="best-item" key={exerciseId}>
                     <span className="best-rank">{best.findIndex(([id]) => id === exerciseId) + 1}</span>
                     <div>
-                      <strong>{exerciseNames.get(exerciseId) ?? exerciseId}</strong>
+                      <strong>{exerciseNames.get(exerciseId) ?? exerciseLabel(exerciseId)}</strong>
                       <small>
                         {value.load > 0 ? `${value.load} kg` : `${value.reps} s`} · meilleur repère
                       </small>

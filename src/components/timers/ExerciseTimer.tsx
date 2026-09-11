@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { SessionTimerState } from '../../domain/types';
 import { createCountdown, type CountdownController } from '../../workout/timer';
+import { getTimerAnnouncement } from '../../workout/timerAnnouncements';
 import { Play, Repeat, X } from '../ui/Icons';
 import { formatDuration } from './RestTimer';
 
@@ -144,7 +145,10 @@ export function ExerciseTimer({
   };
 
   return (
-    <div className={`exercise-timer ${remaining === 0 ? 'complete' : ''}`} aria-live="polite">
+    <div className={`exercise-timer ${remaining === 0 ? 'complete' : ''}`}>
+      <span className="sr-only" role="status" aria-live="polite">
+        {getTimerAnnouncement(remaining) ?? ''}
+      </span>
       <div>
         <span className="eyebrow">COMPTEUR TEMPO</span>
         <strong>{formatDuration(remaining)}</strong>
