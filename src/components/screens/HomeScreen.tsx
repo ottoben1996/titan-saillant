@@ -1,9 +1,31 @@
+import { useMemo } from 'react';
 import type { ProfileId, WorkoutDay, WorkoutSession } from '../../domain/types';
 import { getProgram } from '../../domain/programs';
 import { getWorkoutSteps } from '../../workout/runner';
-import { ArrowRight, Bolt, Clock, Play } from '../ui/Icons';
+import {
+  formatVolume,
+  startOfWeek,
+  volumeLastDays,
+  weekSlots,
+  weeklyComparison,
+  type WeekSlotState,
+} from '../../workout/summary';
+import { ArrowRight, Bolt, Check, Clock, Play } from '../ui/Icons';
 
 export const profileLabels: Record<ProfileId, string> = { ottman: 'Ottman', laura: 'Laura' };
+
+const SLOT_STATES: Record<WeekSlotState, string> = {
+  done: 'Terminée',
+  today: "Aujourd’hui",
+  upcoming: 'À venir',
+};
+
+/** Le volume hebdomadaire cible : chaque profil a 3 créneaux prescrits. */
+const WEEKLY_TARGET = 3;
+
+function estimatedMinutes(day: WorkoutDay) {
+  return Math.round(getWorkoutSteps(day).length * 2 + 12);
+}
 
 interface HomeScreenProps {
   profile: ProfileId;
@@ -22,105 +44,134 @@ export function HomeScreen({
   onStart,
   onResume,
 }: HomeScreenProps) {
-  const completedCount = history.filter((item) => item.completedAt).length;
-  const weekStart = new Date();
-  weekStart.setHours(0, 0, 0, 0);
-  const dayOfWeek = weekStart.getDay();
-  weekStart.setDate(weekStart.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
-  const weekCount = history.filter((item) => item.completedAt && new Date(item.startedAt) >= weekStart).length;
-  const lastSession = history.find((item) => item.completedAt) ?? null;
+  const view = useMemo(() => {
+    const now = new Date();
+    const slots = weekSlots(program.days, history, now);
+    const comparison = weeklyComparison(history, now);
+    const isResuming = Boolean(activeSession && !activeSession.completedAt);
+    const todaySlot = slots.find((slot) => slot.state === 'today') ?? null;
+    return {
+      weekStart: startOfWeek(now),
+      slots,
+      todaySlot,
+      isResuming,
+      weekSessions: comparison.current.sessions,
+      weekVolume: comparison.current.volumeKg,
+      volume7Days: volumeLastDays(history, now),
+      completedCount: history.filter((item) => item.completedAt).length,
+    };
+  }, [program.days, history, activeSession]);
+
+  const weekProgress = Math.min(100, (view.weekSessions / WEEKLY_TARGET) * 100);
+  const todaySlot = view.todaySlot;
+  const weekStartLabel = view.weekStart.toLocaleDateString('fr-FR', {
+    day: 'numeric',
+    month: 'long',
+  });
 
   return (
     <section className="content home-content">
-      <div className="hero-row">
+      {/* En-tête compact : aucun espace mort avant l'action principale. */}
+      <header className="home-head">
         <div>
-          <p className="eyebrow">BONJOUR {profileLabels[profile].toUpperCase()}</p>
-          <h1>
-            On s’entraîne<br />
-            <em>avec intention.</em>
-          </h1>
+          <p className="eyebrow">SEMAINE DU {weekStartLabel.toUpperCase()}</p>
+          <h1>Bonjour {profileLabels[profile]}</h1>
         </div>
-        <div className={`avatar avatar-${profile}`}>{profileLabels[profile][0]}</div>
-      </div>
+        <div className={`avatar avatar-${profile}`} aria-hidden="true">
+          {profileLabels[profile][0]}
+        </div>
+      </header>
 
-      {lastSession && (
-        <div className="last-session-strip">
-          <div>
-            <p className="eyebrow">DERNIÈRE SÉANCE</p>
-            <strong>{program.days.find((day) => day.id === lastSession.dayId)?.name ?? 'Séance'}</strong>
-            <small>
-              {new Date(lastSession.completedAt ?? lastSession.startedAt).toLocaleDateString('fr-FR', {
-                weekday: 'long',
-                day: 'numeric',
-                month: 'long',
-              })}
-              {` · ${lastSession.loggedSets.length} séries`}
-              {lastSession.perceivedExertion ? ` · RPE ${lastSession.perceivedExertion}/10` : ''}
-            </small>
-          </div>
-        </div>
-      )}
-
-      <div className="metric-grid">
-        <div className="metric-card">
-          <span>Cette semaine</span>
-          <strong>
-            {Math.min(weekCount, 7)} <small>/ 3</small>
-          </strong>
-          <div className="progress-track">
-            <i style={{ width: `${Math.min(100, (weekCount / 3) * 100)}%` }} />
-          </div>
-        </div>
-        <div className="metric-card accent">
-          <span>Séances réalisées</span>
-          <strong>{completedCount}</strong>
-          <small>depuis le début</small>
-        </div>
-      </div>
-
-      {activeSession && !activeSession.completedAt && (
+      {view.isResuming && (
         <button className="resume-banner" onClick={onResume}>
           <span className="resume-icon">
             <Play size={18} weight="fill" />
           </span>
           <span>
             <strong>Séance en cours</strong>
-            <small>Reprendre là où tu t’es arrêté</small>
+            <small>{activeSession?.loggedSets.length ?? 0} séries déjà validées — reprendre là où tu t’es arrêté</small>
           </span>
           <ArrowRight size={20} />
         </button>
       )}
 
-      <div className="section-heading">
-        <div>
-          <p className="eyebrow">PROGRAMME PRESCRIT</p>
-          <h2>Choisis ta séance</h2>
-        </div>
-      </div>
+      {/* Action dominante : la séance du jour, ou l'état « semaine complète ». */}
+      {!view.isResuming && todaySlot && (
+        <article className="today-card">
+          <div className="today-card-head">
+            <p className="eyebrow">LA SÉANCE DU JOUR</p>
+            <span className="tag">
+              {todaySlot.day.exercises.length} mouvement
+              {todaySlot.day.exercises.length > 1 ? 's' : ''}
+            </span>
+          </div>
+          <h2>{todaySlot.day.name}</h2>
+          <p className="today-card-sub">{todaySlot.day.subtitle}</p>
+          <div className="today-card-foot">
+            <span className="today-meta">
+              <Clock size={16} /> ≈ {estimatedMinutes(todaySlot.day)} min
+            </span>
+            <button
+              className="primary-button today-cta"
+              onClick={() => onStart(todaySlot.day)}
+            >
+              <Play size={18} weight="fill" /> Démarrer
+            </button>
+          </div>
+        </article>
+      )}
 
-      <div className="workout-grid">
-        {program.days.map((day, index) => (
-          <article className={`workout-card card-${index}`} key={day.id}>
-            <div className="card-top">
-              <span className="day-number">0{index + 1}</span>
-              <span className="tag">{day.exercises.length} mouvements</span>
-            </div>
-            <h3>{day.name}</h3>
-            <p>{day.subtitle}</p>
-            <div className="card-footer">
-              <span>
-                <Clock size={16} /> {Math.round(getWorkoutSteps(day).length * 2 + 12)} min
-              </span>
-              <button
-                className="round-action"
-                onClick={() => onStart(day)}
-                aria-label={`Démarrer ${day.name}`}
-              >
-                <Play size={18} weight="fill" />
-              </button>
-            </div>
-          </article>
+      {!view.isResuming && !todaySlot && (
+        <article className="today-card done">
+          <p className="eyebrow">SEMAINE COMPLÈTE</p>
+          <h2>Les {WEEKLY_TARGET} créneaux sont validés</h2>
+          <p className="today-card-sub">
+            Rien d’obligatoire aujourd’hui. Tu peux refaire une séance si tu te sens frais.
+          </p>
+        </article>
+      )}
+
+      {/* Rail de la semaine : état explicite de chaque créneau. */}
+      <nav className="week-rail" aria-label="Créneaux de la semaine en cours">
+        {view.slots.map((slot) => (
+          <button
+            key={slot.day.id}
+            type="button"
+            className={`week-slot ${slot.state}`}
+            onClick={() => onStart(slot.day)}
+            aria-label={`${slot.day.name} — ${SLOT_STATES[slot.state]}`}
+          >
+            <span className="week-slot-name">{slot.day.name}</span>
+            <span className="week-slot-state">
+              {slot.state === 'done' && <Check size={13} weight="bold" />}
+              {SLOT_STATES[slot.state]}
+            </span>
+          </button>
         ))}
+      </nav>
+
+      {/* Métriques compactes : pas de cartes identiques de grande hauteur. */}
+      <div className="home-metrics">
+        <div className="home-metric">
+          <span>Séances cette semaine</span>
+          <strong>
+            {view.weekSessions}
+            <small> / {WEEKLY_TARGET}</small>
+          </strong>
+          <div className="progress-track">
+            <i style={{ width: `${weekProgress}%` }} />
+          </div>
+        </div>
+        <div className="home-metric accent">
+          <span>Volume 7 jours</span>
+          <strong>
+            {formatVolume(view.volume7Days)}
+            <small> kg·rép.</small>
+          </strong>
+          <small className="home-metric-foot">
+            {view.completedCount} séance{view.completedCount > 1 ? 's' : ''} au total
+          </small>
+        </div>
       </div>
 
       <div className="coach-note">

@@ -57,6 +57,47 @@ function findGhostPerformance(
   return null;
 }
 
+/** Formate un nombre en français : `20` → « 20 », `2.5` → « 2,5 ». */
+function formatFrenchNumber(value: number): string {
+  const rounded = Math.round(value * 100) / 100;
+  return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1).replace('.', ',');
+}
+
+/** Résumé lisible d'une performance passée : « 20 kg × 10 », « 45 s », « 12 répétitions ». */
+function formatGhostPerformance(ghost: {
+  loadKg?: number;
+  repetitions?: number;
+  durationSeconds?: number;
+}): string {
+  if (ghost.durationSeconds !== undefined) {
+    return ghost.loadKg !== undefined
+      ? `${formatFrenchNumber(ghost.loadKg)} kg × ${ghost.durationSeconds} s`
+      : `${ghost.durationSeconds} s`;
+  }
+  if (ghost.repetitions !== undefined) {
+    return ghost.loadKg !== undefined
+      ? `${formatFrenchNumber(ghost.loadKg)} kg × ${ghost.repetitions}`
+      : `${ghost.repetitions} répétitions`;
+  }
+  return ghost.loadKg !== undefined ? `${formatFrenchNumber(ghost.loadKg)} kg` : '';
+}
+
+/**
+ * Écart entre la charge saisie et celle de la dernière fois.
+ * Renvoie `null` quand la comparaison n'a pas de sens (aucune charge saisie ou
+ * aucune charge de référence) ; « identique » quand les deux charges sont égales.
+ */
+function formatGhostDelta(
+  currentLoadKg: number,
+  ghostLoadKg: number
+): { label: string; atParity: boolean } | null {
+  if (!Number.isFinite(currentLoadKg) || !Number.isFinite(ghostLoadKg) || ghostLoadKg <= 0) return null;
+  const diff = Math.round((currentLoadKg - ghostLoadKg) * 100) / 100;
+  if (diff === 0) return { label: 'identique', atParity: true };
+  const sign = diff > 0 ? '+' : '-';
+  return { label: `${sign}${formatFrenchNumber(Math.abs(diff))} kg vs la dernière fois`, atParity: false };
+}
+
 interface WorkoutScreenProps {
   profile?: ProfileId;
   onSwitchDuoProfile?: (target: ProfileId) => void;
@@ -202,8 +243,6 @@ export function WorkoutScreen({
     }
   };
 
-  if (isComplete) return <CompletionFeedback session={session} onFinish={onFinish} />;
-
   const completedInDay = session.loggedSets.length;
   const totalSets = steps.length;
   const progress = Math.round((completedInDay / totalSets) * 100);
@@ -224,6 +263,21 @@ export function WorkoutScreen({
     [exercise?.id, step.setIndex, history]
   );
   const currentLoadVal = parseSafeFloat(load, 0);
+  const ghostSummary = ghostPerf ? formatGhostPerformance(ghostPerf) : '';
+  const ghostDelta =
+    ghostPerf && ghostPerf.loadKg !== undefined && load.trim() !== ''
+      ? formatGhostDelta(currentLoadVal, ghostPerf.loadKg)
+      : null;
+  // Séries restantes pour l'exercice à venir (la série affichée comprise).
+  const remainingForExercise =
+    step.kind === 'exercise' && step.exerciseIndex !== undefined
+      ? steps.filter(
+          (candidate) =>
+            candidate.kind === 'exercise' &&
+            candidate.exerciseIndex === step.exerciseIndex &&
+            (candidate.sequenceIndex ?? 0) >= (step.sequenceIndex ?? 0)
+        ).length
+      : 0;
   const warmupSteps = useMemo(
     () => (prescription?.loadKg ? generateWarmupRamp(prescription.loadKg, exercise?.id) : []),
     [prescription?.loadKg, exercise?.id]
@@ -243,6 +297,11 @@ export function WorkoutScreen({
     const currentLoad = currentLoadVal > 0 ? currentLoadVal : prescription.loadKg;
     return calculatePlateDelta(currentLoad, pSet.loadKg);
   }, [partnerProfile, exercise?.id, step.setIndex, prescription?.loadKg, currentLoadVal, day.id]);
+
+  // Retour anticipé placé APRÈS tous les hooks : un retour avant un hook faisait
+  // varier le nombre de hooks appelés en fin de séance (React : « Rendered fewer
+  // hooks than expected »), ce qui cassait l'écran de bilan.
+  if (isComplete) return <CompletionFeedback session={session} onFinish={onFinish} />;
 
   return (
     <section className="content workout-content">
@@ -461,6 +520,22 @@ export function WorkoutScreen({
                     <span className="rest-next-series">Série {(step.setIndex ?? 0) + 1}</span>
                   </div>
                   <div className="rest-next-name">{exercise.name}</div>
+                  <div className="rest-next-meta">
+                    <span className="rest-next-remaining">
+                      {remainingForExercise > 1
+                        ? `${remainingForExercise} séries restantes`
+                        : remainingForExercise === 1
+                        ? 'Dernière série de l’exercice'
+                        : ''}
+                    </span>
+                    <span className="rest-next-target">
+                      {prescription.durationSeconds !== undefined
+                        ? `${prescription.durationSeconds} s`
+                        : prescription.repetitions !== undefined
+                        ? `${prescription.repetitions} répétitions`
+                        : prescription.loadLabel ?? ''}
+                    </span>
+                  </div>
                   {prescription.loadKg !== undefined && (
                     <div className="rest-next-prep">
                       <span className="rest-next-load">
@@ -496,21 +571,6 @@ export function WorkoutScreen({
                 />
               )}
 
-              {ghostPerf && (
-                <div className="ghost-perf-strip" aria-label="Performance de la séance précédente">
-                  <Repeat size={14} className="ghost-icon" />
-                  <span>
-                    Séance précédente :{' '}
-                    <strong>
-                      {ghostPerf.loadKg !== undefined ? `${ghostPerf.loadKg} kg` : ''}
-                      {ghostPerf.loadKg !== undefined && ghostPerf.repetitions !== undefined ? ' × ' : ''}
-                      {ghostPerf.repetitions !== undefined ? `${ghostPerf.repetitions} réps` : ''}
-                      {ghostPerf.durationSeconds !== undefined ? `${ghostPerf.durationSeconds}s` : ''}
-                    </strong>
-                  </span>
-                </div>
-              )}
-
               <div className="log-card-heading">
                 <span>Ta performance</span>
                 <small>
@@ -519,6 +579,27 @@ export function WorkoutScreen({
                     : 'Ajuste en 1 tap ou tape la valeur'}
                 </small>
               </div>
+
+              {/* Repère de la dernière fois : visible juste au-dessus du champ,
+                  avec l'écart par rapport à la charge saisie. */}
+              {ghostPerf && ghostSummary && (
+                <div
+                  className="ghost-perf-strip"
+                  aria-label={`Dernière fois : ${ghostSummary}${
+                    ghostDelta ? ` — ${ghostDelta.label}` : ''
+                  }`}
+                >
+                  <Repeat size={14} className="ghost-icon" />
+                  <span className="ghost-perf-text">
+                    Dernière fois : <strong>{ghostSummary}</strong>
+                  </span>
+                  {ghostDelta && (
+                    <span className={`ghost-delta${ghostDelta.atParity ? ' at-parity' : ''}`}>
+                      {ghostDelta.label}
+                    </span>
+                  )}
+                </div>
+              )}
 
               <div className="input-row-modern">
                 {prescription.durationSeconds ? (
@@ -529,6 +610,7 @@ export function WorkoutScreen({
                         -5s
                       </button>
                       <input
+                        aria-label="Durée (secondes)"
                         inputMode="numeric"
                         className="stepper-input"
                         value={duration}
@@ -550,6 +632,7 @@ export function WorkoutScreen({
                         -1
                       </button>
                       <input
+                        aria-label="Répétitions réalisées"
                         inputMode="numeric"
                         className="stepper-input"
                         value={reps}
@@ -573,6 +656,7 @@ export function WorkoutScreen({
                         -2.5
                       </button>
                       <input
+                        aria-label="Charge (kg)"
                         inputMode="decimal"
                         className="stepper-input"
                         value={load}

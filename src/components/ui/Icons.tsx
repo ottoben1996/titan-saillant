@@ -1,17 +1,35 @@
 import type { ReactNode } from 'react';
 
-export type IconProps = { size?: number; weight?: string; className?: string };
+/** Épaisseur de trait unique pour toute l'iconographie Titan. */
+export const ICON_STROKE_WIDTH = 1.5;
 
-export const Icon = ({ children, size = 20, className }: IconProps & { children: ReactNode }) => (
+/** Taille par défaut des icônes : 20 px, alignée sur la grille 24. */
+export const ICON_DEFAULT_SIZE = 20;
+
+export type IconProps = {
+  size?: number;
+  /** @deprecated conservé pour compatibilité ; l'épaisseur se règle via strokeWidth. */
+  weight?: string;
+  strokeWidth?: number;
+  className?: string;
+};
+
+export const Icon = ({
+  children,
+  size = ICON_DEFAULT_SIZE,
+  strokeWidth = ICON_STROKE_WIDTH,
+  className,
+}: IconProps & { children: ReactNode }) => (
   <svg
     aria-hidden="true"
+    focusable="false"
     width={size}
     height={size}
     className={className}
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth="1.5"
+    strokeWidth={strokeWidth}
     strokeLinecap="round"
     strokeLinejoin="round"
   >

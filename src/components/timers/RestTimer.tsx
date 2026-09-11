@@ -2,6 +2,13 @@ import { useEffect, useRef, useState } from 'react';
 import type { SessionTimerState } from '../../domain/types';
 import { createCountdown, type CountdownController } from '../../workout/timer';
 import { getTimerAnnouncement } from '../../workout/timerAnnouncements';
+import {
+  REST_PRESETS,
+  REST_SKIP_PRESET,
+  applyRestPreset,
+  restProgressRatio,
+  type AddRestPreset,
+} from '../../workout/restPresets';
 import { Play, Timer, X } from '../ui/Icons';
 
 export const formatDuration = (seconds: number) =>
@@ -112,15 +119,15 @@ export function RestTimer({
     }
   }, [suspended, paused]);
 
-  const handleAddSeconds = (deltaSeconds = 30) => {
+  const handleAddPreset = (preset: AddRestPreset) => {
     triggerHaptic(25);
-    const nextRemaining = remaining + deltaSeconds;
-    setRemaining(nextRemaining);
-    setTotalDuration((prev) => Math.max(prev, nextRemaining));
+    const next = applyRestPreset({ remainingSeconds: remaining, totalSeconds: totalDuration }, preset);
+    setRemaining(next.remainingSeconds);
+    setTotalDuration(next.totalSeconds);
     controller.current?.cancel();
     lastPublishedRef.current = null;
     const timer = createCountdown(
-      nextRemaining,
+      next.remainingSeconds,
       (value) => {
         setRemaining(value);
         if (value === 0 || value <= 5 || value % 15 === 0) {
@@ -137,10 +144,21 @@ export function RestTimer({
     controller.current = timer;
     if (paused) {
       timer.pause();
-      publish(nextRemaining, true);
+      publish(next.remainingSeconds, true);
     } else {
-      publish(nextRemaining, false);
+      publish(next.remainingSeconds, false);
     }
+  };
+
+  const handleSkip = () => {
+    triggerHaptic(30);
+    const next = applyRestPreset({ remainingSeconds: remaining, totalSeconds: totalDuration }, REST_SKIP_PRESET);
+    controller.current?.cancel();
+    setRemaining(next.remainingSeconds);
+    setTotalDuration(next.totalSeconds);
+    setPaused(false);
+    onStateChangeRef.current(null);
+    onDone();
   };
 
   const toggle = () => {
@@ -162,7 +180,7 @@ export function RestTimer({
   const progressTotal = totalDuration > 0 ? totalDuration : (seconds > 0 ? seconds : 60);
   const radius = 52;
   const circumference = 2 * Math.PI * radius;
-  const progressRatio = Math.max(0, Math.min(1, remaining / progressTotal));
+  const progressRatio = restProgressRatio({ remainingSeconds: remaining, totalSeconds: progressTotal });
   const strokeDashoffset = circumference * (1 - progressRatio);
   const isAlert = remaining <= 5 && remaining > 0;
 
@@ -193,28 +211,25 @@ export function RestTimer({
       </div>
       <p>Récupère vraiment. La prochaine série sera plus solide.</p>
       <div className="rest-actions">
-        <button
-          type="button"
-          onClick={() => {
-            triggerHaptic(30);
-            onStateChange(null);
-            onDone();
-          }}
-          aria-label="Passer le temps de repos"
-        >
+        <button type="button" onClick={handleSkip} aria-label="Passer le temps de repos">
           <X size={18} /> Passer
         </button>
         <button type="button" onClick={toggle} disabled={suspended} aria-label={paused ? 'Reprendre' : 'Pause'}>
           <Play size={16} /> {paused ? 'Reprendre' : 'Pause'}
         </button>
-        <button
-          type="button"
-          className="add-rest-btn"
-          onClick={() => handleAddSeconds(30)}
-          aria-label="Ajouter 30 secondes de repos"
-        >
-          +30s
-        </button>
+      </div>
+      <div className="rest-presets" role="group" aria-label="Ajouter du temps de repos">
+        {REST_PRESETS.map((preset) => (
+          <button
+            key={preset.id}
+            type="button"
+            className="rest-preset-btn"
+            onClick={() => handleAddPreset(preset)}
+            aria-label={preset.ariaLabel}
+          >
+            {preset.label}
+          </button>
+        ))}
       </div>
     </div>
   );

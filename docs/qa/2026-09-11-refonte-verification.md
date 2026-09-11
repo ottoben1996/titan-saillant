@@ -78,6 +78,15 @@ Correctif : toutes les opérations passent par `src/storage/guard.ts` (`withStor
 
 Vérification en navigateur : en forçant `IDBObjectStore.prototype.put` à lever une exception, la bannière apparaît après validation d'une série (26 px de haut, bouton de validation toujours visible dans la fenêtre, aucun défilement parasite). Sans le correctif, aucun signal n'apparaissait. 11 sites d'écriture sécurisés, `tsc` sans erreur.
 
+## 6 ter. Robustesse applicative et confort tactile (11 septembre, soirée)
+
+| Ajout | Ce que ça change | Vérification |
+|---|---|---|
+| Filet de sécurité d'affichage (`src/components/layout/ErrorBoundary.tsx`) | une erreur de rendu n'entraîne plus une page blanche : panneau d'erreur français, mention explicite que les données restent sur l'appareil, bouton de rechargement | test unitaire (2 cas) **et** vérification dans le navigateur en forçant une erreur de rendu : le panneau s'affiche, capture à l'appui |
+| Mise à jour différée pendant une séance (`src/main.tsx`, `src/App.tsx`) | une nouvelle version du service worker ne recharge plus l'application au milieu d'une série : l'accueil affiche « Une version plus récente est prête » avec un bouton « Mettre à jour » | lecture du code plus comportement du service worker ; le rechargement différé n'est pas exerçable sans déploiement (voir section 8) |
+| Confort tactile (`src/styles/mobile.css`) | plus de sélection de texte accidentelle ni de menu contextuel en appuyant sur un bouton, alors que le texte informatif reste sélectionnable | règles CSS appliquées après celle de la feuille principale, à confirmer sur appareil |
+| Écran de lancement iOS (`public/splash/`, `scripts/generate-splash.py`) | plus de flash blanc à l'ouverture depuis l'écran d'accueil de l'iPhone 13 | deux images générées en local, 1170x2532 et 1290x2796, déclarées avec les requêtes média correspondantes |
+
 ## 7. Accessibilité
 
 - Annonces de chrono limitées aux paliers utiles (120 s, 60 s, 30 s, 10 s, 5, 4, 3, 2, 1, fin) : 8 annonces au maximum sur 60 secondes, jamais une par seconde. 5 tests couvrent les paliers, le silence, la fin et les valeurs invalides.

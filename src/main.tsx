@@ -8,6 +8,7 @@ import './styles/tokens.css';
 import './styles/mobile.css';
 import './styles/workout.css';
 import './styles/screens.css';
+import './styles/ui.css';
 
 registerSW({
   immediate: true,

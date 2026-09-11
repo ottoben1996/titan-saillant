@@ -1,10 +1,17 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { ProfileId } from '../../domain/types';
 import { exportProfileData, importProfileData } from '../../storage/backup';
-import { deleteProfileData } from '../../storage/sessionRepository';
-import { ArrowLeft, ArrowRight, DownloadSimple, Timer, Trash } from '../ui/Icons';
+import { deleteProfileData, listSessions } from '../../storage/sessionRepository';
+import { ArrowLeft, ArrowRight, DownloadSimple, Timer, Trash, Warning } from '../ui/Icons';
 import { isSoundEnabled, playTimerChime, setSoundEnabled } from '../../workout/alerts';
 import { profileLabels } from './HomeScreen';
+
+const ERASE_WORD = 'SUPPRIMER';
+
+interface SessionCounts {
+  total: number;
+  completed: number;
+}
 
 interface SettingsScreenProps {
   profile: ProfileId;
@@ -19,6 +26,14 @@ interface SettingsScreenProps {
   onInstall: () => void;
   notificationPermission: NotificationPermission | 'unsupported';
   onEnableNotifications: () => void;
+}
+
+function describeSessions(counts: SessionCounts | null): string {
+  if (!counts) return 'toutes les données de ce profil';
+  if (counts.total === 0) return 'aucune séance enregistrée';
+  const total = `${counts.total} séance${counts.total > 1 ? 's' : ''} enregistrée${counts.total > 1 ? 's' : ''}`;
+  const inProgress = counts.total - counts.completed;
+  return inProgress > 0 ? `${total} (dont ${inProgress} en cours)` : total;
 }
 
 export function SettingsScreen({
@@ -36,6 +51,26 @@ export function SettingsScreen({
   onEnableNotifications,
 }: SettingsScreenProps) {
   const fileInput = useRef<HTMLInputElement>(null);
+  const [soundOn, setSoundOn] = useState(() => isSoundEnabled());
+  const [counts, setCounts] = useState<SessionCounts | null>(null);
+  const [eraseConfirming, setEraseConfirming] = useState(false);
+  const [eraseWord, setEraseWord] = useState('');
+  const [erasing, setErasing] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    void listSessions(profile)
+      .then((items) => {
+        if (cancelled) return;
+        setCounts({ total: items.length, completed: items.filter((item) => item.completedAt).length });
+      })
+      .catch(() => {
+        if (!cancelled) setCounts(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [profile]);
 
   const download = async () => {
     const blob = new Blob([await exportProfileData(profile)], { type: 'application/json' });
@@ -47,8 +82,6 @@ export function SettingsScreen({
     URL.revokeObjectURL(url);
     onNotice('Sauvegarde exportée.');
   };
-
-  const [soundOn, setSoundOn] = useState(() => isSoundEnabled());
 
   const importFile = async (file: File) => {
     try {
@@ -64,11 +97,22 @@ export function SettingsScreen({
     }
   };
 
+  const eraseConfirmed = eraseWord.trim().toUpperCase() === ERASE_WORD;
+
   const erase = async () => {
-    if (window.confirm('Supprimer toutes les données de ce profil ?')) {
+    if (!eraseConfirmed || erasing) return;
+    setErasing(true);
+    try {
       await deleteProfileData(profile);
       onSwitch();
+    } finally {
+      setErasing(false);
     }
+  };
+
+  const cancelErase = () => {
+    setEraseConfirming(false);
+    setEraseWord('');
   };
 
   const statusLabel = (ok: boolean, ready: string, pending: string) => (ok ? ready : pending);
@@ -89,127 +133,186 @@ export function SettingsScreen({
         <div className={`avatar avatar-${profile}`}>{profileLabels[profile][0]}</div>
         <div>
           <strong>{profileLabels[profile]}</strong>
-          <small>Programme privé sur cet appareil</small>
+          <small>
+            Programme privé sur cet appareil
+            {counts ? ` · ${describeSessions(counts)}` : ''}
+          </small>
         </div>
         <button className="text-button" onClick={onSwitch}>
           Changer
         </button>
       </div>
 
-      <div className="settings-list">
-        <button
-          className="toggle-row"
-          aria-pressed={soundOn}
-          onClick={() => {
-            const next = !soundOn;
-            setSoundOn(next);
-            setSoundEnabled(next);
-            if (next) playTimerChime('rest');
-            onNotice(next ? 'Signal sonore activé.' : 'Signal sonore coupé.');
-          }}
-        >
-          <Timer size={21} />
-          <span>
-            <strong>Signal sonore de fin de repos</strong>
-            <small>{soundOn ? 'Activé · bip à la fin du chrono' : 'Coupé · vibration seulement'}</small>
-          </span>
-          <span className={`toggle-pill${soundOn ? ' on' : ''}`} aria-hidden="true">
-            <i />
-          </span>
-        </button>
-        <button onClick={download}>
-          <DownloadSimple size={21} />
-          <span>
-            <strong>Exporter mes données</strong>
-            <small>Créer une sauvegarde JSON</small>
-          </span>
-          <ArrowRight size={18} />
-        </button>
-        <button onClick={() => fileInput.current?.click()}>
-          <DownloadSimple size={21} />
-          <span>
-            <strong>Importer une sauvegarde</strong>
-            <small>Restaurer un fichier JSON</small>
-          </span>
-          <ArrowRight size={18} />
-        </button>
-        <input
-          ref={fileInput}
-          type="file"
-          accept="application/json"
-          hidden
-          onChange={(e) => e.target.files?.[0] && void importFile(e.target.files[0])}
-        />
-        <button className="danger-row" onClick={() => void erase()}>
-          <Trash size={21} />
-          <span>
-            <strong>Effacer ce profil</strong>
-            <small>Supprime uniquement les données de {profileLabels[profile]}</small>
-          </span>
-          <ArrowRight size={18} />
-        </button>
-      </div>
-
-      <div className="device-diagnostic">
-        <div className="card-heading">
-          <div>
-            <p className="eyebrow">PRÊT POUR LA SALLE</p>
-            <h2>État de l’application</h2>
-          </div>
-          <span>{isOnline ? 'Connecté' : 'Hors ligne'}</span>
+      {/* ------------------------------------------------------ préférences -- */}
+      <section className="settings-section">
+        <h2 className="settings-title">Préférences</h2>
+        <div className="settings-list">
+          <button
+            className="toggle-row"
+            aria-pressed={soundOn}
+            onClick={() => {
+              const next = !soundOn;
+              setSoundOn(next);
+              setSoundEnabled(next);
+              if (next) playTimerChime('rest');
+              onNotice(next ? 'Signal sonore activé.' : 'Signal sonore coupé.');
+            }}
+          >
+            <Timer size={21} />
+            <span>
+              <strong>Signal sonore de fin de repos</strong>
+              <small>{soundOn ? 'Activé · bip à la fin du chrono' : 'Coupé · vibration seulement'}</small>
+            </span>
+            <span className={`toggle-pill${soundOn ? ' on' : ''}`} aria-hidden="true">
+              <i />
+            </span>
+          </button>
         </div>
-        <div className="diagnostic-list">
-          <div>
-            <span>Connexion</span>
-            <strong className={isOnline ? 'ok' : 'warning'}>{isOnline ? 'En ligne' : 'Hors ligne'}</strong>
+      </section>
+
+      {/* ----------------------------------------------------------- données -- */}
+      <section className="settings-section">
+        <h2 className="settings-title">Mes données</h2>
+        <div className="settings-list">
+          <button onClick={download}>
+            <DownloadSimple size={21} />
+            <span>
+              <strong>Exporter mes données</strong>
+              <small>Créer une sauvegarde JSON de {profileLabels[profile]}</small>
+            </span>
+            <ArrowRight size={18} />
+          </button>
+          <button onClick={() => fileInput.current?.click()}>
+            <DownloadSimple size={21} />
+            <span>
+              <strong>Importer une sauvegarde</strong>
+              <small>Restaurer un fichier JSON</small>
+            </span>
+            <ArrowRight size={18} />
+          </button>
+          <input
+            ref={fileInput}
+            type="file"
+            accept="application/json"
+            hidden
+            onChange={(e) => e.target.files?.[0] && void importFile(e.target.files[0])}
+          />
+          {!eraseConfirming && (
+            <button className="danger-row" onClick={() => setEraseConfirming(true)}>
+              <Trash size={21} />
+              <span>
+                <strong>Effacer ce profil</strong>
+                <small>Supprime uniquement les données de {profileLabels[profile]}</small>
+              </span>
+              <ArrowRight size={18} />
+            </button>
+          )}
+        </div>
+
+        {eraseConfirming && (
+          <div className="danger-confirm" role="alertdialog" aria-label="Confirmation de l’effacement du profil">
+            <div className="danger-confirm-head">
+              <Warning size={20} />
+              <strong>Effacement définitif</strong>
+            </div>
+            <p className="danger-lead">
+              Cette action supprime le profil de <strong>{profileLabels[profile]}</strong> et{' '}
+              <strong>{describeSessions(counts)}</strong>. Aucune récupération n’est possible : pense à
+              exporter une sauvegarde avant de continuer.
+            </p>
+            <label className="danger-word">
+              <span>
+                Écris « {ERASE_WORD} » pour confirmer
+              </span>
+              <input
+                type="text"
+                value={eraseWord}
+                autoComplete="off"
+                autoCapitalize="characters"
+                spellCheck={false}
+                onChange={(event) => setEraseWord(event.target.value)}
+                placeholder={ERASE_WORD}
+              />
+            </label>
+            <div className="danger-actions">
+              <button className="secondary-button" onClick={cancelErase} disabled={erasing}>
+                Annuler
+              </button>
+              <button className="danger-button" onClick={() => void erase()} disabled={!eraseConfirmed || erasing}>
+                {erasing ? 'Suppression…' : 'Effacer définitivement'}
+              </button>
+            </div>
           </div>
-          <div>
-            <span>Mode hors ligne</span>
-            <strong className={offlineReady || serviceWorkerReady ? 'ok' : 'warning'}>
-              {statusLabel(offlineReady || serviceWorkerReady, 'Prêt', 'Préparation…')}
-            </strong>
+        )}
+      </section>
+
+      {/* ------------------------------------------------------- application -- */}
+      <section className="settings-section">
+        <h2 className="settings-title">Application</h2>
+        <div className="device-diagnostic">
+          <div className="card-heading">
+            <div>
+              <p className="eyebrow">PRÊT POUR LA SALLE</p>
+              <h3>État de l’application</h3>
+            </div>
+            <span>{isOnline ? 'Connecté' : 'Hors ligne'}</span>
           </div>
-          <div>
-            <span>Données locales</span>
-            <strong className="ok">{typeof indexedDB === 'undefined' ? 'Indisponibles' : 'Disponibles'}</strong>
-          </div>
-          <div>
-            <span>Alertes de minuteur</span>
-            <strong
-              className={
-                notificationPermission === 'granted'
-                  ? 'ok'
+          <div className="diagnostic-list">
+            <div>
+              <span>Connexion</span>
+              <strong className={isOnline ? 'ok' : 'warning'}>{isOnline ? 'En ligne' : 'Hors ligne'}</strong>
+            </div>
+            <div>
+              <span>Mode hors ligne</span>
+              <strong className={offlineReady || serviceWorkerReady ? 'ok' : 'warning'}>
+                {statusLabel(offlineReady || serviceWorkerReady, 'Prêt', 'Préparation…')}
+              </strong>
+            </div>
+            <div>
+              <span>Données locales</span>
+              <strong className="ok">{typeof indexedDB === 'undefined' ? 'Indisponibles' : 'Disponibles'}</strong>
+            </div>
+            <div>
+              <span>Alertes de minuteur</span>
+              <strong
+                className={
+                  notificationPermission === 'granted'
+                    ? 'ok'
+                    : notificationPermission === 'denied'
+                    ? 'warning'
+                    : ''
+                }
+              >
+                {notificationPermission === 'unsupported'
+                  ? 'Non disponibles'
+                  : notificationPermission === 'granted'
+                  ? 'Activées'
                   : notificationPermission === 'denied'
-                  ? 'warning'
-                  : ''
-              }
-            >
-              {notificationPermission === 'unsupported'
-                ? 'Non disponibles'
-                : notificationPermission === 'granted'
-                ? 'Activées'
-                : notificationPermission === 'denied'
-                ? 'Bloquées'
-                : 'À activer'}
-            </strong>
+                  ? 'Bloquées'
+                  : 'À activer'}
+              </strong>
+            </div>
           </div>
-        </div>
 
-        {notificationPermission === 'default' && (
-          <button className="secondary-button full" onClick={onEnableNotifications}>
-            <Timer size={18} /> Activer les alertes système
-          </button>
-        )}
-        {installAvailable && (
-          <button className="primary-button full" onClick={onInstall}>
-            <DownloadSimple size={18} /> Installer Coach sur cet appareil
-          </button>
-        )}
-      </div>
-      <p className="settings-footnote">Coach hors ligne · tes données restent dans le navigateur de cet appareil.</p>
+          {notificationPermission === 'default' && (
+            <button className="secondary-button full" onClick={onEnableNotifications}>
+              <Timer size={18} /> Activer les alertes système
+            </button>
+          )}
+          {installAvailable && (
+            <button className="primary-button full" onClick={onInstall}>
+              <DownloadSimple size={18} /> Installer Coach sur cet appareil
+            </button>
+          )}
+        </div>
+      </section>
+
+      <p className="settings-footnote">
+        Coach hors ligne · tes données restent dans le navigateur de cet appareil.
+      </p>
       <p className="settings-footnote">
         Illustrations d’exercices :{' '}
-        <a href="https://repdb.co" target="_blank" rel="noreferrer" style={{ color: '#b8f36b' }}>
+        <a href="https://repdb.co" target="_blank" rel="noreferrer">
           Exercise data by RepDB (repdb.co)
         </a>
         .

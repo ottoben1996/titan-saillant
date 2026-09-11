@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { MuscleMap, normalizeMuscle } from './MuscleMap';
 
 describe('normalizeMuscle', () => {
@@ -27,5 +27,40 @@ describe('MuscleMap component', () => {
     expect(container.textContent).toContain('FACE');
     expect(container.textContent).toContain('DOS');
     expect(container.textContent).toContain('Moteur principal');
+  });
+
+  it('expose un rôle, un titre et une alternative textuelle listant les muscles', () => {
+    const { container } = render(
+      <MuscleMap primaryMuscles={['Pectoraux', 'Triceps']} secondaryMuscles={['Épaules']} />
+    );
+
+    const group = screen.getByRole('group', { name: 'Muscles sollicités' });
+    const describedBy = group.getAttribute('aria-describedby');
+    expect(describedBy).toBeTruthy();
+
+    const altText = document.getElementById(describedBy as string)?.textContent ?? '';
+    expect(altText).toContain('Muscles principaux');
+    expect(altText).toContain('Pectoraux');
+    expect(altText).toContain('Triceps');
+    expect(altText).toContain('Muscles synergistes');
+    expect(altText).toContain('Épaules');
+
+    // Le schéma est décoratif : la même information vit dans le texte.
+    const views = container.querySelector('.muscle-map-views');
+    expect(views?.getAttribute('aria-hidden')).toBe('true');
+  });
+
+  it('rend une légende qui correspond aux couleurs du schéma', () => {
+    const { container } = render(<MuscleMap primaryMuscles={['Pectoraux']} secondaryMuscles={['Triceps']} />);
+    expect(container.querySelector('.legend-dot.primary')).not.toBeNull();
+    expect(container.querySelector('.legend-dot.secondary')).not.toBeNull();
+  });
+
+  it('ne produit pas de description vide quand aucun muscle n’est fourni', () => {
+    render(<MuscleMap />);
+    const group = screen.getByRole('group', { name: 'Muscles sollicités' });
+    const describedBy = group.getAttribute('aria-describedby');
+    const altText = document.getElementById(describedBy as string)?.textContent ?? '';
+    expect(altText).toContain('Aucun muscle');
   });
 });

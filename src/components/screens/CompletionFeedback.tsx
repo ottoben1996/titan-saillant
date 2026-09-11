@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import type { WorkoutSession } from '../../domain/types';
-import { ArrowRight, Check } from '../ui/Icons';
+import { formatMinutes, formatVolume, summarizeSession, workoutDayLabel } from '../../workout/summary';
+import { ArrowRight, Check, Clock } from '../ui/Icons';
 
 interface CompletionFeedbackProps {
   session: WorkoutSession;
@@ -13,6 +14,8 @@ export function CompletionFeedback({ session, onFinish }: CompletionFeedbackProp
   const [pain, setPain] = useState(() => session.pain ?? 'Aucune');
   const [notes, setNotes] = useState(() => session.notes ?? '');
   const [saving, setSaving] = useState(false);
+
+  const summary = useMemo(() => summarizeSession(session), [session]);
 
   const submit = async (skip = false) => {
     if (saving) return;
@@ -33,36 +36,46 @@ export function CompletionFeedback({ session, onFinish }: CompletionFeedbackProp
     }
   };
 
-  const totalVolume = session.loggedSets.reduce(
-    (acc, set) => acc + (set.actualLoadKg ?? 0) * (set.actualRepetitions ?? 0),
-    0
-  );
-  const totalSets = session.loggedSets.length;
-
   return (
     <section className="content completion-screen">
-      <div className="completion-icon">
-        <Check size={42} weight="bold" />
-      </div>
-      <p className="eyebrow">SÉANCE TERMINÉE</p>
-      <h1>
-        Tu l’as<br />
-        <em>fait.</em>
-      </h1>
-      <p className="intro">Chaque effort compte. Donne-nous ton ressenti pour adapter les prochains conseils.</p>
-
-      <div className="session-summary-strip">
-        <div className="summary-pill">
-          <span>Volume de la séance</span>
-          <strong>{totalVolume > 0 ? `${totalVolume.toLocaleString('fr-FR')} kg·rép` : 'Séance PDC / Cardio'}</strong>
+      <div className="completion-head">
+        <div className="completion-icon">
+          <Check size={30} weight="bold" />
         </div>
-        <div className="summary-pill">
-          <span>Séries complétées</span>
-          <strong>{totalSets} séries</strong>
+        <div>
+          <p className="eyebrow">SÉANCE TERMINÉE</p>
+          <h1>Bilan de {workoutDayLabel(summary.dayId)}</h1>
         </div>
       </div>
 
+      {/* 1. Le factuel : ce qui a réellement été accompli. */}
+      <div className="bilan-grid">
+        <div className="bilan-cell">
+          <span>
+            <Clock size={14} /> Durée
+          </span>
+          <strong>{formatMinutes(summary.durationSeconds)}</strong>
+        </div>
+        <div className="bilan-cell">
+          <span>Séries validées</span>
+          <strong>{summary.sets}</strong>
+        </div>
+        <div className="bilan-cell accent">
+          <span>Volume</span>
+          <strong>{summary.volumeKg > 0 ? `${formatVolume(summary.volumeKg)} kg·rép.` : 'PDC / cardio'}</strong>
+        </div>
+        <div className="bilan-cell">
+          <span>Meilleure charge</span>
+          <strong>{summary.bestLoadKg > 0 ? `${summary.bestLoadKg} kg` : '—'}</strong>
+        </div>
+      </div>
+
+      {/* 2. Le ressenti : il alimente le coaching de la prochaine séance. */}
       <div className="feedback-card">
+        <div className="feedback-heading">
+          <p className="eyebrow">TON RESSENTI</p>
+          <p className="muted-copy">Ces réponses ajustent le coaching de tes prochaines séances.</p>
+        </div>
         <div className="feedback-grid">
           <label>
             <span>Effort ressenti (RPE)</span>
@@ -104,11 +117,15 @@ export function CompletionFeedback({ session, onFinish }: CompletionFeedbackProp
             rows={2}
           />
         </label>
+      </div>
+
+      {/* 3. L'appel à l'action : dernier écran vu après une séance. */}
+      <div className="bilan-actions">
         <button className="primary-button full" onClick={() => void submit()} disabled={saving}>
-          {saving ? 'Enregistrement…' : 'Enregistrer mon bilan'} <ArrowRight size={19} />
+          {saving ? 'Enregistrement…' : 'Enregistrer et terminer'} <ArrowRight size={19} />
         </button>
         <button className="secondary-button full" onClick={() => void submit(true)} disabled={saving}>
-          Passer pour le moment
+          Terminer sans renseigner le ressenti
         </button>
       </div>
     </section>

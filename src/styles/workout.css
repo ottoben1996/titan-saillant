@@ -1,1 +1,243 @@
-/* Finitions de l'écran de séance — propriété d'un seul intervenant à la fois. */
+/* ============================================================================
+   Finitions de l'écran de séance — Coach Ottman & Laura
+   ----------------------------------------------------------------------------
+   Feuille dédiée à la colonne de séance. Chargée après styles.css, tokens.css
+   et mobile.css : elle resserre la densité et ajoute les finitions propres à
+   la séance (repère de la dernière fois, préréglages de repos, carte de repos
+   utile) sans redéfinir les tokens ni les autres écrans.
+
+   Objectifs mesurables :
+     · la colonne tient dans 100dvh à 390 px sans défilement ;
+     · aucun élément interactif ne passe sous la barre d'accueil ;
+     · chaque cible tactile garde au moins 44 px.
+   ========================================================================== */
+
+/* --- [1] Repère de la dernière fois, juste au-dessus du champ -------------- */
+.workout-content .ghost-perf-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .35rem .5rem;
+  margin: 0 0 .45rem;
+  padding: .35rem .55rem;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--r-md);
+  background: var(--surface-1);
+  color: var(--text-2);
+  font-size: .75rem;
+  line-height: 1.3;
+}
+
+.workout-content .ghost-perf-strip .ghost-icon {
+  flex: none;
+  color: var(--accent);
+}
+
+.workout-content .ghost-perf-strip .ghost-perf-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.workout-content .ghost-perf-strip strong {
+  color: var(--text-1);
+  font-weight: 590;
+  font-variant-numeric: tabular-nums;
+}
+
+.workout-content .ghost-perf-strip .ghost-delta {
+  flex: none;
+  margin-left: auto;
+  padding: .15rem .45rem;
+  border: 1px solid rgba(184, 243, 107, .32);
+  border-radius: var(--r-sm);
+  background: rgba(184, 243, 107, .12);
+  color: var(--accent);
+  font-size: .75rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.workout-content .ghost-perf-strip .ghost-delta.at-parity {
+  border-color: var(--line);
+  background: var(--surface-2);
+  color: var(--text-2);
+}
+
+/* --- [2] Préréglages de repos (paliers une main, ≥ 44 px) ------------------ */
+.rest-presets {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: .4rem;
+  margin-top: .5rem;
+}
+
+.rest-presets .rest-preset-btn {
+  min-height: 44px;
+  padding: .5rem .25rem;
+  border: 1px solid rgba(184, 243, 107, .3);
+  border-radius: var(--r-md);
+  background: rgba(184, 243, 107, .1);
+  color: var(--accent);
+  font-size: .8125rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  transition: background var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease);
+}
+
+.rest-presets .rest-preset-btn:active {
+  background: rgba(184, 243, 107, .22);
+}
+
+/* --- [3] Carte de repos utile : exercice suivant, séries, charge ----------- */
+.workout-content .rest-cockpit-container {
+  gap: .55rem;
+}
+
+.workout-content .rest-orbit-svg-container {
+  width: 108px;
+  height: 108px;
+}
+
+.workout-content .rest-card {
+  padding: .6rem .8rem;
+}
+
+.workout-content .rest-actions {
+  margin-top: .35rem;
+}
+
+.rest-next-preview-card {
+  padding: .6rem .75rem;
+  gap: .3rem;
+  border-radius: var(--r-md);
+}
+
+.rest-next-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem;
+  font-size: .75rem;
+}
+
+.rest-next-remaining {
+  color: var(--text-1);
+  font-weight: 590;
+}
+
+.rest-next-target {
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.workout-content .rest-next-preview-card .plate-badge-container {
+  margin: .3rem 0 0;
+  padding: .35rem .5rem;
+}
+
+/* --- [4] Densité : la colonne de séance tient dans 100dvh ------------------ */
+.workout-content {
+  gap: .4rem;
+  padding-top: .2rem;
+  /* La barre d'accueil est déjà réservée par .workout-shell
+     (padding-bottom: env(safe-area-inset-bottom)) ; on garde une respiration
+     minimale sans la compter deux fois. */
+  padding-bottom: .5rem;
+}
+
+.workout-content .duo-wrapper {
+  gap: .3rem;
+  margin-bottom: 0;
+}
+
+.workout-content .duo-switcher-bar {
+  margin-bottom: 0;
+}
+
+.workout-content .workout-heading {
+  min-height: 2.75rem;
+}
+
+.workout-content .progress-track.large {
+  height: 3px;
+}
+
+.workout-content .workout-actions {
+  gap: .35rem;
+}
+
+.workout-content .prescription-card.compact {
+  padding: .6rem .8rem;
+  gap: .3rem;
+  overflow: hidden;
+}
+
+.workout-content .prescription-card.compact .prescription-main {
+  margin: .25rem 0;
+}
+
+.workout-content .exercise-illustration {
+  min-height: 5rem;
+  margin: .2rem 0 .35rem;
+}
+
+.workout-content .exercise-illustration img {
+  min-height: 4.5rem;
+  max-height: 22dvh;
+}
+
+.workout-content .log-card.compact {
+  padding: .6rem .75rem;
+}
+
+.workout-content .log-card.compact .log-card-heading {
+  margin-bottom: .35rem;
+}
+
+.workout-content .log-card.compact .input-row-modern {
+  gap: .5rem;
+  margin-bottom: .5rem;
+}
+
+.workout-content .log-card.compact .stepper-group {
+  gap: .25rem;
+}
+
+.workout-content .log-card.compact .primary-button {
+  min-height: 44px;
+  padding: .6rem .9rem;
+}
+
+.workout-content .exercise-timer {
+  margin-bottom: .5rem;
+  padding: .5rem .7rem;
+}
+
+.workout-content .next-hint {
+  margin: 0;
+}
+
+/* Écrans bas (paysage, petits Android) : on resserre encore d'un cran. */
+@media (max-height: 700px) {
+  .workout-content .exercise-illustration {
+    min-height: 3.5rem;
+    margin: .15rem 0 .25rem;
+  }
+
+  .workout-content .exercise-illustration img {
+    min-height: 3rem;
+    max-height: 18dvh;
+  }
+
+  .workout-content .rest-orbit-svg-container {
+    width: 92px;
+    height: 92px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rest-presets .rest-preset-btn {
+    transition: none;
+  }
+}

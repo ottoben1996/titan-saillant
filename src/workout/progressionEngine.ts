@@ -38,13 +38,23 @@ export function computeProgressiveOverload(
     return null;
   }
 
+  // Positions (setIndex) des séries de travail dans la prescription. Les séries
+  // d'échauffement sont enregistrées avec le même exerciseId : sans ce filtre,
+  // leurs charges plus basses faisaient échouer la comparaison et empêchaient
+  // toute suggestion sur les exercices à échauffement prescrit (presse, squat).
+  const workingSetIndexes = exercise.sets
+    .map((set, index) => (set.phase === 'warmup' ? -1 : index))
+    .filter((index) => index >= 0);
+
   // Trouver la dernière séance terminée contenant cet exercice
   const completedSessions = [...history]
     .filter((s) => Boolean(s.completedAt))
     .sort((a, b) => (b.completedAt ?? b.updatedAt).localeCompare(a.completedAt ?? a.updatedAt));
 
   for (const session of completedSessions) {
-    const sets = session.loggedSets.filter((s) => s.exerciseId === exercise.id);
+    const sets = session.loggedSets.filter(
+      (s) => s.exerciseId === exercise.id && workingSetIndexes.includes(s.setIndex)
+    );
     if (sets.length >= targetWorkSets.length) {
       // Vérifier si toutes les séries de travail ont atteint ou dépassé les répétitions cibles
       const allRepsReached = sets.every(
@@ -74,6 +84,11 @@ export function computeProgressiveOverload(
           reason: `Toutes les séries (${targetWorkSets.length}×${targetReps}) validées avec aisance lors de ta dernière séance.`,
         };
       }
+
+      // La dernière séance contenant l'exercice ne remplit pas les conditions :
+      // on ne rattrape pas sur une séance plus ancienne (sécurité : ne pas
+      // progresser après une séance dure ou une baisse de performance).
+      return null;
     }
   }
 

@@ -33,4 +33,5 @@ export const exerciseMedia: Readonly<Record<string, ExerciseMedia>> = Object.fre
   'mountain-climber': repdb('mountain-climbers', 'start-peak'),
   crunches: repdb('crunches', 'start-peak'),
   'developpe-clavicule': repdb('dumbbell-shoulder-press', 'start-peak'),
+  'squat-smith': repdb('smith-machine-squat', 'start-peak'),
 });

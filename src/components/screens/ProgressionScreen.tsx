@@ -1,70 +1,92 @@
+import { useMemo } from 'react';
 import type { ProfileId, WorkoutSession } from '../../domain/types';
 import { getProgram } from '../../domain/programs';
-import { getAdaptiveAdvice, type AdaptiveAdvice } from '../../workout/coaching';
-import { ArrowLeft, ArrowRight, ChartLine, Check, TrendDown, TrendUp, Warning } from '../ui/Icons';
 import { exerciseLabel } from '../../domain/labels';
+import { getAdaptiveAdvice, type AdaptiveAdvice } from '../../workout/coaching';
+import {
+  formatMinutes,
+  formatSignedInt,
+  formatSignedKg,
+  formatSignedPercent,
+  formatVolume,
+  historyTotals,
+  personalRecords,
+  volumeTrendPoints,
+  weeklyComparison,
+  type TrendPoint,
+} from '../../workout/summary';
+import { ArrowLeft, ArrowRight, Bolt, ChartLine, TrendDown, TrendUp, Warning } from '../ui/Icons';
 import { profileLabels } from './HomeScreen';
 
-type ProgressionPoint = { label: string; volume: number; series: number };
+/* ------------------------------------------------------------------ graphe -- */
 
-function sessionVolume(item: WorkoutSession) {
-  return item.loggedSets.reduce(
-    (total, set) => total + (set.actualLoadKg ?? 0) * (set.actualRepetitions ?? 0),
-    0
-  );
-}
-
-function sessionActiveSeconds(item: WorkoutSession) {
-  return item.loggedSets.reduce((total, set) => total + (set.actualDurationSeconds ?? 0), 0);
-}
-
-function MiniProgressChart({ points, dataKey }: { points: ProgressionPoint[]; dataKey: 'volume' | 'series' }) {
+function VolumeTrendChart({
+  points,
+  dataKey,
+}: {
+  points: TrendPoint[];
+  dataKey: 'volume' | 'sets';
+}) {
   const width = 640;
-  const height = 220;
-  const padding = { top: 18, right: 14, bottom: 34, left: 14 };
-  const values = points.map((point) => point[dataKey]);
-  const max = Math.max(1, ...values);
+  const height = 200;
+  const padding = { top: 16, right: 12, bottom: 30, left: 12 };
+  const max = Math.max(1, ...points.map((point) => point[dataKey]));
   const innerWidth = width - padding.left - padding.right;
   const innerHeight = height - padding.top - padding.bottom;
-  const coords = points.map((point, index) => {
-    const x = padding.left + (points.length === 1 ? innerWidth / 2 : (index / (points.length - 1)) * innerWidth);
-    const y = padding.top + innerHeight - (point[dataKey] / max) * innerHeight;
-    return { ...point, x, y };
-  });
+  const coords = points.map((point, index) => ({
+    ...point,
+    x: padding.left + (points.length === 1 ? innerWidth / 2 : (index / (points.length - 1)) * innerWidth),
+    y: padding.top + innerHeight - (point[dataKey] / max) * innerHeight,
+  }));
   const line = coords
     .map((point, index) => `${index === 0 ? 'M' : 'L'} ${point.x.toFixed(1)} ${point.y.toFixed(1)}`)
     .join(' ');
   const area = `${line} L ${coords.at(-1)?.x.toFixed(1) ?? padding.left} ${height - padding.bottom} L ${
     coords[0]?.x.toFixed(1) ?? padding.left
   } ${height - padding.bottom} Z`;
+  const last = coords.at(-1);
 
   return (
-    <svg
-      className="progress-chart"
-      viewBox={`0 0 ${width} ${height}`}
-      role="img"
-      aria-label={`Évolution des ${dataKey === 'volume' ? 'volumes' : 'séries'} sur les dernières séances`}
-      preserveAspectRatio="none"
-    >
-      <defs>
-        <linearGradient id="progress-chart-fill" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#b8f36b" stopOpacity=".42" />
-          <stop offset="100%" stopColor="#b8f36b" stopOpacity="0" />
-        </linearGradient>
-      </defs>
-      <path d={area} fill="url(#progress-chart-fill)" />
-      <path d={line} fill="none" stroke="#b8f36b" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
-      {coords.map((point) => (
-        <g key={`${point.label}-${point.x}`}>
-          <circle cx={point.x} cy={point.y} r="5" fill="#131b17" stroke="#b8f36b" strokeWidth="3" />
-          <text x={point.x} y={height - 10} textAnchor="middle" fill="#8fa297" fontSize="12">
-            {point.label}
-          </text>
-        </g>
-      ))}
-    </svg>
+    <div className="trend-chart-wrap">
+      <svg
+        className="progress-chart"
+        viewBox={`0 0 ${width} ${height}`}
+        role="img"
+        aria-label={`Évolution des ${
+          dataKey === 'volume' ? 'volumes' : 'séries validées'
+        } sur les ${points.length} dernières séances, du plus ancien au plus récent`}
+        preserveAspectRatio="none"
+      >
+        <line
+          x1={padding.left}
+          y1={height - padding.bottom}
+          x2={width - padding.right}
+          y2={height - padding.bottom}
+          stroke="rgba(255,255,255,.14)"
+          strokeWidth="1"
+        />
+        <path d={area} fill="rgba(184,243,107,.10)" />
+        <path d={line} fill="none" stroke="#b8f36b" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+        {coords.map((point) => (
+          <g key={point.sessionId}>
+            <circle cx={point.x} cy={point.y} r="3.5" fill="#0B0F0E" stroke="#b8f36b" strokeWidth="2.5" />
+            <text x={point.x} y={height - 8} textAnchor="middle" fill="#78877E" fontSize="12">
+              {point.label}
+            </text>
+          </g>
+        ))}
+      </svg>
+      {last && (
+        <p className="trend-last">
+          Dernière séance :{' '}
+          <strong>{dataKey === 'volume' ? `${formatVolume(last.volume)} kg·rép.` : `${last.sets} séries`}</strong>
+        </p>
+      )}
+    </div>
   );
 }
+
+/* --------------------------------------------------------------- coaching -- */
 
 function AdaptiveAdviceCard({ advice }: { advice: AdaptiveAdvice }) {
   const label =
@@ -80,7 +102,7 @@ function AdaptiveAdviceCard({ advice }: { advice: AdaptiveAdvice }) {
         <h2>{advice.title}</h2>
         <p>{advice.message}</p>
       </div>
-      <span className="adaptive-icon">
+      <span className="adaptive-icon" aria-hidden="true">
         {advice.safety ? (
           <Warning size={22} />
         ) : advice.recommendation === 'increase' ? (
@@ -95,6 +117,8 @@ function AdaptiveAdviceCard({ advice }: { advice: AdaptiveAdvice }) {
   );
 }
 
+/* ------------------------------------------------------------------ écran -- */
+
 interface ProgressionScreenProps {
   history: WorkoutSession[];
   profile: ProfileId;
@@ -102,53 +126,30 @@ interface ProgressionScreenProps {
 }
 
 export function ProgressionScreen({ history, profile, onBack }: ProgressionScreenProps) {
-  const completed = history.filter((item) => Boolean(item.completedAt));
-  const weekStart = new Date();
-  weekStart.setHours(0, 0, 0, 0);
-  const day = weekStart.getDay();
-  weekStart.setDate(weekStart.getDate() - (day === 0 ? 6 : day - 1));
-  const thisWeek = completed.filter((item) => new Date(item.startedAt) >= weekStart).length;
-  const volume = completed.reduce((total, item) => total + sessionVolume(item), 0);
-  const activeSeconds = completed.reduce((total, item) => total + sessionActiveSeconds(item), 0);
-  const maxLoad = completed
-    .flatMap((item) => item.loggedSets)
-    .reduce((max, set) => Math.max(max, set.actualLoadKg ?? 0), 0);
-  const points: ProgressionPoint[] = [...completed]
-    .reverse()
-    .slice(-8)
-    .map((item) => ({
-      label: new Date(item.startedAt).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }),
-      volume: sessionVolume(item),
-      series: item.loggedSets.length,
-    }));
-  const hasVolume = points.some((point) => point.volume > 0);
-  const program = getProgram(profile);
-  const exerciseNames = new Map(program.days.flatMap((item) => item.exercises).map((exercise) => [exercise.id, exercise.name]));
-  const bestByExercise = new Map<string, { load: number; reps: number }>();
+  const view = useMemo(() => {
+    const now = new Date();
+    const completed = history.filter((item) => item.completedAt);
+    const program = getProgram(profile);
+    const exerciseNames = new Map(
+      program.days.flatMap((item) => item.exercises).map((exercise) => [exercise.id, exercise.name])
+    );
+    return {
+      completed,
+      totals: historyTotals(history),
+      week: weeklyComparison(history, now),
+      points: volumeTrendPoints(history, 8),
+      records: personalRecords(history, 5).map((record) => ({
+        ...record,
+        name: exerciseLabel(record.exerciseId, exerciseNames.get(record.exerciseId)),
+      })),
+      advice: getAdaptiveAdvice(completed),
+    };
+  }, [history, profile]);
 
-  completed
-    .flatMap((item) => item.loggedSets)
-    .forEach((set) => {
-      const existing = bestByExercise.get(set.exerciseId);
-      const candidate = {
-        load: set.actualLoadKg ?? 0,
-        reps: set.actualRepetitions ?? set.actualDurationSeconds ?? 0,
-      };
-      if (
-        !existing ||
-        candidate.load > existing.load ||
-        (candidate.load === existing.load && candidate.reps > existing.reps)
-      ) {
-        bestByExercise.set(set.exerciseId, candidate);
-      }
-    });
-
-  const best = [...bestByExercise.entries()]
-    .filter(([, value]) => value.load > 0 || value.reps > 0)
-    .sort((a, b) => b[1].load - a[1].load)
-    .slice(0, 5);
-
-  const advice = getAdaptiveAdvice(completed);
+  const { week, totals } = view;
+  const hasVolume = view.points.some((point) => point.volume > 0);
+  const volumeTrendClass =
+    week.volumeDeltaPct === null ? '' : week.volumeDeltaPct > 0 ? 'up' : week.volumeDeltaPct < 0 ? 'down' : '';
 
   return (
     <section className="content progression-content">
@@ -162,83 +163,155 @@ export function ProgressionScreen({ history, profile, onBack }: ProgressionScree
         </button>
       </div>
       <p className="intro progression-intro">
-        Un aperçu de tes séances enregistrées sur cet appareil. Les données restent privées et séparées de l’autre profil.
+        Un aperçu de tes séances enregistrées sur cet appareil. Les données restent privées et séparées de
+        l’autre profil.
       </p>
 
-      {completed.length === 0 ? (
+      {view.completed.length === 0 ? (
         <div className="empty-state">
           <ChartLine size={34} />
-          <h2>Pas encore de progression</h2>
-          <p>Valide ta première séance pour voir apparaître tes repères.</p>
+          <h2>Aucune donnée de progression</h2>
+          <p>Termine une première séance pour voir apparaître tes repères et ta tendance de volume.</p>
+          <button className="primary-button empty-cta" onClick={onBack}>
+            Retour à l’accueil
+          </button>
         </div>
       ) : (
         <>
-          <div className="progression-metrics">
-            <div className="metric-card">
+          <div className="metric-strip">
+            <div className="metric-cell">
               <span>Cette semaine</span>
-              <strong>{thisWeek}</strong>
-              <small>séance{thisWeek > 1 ? 's' : ''}</small>
+              <strong>{week.current.sessions}</strong>
+              <small>séance{week.current.sessions > 1 ? 's' : ''}</small>
             </div>
-            <div className="metric-card accent">
+            <div className="metric-cell accent">
               <span>Volume total</span>
-              <strong>{volume.toLocaleString('fr-FR')}</strong>
+              <strong>{formatVolume(totals.volumeKg)}</strong>
               <small>kg·rép.</small>
             </div>
-            <div className="metric-card">
+            <div className="metric-cell">
               <span>Meilleure charge</span>
-              <strong>{maxLoad > 0 ? `${maxLoad}` : '—'}</strong>
-              <small>{maxLoad > 0 ? 'kg' : 'à renseigner'}</small>
+              <strong>{totals.bestLoadKg > 0 ? totals.bestLoadKg : '—'}</strong>
+              <small>{totals.bestLoadKg > 0 ? 'kg' : 'à renseigner'}</small>
             </div>
-            <div className="metric-card">
+            <div className="metric-cell">
               <span>Temps actif</span>
-              <strong>{Math.round(activeSeconds / 60)}</strong>
-              <small>minutes</small>
+              <strong>{formatMinutes(totals.activeSeconds)}</strong>
+              <small>temps sous tension</small>
             </div>
           </div>
 
-          {advice && <AdaptiveAdviceCard advice={advice} />}
+          <div className="comparison-card">
+            <div className="card-heading">
+              <div>
+                <p className="eyebrow">SEMAINE EN COURS VS PRÉCÉDENTE</p>
+                <h2>Comparaison</h2>
+              </div>
+              <span className={`trend-chip ${volumeTrendClass}`}>
+                {week.volumeDeltaPct === null ? (
+                  'Première semaine'
+                ) : week.volumeDeltaPct > 0 ? (
+                  <TrendUp size={14} />
+                ) : week.volumeDeltaPct < 0 ? (
+                  <TrendDown size={14} />
+                ) : (
+                  <ArrowRight size={14} />
+                )}
+                {week.volumeDeltaPct === null ? 'pas de repère' : formatSignedPercent(week.volumeDeltaPct)}
+              </span>
+            </div>
+            <div className="comparison-grid">
+              <div className="comparison-item">
+                <span>Volume</span>
+                <strong>{formatSignedKg(week.volumeDeltaKg)} kg·rép.</strong>
+                <small>
+                  {week.previous.volumeKg > 0
+                    ? `${formatVolume(week.current.volumeKg)} cette semaine vs ${formatVolume(
+                        week.previous.volumeKg
+                      )} la semaine dernière`
+                    : 'Aucune séance la semaine dernière'}
+                </small>
+              </div>
+              <div className="comparison-item">
+                <span>Séances</span>
+                <strong>{formatSignedInt(week.sessionsDelta)}</strong>
+                <small>
+                  {week.previous.sessions > 0
+                    ? `${week.current.sessions} cette semaine vs ${week.previous.sessions} la semaine dernière`
+                    : 'Aucune séance la semaine dernière'}
+                </small>
+              </div>
+            </div>
+          </div>
+
+          {view.advice && <AdaptiveAdviceCard advice={view.advice} />}
 
           <div className="progression-card">
             <div className="card-heading">
               <div>
                 <p className="eyebrow">TENDANCE</p>
-                <h2>Volume par séance</h2>
+                <h2>{hasVolume ? 'Volume par séance' : 'Séries validées par séance'}</h2>
               </div>
-              <span>{hasVolume ? 'kg·rép.' : 'Séries validées'}</span>
+              <span>{hasVolume ? 'kg·rép.' : 'séries'}</span>
             </div>
-            <div className="chart-wrap">
-              <MiniProgressChart points={points} dataKey={hasVolume ? 'volume' : 'series'} />
-            </div>
+            {view.points.length > 0 && (
+              <>
+                {!hasVolume && (
+                  <p className="muted-copy">
+                    Aucune charge renseignée pour l’instant : la tendance affiche les séries validées par
+                    séance.
+                  </p>
+                )}
+                <VolumeTrendChart points={view.points} dataKey={hasVolume ? 'volume' : 'sets'} />
+              </>
+            )}
           </div>
 
           <div className="progression-card">
             <div className="card-heading">
               <div>
-                <p className="eyebrow">REPÈRES</p>
-                <h2>Meilleures performances</h2>
+                <p className="eyebrow">RECORDS</p>
+                <h2>Meilleure charge par mouvement</h2>
               </div>
               <span>
-                {best.length} mouvement{best.length > 1 ? 's' : ''}
+                {view.records.length} mouvement{view.records.length > 1 ? 's' : ''}
               </span>
             </div>
-            {best.length === 0 ? (
-              <p className="muted-copy">Renseigne une charge ou une durée réelle pendant tes séries pour créer tes repères.</p>
+            {view.records.length === 0 ? (
+              <p className="muted-copy">
+                Renseigne une charge réelle pendant tes séries pour créer tes records.
+              </p>
             ) : (
-              <div className="best-list">
-                {best.map(([exerciseId, value]) => (
-                  <div className="best-item" key={exerciseId}>
-                    <span className="best-rank">{best.findIndex(([id]) => id === exerciseId) + 1}</span>
-                    <div>
-                      <strong>{exerciseNames.get(exerciseId) ?? exerciseLabel(exerciseId)}</strong>
+              <div className="records-list">
+                {view.records.map((record, index) => (
+                  <div className="record-row" key={record.exerciseId}>
+                    <span className="record-rank">{index + 1}</span>
+                    <div className="record-main">
+                      <strong>{record.name}</strong>
                       <small>
-                        {value.load > 0 ? `${value.load} kg` : `${value.reps} s`} · meilleur repère
+                        {record.loadKg > 0
+                          ? `${record.loadKg} kg × ${record.repetitions} rép.`
+                          : `${record.repetitions} s tenues`}
                       </small>
                     </div>
-                    <Check size={17} />
+                    <span className="record-value">{record.loadKg > 0 ? `${record.loadKg} kg` : '—'}</span>
                   </div>
                 ))}
               </div>
             )}
+          </div>
+
+          <div className="coach-note">
+            <div className="coach-symbol">
+              <Bolt size={20} />
+            </div>
+            <div>
+              <strong>Comment lire ces chiffres</strong>
+              <p>
+                Le volume (charge × répétitions) mesure le travail total. Une meilleure charge sur le même
+                mouvement signale une progression réelle, même si la séance paraît plus courte.
+              </p>
+            </div>
           </div>
         </>
       )}

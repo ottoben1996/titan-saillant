@@ -1,3 +1,5 @@
+import { useId } from 'react';
+
 export type MuscleId =
   | 'chest'
   | 'shoulders'
@@ -20,6 +22,22 @@ interface MuscleMapProps {
   className?: string;
 }
 
+const MUSCLE_LABELS: Record<MuscleId, string> = {
+  chest: 'Pectoraux',
+  shoulders: 'Épaules',
+  biceps: 'Biceps',
+  triceps: 'Triceps',
+  forearms: 'Avant-bras',
+  abs: 'Abdominaux',
+  quads: 'Quadriceps',
+  calves: 'Mollets',
+  lats: 'Grands dorsaux',
+  traps: 'Trapèzes',
+  glutes: 'Fessiers',
+  hamstrings: 'Ischio-jambiers',
+  'lower-back': 'Lombaires',
+};
+
 // Normalise les chaînes de muscles françaises ou anglaises vers MuscleId
 export function normalizeMuscle(name: string): MuscleId | null {
   const n = name.toLowerCase().trim();
@@ -39,34 +57,78 @@ export function normalizeMuscle(name: string): MuscleId | null {
   return null;
 }
 
+/** Convertit une liste de libellés bruts en identifiants dédupliqués, ordre préservé. */
+function toIds(muscles: readonly string[]): MuscleId[] {
+  const seen = new Set<MuscleId>();
+  const ids: MuscleId[] = [];
+  for (const muscle of muscles) {
+    const id = normalizeMuscle(muscle);
+    if (id && !seen.has(id)) {
+      seen.add(id);
+      ids.push(id);
+    }
+  }
+  return ids;
+}
+
 export function MuscleMap({
   primaryMuscles = [],
   secondaryMuscles = [],
   size = 'md',
   className = '',
 }: MuscleMapProps) {
-  const primaries = new Set(primaryMuscles.map(normalizeMuscle).filter(Boolean));
-  const secondaries = new Set(secondaryMuscles.map(normalizeMuscle).filter(Boolean));
+  const titleId = useId();
+  const descId = useId();
 
-  const getColor = (id: MuscleId): string => {
-    if (primaries.has(id)) return '#b8f36b'; // Vert néon Titan
-    if (secondaries.has(id)) return '#34d399'; // Vert menthe doux
-    return '#1c2822'; // Gris-vert sombre au repos
-  };
-
-  const getOpacity = (id: MuscleId): number => {
-    if (primaries.has(id)) return 1.0;
-    if (secondaries.has(id)) return 0.85;
-    return 0.45;
-  };
+  const primaryIds = toIds(primaryMuscles);
+  const secondaryIds = toIds(secondaryMuscles);
+  const primaries = new Set(primaryIds);
+  const secondaries = new Set(secondaryIds);
 
   const scale = size === 'sm' ? 0.75 : size === 'lg' ? 1.25 : 1.0;
   const width = Math.round(220 * scale);
   const height = Math.round(180 * scale);
 
+  // Alternative textuelle : la même information que le schéma, en mots.
+  const primaryText = primaryIds.map((id) => MUSCLE_LABELS[id]).join(', ');
+  const secondaryText = secondaryIds.map((id) => MUSCLE_LABELS[id]).join(', ');
+  const altText =
+    primaryIds.length === 0 && secondaryIds.length === 0
+      ? 'Aucun muscle renseigné pour cet exercice.'
+      : [
+          primaryIds.length > 0 ? `Muscles principaux : ${primaryText}.` : null,
+          secondaryIds.length > 0 ? `Muscles synergistes : ${secondaryText}.` : null,
+        ]
+          .filter(Boolean)
+          .join(' ');
+
+  const getColor = (id: MuscleId): string => {
+    if (primaries.has(id)) return '#B8F36B'; // Vert néon Titan (accent)
+    if (secondaries.has(id)) return '#5FBF97'; // Vert menthe lisible, moins de bruit
+    return '#243129'; // Gris-vert au repos, silhouette encore lisible
+  };
+
+  const getOpacity = (id: MuscleId): number => {
+    if (primaries.has(id)) return 1;
+    if (secondaries.has(id)) return 0.95;
+    return 1;
+  };
+
   return (
-    <div className={`muscle-map-wrapper ${className}`} aria-label="Carte anatomique des muscles ciblés">
-      <div className="muscle-map-views">
+    <div
+      className={`muscle-map-wrapper ${className}`.trim()}
+      role="group"
+      aria-labelledby={titleId}
+      aria-describedby={descId}
+    >
+      <p id={titleId} className="muscle-map-title">
+        Muscles sollicités
+      </p>
+      <p id={descId} className="visually-hidden">
+        {altText}
+      </p>
+
+      <div className="muscle-map-views" aria-hidden="true">
         {/* VUE ANTERIEURE (FACE) */}
         <div className="muscle-figure">
           <span className="figure-label">FACE</span>
@@ -133,7 +195,6 @@ export function MuscleMap({
               d="M44 41 L56 41 L55 64 L45 64 Z"
               fill={getColor('abs')}
               opacity={getOpacity('abs')}
-              rx="2"
             />
 
             {/* Quadriceps */}
@@ -259,15 +320,15 @@ export function MuscleMap({
         </div>
       </div>
 
-      {/* Légende interactive */}
+      {/* Légende : identifie les couleurs du schéma */}
       <div className="muscle-map-legend">
         <div className="legend-item">
-          <span className="legend-dot primary" />
+          <span className="legend-dot primary" aria-hidden="true" />
           <span>Moteur principal</span>
         </div>
         {secondaries.size > 0 && (
           <div className="legend-item">
-            <span className="legend-dot secondary" />
+            <span className="legend-dot secondary" aria-hidden="true" />
             <span>Synergiste / stabilisateur</span>
           </div>
         )}

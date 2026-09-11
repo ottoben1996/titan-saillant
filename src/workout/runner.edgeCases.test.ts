@@ -142,9 +142,9 @@ describe('workout runner — cas limites', () => {
     const exercises = getWorkoutExercises(day, session);
     const steps = getWorkoutSteps(day, session);
 
-    // 3 (coiffe) + 3 (bosu) + 1 (vélo) d'échauffement, puis les circuits, puis le cooldown.
+    // 3 exercices d'échauffement (coiffe, bosu, vélo) puis le premier circuit.
     expect(exercises.slice(0, 5).map((item) => item.id)).toEqual([
-      'coiffe-rotateurs', 'bosu', 'bosu', 'bosu', 'velo',
+      'coiffe-rotateurs', 'bosu', 'velo', 'jumping-jack', 'mountain-climber',
     ]);
     const circuit1 = steps
       .map((step) => exercises[step.exerciseIndex!].id)

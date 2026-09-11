@@ -278,6 +278,23 @@ export default function App() {
 
   const confirmWorkoutStart = (energy: EnergyLevel, multiplier: number) => {
     if (!pendingDay) return;
+
+    // Une seule séance peut rester en cours. Sans cette clôture, démarrer un autre
+    // créneau laissait deux séances « en cours » : la première devenait impossible
+    // à terminer ou à supprimer depuis l'interface. Ses séries validées, elles,
+    // sont réelles et restent dans l'historique.
+    if (session && !session.completedAt) {
+      const closed: WorkoutSession = {
+        ...session,
+        completedAt: new Date().toISOString(),
+        activeTimer: undefined,
+        updatedAt: new Date().toISOString(),
+      };
+      void withStorageGuard(saveSession(closed), onStorageFailure, undefined);
+      setNotice('Séance précédente clôturée. Ses séries validées restent dans l’historique.');
+      window.setTimeout(() => setNotice(''), 4000);
+    }
+
     const fresh = createRunner(pendingDay, profile);
     setSelectedDay(pendingDay);
     setRestMultiplier(multiplier);
