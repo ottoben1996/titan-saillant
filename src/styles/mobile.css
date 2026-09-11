@@ -74,6 +74,34 @@
   min-height: 44px;
 }
 
+/* --- confort tactile : pas de sélection accidentelle ni de menu contextuel --- */
+.app-shell button,
+.app-shell a,
+.bottom-nav button,
+.duo-pill-btn,
+.round-action,
+.icon-button {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.app-shell button,
+.app-shell input,
+.bottom-nav {
+  touch-action: manipulation;
+}
+
+/* Le texte reste sélectionnable là où il porte de l'information utile. */
+.app-shell p,
+.app-shell small,
+.app-shell strong,
+.app-shell li,
+.app-shell input {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
 /* --- saisie : pas de zoom automatique iOS (16 px minimum) ---------------- */
 .app-shell input,
 .app-shell select,

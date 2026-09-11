@@ -567,6 +567,73 @@ body {
   grid-template-rows: auto auto minmax(0, 1fr);
 }
 
+/* Filet de sécurité d'affichage */
+.error-shell {
+  display: grid;
+  place-items: center;
+  min-height: 100dvh;
+}
+
+.error-panel {
+  width: min(100%, 34rem);
+  padding: 24px;
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-left: 2px solid var(--danger);
+  border-radius: var(--r-lg);
+}
+
+.error-panel h1 {
+  margin: 8px 0 12px;
+  font-size: clamp(1.5rem, 6vw, 2rem);
+  line-height: 1.15;
+  letter-spacing: -.01em;
+}
+
+.error-panel .primary-button {
+  margin-top: 20px;
+}
+
+.error-detail {
+  margin: 12px 0 0;
+  padding: 8px 10px;
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
+  color: var(--text-3);
+  font-size: .75rem;
+  font-family: ui-monospace, "SFMono-Regular", "Cascadia Mono", monospace;
+  overflow-wrap: anywhere;
+}
+
+/* Mise à jour disponible : discrète, jamais au milieu d'une séance */
+.update-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: min(100%, 72rem);
+  margin: 0 auto 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface-2);
+  color: var(--text-2);
+  font-size: .8125rem;
+}
+
+.update-banner button {
+  flex: none;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: var(--r-md);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font: inherit;
+  font-weight: 590;
+  cursor: pointer;
+}
+
 .toast {
   background: var(--accent);
   color: var(--accent-ink);

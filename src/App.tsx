@@ -63,6 +63,7 @@ export default function App() {
   );
 
   const [storageMessage, setStorageMessage] = useState('');
+  const [updateReady, setUpdateReady] = useState(false);
 
   const onStorageFailure = () => setStorageMessage(STORAGE_UNAVAILABLE_MESSAGE);
 
@@ -135,6 +136,18 @@ export default function App() {
       window.removeEventListener('coach-offline-ready', onOfflineReady);
       window.removeEventListener('beforeinstallprompt', onBeforeInstall);
     };
+  }, []);
+
+  useEffect(() => {
+    // L'application signale au service worker qu'une séance est en cours :
+    // une mise à jour attend alors au lieu de recharger l'écran.
+    document.documentElement.dataset.coachBusy = screen === 'workout' ? 'true' : 'false';
+  }, [screen]);
+
+  useEffect(() => {
+    const onUpdatePending = () => setUpdateReady(true);
+    window.addEventListener('coach-update-pending', onUpdatePending);
+    return () => window.removeEventListener('coach-update-pending', onUpdatePending);
   }, []);
 
   useEffect(() => {
@@ -505,6 +518,15 @@ export default function App() {
         isOnline={isOnline}
         onOpenSettings={() => setScreen('settings')}
       />
+
+      {updateReady && screen !== 'workout' && (
+        <div className="update-banner" role="status">
+          <span>Une version plus récente est prête.</span>
+          <button type="button" onClick={() => window.dispatchEvent(new Event('coach-apply-update'))}>
+            Mettre à jour
+          </button>
+        </div>
+      )}
 
       {storageMessage && (
         <div className="storage-alert" role="alert">
