@@ -218,6 +218,92 @@
   margin: 0;
 }
 
+/* Sans illustration à absorber l'espace libre, la carte se contente de son
+   contenu : sinon elle s'étire sur les grands écrans et laisse une zone morte
+   sous le repère clé (constaté à 430 × 932). */
+.workout-content .prescription-card.compact:not(:has(.exercise-illustration)) {
+  flex: 0 0 auto;
+}
+
+/* Repère clé du tutoriel, affiché à la place de l'illustration quand le
+   mouvement n'en a pas : sans lui, la carte étirée laissait une zone vide. */
+.workout-content .key-cue-strip {
+  display: grid;
+  gap: .2rem;
+  margin: .15rem 0 .25rem;
+  padding: .5rem .65rem;
+  border-left: 2px solid var(--accent);
+  border-radius: 6px;
+  background: var(--surface-2);
+}
+
+.workout-content .key-cue-strip span:last-child {
+  color: var(--text-1);
+  font-size: .84rem;
+  line-height: 1.35;
+}
+
+/* --- Chrono de tempo -------------------------------------------------------
+   Mesuré à 390 px sur la carte de 340 px : la colonne d'actions (3 boutons de
+   44 px empilés, 143 px de haut) écrasait la lecture dans 158 px de large.
+   Résultat : intitulé sur deux lignes, état « Prêt à démarrer » sur deux lignes
+   et surtout un chevauchement de 20 px entre le chiffre et l'état.
+   La lecture reprend toute la largeur, les actions passent dessous, le bouton
+   principal (Démarrer / Pause) sur une ligne à lui pour rester visable au pouce. */
+.workout-content .exercise-timer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: stretch;
+  gap: .5rem;
+}
+
+.workout-content .exercise-timer > div:first-of-type {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: .1rem .55rem;
+  min-width: 0;
+}
+
+/* L'intitulé occupe sa propre ligne : plus de « COMPTEUR TEMPO » coupé en deux. */
+.workout-content .exercise-timer .eyebrow {
+  flex-basis: 100%;
+  white-space: nowrap;
+}
+
+.workout-content .exercise-timer small {
+  white-space: nowrap;
+}
+
+.workout-content .timer-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .35rem;
+  justify-content: stretch;
+}
+
+.workout-content .timer-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+}
+
+/* Deux rangées explicites, quel que soit l'ordre du DOM :
+   [ Démarrer / Reprendre / Pause  — pleine largeur, sous le pouce ]
+   [ Passer ]              [ Recommencer ]                        */
+.workout-content .timer-actions button:not(.skip-tempo-btn):not(:last-child) {
+  grid-area: 1 / 1 / 2 / 3;
+}
+
+.workout-content .timer-actions .skip-tempo-btn {
+  grid-area: 2 / 1 / 3 / 2;
+}
+
+.workout-content .timer-actions button:last-child {
+  grid-area: 2 / 2 / 3 / 3;
+}
+
 /* Écrans bas (paysage, petits Android) : on resserre encore d'un cran. */
 @media (max-height: 700px) {
   .workout-content .exercise-illustration {

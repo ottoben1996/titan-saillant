@@ -434,6 +434,16 @@ export function WorkoutScreen({
               )}
             </div>
 
+            {/* Ce mouvement n'a pas d'illustration honnête : l'espace que l'image
+                occuperait accueille le repère clé du tutoriel — du contenu réel
+                plutôt qu'un vide au milieu de la carte. */}
+            {!movementMedia && tutorials[exercise.id]?.keyCue && (
+              <p className="key-cue-strip">
+                <span className="eyebrow">REPÈRE CLÉ</span>
+                <span>{tutorials[exercise.id]?.keyCue}</span>
+              </p>
+            )}
+
             {/* Calculateur de disques par côté avec tare automatique */}
             {prescription.loadKg !== undefined && prescription.loadKg >= 20 && !activeAlternative && (
               <PlateBadge

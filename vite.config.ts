@@ -3,6 +3,9 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
+  // GitHub Pages sert le site sous /<depot>/ : le chemin est injecté au moment du
+  // déploiement (VITE_BASE), et reste la racine en développement.
+  base: process.env.VITE_BASE ?? '/',
   plugins: [
     react(),
     VitePWA({

@@ -126,6 +126,23 @@ Trois agents ont travaillé en parallèle sur des périmètres disjoints, puis u
 
 Parcours d'intégration pilotés par l'interface : 7 (profil → accueil → énergie → échauffement → travail → repos → fin de séance, reprise après remontage, pause/reprise, isolation des profils, bilan, séance orpheline, noms accessibles).
 
+## 7 ter. Défaut d'interface signalé par capture (chrono de tempo)
+
+Signalement : sur le chrono de tempo, l'intitulé, le chiffre et l'état « Prêt à démarrer » se chevauchaient.
+
+Mesures relevées à 390 px, carte de 340 px, avant correction :
+
+| Élément | Mesure | Lecture |
+|---|---|---|
+| Colonne d'actions | 3 boutons empilés, 143 px de haut | écrasait la lecture dans 158 px de large |
+| Intitulé « COMPTEUR TEMPO » | 46 px | coupé sur deux lignes |
+| État « Prêt à démarrer » | 36 px | coupé sur deux lignes |
+| Chiffre / état | **chevauchement de 20 px** | le défaut visible sur la capture |
+
+Après correction : intitulé sur une ligne (15 px), chiffre et état sur la même ligne de base (32 px / 15 px), boutons en deux rangées — « Démarrer » pleine largeur au-dessus de « Passer » et « Recommencer » — toutes les cibles à 44 px, chrono de 168 px.
+
+Second défaut visible sur la même capture, corrigé dans la foulée : pour un mouvement **sans illustration** (`bosu`, `skierg`, `sit-to-stand`), la carte de prescription s'étirait et laissait une zone morte de ~90 px, et laissait ~180 px de vide sur un écran de 932 px de haut. La carte se contente désormais de son contenu et l'espace libéré accueille le **repère clé du tutoriel** (« REPÈRE CLÉ — Regard fixe devant, appui au centre du bosu »), du contenu réel plutôt qu'un vide. Carte mesurée après correction : 193 px (390 × 844) et 196 px (430 × 932), sans débordement de page dans les deux cas.
+
 ## 8. Ce qui n'a PAS été vérifié
 
 1. Les encoches réelles : `env(safe-area-inset-*)` vaut 0 dans un navigateur de bureau, la structure est en place mais l'effet réel demande un appareil ou une émulation avec encoche.
