@@ -546,6 +546,27 @@ body {
   color: var(--accent);
 }
 
+/* Échec du stockage local : visible, jamais silencieux. */
+.storage-alert {
+  flex: none;
+  width: min(100%, 72rem);
+  margin: 0 auto 12px;
+  padding: 12px 14px;
+  border: 1px solid rgba(231, 146, 146, .35);
+  border-left: 2px solid var(--danger);
+  border-radius: var(--r-lg);
+  background: rgba(231, 146, 146, .10);
+  color: #F3D6D6;
+  font-size: .8125rem;
+  line-height: 1.45;
+}
+
+/* L'écran de séance est une grille à deux rangées : la bannière d'erreur a
+   besoin de sa propre rangée, sinon elle est écrasée par le contenu. */
+.workout-shell:has(.storage-alert) {
+  grid-template-rows: auto auto minmax(0, 1fr);
+}
+
 .toast {
   background: var(--accent);
   color: var(--accent-ink);

@@ -68,6 +68,16 @@ Les images lourdes de MUSTAPHA restent disponibles hors ligne via une mise en ca
 | Badge « RÉPÉTITIONS » | troisième couleur d'accent de l'écran | supprimé, l'information figure déjà dans la prescription |
 | Bandeau duo | pleine largeur, badges permanents | limité à 20 rem, pilules compactes de 32 px |
 
+## 6 bis. Échec du stockage local
+
+Constat d'audit : `src/App.tsx` enchaînait 11 écritures IndexedDB sans aucune gestion d'erreur (`0` occurrence de `.catch`). En navigation privée iOS, en quota dépassé ou base bloquée, la série semblait validée sans être enregistrée.
+
+Correctif : toutes les opérations passent par `src/storage/guard.ts` (`withStorageGuard`), qui renvoie un repli explicite et déclenche une bannière visible `role="alert"` :
+
+> « Stockage local indisponible : tes séries ne sont pas enregistrées. Autorise le stockage du site ou quitte la navigation privée. »
+
+Vérification en navigateur : en forçant `IDBObjectStore.prototype.put` à lever une exception, la bannière apparaît après validation d'une série (26 px de haut, bouton de validation toujours visible dans la fenêtre, aucun défilement parasite). Sans le correctif, aucun signal n'apparaissait. 11 sites d'écriture sécurisés, `tsc` sans erreur.
+
 ## 7. Accessibilité
 
 - Annonces de chrono limitées aux paliers utiles (120 s, 60 s, 30 s, 10 s, 5, 4, 3, 2, 1, fin) : 8 annonces au maximum sur 60 secondes, jamais une par seconde. 5 tests couvrent les paliers, le silence, la fin et les valeurs invalides.
@@ -88,7 +98,7 @@ Les images lourdes de MUSTAPHA restent disponibles hors ligne via une mise en ca
 
 | | Avant | Après |
 |---|---|---|
-| Fichiers de tests | 21 | 24 |
-| Tests | 68 | 81 |
+| Fichiers de tests | 21 | 26 |
+| Tests | 68 | 89 |
 
-Nouveaux tests : alertes de chrono et vibration (5), annonces accessibles des chronos (5), libellés d'exercices (3).
+Nouveaux tests : alertes de chrono et vibration (5), annonces accessibles des chronos (5), libellés d'exercices (3), garde-fou de stockage (4), dépôt des séances (4).

@@ -7,6 +7,7 @@ import { createRunner, completeSet, getNextStep, getWorkoutExercises } from './w
 import { playTimerChime, timerTitle, vibrateTimer } from './workout/alerts';
 import { restoreRemainingSeconds } from './workout/timer';
 import { getActiveSession, listSessions, saveSession } from './storage/sessionRepository';
+import { STORAGE_UNAVAILABLE_MESSAGE, withStorageGuard } from './storage/guard';
 import MustaphaApp from './mustapha/MustaphaApp';
 
 import { TopBar } from './components/layout/TopBar';
@@ -61,12 +62,20 @@ export default function App() {
     typeof Notification === 'undefined' ? 'unsupported' : Notification.permission
   );
 
-  const refreshHistory = async (id: ProfileId) => setHistory(await listSessions(id));
+  const [storageMessage, setStorageMessage] = useState('');
+
+  const onStorageFailure = () => setStorageMessage(STORAGE_UNAVAILABLE_MESSAGE);
+
+  const persist = (sessionToSave: WorkoutSession) =>
+    void withStorageGuard(saveSession(sessionToSave), onStorageFailure, undefined);
+
+  const refreshHistory = async (id: ProfileId) =>
+    setHistory(await withStorageGuard(listSessions(id), onStorageFailure, []));
 
   useEffect(() => {
     if (!profile) return;
     void refreshHistory(profile);
-    void getActiveSession(profile).then((active) => {
+    void withStorageGuard(getActiveSession(profile), onStorageFailure, undefined).then((active) => {
       if (!active) return;
       const restoredTimer = active.activeTimer
         ? { ...active.activeTimer, remainingSeconds: restoreRemainingSeconds(active.activeTimer) }
@@ -92,7 +101,7 @@ export default function App() {
         setIsResting(false);
       }
       if (restoredTimer && restoredTimer.remainingSeconds <= 0) {
-        void saveSession({ ...restored, activeTimer: undefined, updatedAt: new Date().toISOString() });
+        persist({ ...restored, activeTimer: undefined, updatedAt: new Date().toISOString() });
       }
     });
   }, [profile]);
@@ -141,7 +150,7 @@ export default function App() {
 
   useEffect(() => {
     const persistBeforePageHide = () => {
-      if (session) void saveSession({ ...session, updatedAt: new Date().toISOString() });
+      if (session) persist({ ...session, updatedAt: new Date().toISOString() });
     };
     window.addEventListener('pagehide', persistBeforePageHide);
     return () => window.removeEventListener('pagehide', persistBeforePageHide);
@@ -213,7 +222,7 @@ export default function App() {
   const switchDuoProfile = async (target: ProfileId) => {
     if (target === profile) return;
     if (session) {
-      await saveSession({ ...session, updatedAt: new Date().toISOString() });
+      await withStorageGuard(saveSession({ ...session, updatedAt: new Date().toISOString() }), onStorageFailure, undefined);
     }
     localStorage.setItem(profileKey, target);
     setProfile(target);
@@ -260,7 +269,7 @@ export default function App() {
     setSelectedDay(pendingDay);
     setRestMultiplier(multiplier);
     setSession(fresh);
-    void saveSession(fresh);
+    persist(fresh);
     setPendingDay(null);
     setScreen('workout');
 
@@ -292,7 +301,7 @@ export default function App() {
 
   const pauseWorkout = () => {
     if (!session) return;
-    void saveSession(session);
+    persist(session);
     setExitPromptOpen(false);
     setScreen('home');
     setSelectedDay(null);
@@ -314,7 +323,7 @@ export default function App() {
       actualLoadKg: values.loadKg,
     });
     setSession(updated);
-    await saveSession(updated);
+    await withStorageGuard(saveSession(updated), onStorageFailure, undefined);
     await refreshHistory(profile);
 
     const rawPrescribedRest = exercise.sets[step.setIndex]?.restSeconds ?? exercise.restAfterSeconds ?? 0;
@@ -333,7 +342,7 @@ export default function App() {
         },
       };
       setSession(withTimer);
-      await saveSession(withTimer);
+      await withStorageGuard(saveSession(withTimer), onStorageFailure, undefined);
       setRestSeconds(effectiveRest);
       setIsResting(true);
     }
@@ -349,7 +358,7 @@ export default function App() {
       updatedAt: new Date().toISOString(),
     };
     setSession(updated);
-    void saveSession(updated);
+    persist(updated);
     if (suggestedLoadKg) {
       setNotice(`Alternative activée (charge suggérée : ${suggestedLoadKg} kg)`);
       window.setTimeout(() => setNotice(''), 3500);
@@ -365,7 +374,7 @@ export default function App() {
       updatedAt: new Date().toISOString(),
     };
     setSession(updated);
-    void saveSession(updated);
+    persist(updated);
     setNotice('Retour au mouvement original.');
     window.setTimeout(() => setNotice(''), 3000);
   };
@@ -384,7 +393,7 @@ export default function App() {
     setSession(updated);
 
     if (isStateTransition) {
-      void saveSession(updated);
+      persist(updated);
     }
 
     if (!state || state.kind !== 'rest' || state.remainingSeconds <= 0) {
@@ -451,7 +460,7 @@ export default function App() {
         updatedAt: new Date().toISOString(),
       };
       setSession(updated);
-      await saveSession(updated);
+      await withStorageGuard(saveSession(updated), onStorageFailure, undefined);
       await refreshHistory(profile);
     }
     setExitPromptOpen(false);
@@ -496,6 +505,12 @@ export default function App() {
         isOnline={isOnline}
         onOpenSettings={() => setScreen('settings')}
       />
+
+      {storageMessage && (
+        <div className="storage-alert" role="alert">
+          {storageMessage}
+        </div>
+      )}
 
       {notice && (
         <div className="toast" role="status">
