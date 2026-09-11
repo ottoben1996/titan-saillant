@@ -5,6 +5,8 @@ import App from './App';
 import './styles.css';
 import './styles/tokens.css';
 import './styles/mobile.css';
+import './styles/workout.css';
+import './styles/screens.css';
 
 registerSW({
   immediate: true,
