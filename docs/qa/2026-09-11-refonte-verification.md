@@ -94,6 +94,38 @@ Vérification en navigateur : en forçant `IDBObjectStore.prototype.put` à leve
 - Toutes les actions de chrono, de repos, de réglages et de navigation atteignent au moins 44 px.
 - Aucun emoji utilisé comme icône dans l'application Ottman/Laura (relevé par recherche sur `src/`) ; les glyphes restants sont cantonnés à l'espace MUSTAPHA.
 
+## 7 bis. Deuxième vague (nuit du 11 au 12 septembre)
+
+Trois agents ont travaillé en parallèle sur des périmètres disjoints, puis une vague de tests d'intégration. Deux agents ont été interrompus par l'épuisement du crédit DeepSeek (HTTP 402) ; leur travail a été repris et terminé à la main.
+
+| Livraison | Détail vérifié |
+|---|---|
+| Illustrations | 29 fichiers : ajout du squat Smith (même jeu RepDB, style identique), et **détourage du fond bleu clair** des 29 illustrations (licence RepDB autorisant le recadrage et la modification pour l'usage in-app). Script reproductible : `scripts/prepare-exercise-media.py`. Total 628 Ko. Chaque entrée conserve crédit, source et licence ; un test échoue si un chemin pointe vers un fichier absent. |
+| Mouvements sans illustration honnête | `skierg`, `sit-to-stand`, `bosu` restent volontairement sans image (aucun équivalent crédible, un candidat vérifié visuellement montrait un autre mouvement) : repli pictogramme assumé et testé. |
+| Écran de séance | « Dernière fois : 22,5 kg × 30 s » affiché juste au-dessus du champ, avec écart ; préréglages de repos +15/+30/+60 s (module pur testé) ; carte de repos enrichie (série suivante, séries restantes, charge) ; séance tenant dans 100dvh. |
+| Accueil | Rail de semaine (terminée / aujourd'hui / à venir), action dominante, métriques compactes, dernière séance, conseil du coach. |
+| Progression | Indicateurs compacts, comparaison chiffrée avec la semaine précédente, records en libellés français, tendance. |
+| Historique | Regroupement par semaine, durée, séries, RPE, volume par séance, état vide avec appel à l'action. |
+| Réglages | Sections (préférences, mes données, application), confirmation d'effacement annonçant le nombre de séances. |
+| Confirmation | `window.confirm` natif retiré : la bascule de profil passe par un dialogue de l'application (`ConfirmDialog`), accessible au clavier, testé. |
+| Charges | Un seul formateur `formatLoadKg` : « 22,5 kg » et non « 22.5 kg », dans les six emplacements concernés. |
+| Mise en forme | Badge de comparaison corrigé : « Première semaine » au lieu de deux libellés collés. Sans semaine de référence, la comparaison affiche la valeur de la semaine sans signe trompeur. |
+
+### Trois défauts réels trouvés et corrigés
+
+1. **Violation des règles des hooks React (antérieure à la refonte)** : `WorkoutScreen` retournait tôt quand la séance était terminée, avant quatre hooks déclarés plus bas — React levait « Rendered fewer hooks than expected », ce qui cassait l'écran de bilan. Le retour anticipé est déplacé après tous les hooks. Vérifié par le test d'intégration [1] et [5], qui échouaient avant le correctif.
+2. **Séance orpheline** : démarrer un second créneau laissait deux séances « en cours », la première devenant impossible à terminer depuis l'interface. La séance précédente est désormais clôturée avec ses séries réelles, et le test [6] vérifie qu'une seule séance reste ouverte.
+3. **Champs sans nom accessible** : les champs répétitions, charge et durée n'avaient ni `label` ni `aria-label` (un lecteur d'écran annonçait « champ de saisie » sans dire ce qu'il mesure). Corrigé pour les trois, test [6b].
+
+### Dossier de tests
+
+| | Début de soirée | Maintenant |
+|---|---|---|
+| Fichiers de tests | 27 | 40 |
+| Tests | 91 | 320 |
+
+Parcours d'intégration pilotés par l'interface : 7 (profil → accueil → énergie → échauffement → travail → repos → fin de séance, reprise après remontage, pause/reprise, isolation des profils, bilan, séance orpheline, noms accessibles).
+
 ## 8. Ce qui n'a PAS été vérifié
 
 1. Les encoches réelles : `env(safe-area-inset-*)` vaut 0 dans un navigateur de bureau, la structure est en place mais l'effet réel demande un appareil ou une émulation avec encoche.
@@ -102,6 +134,8 @@ Vérification en navigateur : en forçant `IDBObjectStore.prototype.put` à leve
 4. Mise en cache à la première visite des images MUSTAPHA (configuration en place, non exerçable sans déploiement).
 5. Espace MUSTAPHA : non retouché, donc non re-vérifié au-delà de ses tests unitaires.
 6. Droits des images de recettes extraites des PDF : point ouvert, non traité.
+7. Écran de bilan : vérifié par le test d'intégration (durée, séries, volume, meilleure charge lus dans le rendu réel) mais **pas par capture d'écran** — le harnais de contrôle à deux cadres n'était plus servi par le serveur de prévisualisation en fin de session.
+8. Comparaison hebdomadaire affichée avec une vraie semaine de référence : le cas « première semaine » a été vu à l'écran, le cas « avec référence » seulement en test.
 
 ## 9. Dossier de tests
 

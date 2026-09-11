@@ -209,37 +209,51 @@ export function ProgressionScreen({ history, profile, onBack }: ProgressionScree
                 <h2>Comparaison</h2>
               </div>
               <span className={`trend-chip ${volumeTrendClass}`}>
+                {/* Un seul libellé par état : deux textes frères dans la même pastille
+                    se collaient sans espace (« Première semainepas de repère »). */}
                 {week.volumeDeltaPct === null ? (
                   'Première semaine'
-                ) : week.volumeDeltaPct > 0 ? (
-                  <TrendUp size={14} />
-                ) : week.volumeDeltaPct < 0 ? (
-                  <TrendDown size={14} />
                 ) : (
-                  <ArrowRight size={14} />
+                  <>
+                    {week.volumeDeltaPct > 0 ? (
+                      <TrendUp size={14} />
+                    ) : week.volumeDeltaPct < 0 ? (
+                      <TrendDown size={14} />
+                    ) : (
+                      <ArrowRight size={14} />
+                    )}
+                    {formatSignedPercent(week.volumeDeltaPct)}
+                  </>
                 )}
-                {week.volumeDeltaPct === null ? 'pas de repère' : formatSignedPercent(week.volumeDeltaPct)}
               </span>
             </div>
             <div className="comparison-grid">
+              {/* Sans semaine de référence, un écart signé ferait croire à une
+                  progression : on affiche la valeur de la semaine, sans signe. */}
               <div className="comparison-item">
                 <span>Volume</span>
-                <strong>{formatSignedKg(week.volumeDeltaKg)} kg·rép.</strong>
+                <strong>
+                  {week.previous.volumeKg > 0
+                    ? `${formatSignedKg(week.volumeDeltaKg)} kg·rép.`
+                    : `${formatVolume(week.current.volumeKg)} kg·rép.`}
+                </strong>
                 <small>
                   {week.previous.volumeKg > 0
                     ? `${formatVolume(week.current.volumeKg)} cette semaine vs ${formatVolume(
                         week.previous.volumeKg
                       )} la semaine dernière`
-                    : 'Aucune séance la semaine dernière'}
+                    : 'Rien à comparer pour l’instant'}
                 </small>
               </div>
               <div className="comparison-item">
                 <span>Séances</span>
-                <strong>{formatSignedInt(week.sessionsDelta)}</strong>
+                <strong>
+                  {week.previous.sessions > 0 ? formatSignedInt(week.sessionsDelta) : week.current.sessions}
+                </strong>
                 <small>
                   {week.previous.sessions > 0
                     ? `${week.current.sessions} cette semaine vs ${week.previous.sessions} la semaine dernière`
-                    : 'Aucune séance la semaine dernière'}
+                    : 'Rien à comparer pour l’instant'}
                 </small>
               </div>
             </div>
