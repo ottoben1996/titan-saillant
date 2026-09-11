@@ -1,0 +1,590 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Maquette — Coach Ottman &amp; Laura (refonte UI/UX)</title>
+<style>
+/* ============================================================
+   Tokens cibles — design system de la refonte
+   ============================================================ */
+:root{
+  --surface-0:#0B0F0E; --surface-1:#121715; --surface-2:#18201D;
+  --line:rgba(255,255,255,.09); --line-strong:rgba(255,255,255,.16);
+  --text-1:#F1F5F2; --text-2:#A9B7AE; --text-3:#78877E;
+  --accent:#B8F36B; --accent-ink:#0E1710; --rest:#F3BD6B; --danger:#E79292; --laura:#E0A9EE;
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --s7:48px;
+  --r-sm:6px; --r-md:10px; --r-lg:14px; --r-pill:999px;
+  --shadow:0 1px 0 rgba(255,255,255,.04) inset, 0 8px 24px rgba(0,0,0,.35);
+  --ease:cubic-bezier(.2,.8,.2,1);
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:#060908;color:var(--text-1);
+  font-family:Inter,"Segoe UI",system-ui,-apple-system,sans-serif;font-size:15px;line-height:1.5}
+a{color:inherit}
+.wrap{max-width:1560px;margin:0 auto;padding:var(--s6) var(--s5) 96px}
+
+/* ---------- chrome de la maquette (hors app) ---------- */
+.doc-head{display:flex;align-items:baseline;justify-content:space-between;gap:var(--s4);
+  border-bottom:1px solid var(--line);padding-bottom:var(--s4);margin-bottom:var(--s5)}
+.doc-head h1{margin:0 0 6px;font-size:22px;font-weight:590;letter-spacing:-.01em}
+.doc-head p{margin:0;color:var(--text-2);font-size:13px;max-width:70ch}
+.doc-tag{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:590;white-space:nowrap}
+.section-title{display:flex;align-items:center;gap:var(--s3);margin:var(--s7) 0 var(--s4)}
+.section-title h2{margin:0;font-size:15px;font-weight:590;letter-spacing:-.01em}
+.section-title span{height:1px;flex:1;background:var(--line)}
+.hint{color:var(--text-3);font-size:12px;margin:0 0 var(--s4)}
+
+/* ---------- cadre appareil ---------- */
+.frames{display:flex;gap:var(--s6);align-items:flex-start;flex-wrap:wrap}
+.device{width:390px;height:844px;background:var(--surface-0);border:1px solid var(--line-strong);
+  border-radius:32px;overflow:hidden;position:relative;display:flex;flex-direction:column;box-shadow:var(--shadow)}
+.device.desk{width:1320px;height:820px;border-radius:14px}
+.screen{flex:1;min-height:0;overflow:auto;scrollbar-width:thin}
+.screen[hidden]{display:none}
+
+/* ---------- barre d'application ---------- */
+.appbar{display:flex;align-items:center;justify-content:space-between;gap:var(--s3);
+  padding:var(--s4) var(--s4) var(--s3)}
+.appbar .date{margin:0;color:var(--text-3);font-size:12px}
+.appbar h1{margin:2px 0 0;font-size:20px;font-weight:590;letter-spacing:-.01em}
+.iconbtn{width:36px;height:36px;display:grid;place-items:center;border-radius:var(--r-pill);
+  border:1px solid var(--line);background:transparent;color:var(--text-2);cursor:pointer}
+.iconbtn:hover{border-color:var(--line-strong);color:var(--text-1)}
+.avatar{width:36px;height:36px;border-radius:var(--r-md);display:grid;place-items:center;
+  font-weight:590;font-size:13px;background:var(--accent);color:var(--accent-ink)}
+.avatar.laura{background:var(--laura);color:#26162c}
+
+/* ---------- corps ---------- */
+.content{padding:0 var(--s4) var(--s5);display:grid;gap:var(--s4)}
+.eyebrow{margin:0 0 var(--s2);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3);font-weight:590}
+.card{background:var(--surface-1);border:1px solid var(--line);border-radius:var(--r-lg);padding:var(--s4)}
+
+/* carte dominante : la seule accentuee de l'ecran */
+.hero{background:var(--surface-1);border:1px solid rgba(184,243,107,.28);border-radius:var(--r-lg);padding:var(--s4)}
+.hero h2{margin:0;font-size:22px;font-weight:590;letter-spacing:-.01em}
+.hero .focus{margin:var(--s1) 0 var(--s3);color:var(--text-2);font-size:13px}
+.hero .meta{display:flex;gap:var(--s3);flex-wrap:wrap;color:var(--text-2);font-size:12px;margin-bottom:var(--s3)}
+.hero .meta i{display:inline-flex;align-items:center;gap:6px;font-style:normal}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:var(--s4)}
+.chip{font-size:11px;color:var(--text-2);border:1px solid var(--line);border-radius:var(--r-pill);padding:3px 9px}
+.btn{display:flex;align-items:center;justify-content:center;gap:var(--s2);width:100%;min-height:48px;
+  border:0;border-radius:var(--r-md);font:inherit;font-weight:590;font-size:15px;cursor:pointer;
+  background:var(--accent);color:var(--accent-ink);transition:transform 120ms var(--ease),background 120ms var(--ease)}
+.btn:hover{transform:translateY(-1px);background:#c4f884}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--text-1);font-weight:510}
+.btn.ghost:hover{border-color:var(--line-strong);background:rgba(255,255,255,.03)}
+.btn.sm{min-height:44px;font-size:14px}
+
+/* reprise */
+.resume{display:flex;align-items:center;gap:var(--s3);background:var(--surface-2);border:1px solid var(--line);
+  border-radius:var(--r-lg);padding:var(--s3) var(--s4)}
+.resume .txt{flex:1}
+.resume strong{display:block;font-weight:590;font-size:14px}
+.resume small{color:var(--text-3);font-size:12px}
+.bar{height:4px;border-radius:var(--r-pill);background:rgba(255,255,255,.12);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent)}
+
+/* rail de semaine */
+.week{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s2)}
+.day{border:1px solid var(--line);border-radius:var(--r-md);padding:var(--s3);background:var(--surface-1)}
+.day small{display:block;color:var(--text-3);font-size:11px}
+.day strong{display:block;font-size:13px;font-weight:590;margin:2px 0 6px}
+.day span{font-size:11px;color:var(--text-3)}
+.day.done span{color:var(--accent)}
+.day.today{border-color:var(--accent)}
+.day.today strong{color:var(--accent)}
+
+/* indicateurs compacts */
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:var(--s2)}
+.kpi{border:1px solid var(--line);border-radius:var(--r-md);padding:var(--s3);background:var(--surface-1)}
+.kpi small{display:block;color:var(--text-3);font-size:11px;letter-spacing:.06em;text-transform:uppercase}
+.kpi strong{display:block;margin-top:6px;font-size:20px;font-weight:590;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.kpi strong b{font-size:12px;font-weight:510;color:var(--text-2);margin-left:4px}
+
+/* lignes de liste */
+.row{display:flex;align-items:center;gap:var(--s3);padding:var(--s3) 0;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:0}
+.row .rank{width:24px;height:24px;border-radius:var(--r-sm);background:var(--surface-2);border:1px solid var(--line);
+  display:grid;place-items:center;font-size:11px;color:var(--text-2);font-variant-numeric:tabular-nums}
+.row .grow{flex:1;min-width:0}
+.row strong{display:block;font-weight:510;font-size:14px}
+.row small{color:var(--text-3);font-size:12px}
+.row .val{font-variant-numeric:tabular-nums;font-size:14px;color:var(--text-1)}
+
+/* coach */
+.coach p{margin:0;color:var(--text-2);font-size:13px}
+.coach strong{display:block;font-weight:590;font-size:14px;margin-bottom:6px;color:var(--text-1)}
+
+/* feance en cours */
+.session-head{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--s3)}
+.session-head h1{margin:4px 0 0;font-size:20px;font-weight:590;letter-spacing:-.01em}
+.session-head .count{font-variant-numeric:tabular-nums;color:var(--text-2);font-size:13px}
+.duo{display:inline-flex;gap:2px;padding:2px;border:1px solid var(--line);border-radius:var(--r-pill);background:var(--surface-2)}
+.duo button{display:inline-flex;align-items:center;gap:6px;border:0;background:transparent;color:var(--text-2);
+  font:inherit;font-size:11px;padding:5px 10px;border-radius:var(--r-pill);cursor:pointer;min-height:28px}
+.duo button.on{background:var(--surface-1);color:var(--text-1);border:1px solid var(--line)}
+.visual{border:1px solid var(--line);border-radius:var(--r-lg);background:var(--surface-1);min-height:150px;
+  display:grid;place-items:center;gap:var(--s2);color:var(--text-3);font-size:12px;padding:var(--s4);text-align:center}
+.prescription{border:1px solid var(--line);border-radius:var(--r-lg);background:var(--surface-1);padding:var(--s4)}
+.prescription .label{color:var(--text-3);font-size:11px;letter-spacing:.12em;text-transform:uppercase}
+.prescription .value{display:flex;align-items:baseline;gap:var(--s2);margin:var(--s2) 0}
+.prescription .value strong{font-size:40px;font-weight:590;letter-spacing:-.02em;line-height:1;font-variant-numeric:tabular-nums}
+.prescription .value span{color:var(--text-2);font-size:14px}
+.prescription .note{margin:0;color:var(--text-2);font-size:12px}
+.timer{display:flex;align-items:center;justify-content:space-between;gap:var(--s3);
+  border:1px solid var(--line);border-radius:var(--r-md);background:var(--surface-2);padding:var(--s3) var(--s4)}
+.timer strong{font-size:28px;font-weight:590;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.timer small{display:block;color:var(--text-3);font-size:11px}
+.timer .acts{display:flex;gap:6px}
+.timer .acts button{min-height:32px;padding:0 10px;border:1px solid var(--line);background:transparent;color:var(--text-2);
+  border-radius:var(--r-sm);font:inherit;font-size:12px;cursor:pointer}
+.stepper{display:grid;grid-template-columns:52px 1fr 52px;gap:var(--s2);align-items:center}
+.stepper button{height:52px;border:1px solid var(--line);border-radius:var(--r-md);background:var(--surface-2);
+  color:var(--text-1);font:inherit;font-size:18px;cursor:pointer}
+.stepper input{height:52px;text-align:center;font:inherit;font-size:20px;font-variant-numeric:tabular-nums;
+  background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-md);color:var(--text-1)}
+.last-time{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--text-3);margin:var(--s3) 0}
+.next{color:var(--text-3);font-size:12px;display:flex;align-items:center;gap:6px}
+
+/* nav mobile */
+.tabbar{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);background:var(--surface-1)}
+.tabbar button{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px 12px;min-height:56px;
+  border:0;background:transparent;color:var(--text-3);font:inherit;font-size:11px;cursor:pointer}
+.tabbar button.on{color:var(--accent)}
+.tabbar svg{width:20px;height:20px}
+
+/* desktop */
+.desk-body{display:grid;grid-template-columns:232px 1fr;height:100%}
+.side{border-right:1px solid var(--line);background:var(--surface-1);display:flex;flex-direction:column;padding:var(--s4)}
+.side .brand{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:590;letter-spacing:.08em;margin-bottom:var(--s5)}
+.brand-mark{width:28px;height:28px;border-radius:8px;background:var(--accent);color:var(--accent-ink);
+  display:grid;place-items:center;font-size:12px;font-weight:590}
+.nav{display:grid;gap:2px}
+.nav button{display:flex;align-items:center;gap:10px;width:100%;min-height:40px;padding:0 12px;border:0;border-radius:var(--r-md);
+  background:transparent;color:var(--text-2);font:inherit;font-size:13px;cursor:pointer;text-align:left}
+.nav button:hover{background:rgba(255,255,255,.03);color:var(--text-1)}
+.nav button.on{background:rgba(184,243,107,.10);color:var(--text-1);box-shadow:inset 2px 0 0 var(--accent)}
+.side .who{margin-top:auto;display:flex;align-items:center;gap:10px;border-top:1px solid var(--line);padding-top:var(--s4)}
+.side .who small{display:block;color:var(--text-3);font-size:11px}
+.desk-main{display:grid;grid-template-columns:1fr 320px;gap:var(--s5);padding:var(--s5);overflow:auto}
+.desk-col{display:grid;gap:var(--s4);align-content:start}
+.spark{display:flex;align-items:flex-end;gap:4px;height:64px}
+.spark i{flex:1;background:rgba(184,243,107,.55);border-radius:2px 2px 0 0}
+
+/* specimen */
+.specimen{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:var(--s4)}
+.sw{display:flex;align-items:center;gap:var(--s3);font-size:12px;color:var(--text-2)}
+.sw i{width:32px;height:32px;border-radius:var(--r-sm);border:1px solid var(--line)}
+.type-row{display:flex;align-items:baseline;gap:var(--s3);border-bottom:1px solid var(--line);padding:var(--s2) 0}
+.type-row small{color:var(--text-3);width:64px;font-size:11px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="doc-head">
+    <div>
+      <h1>Coach Ottman &amp; Laura — maquette de la refonte</h1>
+      <p>Trois ecrans mobiles (390 x 844) et un ecran desktop (1320 x 820). La navigation basse du premier cadre est cliquable. Donnees illustratives, aucune connexion requise.</p>
+    </div>
+    <span class="doc-tag">11 septembre 2026</span>
+  </header>
+
+  <!-- ================= MOBILE ================= -->
+  <div class="section-title"><h2>Mobile — 390 px</h2><span></span></div>
+  <p class="hint">Le cadre de gauche est interactif : cliquez sur les onglets pour changer d'ecran.</p>
+
+  <div class="frames">
+    <!-- device interactif -->
+    <div class="device" id="device">
+      <!-- AUJOURD'HUI -->
+      <section class="screen" data-screen="today">
+        <div class="appbar">
+          <div>
+            <p class="date">jeudi 11 septembre</p>
+            <h1>Bonjour Ottman</h1>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <div class="avatar">O</div>
+            <button class="iconbtn" aria-label="Reglages">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 7 19.4l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.7 1.7 0 0 0 3 13.7H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.6 7l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 2.9-1.2V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 2.9 1.2l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0 1.2 2.9H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="content">
+          <div class="resume">
+            <div class="txt">
+              <strong>Seance en cours — Full Body A</strong>
+              <small>12 series sur 26 · reprise possible</small>
+              <div class="bar" style="margin-top:8px"><i style="width:46%"></i></div>
+            </div>
+            <button class="btn sm" style="width:auto;padding:0 16px">Reprendre</button>
+          </div>
+
+          <div class="hero">
+            <p class="eyebrow">Seance du jour</p>
+            <h2>Full Body A</h2>
+            <p class="focus">Polyarticulaire et finisher cardio</p>
+            <div class="meta">
+              <i>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
+                64 min
+              </i>
+              <i>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 9v6M18 9v6M3.5 10.5v3M20.5 10.5v3M6 12h12"/></svg>
+                6 mouvements
+              </i>
+            </div>
+            <div class="chips"><span class="chip">Pectoraux</span><span class="chip">Dos</span><span class="chip">Epaules</span></div>
+            <button class="btn">Commencer Full Body A</button>
+          </div>
+
+          <div>
+            <p class="eyebrow">Semaine en cours</p>
+            <div class="week">
+              <div class="day done"><small>lun. 08</small><strong>Full Body A</strong><span>Terminee · 15 series</span></div>
+              <div class="day done"><small>mer. 10</small><strong>Full Body B</strong><span>Terminee · 18 series</span></div>
+              <div class="day today"><small>sam. 13</small><strong>Cardio</strong><span>Aujourd'hui · 72 min</span></div>
+            </div>
+          </div>
+
+          <div class="kpis">
+            <div class="kpi"><small>Cette semaine</small><strong>2 <b>/ 3 seances</b></strong></div>
+            <div class="kpi"><small>Volume 7 jours</small><strong>14 260 <b>kg·rep</b></strong></div>
+          </div>
+
+          <div class="card">
+            <p class="eyebrow">Derniere seance</p>
+            <div class="row" style="padding-top:0">
+              <div class="grow">
+                <strong>Full Body B</strong>
+                <small>mercredi 10 septembre · 62 min · RPE 7/10</small>
+              </div>
+              <span class="val">18 series</span>
+            </div>
+          </div>
+
+          <div class="card coach">
+            <strong>Conseil du coach</strong>
+            <p>Reste sur cette base cette semaine : cherche des repetitions regulieres et controlees avant d'ajouter de la charge.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SEANCE -->
+      <section class="screen" data-screen="session" hidden>
+        <div class="appbar">
+          <div>
+            <p class="date">Full Body A · Echauffement</p>
+            <h1>Coiffe des rotateurs</h1>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span class="session-head count">12 / 26</span>
+            <span class="session-head count">00:41:12</span>
+          </div>
+        </div>
+        <div class="content">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div class="duo" role="group" aria-label="Profil actif">
+              <button class="on" aria-pressed="true">Ottman</button>
+              <button aria-pressed="false">Laura</button>
+            </div>
+            <button class="btn ghost sm" style="width:auto;padding:0 14px">Tutoriel</button>
+          </div>
+
+          <div class="visual">
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 18c3-6 5-9 8-9s5 3 8 9"/><circle cx="12" cy="6.5" r="2"/></svg>
+            <span>Illustration du mouvement (RepDB) — repli pictogramme si l'image manque</span>
+          </div>
+
+          <div class="prescription">
+            <span class="label">Echauffement · serie 1 / 3</span>
+            <div class="value"><strong>10</strong><span>repetitions</span></div>
+            <p class="note">10 repetitions par bras · repos prescrit 30 s · mouvement lent et controle</p>
+          </div>
+
+          <div class="timer">
+            <div><strong>00:40</strong><small>Compteur tempo</small></div>
+            <div class="acts">
+              <button>Passer</button>
+              <button>Demarrer</button>
+              <button>Recommencer</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <p class="eyebrow" style="margin-bottom:10px">Ta performance</p>
+            <div class="stepper">
+              <button aria-label="Retirer 1 repetition">−1</button>
+              <input value="10" inputmode="numeric" aria-label="Repetitions realisees" />
+              <button aria-label="Ajouter 1 repetition">+1</button>
+            </div>
+            <div class="last-time">
+              <span>Derniere fois : 10 kg x 10</span>
+              <span>+1,5 kg conseilles</span>
+            </div>
+            <button class="btn">Valider la serie</button>
+          </div>
+
+          <p class="next">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+            Ensuite : Equilibre sur bosu · 40 s
+          </p>
+          <button class="btn ghost">Machine indisponible ? Voir l'alternative</button>
+        </div>
+      </section>
+
+      <!-- REPOS -->
+      <section class="screen" data-screen="rest" hidden>
+        <div class="appbar">
+          <div>
+            <p class="date">Full Body A · Bloc principal</p>
+            <h1>Repos</h1>
+          </div>
+          <span class="session-head count">13 / 26</span>
+        </div>
+        <div class="content">
+          <div class="timer" style="border-color:rgba(243,189,107,.35)">
+            <div><strong style="color:var(--rest)">01:30</strong><small>Repos prescrit · 90 s</small></div>
+            <div class="acts"><button>−15 s</button><button>+15 s</button></div>
+          </div>
+          <div class="card">
+            <p class="eyebrow">Prochaine serie</p>
+            <div class="row" style="padding-top:0">
+              <div class="grow">
+                <strong>Developpe incline · serie 2 / 4</strong>
+                <small>10 repetitions · charge prescrite 20 kg</small>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:12px">
+              <button class="btn ghost sm" style="flex:1">Passer le repos</button>
+              <button class="btn sm" style="flex:1">Marquer la serie</button>
+            </div>
+          </div>
+          <div class="card coach">
+            <strong>Respiration</strong>
+            <p>Deux inspirations par le nez, expiration longue : la serie suivante sera mieux executee.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- PROGRESSION -->
+      <section class="screen" data-screen="prog" hidden>
+        <div class="appbar">
+          <div>
+            <p class="date">Ton parcours · Ottman</p>
+            <h1>Progression</h1>
+          </div>
+        </div>
+        <div class="content">
+          <div class="duo" style="justify-self:start" role="tablist">
+            <button class="on" role="tab" aria-selected="true">Tendance</button>
+            <button role="tab" aria-selected="false">Historique</button>
+          </div>
+          <div class="kpis">
+            <div class="kpi"><small>Cette semaine</small><strong>2 <b>seances</b></strong></div>
+            <div class="kpi"><small>Volume total</small><strong>63 714 <b>kg·rep</b></strong></div>
+            <div class="kpi"><small>Charge max</small><strong>63 <b>kg</b></strong></div>
+            <div class="kpi"><small>Temps actif</small><strong>4 <b>h 12</b></strong></div>
+          </div>
+          <div class="card">
+            <p class="eyebrow">Volume par seance</p>
+            <div class="spark">
+              <i style="height:44%"></i><i style="height:58%"></i><i style="height:36%"></i><i style="height:72%"></i>
+              <i style="height:64%"></i><i style="height:88%"></i><i style="height:76%"></i><i style="height:96%"></i>
+            </div>
+            <div style="display:flex;justify-content:space-between;color:var(--text-3);font-size:11px;margin-top:8px">
+              <span>08/08</span><span>23/08</span><span>06/09</span><span>10/09</span>
+            </div>
+          </div>
+          <div class="card">
+            <p class="eyebrow">Records par mouvement</p>
+            <div class="row" style="padding-top:0"><span class="rank">1</span><div class="grow"><strong>Velo stationnaire</strong><small>meilleure charge tenue</small></div><span class="val">63 kg</span></div>
+            <div class="row"><span class="rank">2</span><div class="grow"><strong>Tractions assistees</strong><small>meilleure charge tenue</small></div><span class="val">62 kg</span></div>
+            <div class="row"><span class="rank">3</span><div class="grow"><strong>Rameur</strong><small>meilleure charge tenue</small></div><span class="val">56 kg</span></div>
+            <div class="row"><span class="rank">4</span><div class="grow"><strong>Cardio</strong><small>meilleure charge tenue</small></div><span class="val">55 kg</span></div>
+          </div>
+          <div class="card coach">
+            <strong>Coaching apres seance</strong>
+            <p>Reste sur cette base : la tendance est stable sur quatre seances. Une progression est conseillee a partir de la semaine prochaine.</p>
+          </div>
+        </div>
+      </section>
+
+      <nav class="tabbar" role="tablist" aria-label="Navigation principale">
+        <button data-go="today" class="on" role="tab" aria-selected="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 11 12 4l8 7v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/></svg>
+          Aujourd'hui
+        </button>
+        <button data-go="session" role="tab" aria-selected="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 9v6M18 9v6M3.5 10.5v3M20.5 10.5v3M6 12h12"/></svg>
+          Seance
+        </button>
+        <button data-go="rest" role="tab" aria-selected="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9.5V13l2.5 1.5M9 3h6"/></svg>
+          Repos
+        </button>
+        <button data-go="prog" role="tab" aria-selected="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M4 19h16M7 16V9m5 7V5m5 11v-5"/></svg>
+          Progression
+        </button>
+      </nav>
+    </div>
+
+    <!-- desktop -->
+    <div class="device desk">
+      <div class="desk-body">
+        <aside class="side">
+          <div class="brand"><span class="brand-mark">C</span> COACH</div>
+          <nav class="nav" aria-label="Sections desktop">
+            <button class="on">Aujourd'hui</button>
+            <button>Programme</button>
+            <button>Progression</button>
+            <button>Profil</button>
+          </nav>
+          <div class="who">
+            <div class="avatar">O</div>
+            <div><strong style="font-size:13px">Ottman</strong><small>Donnees locales</small></div>
+          </div>
+        </aside>
+        <div class="desk-main">
+          <div class="desk-col">
+            <div>
+              <p class="eyebrow">jeudi 11 septembre</p>
+              <h1 style="margin:0;font-size:28px;font-weight:590;letter-spacing:-.01em">Bonjour Ottman</h1>
+            </div>
+            <div class="resume">
+              <div class="txt">
+                <strong>Seance en cours — Full Body A</strong>
+                <small>12 series sur 26 · reprise possible</small>
+                <div class="bar" style="margin-top:8px"><i style="width:46%"></i></div>
+              </div>
+              <button class="btn sm" style="width:auto;padding:0 18px">Reprendre</button>
+            </div>
+            <div class="hero">
+              <p class="eyebrow">Seance du jour</p>
+              <h2>Full Body A</h2>
+              <p class="focus">Polyarticulaire et finisher cardio</p>
+              <div class="meta">
+                <i>64 min</i><i>6 mouvements</i><i>26 series</i>
+              </div>
+              <div class="chips"><span class="chip">Pectoraux</span><span class="chip">Dos</span><span class="chip">Epaules</span><span class="chip">Quadriceps</span></div>
+              <button class="btn" style="max-width:320px">Commencer Full Body A</button>
+            </div>
+            <div>
+              <p class="eyebrow">Semaine en cours</p>
+              <div class="week">
+                <div class="day done"><small>lun. 08</small><strong>Full Body A</strong><span>Terminee · 15 series</span></div>
+                <div class="day done"><small>mer. 10</small><strong>Full Body B</strong><span>Terminee · 18 series</span></div>
+                <div class="day today"><small>sam. 13</small><strong>Cardio</strong><span>Aujourd'hui · 72 min</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="desk-col">
+            <div class="kpis" style="grid-template-columns:1fr">
+              <div class="kpi"><small>Cette semaine</small><strong>2 <b>/ 3 seances</b></strong></div>
+              <div class="kpi"><small>Volume 7 jours</small><strong>14 260 <b>kg·rep</b></strong></div>
+            </div>
+            <div class="card">
+              <p class="eyebrow">Derniere seance</p>
+              <div class="row" style="padding-top:0">
+                <div class="grow"><strong>Full Body B</strong><small>mercredi 10 septembre · RPE 7/10</small></div>
+                <span class="val">18 series</span>
+              </div>
+            </div>
+            <div class="card">
+              <p class="eyebrow">Volume sur 8 seances</p>
+              <div class="spark">
+                <i style="height:44%"></i><i style="height:58%"></i><i style="height:36%"></i><i style="height:72%"></i>
+                <i style="height:64%"></i><i style="height:88%"></i><i style="height:76%"></i><i style="height:96%"></i>
+              </div>
+            </div>
+            <div class="card coach">
+              <strong>Conseil du coach</strong>
+              <p>Reste sur cette base cette semaine : repetitions regulieres et controlees avant d'ajouter de la charge.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= SPECIMEN ================= -->
+  <div class="section-title"><h2>Design system cible</h2><span></span></div>
+  <div class="specimen">
+    <div class="card">
+      <p class="eyebrow">Surfaces et lignes</p>
+      <div class="sw" style="margin-bottom:8px"><i style="background:var(--surface-0)"></i> surface-0 #0B0F0E</div>
+      <div class="sw" style="margin-bottom:8px"><i style="background:var(--surface-1)"></i> surface-1 #121715</div>
+      <div class="sw" style="margin-bottom:8px"><i style="background:var(--surface-2)"></i> surface-2 #18201D</div>
+      <div class="sw"><i style="background:transparent;border-color:var(--line-strong)"></i> line rgba(255,255,255,.09)</div>
+    </div>
+    <div class="card">
+      <p class="eyebrow">Accents</p>
+      <div class="sw" style="margin-bottom:8px"><i style="background:var(--accent)"></i> accent #B8F36B — action principale</div>
+      <div class="sw" style="margin-bottom:8px"><i style="background:var(--rest)"></i> rest #F3BD6B — repos</div>
+      <div class="sw" style="margin-bottom:8px"><i style="background:var(--laura)"></i> laura #E0A9EE — identite profil</div>
+      <div class="sw"><i style="background:var(--danger)"></i> danger #E79292 — suppression</div>
+    </div>
+    <div class="card">
+      <p class="eyebrow">Echelle typographique</p>
+      <div class="type-row"><small>40/1</small><span style="font-size:40px;font-weight:590;letter-spacing:-.02em">12 / 26</span></div>
+      <div class="type-row"><small>28/1.15</small><span style="font-size:28px;font-weight:590;letter-spacing:-.01em">Bonjour Ottman</span></div>
+      <div class="type-row"><small>22/1.15</small><span style="font-size:22px;font-weight:590">Full Body A</span></div>
+      <div class="type-row"><small>15/1.5</small><span style="font-size:15px">Polyarticulaire et finisher cardio</span></div>
+      <div class="type-row"><small>12/1.5</small><span style="font-size:12px;color:var(--text-3)">Chiffres tabulaires : 00:41:12</span></div>
+    </div>
+    <div class="card">
+      <p class="eyebrow">Actions et cibles</p>
+      <button class="btn" style="margin-bottom:10px">Action principale — 48 px</button>
+      <button class="btn ghost" style="margin-bottom:10px">Action secondaire — 48 px</button>
+      <div class="timer" style="padding:8px 12px">
+        <div><strong style="font-size:20px">00:40</strong><small>Micro-action 32 px</small></div>
+        <div class="acts"><button>−15 s</button><button>+15 s</button></div>
+      </div>
+      <p class="hint" style="margin:12px 0 0">Toute cible d'action respecte au minimum 44 x 44 px.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+// Navigation du cadre mobile : changement d'ecran reel, verifiable au clic.
+document.querySelectorAll('.tabbar button').forEach(function (tab) {
+  tab.addEventListener('click', function () {
+    var target = tab.dataset.go;
+    document.querySelectorAll('.tabbar button').forEach(function (b) {
+      var on = b === tab;
+      b.classList.toggle('on', on);
+      b.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    document.querySelectorAll('.screen').forEach(function (s) {
+      s.hidden = s.dataset.screen !== target;
+    });
+    document.getElementById('device').querySelector('.screen:not([hidden])').scrollTop = 0;
+  });
+});
+// Selecteur desktop
+document.querySelectorAll('.nav button').forEach(function (b) {
+  b.addEventListener('click', function () {
+    document.querySelectorAll('.nav button').forEach(function (x) { x.classList.remove('on'); });
+    b.classList.add('on');
+  });
+});
+// Bascules internes (duo, sous-onglets)
+document.querySelectorAll('.duo button').forEach(function (b) {
+  b.addEventListener('click', function () {
+    b.parentElement.querySelectorAll('button').forEach(function (x) {
+      x.classList.remove('on');
+      x.setAttribute('aria-pressed', 'false');
+      x.setAttribute('aria-selected', 'false');
+    });
+    b.classList.add('on');
+    b.setAttribute('aria-pressed', 'true');
+    b.setAttribute('aria-selected', 'true');
+  });
+});
+</script>
+</body>
+</html>

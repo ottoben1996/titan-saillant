@@ -1,0 +1,16 @@
+node_modules/
+dist/
+.wrangler/
+.tmp/
+.agents/
+
+# Sources de travail volumineuses (livres PDF et extractions texte)
+*.pdf
+Body-Build-Book-7.txt
+extract_*.txt
+
+# Captures et fichiers temporaires
+_page*.png
+page*.png
+.DS_Store
+Thumbs.db

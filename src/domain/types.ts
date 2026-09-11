@@ -1,0 +1,102 @@
+export type ProfileId = 'ottman' | 'laura';
+
+export type WorkoutDayId = 'full-body-a' | 'full-body-b' | 'cardio';
+export type ExerciseKind = 'strength' | 'timed' | 'cardio' | 'warmup' | 'cooldown';
+
+export interface SetPrescription {
+  readonly repetitions?: number;
+  readonly durationSeconds?: number;
+  readonly loadKg?: number;
+  readonly loadLabel?: string;
+  readonly restSeconds?: number;
+  readonly phase?: 'warmup' | 'working';
+}
+
+export interface ExercisePrescription {
+  readonly id: string;
+  readonly name: string;
+  readonly kind: ExerciseKind;
+  readonly sets: readonly SetPrescription[];
+  readonly notes?: string;
+  readonly circuitId?: string;
+  readonly restAfterSeconds?: number;
+}
+
+export interface WorkoutDay {
+  readonly id: WorkoutDayId;
+  readonly name: string;
+  readonly subtitle: string;
+  readonly exercises: readonly ExercisePrescription[];
+  readonly warmup?: readonly ExercisePrescription[];
+  readonly cooldown: Readonly<{
+    readonly name: string;
+    readonly durationSeconds: number;
+    readonly loadLabel?: string;
+  }>;
+}
+
+export interface WorkoutPlan {
+  readonly profileId: ProfileId;
+  readonly displayName: string;
+  readonly coach: string;
+  readonly warmup: readonly ExercisePrescription[];
+  readonly days: readonly WorkoutDay[];
+}
+
+export interface Tutorial {
+  readonly exerciseId: string;
+  readonly title: string;
+  readonly muscles: readonly string[];
+  readonly equipment: readonly string[];
+  readonly position: string;
+  readonly steps: readonly string[];
+  readonly commonMistakes: readonly string[];
+  readonly safety: readonly string[];
+  readonly videoUrl?: string;
+  readonly youtubeShortId?: string;
+  readonly primaryMuscles?: readonly string[];
+  readonly secondaryMuscles?: readonly string[];
+  readonly tempoRecommended?: string;
+  readonly keyCue?: string;
+}
+
+export interface LoggedSet {
+  exerciseId: string;
+  setIndex: number;
+  actualRepetitions?: number;
+  actualDurationSeconds?: number;
+  actualLoadKg?: number;
+  completedAt: string;
+}
+
+export interface SessionTimerState {
+  kind: 'rest' | 'tempo';
+  exerciseId: string;
+  setIndex: number;
+  remainingSeconds: number;
+  paused: boolean;
+  /** Faux au chargement d'une série tempo, avant l'appui explicite sur « Démarrer ». */
+  started?: boolean;
+  updatedAt: string;
+}
+
+export interface WorkoutSession {
+  id: string;
+  profileId: ProfileId;
+  dayId: WorkoutDayId;
+  sequenceVersion?: 2;
+  currentStepIndex?: number;
+  startedAt: string;
+  updatedAt: string;
+  completedAt?: string;
+  currentExerciseIndex: number;
+  currentSetIndex: number;
+  loggedSets: LoggedSet[];
+  activeTimer?: SessionTimerState;
+  /** Retour post-séance, facultatif pour rester compatible avec les anciennes sauvegardes. */
+  perceivedExertion?: number;
+  energy?: number;
+  pain?: string;
+  notes?: string;
+  alternativesUsed?: string[];
+}

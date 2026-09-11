@@ -1,0 +1,217 @@
+import { useEffect, useRef, useState } from 'react';
+import type { SessionTimerState } from '../../domain/types';
+import { createCountdown, type CountdownController } from '../../workout/timer';
+import { Play, Timer, X } from '../ui/Icons';
+
+export const formatDuration = (seconds: number) =>
+  `${Math.floor(seconds / 60).toString().padStart(2, '0')}:${Math.max(0, seconds % 60).toString().padStart(2, '0')}`;
+
+interface RestTimerProps {
+  exerciseId: string;
+  setIndex: number;
+  seconds: number;
+  initialState?: SessionTimerState;
+  suspended: boolean;
+  onStateChange: (state: SessionTimerState | null) => void;
+  onDone: () => void;
+}
+
+export function RestTimer({
+  exerciseId,
+  setIndex,
+  seconds,
+  initialState,
+  suspended,
+  onStateChange,
+  onDone,
+}: RestTimerProps) {
+  const controller = useRef<CountdownController | null>(null);
+  const onStateChangeRef = useRef(onStateChange);
+  const [remaining, setRemaining] = useState(initialState?.remainingSeconds ?? seconds);
+  const [totalDuration, setTotalDuration] = useState(Math.max(seconds, initialState?.remainingSeconds ?? seconds));
+  const [paused, setPaused] = useState(initialState?.paused ?? false);
+  const autoPausedRef = useRef(false);
+  const lastPublishedRef = useRef<number | null>(null);
+
+  onStateChangeRef.current = onStateChange;
+
+  const triggerHaptic = (ms = 25) => {
+    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+      try {
+        navigator.vibrate?.(ms);
+      } catch {
+        /* ignorer */
+      }
+    }
+  };
+
+  const publish = (value: number, isPaused: boolean) => {
+    if (lastPublishedRef.current === value && !isPaused) return;
+    lastPublishedRef.current = value;
+    onStateChangeRef.current({
+      kind: 'rest',
+      exerciseId,
+      setIndex,
+      remainingSeconds: value,
+      paused: isPaused,
+      updatedAt: new Date().toISOString(),
+    });
+  };
+
+  useEffect(() => {
+    controller.current?.cancel();
+    lastPublishedRef.current = null;
+    const start = initialState?.remainingSeconds ?? seconds;
+    const initialPaused = initialState?.paused ?? false;
+    setRemaining(start);
+    setTotalDuration(Math.max(seconds, start));
+    setPaused(initialPaused);
+
+    const timer = createCountdown(
+      start,
+      (value) => {
+        setRemaining(value);
+        // Sauvegarde périodique (toutes les 15s ou <= 5s) pour découpler le root React
+        if (value === 0 || value <= 5 || value % 15 === 0) {
+          publish(value, false);
+        }
+      },
+      () => {
+        setRemaining(0);
+        setPaused(false);
+        onStateChangeRef.current(null);
+        onDone();
+      }
+    );
+
+    controller.current = timer;
+    if (initialPaused) {
+      timer.pause();
+    } else {
+      publish(start, false);
+    }
+
+    return () => timer.cancel();
+  }, [seconds, initialState?.exerciseId, initialState?.setIndex]);
+
+  useEffect(() => {
+    if (!controller.current) return;
+    if (suspended && !paused) {
+      controller.current.pause();
+      const value = controller.current.getRemaining();
+      setRemaining(value);
+      publish(value, true);
+      setPaused(true);
+      autoPausedRef.current = true;
+    } else if (!suspended && paused && autoPausedRef.current) {
+      controller.current.resume();
+      setPaused(false);
+      autoPausedRef.current = false;
+      publish(controller.current.getRemaining(), false);
+    }
+  }, [suspended, paused]);
+
+  const handleAddSeconds = (deltaSeconds = 30) => {
+    triggerHaptic(25);
+    const nextRemaining = remaining + deltaSeconds;
+    setRemaining(nextRemaining);
+    setTotalDuration((prev) => Math.max(prev, nextRemaining));
+    controller.current?.cancel();
+    lastPublishedRef.current = null;
+    const timer = createCountdown(
+      nextRemaining,
+      (value) => {
+        setRemaining(value);
+        if (value === 0 || value <= 5 || value % 15 === 0) {
+          publish(value, false);
+        }
+      },
+      () => {
+        setRemaining(0);
+        setPaused(false);
+        onStateChangeRef.current(null);
+        onDone();
+      }
+    );
+    controller.current = timer;
+    if (paused) {
+      timer.pause();
+      publish(nextRemaining, true);
+    } else {
+      publish(nextRemaining, false);
+    }
+  };
+
+  const toggle = () => {
+    if (!controller.current) return;
+    triggerHaptic(20);
+    if (paused) {
+      controller.current.resume();
+      setPaused(false);
+      publish(controller.current.getRemaining(), false);
+    } else {
+      controller.current.pause();
+      const value = controller.current.getRemaining();
+      setRemaining(value);
+      setPaused(true);
+      publish(value, true);
+    }
+  };
+
+  const progressTotal = totalDuration > 0 ? totalDuration : (seconds > 0 ? seconds : 60);
+  const radius = 52;
+  const circumference = 2 * Math.PI * radius;
+  const progressRatio = Math.max(0, Math.min(1, remaining / progressTotal));
+  const strokeDashoffset = circumference * (1 - progressRatio);
+  const isAlert = remaining <= 5 && remaining > 0;
+
+  return (
+    <div className="rest-card">
+      <div className={`rest-orbit-svg-container ${isAlert ? 'rest-circle-alert' : ''}`}>
+        <svg className="rest-circle-svg" viewBox="0 0 120 120" aria-hidden="true">
+          <circle className="rest-circle-bg" cx="60" cy="60" r={radius} />
+          <circle
+            className="rest-circle-progress"
+            cx="60"
+            cy="60"
+            r={radius}
+            strokeDasharray={circumference}
+            strokeDashoffset={strokeDashoffset}
+          />
+        </svg>
+        <div className="rest-orbit-content">
+          <span style={{ color: isAlert ? '#facc15' : '#b8f36b', marginBottom: '0.2rem', display: 'flex' }}>
+            <Timer size={20} />
+          </span>
+          <strong>{formatDuration(remaining)}</strong>
+          <span>{paused ? 'en pause' : 'repos'}</span>
+        </div>
+      </div>
+      <p>Récupère vraiment. La prochaine série sera plus solide.</p>
+      <div className="rest-actions">
+        <button
+          type="button"
+          onClick={() => {
+            triggerHaptic(30);
+            onStateChange(null);
+            onDone();
+          }}
+          aria-label="Passer le temps de repos"
+        >
+          <X size={18} /> Passer
+        </button>
+        <button type="button" onClick={toggle} disabled={suspended} aria-label={paused ? 'Reprendre' : 'Pause'}>
+          <Play size={16} /> {paused ? 'Reprendre' : 'Pause'}
+        </button>
+        <button
+          type="button"
+          className="add-rest-btn"
+          onClick={() => handleAddSeconds(30)}
+          aria-label="Ajouter 30 secondes de repos"
+        >
+          +30s
+        </button>
+      </div>
+    </div>
+  );
+}
