@@ -143,6 +143,16 @@ Après correction : intitulé sur une ligne (15 px), chiffre et état sur la mê
 
 Second défaut visible sur la même capture, corrigé dans la foulée : pour un mouvement **sans illustration** (`bosu`, `skierg`, `sit-to-stand`), la carte de prescription s'étirait et laissait une zone morte de ~90 px, et laissait ~180 px de vide sur un écran de 932 px de haut. La carte se contente désormais de son contenu et l'espace libéré accueille le **repère clé du tutoriel** (« REPÈRE CLÉ — Regard fixe devant, appui au centre du bosu »), du contenu réel plutôt qu'un vide. Carte mesurée après correction : 193 px (390 × 844) et 196 px (430 × 932), sans débordement de page dans les deux cas.
 
+## 7 quater. Mise en ligne
+
+Application publiée : **https://ottoben1996.github.io/titan-saillant/** (dépôt public `ottoben1996/titan-saillant`, GitHub Pages, HTTPS forcé).
+
+Publié : le dossier construit uniquement (aucune source, aucun document interne, aucun harnais de contrôle). Le chemin de base est injecté au déploiement (`VITE_BASE=/titan-saillant/`), les manifestes sont passés en chemins relatifs et un point d'entrée `mustapha/index.html` rend l'espace Mustapha accessible sous son chemin. Repli `404.html` pour les chemins gérés côté client.
+
+Écarté de la publication : `mustapha/assets/recipes_extracted` (4,1 Mo, 5 images extraites des PDF de recettes) — provenance non documentée dans les crédits, publier vaudrait redistribution. À réintégrer sur décision explicite.
+
+Contrôles effectués sur l'adresse en ligne : racine, manifeste, `sw.js`, icône 192, police, illustration d'exercice et écran de lancement en 200 avec contenu réel ; manifeste lu par le navigateur (`start_url` et `scope` relatifs, 4 icônes) ; service worker actif sous `/titan-saillant/sw.js` et page contrôlée ; 43 entrées en précache ; **zéro message console, zéro exception JS**.
+
 ## 8. Ce qui n'a PAS été vérifié
 
 1. Les encoches réelles : `env(safe-area-inset-*)` vaut 0 dans un navigateur de bureau, la structure est en place mais l'effet réel demande un appareil ou une émulation avec encoche.
