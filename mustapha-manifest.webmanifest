@@ -2,11 +2,18 @@
   "name": "MUSTAPHA COACH",
   "short_name": "Mustapha Coach",
   "description": "Coach local de 8 semaines pour entraînement, nutrition et progression.",
-  "start_url": "/mustapha",
-  "scope": "/mustapha",
+  "start_url": ".",
+  "scope": ".",
   "display": "standalone",
   "background_color": "#0a0e0d",
   "theme_color": "#b8f36b",
   "lang": "fr",
-  "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
 }
