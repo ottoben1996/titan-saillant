@@ -164,19 +164,25 @@ export function ExerciseTimer({
             : 'En cours'}
         </small>
       </div>
-      <div className="timer-actions">
-        <button
-          type="button"
-          onClick={handleSkip}
-          disabled={suspended || remaining === 0}
-          className="skip-tempo-btn"
-          aria-label="Passer le tempo"
-        >
-          <X size={15} /> Passer
-        </button>
-        <button type="button" onClick={toggle} disabled={!running || suspended}>
-          <Play size={15} /> {!started ? 'Démarrer' : paused ? 'Reprendre' : 'Pause'}
-        </button>
+      {/* Temps écoulé : « Passer » et « Démarrer » n'ont plus d'objet, on ne garde
+          qu'une action — et l'écran rend la place au bouton de validation. */}
+      <div className={`timer-actions${remaining === 0 ? ' finished' : ''}`}>
+        {remaining > 0 && (
+          <button
+            type="button"
+            onClick={handleSkip}
+            disabled={suspended}
+            className="skip-tempo-btn"
+            aria-label="Passer le tempo"
+          >
+            <X size={15} /> Passer
+          </button>
+        )}
+        {remaining > 0 && (
+          <button type="button" onClick={toggle} disabled={!running || suspended}>
+            <Play size={15} /> {!started ? 'Démarrer' : paused ? 'Reprendre' : 'Pause'}
+          </button>
+        )}
         <button type="button" onClick={() => setResetNonce((value) => value + 1)} disabled={suspended}>
           <Repeat size={15} /> Recommencer
         </button>

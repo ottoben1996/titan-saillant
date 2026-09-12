@@ -231,7 +231,7 @@
   display: grid;
   gap: .2rem;
   margin: .15rem 0 .25rem;
-  padding: .5rem .65rem;
+  padding: .4rem .6rem;
   border-left: 2px solid var(--accent);
   border-radius: 6px;
   background: var(--surface-2);
@@ -288,6 +288,45 @@
   .workout-content .exercise-illustration.animated .frame-peak {
     opacity: 0;
   }
+}
+
+/* Sur un écran court (barre d'adresse visible, petit téléphone), l'action
+   principale reste collée au bas de la colonne : impossible de se retrouver
+   sans moyen de valider la série, même sans défiler. */
+@media (max-height: 780px) {
+  /* Toute la carte de saisie se fixe en bas, fond opaque : l'utilisateur garde
+     sous les yeux la valeur en cours ET le bouton de validation, et le reste de
+     la séance défile derrière. Un bouton seul collé par-dessus masquait la
+     rangée de saisie. */
+  .workout-content .log-card.compact {
+    position: sticky;
+    bottom: 0;
+    z-index: 3;
+    background: var(--surface-1);
+    box-shadow: 0 -14px 28px rgba(0, 0, 0, .5);
+  }
+
+  /* La marge basse du conteneur ne doit pas créer de vide sous le panneau. */
+  .workout-content {
+    padding-bottom: 0;
+  }
+}
+
+/* --- Jamais d'action inatteignable -----------------------------------------
+   La colonne de séance était en `overflow: hidden` : sur un écran plus court
+   (barre d'adresse du navigateur, petit téléphone) le contenu dépassait et le
+   bouton « Valider la série » se retrouvait coupé, sans aucun moyen de défiler.
+   Le défilement redevient possible, et les cartes gardent leur taille naturelle
+   au lieu d'être comprimées. */
+.workout-content {
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: calc(.7rem + env(safe-area-inset-bottom, 0px));
+}
+
+.workout-content > * {
+  flex-shrink: 0;
 }
 
 /* --- Chrono de tempo -------------------------------------------------------
@@ -349,6 +388,16 @@
 
 .workout-content .timer-actions button:last-child {
   grid-area: 2 / 2 / 3 / 3;
+}
+
+/* Chrono terminé : il ne reste que « Recommencer », sur toute la largeur.
+   La règle doit suivre celle du dernier bouton pour l'emporter. */
+.workout-content .timer-actions.finished {
+  grid-template-columns: 1fr;
+}
+
+.workout-content .timer-actions.finished button {
+  grid-area: 1 / 1 / 2 / 2;
 }
 
 /* Écrans bas (paysage, petits Android) : on resserre encore d'un cran. */

@@ -4,13 +4,28 @@
     <meta charset="utf-8" />
     <title>Contrôle 390 px — Coach</title>
     <style>
-      body { margin: 0; background: #1b1f1e; display: flex; gap: 16px; padding: 12px; }
-      iframe { width: 390px; height: 844px; border: 0; background: #0b0f0e; border-radius: 8px; }
-      iframe.wide { width: 430px; height: 932px; }
+      body { margin: 0; background: #1b1f1e; display: flex; gap: 16px; padding: 12px; align-items: flex-start; }
+      figure { margin: 0; }
+      figcaption { color: #8b9a91; font: 11px/1.6 system-ui, sans-serif; }
+      iframe { border: 0; background: #0b0f0e; border-radius: 8px; display: block; }
+      #narrow { width: 390px; height: 844px; }
+      #wide { width: 430px; height: 932px; }
+      /* Écran court : simule un navigateur avec barre d'adresse visible. */
+      #short { width: 390px; height: 620px; }
     </style>
   </head>
   <body>
-    <iframe id="narrow" src="/" title="iPhone 13 — 390 px"></iframe>
-    <iframe id="wide" class="wide" src="/" title="Xiaomi — 430 px"></iframe>
+    <figure>
+      <iframe id="narrow" src="/" title="iPhone 13 — 390 px"></iframe>
+      <figcaption>iPhone 13 — 390 × 844</figcaption>
+    </figure>
+    <figure>
+      <iframe id="wide" src="/" title="Xiaomi — 430 px"></iframe>
+      <figcaption>Xiaomi — 430 × 932</figcaption>
+    </figure>
+    <figure>
+      <iframe id="short" src="/" title="Écran court — 390 × 620"></iframe>
+      <figcaption>Écran court — 390 × 620</figcaption>
+    </figure>
   </body>
 </html>
