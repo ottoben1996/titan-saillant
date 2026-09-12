@@ -49,12 +49,24 @@
   --text-2: #A9B7AE;
   --text-3: #78877E;
 
-  /* Accents */
+  /* Accents — l'accent suit le profil actif (voir [data-profile] plus bas).
+     Les canaux séparés permettent les voiles translucides sans coder la teinte
+     en dur dans chaque composant. */
   --accent: #B8F36B;
+  --accent-rgb: 184 243 107;
   --accent-ink: #0E1710;
+  --accent-2: #5FBF97;
+  --accent-3: #243129;
   --rest: #F3BD6B;
   --danger: #E79292;
-  --profile-laura: #E0A9EE;
+  --profile-laura: #E3C0F7;
+
+  /* Laura : lilas pastel, même structure, teinte plus douce */
+  --accent-laura: #E3C0F7;
+  --accent-laura-rgb: 227 192 247;
+  --accent-laura-ink: #1A1024;
+  --accent-laura-2: #A98BC4;
+  --accent-laura-3: #2A2434;
 
   /* Rayons */
   --r-sm: 6px;
@@ -85,7 +97,7 @@ body {
 }
 
 ::selection {
-  background: rgba(184, 243, 107, .25);
+  background: rgb(var(--accent-rgb) / .25);
   color: var(--text-1);
 }
 
@@ -98,7 +110,7 @@ body {
 .app-shell button:focus-visible,
 .app-shell input:focus-visible,
 .app-shell select:focus-visible {
-  outline: 2px solid rgba(184, 243, 107, .75);
+  outline: 2px solid rgb(var(--accent-rgb) / .75);
   outline-offset: 2px;
 }
 
@@ -377,7 +389,7 @@ body {
    seule sa valeur porte l'accent. */
 .metric-card.accent {
   background: var(--surface-1);
-  border-color: rgba(184, 243, 107, .28);
+  border-color: rgb(var(--accent-rgb) / .28);
   color: var(--text-1);
 }
 
@@ -428,8 +440,8 @@ body {
 }
 
 .toggle-row .toggle-pill.on {
-  background: rgba(184, 243, 107, .25);
-  border-color: rgba(184, 243, 107, .45);
+  background: rgb(var(--accent-rgb) / .25);
+  border-color: rgb(var(--accent-rgb) / .45);
 }
 
 .toggle-row .toggle-pill.on i {
@@ -518,7 +530,7 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  border-color: rgba(184, 243, 107, .35) !important;
+  border-color: rgb(var(--accent-rgb) / .35) !important;
   color: var(--accent) !important;
   font-weight: 590;
 }
@@ -668,4 +680,14 @@ body {
 
 .empty-state h2 {
   color: var(--text-1);
+}
+
+/* Profil actif : Laura remplace l'accent lime par son lilas pastel.
+   Un seul attribut sur <html> suffit — aucun composant ne connaît le profil. */
+:root[data-profile='laura'] {
+  --accent: var(--accent-laura);
+  --accent-rgb: var(--accent-laura-rgb);
+  --accent-ink: var(--accent-laura-ink);
+  --accent-2: var(--accent-laura-2);
+  --accent-3: var(--accent-laura-3);
 }

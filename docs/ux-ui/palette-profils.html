@@ -16,9 +16,9 @@
         --ottman: #b8f36b;
         --ottman-ink: #0e1710;
         --ottman-soft: rgba(184, 243, 107, 0.12);
-        --laura: #d9a7f5;
+        --laura: #e3c0f7;
         --laura-ink: #1a1024;
-        --laura-soft: rgba(217, 167, 245, 0.12);
+        --laura-soft: rgba(227, 192, 247, 0.12);
       }
       * { box-sizing: border-box; }
       body {
@@ -52,7 +52,7 @@
       .ottman .accent { color: var(--ottman); }
       .laura .avatar { background: var(--laura); color: var(--laura-ink); }
       .laura .cta { background: var(--laura); color: var(--laura-ink); }
-      .laura .pill { background: var(--laura-soft); color: var(--laura); border: 1px solid rgba(217, 167, 245, 0.4); }
+      .laura .pill { background: var(--laura-soft); color: var(--laura); border: 1px solid rgba(227, 192, 247, 0.4); }
       .laura .accent { color: var(--laura); }
       .shared { margin-top: 24px; max-width: 1100px; border-top: 1px solid var(--line); padding-top: 18px; }
       .shared .swatches { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -63,6 +63,7 @@
     <p class="lead">
       Le fond, les textes et les règles de densité ne bougent pas. Seul l'accent change avec le profil actif :
       bouton principal, chrono, compteur, avatar, sélection duo. Un seul accent à l'écran, comme aujourd'hui.
+      Bascule technique : un attribut <span class="mono">data-profile</span> sur &lt;html&gt;, trois variables CSS, aucun composant modifié.
     </p>
 
     <div class="grid">
@@ -96,7 +97,7 @@
           <span class="avatar">L</span>
           <div>
             <h2>Laura</h2>
-            <small>Tonique &amp; cardio — lilas #D9A7F5</small>
+            <small>Tonique &amp; cardio — lilas pastel #E3C0F7</small>
           </div>
         </header>
         <div class="card">
@@ -110,9 +111,9 @@
         <p><span class="pill">Laura · en cours</span></p>
         <button class="cta">Valider la série</button>
         <div class="swatches">
-          <div class="sw"><span class="chip" style="background: var(--laura)"></span><span class="mono">#D9A7F5</span><span>9,9:1 sur le fond</span></div>
+          <div class="sw"><span class="chip" style="background: var(--laura)"></span><span class="mono">#E3C0F7</span><span>12,1:1 sur le fond</span></div>
           <div class="sw"><span class="chip" style="background: var(--laura-ink)"></span><span class="mono">#1A1024</span><span>encre du bouton</span></div>
-          <div class="sw"><span class="chip" style="background: var(--laura-soft)"></span><span class="mono">rgba(217,167,245,.12)</span><span>voile</span></div>
+          <div class="sw"><span class="chip" style="background: var(--laura-soft)"></span><span class="mono">rgba(227,192,247,.12)</span><span>voile</span></div>
         </div>
       </section>
     </div>

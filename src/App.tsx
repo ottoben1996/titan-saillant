@@ -41,6 +41,27 @@ export default function App() {
     return saved === 'ottman' || saved === 'laura' ? saved : null;
   });
 
+  /**
+   * L'accent de l'application suit le profil actif : lime pour Ottman, lilas
+   * pastel pour Laura. Tout passe par l'attribut `data-profile` sur <html> et
+   * les variables CSS — les composants n'ont rien à savoir du profil.
+   * La couleur de la barre système suit aussi, sinon le navigateur garderait
+   * le vert lime au-dessus d'une interface lilas.
+   */
+  useEffect(() => {
+    const root = document.documentElement;
+    if (profile) {
+      root.dataset.profile = profile;
+    } else {
+      delete root.dataset.profile;
+    }
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) {
+      const accent = getComputedStyle(root).getPropertyValue('--accent').trim();
+      if (accent) meta.setAttribute('content', accent);
+    }
+  }, [profile]);
+
   const [screen, setScreen] = useState<Screen>('home');
   const [selectedDay, setSelectedDay] = useState<WorkoutDay | null>(null);
   const [pendingDay, setPendingDay] = useState<WorkoutDay | null>(null);

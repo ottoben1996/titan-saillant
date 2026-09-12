@@ -103,9 +103,9 @@ export function MuscleMap({
           .join(' ');
 
   const getColor = (id: MuscleId): string => {
-    if (primaries.has(id)) return '#B8F36B'; // Vert néon Titan (accent)
-    if (secondaries.has(id)) return '#5FBF97'; // Vert menthe lisible, moins de bruit
-    return '#243129'; // Gris-vert au repos, silhouette encore lisible
+    if (primaries.has(id)) return 'var(--accent)';
+    if (secondaries.has(id)) return 'var(--accent-2)';
+    return 'var(--accent-3)';
   };
 
   const getOpacity = (id: MuscleId): number => {
@@ -135,7 +135,7 @@ export function MuscleMap({
           <svg viewBox="0 0 100 160" className="muscle-svg" width={width / 2} height={height}>
             <defs>
               <filter id="glow-titan" x="-20%" y="-20%" width="140%" height="140%">
-                <feDropShadow dx="0" dy="0" stdDeviation="1.5" floodColor="#b8f36b" floodOpacity="0.6" />
+                <feDropShadow dx="0" dy="0" stdDeviation="1.5" style={{ floodColor: 'var(--accent)' }} floodOpacity="0.6" />
               </filter>
             </defs>
             {/* Silhouette / Tête */}
@@ -145,79 +145,79 @@ export function MuscleMap({
             {/* Épaules / Deltoïdes antérieurs */}
             <path
               d="M32 25 C30 28 28 35 30 40 C33 39 37 34 38 28 Z"
-              fill={getColor('shoulders')}
+              style={{ fill: getColor('shoulders') }}
               opacity={getOpacity('shoulders')}
             />
             <path
               d="M68 25 C70 28 72 35 70 40 C67 39 63 34 62 28 Z"
-              fill={getColor('shoulders')}
+              style={{ fill: getColor('shoulders') }}
               opacity={getOpacity('shoulders')}
             />
 
             {/* Pectoraux */}
             <path
               d="M38 27 C42 27 49 28 49 38 C42 41 36 38 35 34 C35 30 36 27 38 27 Z"
-              fill={getColor('chest')}
+              style={{ fill: getColor('chest') }}
               opacity={getOpacity('chest')}
             />
             <path
               d="M62 27 C58 27 51 28 51 38 C58 41 64 38 65 34 C65 30 64 27 62 27 Z"
-              fill={getColor('chest')}
+              style={{ fill: getColor('chest') }}
               opacity={getOpacity('chest')}
             />
 
             {/* Biceps */}
             <path
               d="M27 39 C26 44 26 50 28 55 C31 54 32 48 31 41 Z"
-              fill={getColor('biceps')}
+              style={{ fill: getColor('biceps') }}
               opacity={getOpacity('biceps')}
             />
             <path
               d="M73 39 C74 44 74 50 72 55 C69 54 68 48 69 41 Z"
-              fill={getColor('biceps')}
+              style={{ fill: getColor('biceps') }}
               opacity={getOpacity('biceps')}
             />
 
             {/* Avant-bras */}
             <path
               d="M26 56 C24 63 24 72 26 78 C28 77 30 70 29 58 Z"
-              fill={getColor('forearms')}
+              style={{ fill: getColor('forearms') }}
               opacity={getOpacity('forearms')}
             />
             <path
               d="M74 56 C76 63 76 72 74 78 C72 77 70 70 71 58 Z"
-              fill={getColor('forearms')}
+              style={{ fill: getColor('forearms') }}
               opacity={getOpacity('forearms')}
             />
 
             {/* Abdominaux */}
             <path
               d="M44 41 L56 41 L55 64 L45 64 Z"
-              fill={getColor('abs')}
+              style={{ fill: getColor('abs') }}
               opacity={getOpacity('abs')}
             />
 
             {/* Quadriceps */}
             <path
               d="M37 68 C35 78 35 95 38 108 C42 108 45 98 46 80 C46 72 43 68 37 68 Z"
-              fill={getColor('quads')}
+              style={{ fill: getColor('quads') }}
               opacity={getOpacity('quads')}
             />
             <path
               d="M63 68 C65 78 65 95 62 108 C58 108 55 98 54 80 C54 72 57 68 63 68 Z"
-              fill={getColor('quads')}
+              style={{ fill: getColor('quads') }}
               opacity={getOpacity('quads')}
             />
 
             {/* Mollets face */}
             <path
               d="M37 114 C36 122 37 135 39 144 C42 144 43 135 43 124 C43 118 41 114 37 114 Z"
-              fill={getColor('calves')}
+              style={{ fill: getColor('calves') }}
               opacity={getOpacity('calves')}
             />
             <path
               d="M63 114 C64 122 63 135 61 144 C58 144 57 135 57 124 C57 118 59 114 63 114 Z"
-              fill={getColor('calves')}
+              style={{ fill: getColor('calves') }}
               opacity={getOpacity('calves')}
             />
           </svg>
@@ -234,43 +234,43 @@ export function MuscleMap({
             {/* Trapèzes */}
             <path
               d="M45 23 L55 23 L62 29 L50 37 L38 29 Z"
-              fill={getColor('traps')}
+              style={{ fill: getColor('traps') }}
               opacity={getOpacity('traps')}
             />
 
             {/* Épaules dos (deltoïdes postérieurs) */}
             <path
               d="M32 26 C30 30 30 36 33 40 C35 38 37 33 37 28 Z"
-              fill={getColor('shoulders')}
+              style={{ fill: getColor('shoulders') }}
               opacity={getOpacity('shoulders')}
             />
             <path
               d="M68 26 C70 30 70 36 67 40 C65 38 63 33 63 28 Z"
-              fill={getColor('shoulders')}
+              style={{ fill: getColor('shoulders') }}
               opacity={getOpacity('shoulders')}
             />
 
             {/* Grands dorsaux */}
             <path
               d="M37 32 C42 35 47 38 48 54 C42 53 38 48 35 40 Z"
-              fill={getColor('lats')}
+              style={{ fill: getColor('lats') }}
               opacity={getOpacity('lats')}
             />
             <path
               d="M63 32 C58 35 53 38 52 54 C58 53 62 48 65 40 Z"
-              fill={getColor('lats')}
+              style={{ fill: getColor('lats') }}
               opacity={getOpacity('lats')}
             />
 
             {/* Triceps */}
             <path
               d="M28 38 C27 45 27 52 29 57 C31 55 32 48 31 40 Z"
-              fill={getColor('triceps')}
+              style={{ fill: getColor('triceps') }}
               opacity={getOpacity('triceps')}
             />
             <path
               d="M72 38 C73 45 73 52 71 57 C69 55 68 48 69 40 Z"
-              fill={getColor('triceps')}
+              style={{ fill: getColor('triceps') }}
               opacity={getOpacity('triceps')}
             />
 
@@ -284,36 +284,36 @@ export function MuscleMap({
             {/* Fessiers */}
             <path
               d="M37 66 C43 65 48 68 49 79 C44 82 38 81 35 75 Z"
-              fill={getColor('glutes')}
+              style={{ fill: getColor('glutes') }}
               opacity={getOpacity('glutes')}
             />
             <path
               d="M63 66 C57 65 52 68 51 79 C56 82 62 81 65 75 Z"
-              fill={getColor('glutes')}
+              style={{ fill: getColor('glutes') }}
               opacity={getOpacity('glutes')}
             />
 
             {/* Ischio-jambiers */}
             <path
               d="M37 81 C40 81 47 83 46 102 C42 104 38 101 37 92 Z"
-              fill={getColor('hamstrings')}
+              style={{ fill: getColor('hamstrings') }}
               opacity={getOpacity('hamstrings')}
             />
             <path
               d="M63 81 C60 81 53 83 54 102 C58 104 62 101 63 92 Z"
-              fill={getColor('hamstrings')}
+              style={{ fill: getColor('hamstrings') }}
               opacity={getOpacity('hamstrings')}
             />
 
             {/* Mollets dos */}
             <path
               d="M37 112 C35 120 36 134 39 144 C42 144 44 133 44 122 C44 116 41 112 37 112 Z"
-              fill={getColor('calves')}
+              style={{ fill: getColor('calves') }}
               opacity={getOpacity('calves')}
             />
             <path
               d="M63 112 C65 120 64 134 61 144 C58 144 56 133 56 122 C56 116 59 112 63 112 Z"
-              fill={getColor('calves')}
+              style={{ fill: getColor('calves') }}
               opacity={getOpacity('calves')}
             />
           </svg>

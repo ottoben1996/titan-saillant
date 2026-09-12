@@ -48,9 +48,9 @@
   flex: none;
   margin-left: auto;
   padding: .15rem .45rem;
-  border: 1px solid rgba(184, 243, 107, .32);
+  border: 1px solid rgb(var(--accent-rgb) / .32);
   border-radius: var(--r-sm);
-  background: rgba(184, 243, 107, .12);
+  background: rgb(var(--accent-rgb) / .12);
   color: var(--accent);
   font-size: .75rem;
   font-weight: 700;
@@ -75,9 +75,9 @@
 .rest-presets .rest-preset-btn {
   min-height: 44px;
   padding: .5rem .25rem;
-  border: 1px solid rgba(184, 243, 107, .3);
+  border: 1px solid rgb(var(--accent-rgb) / .3);
   border-radius: var(--r-md);
-  background: rgba(184, 243, 107, .1);
+  background: rgb(var(--accent-rgb) / .1);
   color: var(--accent);
   font-size: .8125rem;
   font-weight: 700;
@@ -86,7 +86,7 @@
 }
 
 .rest-presets .rest-preset-btn:active {
-  background: rgba(184, 243, 107, .22);
+  background: rgb(var(--accent-rgb) / .22);
 }
 
 /* --- [3] Carte de repos utile : exercice suivant, séries, charge ----------- */

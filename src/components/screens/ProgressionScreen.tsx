@@ -66,11 +66,11 @@ function VolumeTrendChart({
           stroke="rgba(255,255,255,.14)"
           strokeWidth="1"
         />
-        <path d={area} fill="rgba(184,243,107,.10)" />
-        <path d={line} fill="none" stroke="#b8f36b" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+        <path d={area} style={{ fill: 'rgb(var(--accent-rgb) / 0.10)' }} />
+        <path d={line} fill="none" style={{ stroke: 'var(--accent)' }} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
         {coords.map((point) => (
           <g key={point.sessionId}>
-            <circle cx={point.x} cy={point.y} r="3.5" fill="#0B0F0E" stroke="#b8f36b" strokeWidth="2.5" />
+            <circle cx={point.x} cy={point.y} r="3.5" fill="#0B0F0E" style={{ stroke: 'var(--accent)' }} strokeWidth="2.5" />
             <text x={point.x} y={height - 8} textAnchor="middle" fill="#78877E" fontSize="12">
               {point.label}
             </text>

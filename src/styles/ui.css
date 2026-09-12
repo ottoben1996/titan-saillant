@@ -279,8 +279,8 @@
 }
 
 .session-plan-item.current {
-  border-color: rgba(184, 243, 107, .5);
-  background: rgba(184, 243, 107, .07);
+  border-color: rgb(var(--accent-rgb) / .5);
+  background: rgb(var(--accent-rgb) / .07);
 }
 
 .session-plan-item.done .session-plan-body strong {
@@ -306,8 +306,8 @@
 }
 
 .session-plan-item.done .session-plan-index {
-  border-color: rgba(184, 243, 107, .5);
-  background: rgba(184, 243, 107, .14);
+  border-color: rgb(var(--accent-rgb) / .5);
+  background: rgb(var(--accent-rgb) / .14);
   color: var(--accent);
 }
 
