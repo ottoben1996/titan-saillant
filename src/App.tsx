@@ -7,6 +7,14 @@ import { createRunner, completeSet, getNextStep, getWorkoutExercises } from './w
 import { playTimerChime, timerTitle, vibrateTimer } from './workout/alerts';
 import { restoreRemainingSeconds } from './workout/timer';
 import { deleteSession, getActiveSession, listSessions, saveSession } from './storage/sessionRepository';
+import {
+  listMeasurements,
+  saveMeasurement,
+  seedMeasurementsIfEmpty,
+} from './storage/measurementRepository';
+import type { WeeklyMeasurement } from './domain/measurements';
+import { FollowupScreen } from './components/screens/FollowupScreen';
+import { BilanScreen } from './components/screens/BilanScreen';
 import { STORAGE_UNAVAILABLE_MESSAGE, withStorageGuard } from './storage/guard';
 import MustaphaApp from './mustapha/MustaphaApp';
 
@@ -63,6 +71,10 @@ export default function App() {
   }, [profile]);
 
   const [screen, setScreen] = useState<Screen>('home');
+  /** Points hebdomadaires du profil actif, du plus ancien au plus récent. */
+  const [measurements, setMeasurements] = useState<WeeklyMeasurement[]>([]);
+  /** Semaine ouverte dans le bilan imprimable. */
+  const [bilanTarget, setBilanTarget] = useState<WeeklyMeasurement | null>(null);
   const [selectedDay, setSelectedDay] = useState<WorkoutDay | null>(null);
   const [pendingDay, setPendingDay] = useState<WorkoutDay | null>(null);
   const [restMultiplier, setRestMultiplier] = useState<number>(1.0);
@@ -100,6 +112,11 @@ export default function App() {
   useEffect(() => {
     if (!profile) return;
     void refreshHistory(profile);
+    // Reprise de l'historique de la feuille de suivi au premier lancement, puis
+    // lecture des points enregistrés (revalider une semaine remplace la valeur).
+    void withStorageGuard(seedMeasurementsIfEmpty(profile), onStorageFailure, 0).then(() =>
+      withStorageGuard(listMeasurements(profile), onStorageFailure, []).then(setMeasurements),
+    );
     void withStorageGuard(getActiveSession(profile), onStorageFailure, undefined).then((active) => {
       if (!active) return;
       const restoredTimer = active.activeTimer
@@ -227,6 +244,21 @@ export default function App() {
       if (current) void current.release();
     };
   }, [screen]);
+
+  /**
+   * Enregistrement d'un point hebdomadaire.
+   *
+   * L'état est mis à jour tout de suite, l'écriture en base suit : une semaine
+   * revalidée remplace la précédente, jamais ne la duplique.
+   */
+  const saveFollowup = (measurement: WeeklyMeasurement) => {
+    setMeasurements((current) =>
+      [...current.filter((item) => item.id !== measurement.id), measurement].sort((a, b) =>
+        a.cycle === b.cycle ? a.week - b.week : a.cycle - b.cycle,
+      ),
+    );
+    void withStorageGuard(saveMeasurement(measurement), onStorageFailure, undefined);
+  };
 
   const chooseProfile = (next: ProfileId) => {
     localStorage.setItem(profileKey, next);
@@ -693,7 +725,35 @@ export default function App() {
       )}
 
       {screen === 'progression' && (
-        <ProgressionScreen history={history} profile={profile} onBack={() => setScreen('home')} />
+        <ProgressionScreen
+          history={history}
+          profile={profile}
+          measurements={measurements}
+          onBack={() => setScreen('home')}
+          onOpenFollowup={() => setScreen('followup')}
+        />
+      )}
+      {screen === 'followup' && profile && (
+        <FollowupScreen
+          profileId={profile}
+          measurements={measurements}
+          sessionsThisWeek={history.filter((session) => session.completedAt).length}
+          onSave={saveFollowup}
+          onOpenBilan={(measurement) => {
+            setBilanTarget(measurement);
+            setScreen('bilan');
+          }}
+          onBack={() => setScreen('progression')}
+        />
+      )}
+      {screen === 'bilan' && profile && bilanTarget && (
+        <BilanScreen
+          profileId={profile}
+          measurements={measurements}
+          current={bilanTarget}
+          sessions={history}
+          onBack={() => setScreen('followup')}
+        />
       )}
 
       {screen === 'settings' && (
@@ -714,7 +774,10 @@ export default function App() {
         />
       )}
 
-      {screen !== 'workout' && <BottomNav currentScreen={screen} onNavigate={setScreen} />}
+      {/* Le bilan est un document : aucune navigation ne doit apparaître dessus. */}
+      {screen !== 'workout' && screen !== 'bilan' && (
+        <BottomNav currentScreen={screen} onNavigate={setScreen} />
+      )}
 
       {tutorialId && tutorials[tutorialId] && (
         <TutorialModal tutorial={tutorials[tutorialId]} onClose={() => setTutorialId(null)} />

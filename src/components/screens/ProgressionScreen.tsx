@@ -16,8 +16,10 @@ import {
   weeklyComparison,
   type TrendPoint,
 } from '../../workout/summary';
-import { ArrowLeft, ArrowRight, Bolt, ChartLine, TrendDown, TrendUp, Warning } from '../ui/Icons';
+import { ArrowLeft, ArrowRight, Bolt, ChartLine, ChevronRight, TrendDown, TrendUp, Warning } from '../ui/Icons';
 import { profileLabels } from './HomeScreen';
+import { nextTargetWeek } from '../../workout/followup';
+import type { WeeklyMeasurement } from '../../domain/measurements';
 
 /* ------------------------------------------------------------------ graphe -- */
 
@@ -123,10 +125,19 @@ function AdaptiveAdviceCard({ advice }: { advice: AdaptiveAdvice }) {
 interface ProgressionScreenProps {
   history: WorkoutSession[];
   profile: ProfileId;
+  /** Points hebdomadaires : alimentent la carte du point du samedi. */
+  measurements: readonly WeeklyMeasurement[];
   onBack: () => void;
+  onOpenFollowup: () => void;
 }
 
-export function ProgressionScreen({ history, profile, onBack }: ProgressionScreenProps) {
+export function ProgressionScreen({
+  history,
+  profile,
+  measurements,
+  onBack,
+  onOpenFollowup,
+}: ProgressionScreenProps) {
   const view = useMemo(() => {
     const now = new Date();
     const completed = history.filter((item) => item.completedAt);
@@ -152,6 +163,14 @@ export function ProgressionScreen({ history, profile, onBack }: ProgressionScree
   const volumeTrendClass =
     week.volumeDeltaPct === null ? '' : week.volumeDeltaPct > 0 ? 'up' : week.volumeDeltaPct < 0 ? 'down' : '';
 
+  const pointTarget = nextTargetWeek(measurements);
+  const dernierPoint = [...measurements]
+    .sort((a, b) => (a.cycle === b.cycle ? a.week - b.week : a.cycle - b.cycle))
+    .at(-1);
+  const pointAJour = Boolean(
+    dernierPoint && dernierPoint.cycle === pointTarget.cycle && dernierPoint.week === pointTarget.week,
+  );
+
   return (
     <section className="content progression-content">
       <div className="page-heading">
@@ -167,6 +186,27 @@ export function ProgressionScreen({ history, profile, onBack }: ProgressionScree
         Un aperçu de tes séances enregistrées sur cet appareil. Les données restent privées et séparées de
         l’autre profil.
       </p>
+
+      {/* Point du samedi : l'entrée vers le suivi hebdomadaire, au même endroit
+          que le reste des repères de progression. */}
+      <button type="button" className="followup-cta" onClick={onOpenFollowup}>
+        <span className="followup-cta-icon">
+          <TrendUp size={18} />
+        </span>
+        <span className="followup-cta-text">
+          <strong>
+            {pointAJour ? `Semaine ${pointTarget.week} déjà renseignée` : `Point du samedi — semaine ${pointTarget.week}`}
+          </strong>
+          <small>
+            {dernierPoint
+              ? `Dernier relevé : ${
+                  typeof dernierPoint.weightKg === 'number' ? `${formatLoadKg(dernierPoint.weightKg)} kg` : 'poids non renseigné'
+                }${typeof dernierPoint.waistCm === 'number' ? ` · taille ${formatLoadKg(dernierPoint.waistCm)} cm` : ''}`
+              : 'Mensurations et poids, une fois par semaine'}
+          </small>
+        </span>
+        <ChevronRight size={18} />
+      </button>
 
       {view.completed.length === 0 ? (
         <div className="empty-state">

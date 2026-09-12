@@ -1,5 +1,6 @@
 import type { ProfileId, WorkoutSession } from '../domain/types';
 import { db } from './db';
+import { deleteProfileMeasurements } from './measurementRepository';
 
 export async function saveSession(session: WorkoutSession) { await db.sessions.put(session); }
 export async function getActiveSession(profileId: ProfileId) {
@@ -21,6 +22,7 @@ export async function deleteSession(sessionId: string) {
 }
 
 export async function deleteProfileData(profileId: ProfileId) {
+  await deleteProfileMeasurements(profileId);
   await db.sessions.where('profileId').equals(profileId).delete();
   await db.preferences.where('profileId').equals(profileId).delete();
 }

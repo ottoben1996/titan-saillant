@@ -1,6 +1,15 @@
 import { Barbell, ChartLine, Repeat, UserCircle } from '../ui/Icons';
 
-export type Screen = 'home' | 'workout' | 'history' | 'progression' | 'settings';
+export type Screen =
+  | 'home'
+  | 'workout'
+  | 'history'
+  | 'progression'
+  | 'settings'
+  /** Suivi hebdomadaire : saisie du samedi et historique des semaines. */
+  | 'followup'
+  /** Bilan imprimable d'une semaine, destiné au coach. */
+  | 'bilan';
 
 interface BottomNavProps {
   currentScreen: Screen;

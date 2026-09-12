@@ -9,6 +9,7 @@ import './styles/mobile.css';
 import './styles/workout.css';
 import './styles/screens.css';
 import './styles/ui.css';
+import './styles/followup.css';
 
 registerSW({
   immediate: true,

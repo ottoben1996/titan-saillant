@@ -1,0 +1,634 @@
+/* ============================================================================
+   SUIVI HEBDOMADAIRE — saisie du samedi et bilan destiné au coach.
+
+   Deux contextes dans un même fichier, volontairement :
+   - `.followup` vit dans l'application, thème sombre, accent du profil actif ;
+   - `.bilan` est un document clair, pensé pour être lu et imprimé par le coach.
+     C'est un parti pris : un PDF sombre se lit mal et consomme de l'encre.
+   ========================================================================== */
+
+/* ------------------------------------------------------ Saisie du samedi --- */
+
+.followup {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-top: 8px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-2);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.followup h1 {
+  margin: 0;
+  font-size: clamp(1.6rem, 8vw, 2.2rem);
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+}
+
+.followup h1 em {
+  color: var(--accent);
+  font-style: normal;
+}
+
+/* Rail du cycle : on voit d'un coup d'œil où on en est sur les huit semaines. */
+.cycle-track {
+  display: flex;
+  gap: 5px;
+}
+
+.cycle-track i {
+  flex: 1;
+  height: 4px;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.cycle-track i.done {
+  background: var(--accent);
+}
+
+.cycle-track i.now {
+  background: var(--accent);
+  opacity: 0.45;
+}
+
+.report-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid rgb(var(--accent-rgb) / 0.35);
+  background: rgb(var(--accent-rgb) / 0.12);
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.report-button:disabled {
+  opacity: 0.45;
+}
+
+.followup-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface-1);
+  padding: 4px 14px;
+}
+
+.followup-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.followup-field:last-child {
+  border-bottom: 0;
+}
+
+.followup-field.alarming {
+  background: rgb(var(--rest-rgb, 243 189 107) / 0.08);
+}
+
+.followup-label {
+  flex: 1;
+  min-width: 0;
+}
+
+.followup-label b {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.followup-label small {
+  display: block;
+  color: var(--text-3);
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.followup-stepper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.followup-stepper button {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 40px;
+  border-radius: 11px;
+  background: var(--surface-2);
+  color: var(--text-2);
+}
+
+.followup-stepper input {
+  width: 68px;
+  padding: 9px 6px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: var(--surface-0);
+  color: var(--text-1);
+  font-size: 17px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.followup-stepper input::placeholder {
+  color: var(--text-3);
+  font-weight: 500;
+}
+
+.followup-delta {
+  min-width: 46px;
+  text-align: right;
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-3);
+}
+
+.followup-delta.up {
+  color: var(--accent);
+}
+
+.followup-delta.down {
+  color: var(--rest);
+}
+
+.followup-warning {
+  display: flex;
+  gap: 9px;
+  padding: 11px 12px;
+  border-radius: 13px;
+  border: 1px solid rgb(243 189 107 / 0.32);
+  background: rgb(243 189 107 / 0.1);
+  color: #f0d6a8;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.followup-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  color: var(--text-3);
+  font-size: 11.5px;
+}
+
+.followup-summary b {
+  color: var(--text-2);
+}
+
+.followup-saved {
+  margin: 0;
+  color: var(--accent);
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.bilan-button {
+  margin-top: 2px;
+}
+
+.followup-next {
+  align-self: center;
+  padding: 10px 4px;
+}
+
+.followup-history-title {
+  margin: 10px 0 0;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-3);
+}
+
+.followup-history {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.followup-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 13px;
+  border-radius: 13px;
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+}
+
+.followup-week {
+  min-width: 58px;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.followup-row-values {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+}
+
+.followup-row-values b {
+  font-size: 15px;
+}
+
+.followup-row-values small {
+  color: var(--text-3);
+  font-size: 11.5px;
+}
+
+/* Entrée depuis l'écran Progression. */
+.followup-cta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin: 18px 0 6px;
+  padding: 14px;
+  border-radius: 16px;
+  border: 1px solid rgb(var(--accent-rgb) / 0.28);
+  background: rgb(var(--accent-rgb) / 0.08);
+  text-align: left;
+}
+
+.followup-cta-icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.followup-cta-text {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+}
+
+.followup-cta-text strong {
+  font-size: 14px;
+}
+
+.followup-cta-text small {
+  color: var(--text-3);
+  font-size: 11.5px;
+}
+
+.followup-cta > svg {
+  color: var(--accent);
+}
+
+/* ------------------------------------------------------------------ Bilan --- */
+
+.bilan {
+  padding: 10px 0 40px;
+}
+
+.bilan-bar {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: rgb(16 22 21 / 0.92);
+  backdrop-filter: blur(14px);
+}
+
+.bilan-bar .primary-button {
+  padding: 11px 14px;
+  font-size: 13px;
+}
+
+.bilan-doc {
+  width: min(100%, 820px);
+  margin: 0 auto;
+  padding: 26px 24px 30px;
+  border-radius: 14px;
+  background: #ffffff;
+  color: #16211c;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+}
+
+.bilan-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #16211c;
+}
+
+.bilan-head h2 {
+  margin: 0;
+  font-size: 21px;
+  letter-spacing: -0.03em;
+}
+
+.bilan-head p {
+  margin: 4px 0 0;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #55655c;
+}
+
+.bilan-tag {
+  text-align: right;
+  font-size: 11px;
+  color: #55655c;
+}
+
+.bilan-tag b {
+  display: block;
+  font-size: 15px;
+  color: #16211c;
+  letter-spacing: -0.02em;
+}
+
+.bilan-kpis {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+  margin: 16px 0 6px;
+}
+
+.bilan-kpis > div {
+  border: 1px solid #d8e0db;
+  border-radius: 9px;
+  padding: 9px 11px;
+}
+
+.bilan-kpis span {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #55655c;
+}
+
+.bilan-kpis b {
+  display: block;
+  margin-top: 4px;
+  font-size: 18px;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.bilan-kpis small {
+  display: block;
+  font-size: 10.5px;
+  color: #55655c;
+}
+
+.bilan-doc h3 {
+  margin: 20px 0 8px;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #55655c;
+}
+
+.bilan-doc h4 {
+  margin: 14px 0 6px;
+  font-size: 13px;
+}
+
+.bilan-charges h4 {
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+}
+
+.bilan-doc table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+
+.bilan-doc th {
+  padding: 6px 0 6px 0;
+  border-bottom: 1px solid #d8e0db;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #55655c;
+  text-align: left;
+}
+
+.bilan-doc td {
+  padding: 7px 0;
+  border-bottom: 1px solid #eef2ef;
+  font-variant-numeric: tabular-nums;
+}
+
+.bilan-doc td.num,
+.bilan-doc th.num {
+  text-align: right;
+  white-space: nowrap;
+  padding-left: 16px;
+}
+
+.bilan-doc td.note,
+.bilan-doc th.note {
+  text-align: left;
+  padding-left: 20px;
+  font-size: 11px;
+  color: #55655c;
+}
+
+.bilan-doc .pos {
+  color: #3f7a3a;
+  font-weight: 700;
+}
+
+.bilan-doc .neg {
+  color: #9a6a12;
+  font-weight: 700;
+}
+
+.bilan-chart {
+  margin: 4px 0 10px;
+}
+
+.bilan-chart h4 {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  margin: 0 0 2px;
+  font-size: 12px;
+}
+
+.bilan-chart h4 span {
+  font-size: 10px;
+  color: #55655c;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.bilan-chart svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.bilan-note {
+  margin: 4px 0 0;
+  font-size: 10.5px;
+  line-height: 1.5;
+  color: #55655c;
+}
+
+.bilan-read {
+  border-left: 3px solid var(--accent);
+  background: #f4fbf0;
+  padding: 11px 13px;
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+.bilan-read.alert {
+  border-left-color: #e0a13c;
+  background: #fdf6ea;
+}
+
+.bilan-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 22px;
+  padding-top: 10px;
+  border-top: 1px solid #d8e0db;
+  font-size: 10px;
+  color: #55655c;
+}
+
+/* Impression : seul le document doit sortir, sur fond blanc, sans habillage. */
+@media print {
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+
+  html,
+  body {
+    background: #ffffff !important;
+  }
+
+  .bilan-bar,
+  .bottom-nav,
+  .toast {
+    display: none !important;
+  }
+
+  .app-shell {
+    padding: 0 !important;
+  }
+
+  .bilan {
+    padding: 0;
+  }
+
+  .bilan-doc {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .bilan-doc h3,
+  .bilan-chart,
+  .bilan-read,
+  .bilan-charges {
+    break-inside: avoid;
+  }
+}
+
+/* Sur un téléphone, le document ne doit jamais être tronqué ni défiler de côté :
+   en-têtes compacts, marges resserrées. La version imprimée garde sa respiration. */
+@media (max-width: 480px) {
+  .bilan-doc {
+    padding: 18px 14px 22px;
+  }
+
+  .bilan-doc table {
+    font-size: 11.5px;
+    table-layout: fixed;
+  }
+
+  .bilan-doc th {
+    font-size: 9.5px;
+    letter-spacing: 0.04em;
+  }
+
+  .bilan-doc td.num,
+  .bilan-doc th.num {
+    padding-left: 6px;
+  }
+
+  .bilan-doc td:first-child,
+  .bilan-doc th:first-child {
+    width: 34%;
+    white-space: normal;
+  }
+
+  .bilan-kpis b {
+    font-size: 16px;
+  }
+
+  .bilan-head h2 {
+    font-size: 18px;
+  }
+}
+
+/* Écran étroit : les libellés et les pas de saisie doivent tenir sur une ligne. */
+@media (max-width: 380px) {
+  .followup-stepper input {
+    width: 64px;
+  }
+
+  .followup-delta {
+    min-width: 44px;
+  }
+
+  .bilan-doc {
+    padding: 20px 16px 24px;
+  }
+}
