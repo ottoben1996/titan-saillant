@@ -7,10 +7,17 @@ export type ExerciseMedia = Readonly<{
   license: string;
 }>;
 
+/**
+ * Les visuels vivent sous le chemin de base du site (`/` en local,
+ * `/titan-saillant/` sur GitHub Pages). Un chemin absolu écrit en dur pointait
+ * sur la racine du domaine et cassait toutes les illustrations en ligne.
+ */
+const MEDIA_BASE = `${import.meta.env.BASE_URL}exercise-media/`;
+
 const repdb = (slug: string, poses: 'start-peak' | 'main'): ExerciseMedia => ({
   ...(poses === 'main'
-    ? { main: `/exercise-media/${slug}-main.webp` }
-    : { start: `/exercise-media/${slug}-start.webp`, peak: `/exercise-media/${slug}-peak.webp` }),
+    ? { main: `${MEDIA_BASE}${slug}-main.webp` }
+    : { start: `${MEDIA_BASE}${slug}-start.webp`, peak: `${MEDIA_BASE}${slug}-peak.webp` }),
   credit: 'Exercise data by RepDB (repdb.co)',
   source: 'https://exercise-dataset.com/',
   license: 'Utilisation commerciale dans l’application avec attribution visible.',

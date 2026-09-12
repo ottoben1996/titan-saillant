@@ -243,6 +243,53 @@
   line-height: 1.35;
 }
 
+/* Démonstration du mouvement : les positions de départ et d'arrivée alternent.
+   Aucune ressource supplémentaire (pas de GIF ni de vidéo), les deux visuels
+   sont déjà précachés hors ligne. Le mouvement se met en pause si l'utilisateur
+   a demandé moins d'animations dans son système. */
+.workout-content .exercise-illustration.animated {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  place-items: center;
+  gap: 0;
+}
+
+.workout-content .exercise-illustration.animated .movement-frame {
+  grid-area: 1 / 1;
+  width: auto;
+  max-width: 13rem;
+  animation: coach-movement-alt 1.5s steps(1, end) infinite;
+}
+
+/* Les deux images se relaient : une visible, l'autre masquée. */
+.workout-content .exercise-illustration.animated .frame-start {
+  animation-name: coach-movement-start;
+}
+
+.workout-content .exercise-illustration.animated .frame-peak {
+  animation-name: coach-movement-peak;
+}
+
+@keyframes coach-movement-start {
+  0%, 49.99% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+@keyframes coach-movement-peak {
+  0%, 49.99% { opacity: 0; }
+  50%, 100% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .workout-content .exercise-illustration.animated .movement-frame {
+    animation: none;
+  }
+
+  .workout-content .exercise-illustration.animated .frame-peak {
+    opacity: 0;
+  }
+}
+
 /* --- Chrono de tempo -------------------------------------------------------
    Mesuré à 390 px sur la carte de 340 px : la colonne d'actions (3 boutons de
    44 px empilés, 143 px de haut) écrasait la lecture dans 158 px de large.

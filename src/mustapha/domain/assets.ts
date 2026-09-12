@@ -16,7 +16,8 @@ const exerciseAssetById: Record<string, string> = {
 
 export function getExerciseAsset(exerciseId: string, pose: 0 | 1 = 0): string | undefined {
   const asset = exerciseAssetById[exerciseId];
-  return asset ? `/mustapha/assets/exercises/${asset}-${pose}.jpg` : undefined;
+  // Même règle que les illustrations de séance : le chemin suit la base du site.
+  return asset ? `${import.meta.env.BASE_URL}mustapha/assets/exercises/${asset}-${pose}.jpg` : undefined;
 }
 
 export function getRecipeAsset(recipe: Pick<Recipe, 'id'>): string | undefined {

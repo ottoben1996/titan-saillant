@@ -399,16 +399,19 @@ export function WorkoutScreen({
 
           <div className="prescription-card compact">
             {movementMedia && (
-              <div className={`exercise-illustration${movementMedia.start ? '' : ' single'}`}>
+              <div className={`exercise-illustration${movementMedia.start ? ' animated' : ' single'}`}>
                 {movementMedia.start ? (
                   <>
+                    {/* Les deux positions alternent : le mouvement se lit sans vidéo
+                        ni GIF, hors ligne, avec des visuels déjà sous licence. */}
                     <img
+                      className="movement-frame frame-start"
                       src={movementMedia.start}
                       alt={`Position de départ : ${exercise.name}`}
                       decoding="async"
                     />
-                    <ArrowRight size={16} className="illustration-arrow" />
                     <img
+                      className="movement-frame frame-peak"
                       src={movementMedia.peak ?? movementMedia.start}
                       alt={`Position finale : ${exercise.name}`}
                       decoding="async"
