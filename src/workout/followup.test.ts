@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { measurementId, starterMeasurements, type WeeklyMeasurement } from '../domain/measurements';
 import {
   bodyMassIndex,
+  formFromEnergy,
+  weeklyCheckinSummary,
   buildWeeklyReading,
   implausibleZones,
   lastExerciseLoads,
@@ -122,5 +124,60 @@ describe('suivi hebdomadaire', () => {
     expect(presse?.last).toBe(115);
     expect(presse?.previous).toBe(110);
     expect(presse?.delta).toBe(5);
+  });
+
+  it('traduit la forme ressentie en langage parlé', () => {
+    expect(formFromEnergy(5)).toBe('better');
+    expect(formFromEnergy(4)).toBe('better');
+    expect(formFromEnergy(3)).toBe('same');
+    expect(formFromEnergy(2)).toBe('worse');
+    expect(formFromEnergy(undefined)).toBeUndefined();
+  });
+
+  it('agrège le ressenti des séances de la semaine', () => {
+    const sessions = [
+      {
+        dayId: 'full-body-a',
+        completedAt: '2026-09-07T10:00:00.000Z',
+        perceivedExertion: 7,
+        energy: 5,
+        pain: 'Gêne légère',
+        painLocation: 'épaule droite',
+        loadConsigne: 'increase' as const,
+        notes: 'bonne séance',
+      },
+      {
+        dayId: 'full-body-b',
+        completedAt: '2026-09-10T10:00:00.000Z',
+        perceivedExertion: 9,
+        energy: 5,
+        pain: 'Aucune',
+        loadConsigne: 'same' as const,
+      },
+      // Séance abandonnée : aucun ressenti à raconter.
+      { dayId: 'cardio', loggedSets: [] },
+    ];
+    const ressenti = weeklyCheckinSummary(sessions);
+
+    expect(ressenti.sessions).toBe(2);
+    expect(ressenti.averageRpe).toBe(8);
+    expect(ressenti.painCount).toBe(1);
+    expect(ressenti.painDetails[0]).toEqual({ dayId: 'full-body-a', pain: 'Gêne légère', location: 'épaule droite' });
+    expect(ressenti.formTrend).toBe('better');
+    expect(ressenti.consignes).toEqual([
+      { dayId: 'full-body-a', consigne: 'increase' },
+      { dayId: 'full-body-b', consigne: 'same' },
+    ]);
+    expect(ressenti.notes).toEqual([{ dayId: 'full-body-a', notes: 'bonne séance' }]);
+  });
+
+  it('signale une forme qui part dans les deux sens et une gêne répétée', () => {
+    const ressenti = weeklyCheckinSummary([
+      { dayId: 'full-body-a', completedAt: '2026-09-07T10:00:00.000Z', energy: 1, pain: 'Douleur' },
+      { dayId: 'full-body-b', completedAt: '2026-09-10T10:00:00.000Z', energy: 5, pain: 'Douleur' },
+    ]);
+    expect(ressenti.formTrend).toBe('mixed');
+    expect(ressenti.painCount).toBe(2);
+    expect(ressenti.averageRpe).toBeUndefined();
   });
 });

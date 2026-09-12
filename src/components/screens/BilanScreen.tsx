@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { cycleLengthWeeks, measurementZones, profileBody, type WeeklyMeasurement } from '../../domain/measurements';
+import type { LoadConsigne } from '../../domain/types';
 import type { ProfileId, WorkoutSession } from '../../domain/types';
 import { getProgram } from '../../domain/programs';
 import {
@@ -16,7 +17,8 @@ import {
   weightVelocity,
   zoneDelta,
 } from '../../workout/followup';
-import { sessionVolume } from '../../workout/summary';
+import { sessionVolume, workoutDayLabel } from '../../workout/summary';
+import { formFromEnergy, weeklyCheckinSummary } from '../../workout/followup';
 import { ArrowLeft, DownloadSimple } from '../ui/Icons';
 
 interface BilanScreenProps {
@@ -84,6 +86,13 @@ function Courbe({
   );
 }
 
+/** Traductions courtes, pour que le coach lise sans jargon. */
+const libelleForme = (forme: 'better' | 'same' | 'worse' | undefined) =>
+  forme === 'better' ? 'mieux' : forme === 'worse' ? 'moins bien' : forme === 'same' ? 'habituelle' : '—';
+
+const libelleConsigne = (consigne: LoadConsigne) =>
+  consigne === 'increase' ? 'charger plus' : consigne === 'decrease' ? 'alléger' : 'même charge';
+
 export function BilanScreen({ profileId, measurements, current, sessions, onBack }: BilanScreenProps) {
   const body = profileBody[profileId];
   const ordered = useMemo(
@@ -130,6 +139,10 @@ export function BilanScreen({ profileId, measurements, current, sessions, onBack
     .filter((entree) => entree.lignes.length > 0);
 
   const volumeSemaine = sessions.reduce((total, session) => (session.completedAt ? total + sessionVolume(session) : total), 0);
+
+  /** Séances terminées de la semaine, pour la page « Ressenti ». */
+  const seancesSemaine = sessions.filter((session) => session.completedAt);
+  const ressenti = weeklyCheckinSummary(seancesSemaine);
 
   const lecture = buildWeeklyReading({
     current,
@@ -383,6 +396,66 @@ export function BilanScreen({ profileId, measurements, current, sessions, onBack
               Charges les plus lourdes réellement validées, relevées automatiquement dans les séances enregistrées.
               Volume soulevé sur l'ensemble du suivi : {Math.round(volumeSemaine).toLocaleString('fr-FR')} kg.
             </p>
+          </>
+        )}
+
+        {ressenti.sessions > 0 && (
+          <>
+            <h3>Ressenti de la semaine</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Séance</th>
+                  <th className="num">Effort</th>
+                  <th className="num">Forme</th>
+                  <th className="note">Gêne</th>
+                </tr>
+              </thead>
+              <tbody>
+                {seancesSemaine.map((seance) => (
+                  <tr key={seance.id}>
+                    <td>{workoutDayLabel(seance.dayId)}</td>
+                    <td className="num">
+                      {typeof seance.perceivedExertion === 'number' ? `${seance.perceivedExertion}/10` : '—'}
+                    </td>
+                    <td className="num">{libelleForme(formFromEnergy(seance.energy))}</td>
+                    <td className="note">
+                      {seance.pain && seance.pain.toLowerCase() !== 'aucune'
+                        ? `${seance.pain}${seance.painLocation ? ` (${seance.painLocation})` : ''}`
+                        : '—'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <p className="bilan-note">
+              {ressenti.averageRpe !== undefined
+                ? `Effort moyen de la semaine : ${formatNombre(ressenti.averageRpe)}/10. `
+                : ''}
+              {ressenti.formTrend === 'better'
+                ? 'Forme en hausse sur la semaine.'
+                : ressenti.formTrend === 'worse'
+                  ? 'Forme en baisse sur la semaine.'
+                  : ressenti.formTrend === 'mixed'
+                    ? 'Forme variable selon les séances.'
+                    : ''}
+              {ressenti.consignes.length > 0
+                ? ` Consignes données : ${ressenti.consignes
+                    .map((item) => `${workoutDayLabel(item.dayId).toLowerCase()} — ${libelleConsigne(item.consigne)}`)
+                    .join(', ')}.`
+                : ''}
+            </p>
+            {ressenti.painCount >= 2 && (
+              <div className="bilan-read alert">
+                <b>Gêne signalée {ressenti.painCount} fois cette semaine.</b> Deux séances de suite avec une gêne
+                méritent d'être regardées de près avant d'augmenter les charges.
+              </div>
+            )}
+            {ressenti.notes.length > 0 && (
+              <p className="bilan-note">
+                Notes : {ressenti.notes.map((item) => `${workoutDayLabel(item.dayId).toLowerCase()} — « ${item.notes} »`).join(' · ')}
+              </p>
+            )}
           </>
         )}
 

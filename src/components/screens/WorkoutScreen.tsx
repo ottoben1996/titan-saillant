@@ -116,7 +116,7 @@ interface WorkoutScreenProps {
   onTutorial: (id: string) => void;
   onAlternative: (id: string) => void;
   onRevertAlternative?: (id: string) => void;
-  onFinish: (feedback?: Pick<WorkoutSession, 'perceivedExertion' | 'energy' | 'pain' | 'notes'>) => Promise<void>;
+  onFinish: (feedback?: Pick<WorkoutSession, 'perceivedExertion' | 'energy' | 'pain' | 'painLocation' | 'loadConsigne' | 'notes'>) => Promise<void>;
 }
 
 export function WorkoutScreen({

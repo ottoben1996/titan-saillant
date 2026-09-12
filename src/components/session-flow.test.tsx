@@ -126,6 +126,11 @@ function bilanCell(label: RegExp): HTMLElement {
   return cell as HTMLElement;
 }
 
+/** Groupe de boutons d'une question du quiz de fin de séance. */
+function quizGroup(label: RegExp): HTMLElement {
+  return screen.getByRole('group', { name: label });
+}
+
 /** Rejoue une séance complète au niveau moteur (fixture de test, sans clics). */
 function completedSession(profileId: 'ottman' | 'laura', dayId: string): WorkoutSession {
   const program = getProgram(profileId);
@@ -378,8 +383,10 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
     expect(bilanCell(/volume/i).textContent).toMatch(/[\d][\s\u202f]?[\d]{3} kg·rép\./);
 
     // --- 2. Ressenti saisi par l'utilisateur (alimente le coaching suivant).
-    fireEvent.change(screen.getByLabelText(/effort ressenti/i), { target: { value: '8' } });
-    fireEvent.change(screen.getByLabelText(/^énergie$/i), { target: { value: '4' } });
+    // Le quiz se répond en boutons, debout dans la salle : plus de liste déroulante.
+    fireEvent.click(within(quizGroup(/effort ressenti/i)).getByRole('button', { name: '8' }));
+    fireEvent.click(within(quizGroup(/forme du jour/i)).getByRole('button', { name: "Mieux que d'habitude" }));
+    fireEvent.click(within(quizGroup(/prochaine fois/i)).getByRole('button', { name: 'Charger plus' }));
 
     // --- 3. Enregistrement → retour à l'accueil, séance dans l'historique.
     fireEvent.click(screen.getByRole('button', { name: /enregistrer et terminer/i }));
@@ -402,7 +409,9 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
     expect(saved[0].completedAt).toBeTruthy();
     expect(saved[0].loggedSets).toHaveLength(FULL_BODY_A_STEPS);
     expect(saved[0].perceivedExertion).toBe(8);
-    expect(saved[0].energy).toBe(4);
+    // « Mieux que d'habitude » vaut 5 sur l'échelle d'énergie (1 à 5).
+    expect(saved[0].energy).toBe(5);
+    expect(saved[0].loadConsigne).toBe('increase');
   });
 
   /* ------------------------------------------------------------------------- *\

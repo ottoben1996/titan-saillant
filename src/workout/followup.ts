@@ -1,3 +1,4 @@
+import type { LoadConsigne } from '../domain/types';
 import type { WeeklyMeasurement, MeasurementZone, ProfileBody } from '../domain/measurements';
 import { cycleLengthWeeks as cycleLengthWeeksCurrent, measurementZones, profileBody } from '../domain/measurements';
 
@@ -166,6 +167,74 @@ export function navyBodyFat(options: {
   const base = waistCm + hipCm - neckCm;
   if (base <= 0) return undefined;
   return arrondi(495 / (1.29579 - 0.35004 * Math.log10(base) + 0.221 * Math.log10(heightCm)) - 450, 1);
+}
+
+export interface CheckinSummary {
+  sessions: number;
+  averageRpe?: number;
+  painCount: number;
+  painDetails: { dayId: string; pain: string; location?: string }[];
+  /** Tendance de forme de la semaine, ou « mixed » si elle part dans les deux sens. */
+  formTrend?: 'better' | 'same' | 'worse' | 'mixed';
+  consignes: { dayId: string; consigne: LoadConsigne }[];
+  notes: { dayId: string; notes: string }[];
+}
+
+/** Traduit l'énergie (1 à 5) en langage parlé, celui du quiz. */
+export function formFromEnergy(energy: number | undefined): 'better' | 'same' | 'worse' | undefined {
+  if (energy === undefined || !Number.isFinite(energy)) return undefined;
+  if (energy >= 4) return 'better';
+  if (energy === 3) return 'same';
+  return 'worse';
+}
+
+/**
+ * Ressenti agrégé des séances d'une semaine, pour la page « Ressenti » du bilan.
+ *
+ * Ne retient que les séances réellement terminées : une séance abandonnée n'a
+ * pas de ressenti à raconter, et une séance sans réponse ne compte pas dans la
+ * moyenne (sinon un oubli ferait chuter la moyenne d'effort).
+ */
+export function weeklyCheckinSummary(
+  sessions: readonly {
+    dayId: string;
+    completedAt?: string;
+    perceivedExertion?: number;
+    energy?: number;
+    pain?: string;
+    painLocation?: string;
+    loadConsigne?: LoadConsigne;
+    notes?: string;
+  }[],
+): CheckinSummary {
+  const terminees = sessions.filter((session) => session.completedAt);
+  const rpes = terminees
+    .map((session) => session.perceivedExertion)
+    .filter((value): value is number => typeof value === 'number' && Number.isFinite(value));
+
+  const douleurs = terminees.filter((session) => session.pain && session.pain.toLowerCase() !== 'aucune');
+  const formes = terminees
+    .map((session) => formFromEnergy(session.energy))
+    .filter((value): value is 'better' | 'same' | 'worse' => value !== undefined);
+  const uniques = [...new Set(formes)];
+
+  return {
+    sessions: terminees.length,
+    averageRpe: rpes.length > 0 ? arrondi(rpes.reduce((total, value) => total + value, 0) / rpes.length) : undefined,
+    painCount: douleurs.length,
+    painDetails: douleurs.map((session) => ({
+      dayId: session.dayId,
+      pain: session.pain as string,
+      location: session.painLocation,
+    })),
+    formTrend: uniques.length === 0 ? undefined : uniques.length === 1 ? uniques[0] : 'mixed',
+    consignes: terminees
+      .filter((session) => session.loadConsigne !== undefined)
+      .map((session) => ({ dayId: session.dayId, consigne: session.loadConsigne as LoadConsigne })),
+    notes: terminees
+      .filter((session) => (session.notes ?? '').trim().length > 0)
+      .map((session) => ({ dayId: session.dayId, notes: (session.notes ?? '').trim() })),
+  };
 }
 
 export interface ExerciseLoad {

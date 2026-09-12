@@ -60,6 +60,9 @@ export interface Tutorial {
   readonly keyCue?: string;
 }
 
+/** Consigne du quiz de fin de séance, reprise dans le bilan hebdomadaire. */
+export type LoadConsigne = 'increase' | 'same' | 'decrease';
+
 export interface LoggedSet {
   exerciseId: string;
   setIndex: number;
@@ -95,8 +98,13 @@ export interface WorkoutSession {
   activeTimer?: SessionTimerState;
   /** Retour post-séance, facultatif pour rester compatible avec les anciennes sauvegardes. */
   perceivedExertion?: number;
+  /** 1 à 5 : 5 « mieux que d'habitude », 3 « comme d'habitude », 1 « moins bien ». */
   energy?: number;
   pain?: string;
+  /** Où se situe la gêne, quand il y en a une. */
+  painLocation?: string;
+  /** Ce que l'athlète demande pour la prochaine fois. */
+  loadConsigne?: LoadConsigne;
   notes?: string;
   alternativesUsed?: string[];
 }

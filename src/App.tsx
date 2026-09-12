@@ -602,7 +602,7 @@ export default function App() {
     window.setTimeout(() => setNotice(''), 3500);
   };
 
-  const finishWorkout = async (feedback?: Pick<WorkoutSession, 'perceivedExertion' | 'energy' | 'pain' | 'notes'>) => {
+  const finishWorkout = async (feedback?: Pick<WorkoutSession, 'perceivedExertion' | 'energy' | 'pain' | 'painLocation' | 'loadConsigne' | 'notes'>) => {
     if (session) {
       const updated: WorkoutSession = {
         ...session,
