@@ -391,23 +391,36 @@ export default function App() {
       window.setTimeout(() => setNotice(''), 3500);
       return;
     }
-    void navigator.serviceWorker
-      .getRegistration()
-      .then((registration) => {
-        if (!registration) {
-          setNotice('Aucune version installée à mettre à jour.');
-          return undefined;
+    const show = (message: string) => {
+      setNotice(message);
+      window.setTimeout(() => setNotice(''), 4500);
+    };
+
+    void (async () => {
+      try {
+        // Comparaison directe avec la version publiée : le manifeste du service
+        // worker en ligne nomme le lot de code attendu. Plus fiable que le cycle
+        // d'installation, qui peut rester bloqué sur un vieux cache.
+        const running = performance
+          .getEntriesByType('resource')
+          .map((entry) => entry.name)
+          .find((name) => /assets\/index-[A-Za-z0-9_-]+\.js/.test(name));
+        const swSource = await (await fetch(`${import.meta.env.BASE_URL}sw.js`, { cache: 'no-store' })).text();
+        const published = swSource.match(/assets\/index-[A-Za-z0-9_-]+\.js/)?.[0];
+
+        if (published && running && !running.includes(published)) {
+          show('Nouvelle version trouvée : rechargement…');
+          window.setTimeout(() => window.dispatchEvent(new Event('coach-force-update')), 700);
+          return;
         }
-        return registration.update().then(() => {
-          setNotice(
-            registration.installing || registration.waiting
-              ? 'Mise à jour trouvée : l’application va se recharger.'
-              : 'Application à jour.',
-          );
-        });
-      })
-      .catch(() => setNotice('Recherche impossible (connexion indisponible).'))
-      .finally(() => window.setTimeout(() => setNotice(''), 4000));
+
+        const registration = await navigator.serviceWorker.getRegistration();
+        await registration?.update();
+        show('Application à jour.');
+      } catch {
+        show('Recherche impossible (connexion indisponible).');
+      }
+    })();
   };
 
   const finishSet = async (values: { repetitions?: number; durationSeconds?: number; loadKg?: number }) => {
@@ -611,7 +624,7 @@ export default function App() {
       {updateReady && screen !== 'workout' && (
         <div className="update-banner" role="status">
           <span>Une version plus récente est prête.</span>
-          <button type="button" onClick={() => window.dispatchEvent(new Event('coach-apply-update'))}>
+          <button type="button" onClick={() => window.dispatchEvent(new Event('coach-force-update'))}>
             Mettre à jour
           </button>
         </div>
