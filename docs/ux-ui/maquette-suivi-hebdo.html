@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Maquette — suivi hebdomadaire et bilan</title>
+    <style>
+      :root {
+        --s0: #0b0f0e;
+        --s1: #121715;
+        --s2: #18201d;
+        --line: rgba(255, 255, 255, 0.09);
+        --t1: #f1f5f2;
+        --t2: #a9b7ae;
+        --t3: #78877e;
+        --accent: #b8f36b;
+        --accent-ink: #0e1710;
+        --accent-soft: rgba(184, 243, 107, 0.12);
+        --rest: #f3bd6b;
+        --danger: #e79292;
+        --doc-ink: #16211c;
+        --doc-ink-2: #55655c;
+        --doc-line: #d8e0db;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        padding: 26px;
+        background: #1b1f1e;
+        color: var(--t1);
+        font: 14px/1.5 "Segoe UI", system-ui, sans-serif;
+      }
+      h1.page { font-size: 20px; margin: 0 0 4px; letter-spacing: -0.02em; }
+      p.page { color: #8b9a91; margin: 0 0 22px; max-width: 60rem; }
+      .scene { display: flex; gap: 28px; align-items: flex-start; flex-wrap: wrap; }
+      .caption { color: #8b9a91; font-size: 11px; margin: 8px 0 0; }
+
+      /* ---------- Écran de saisie (application, thème sombre) ---------- */
+      .phone {
+        width: 390px;
+        background: var(--s0);
+        border-radius: 26px;
+        padding: 18px 16px 20px;
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+      }
+      .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+      .mark { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 12px; background: var(--accent); color: var(--accent-ink); font-weight: 800; }
+      .topbar strong { letter-spacing: 0.18em; font-size: 11px; }
+      .eyebrow { margin: 0; color: var(--t3); font-size: 11px; font-weight: 700; letter-spacing: 0.14em; }
+      .phone h2 { margin: 6px 0 4px; font-size: 26px; line-height: 1.05; letter-spacing: -0.04em; }
+      .phone h2 em { color: var(--accent); font-style: normal; }
+      .cycle { display: flex; gap: 5px; margin: 12px 0 16px; }
+      .cycle i { flex: 1; height: 4px; border-radius: 99px; background: rgba(255, 255, 255, 0.12); }
+      .cycle i.done { background: var(--accent); }
+      .cycle i.now { background: var(--accent); opacity: 0.45; }
+      .card { border: 1px solid var(--line); border-radius: 16px; background: var(--s1); padding: 14px; margin-bottom: 12px; }
+      .field { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); }
+      .field:last-child { border-bottom: 0; }
+      .field .label { flex: 1; }
+      .field .label b { display: block; font-weight: 600; font-size: 13px; }
+      .field .label small { display: block; color: var(--t3); font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .stepper { display: flex; align-items: center; gap: 6px; }
+      .stepper button { width: 34px; height: 34px; border-radius: 10px; background: var(--s2); color: var(--t2); font-size: 16px; }
+      .stepper .value { min-width: 78px; text-align: center; font-size: 19px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+      .stepper .value span { font-size: 11px; color: var(--t3); font-weight: 500; }
+      .delta { min-width: 58px; text-align: right; font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; }
+      .up { color: var(--accent); }
+      .down { color: var(--rest); }
+      .flat { color: var(--t3); }
+      .side { display: flex; gap: 6px; margin-top: 4px; }
+      .side span { padding: 2px 7px; border-radius: 99px; background: var(--s2); color: var(--t2); font-size: 10px; font-weight: 700; }
+      .ghost { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px; margin-bottom: 12px; border-radius: 12px; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 12px; border: 1px solid rgba(184, 243, 107, 0.35); }
+      .warn { display: flex; gap: 9px; padding: 10px 12px; margin-bottom: 12px; border-radius: 12px; background: rgba(243, 189, 107, 0.1); border: 1px solid rgba(243, 189, 107, 0.32); color: #f0d6a8; font-size: 11.5px; line-height: 1.45; }
+      .cta { width: 100%; padding: 15px; border: 0; border-radius: 14px; background: var(--accent); color: var(--accent-ink); font: inherit; font-weight: 800; }
+
+      /* ---------- Page de bilan (document blanc pour le coach) ---------- */
+      .sheet { width: 660px; background: #fff; color: var(--doc-ink); border-radius: 4px; padding: 34px 40px 40px; box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45); }
+      .doc-head { display: flex; align-items: flex-start; justify-content: space-between; border-bottom: 2px solid var(--doc-ink); padding-bottom: 12px; }
+      .doc-head h3 { margin: 0; font-size: 21px; letter-spacing: -0.03em; }
+      .doc-head p { margin: 4px 0 0; font-size: 11px; color: var(--doc-ink-2); text-transform: uppercase; letter-spacing: 0.12em; }
+      .doc-tag { text-align: right; font-size: 11px; color: var(--doc-ink-2); }
+      .doc-tag b { display: block; font-size: 15px; color: var(--doc-ink); letter-spacing: -0.02em; }
+      .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 18px 0; }
+      .kpi { border: 1px solid var(--doc-line); border-radius: 8px; padding: 10px 11px; }
+      .kpi span { display: block; font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--doc-ink-2); }
+      .kpi b { display: block; margin-top: 5px; font-size: 19px; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+      .kpi small { display: block; margin-top: 2px; font-size: 10.5px; color: var(--doc-ink-2); }
+      .kpi small.good { color: #3f7a3a; font-weight: 700; }
+      .kpi small.watch { color: #9a6a12; font-weight: 700; }
+      h4 { margin: 20px 0 8px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--doc-ink-2); }
+      table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+      th { text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--doc-ink-2); border-bottom: 1px solid var(--doc-line); padding: 6px 8px 6px 0; font-weight: 600; }
+      td { padding: 7px 8px 7px 0; border-bottom: 1px solid #eef2ef; font-variant-numeric: tabular-nums; }
+      td.num, th.num { text-align: right; padding-right: 0; }
+      td.note, th.note { text-align: left; color: var(--doc-ink-2); font-size: 11px; padding-left: 20px; }
+      td.num, th.num, td.note, th.note { padding-left: 20px; }
+      td.num, th.num { white-space: nowrap; }
+      .pos { color: #3f7a3a; font-weight: 700; }
+      .neg { color: #9a6a12; font-weight: 700; }
+      .read { border-left: 3px solid var(--accent); background: #f4fbf0; padding: 11px 13px; font-size: 12.5px; line-height: 1.55; }
+      .read b { color: var(--doc-ink); }
+      .foot { margin-top: 22px; padding-top: 10px; border-top: 1px solid var(--doc-line); font-size: 10px; color: var(--doc-ink-2); display: flex; justify-content: space-between; }
+      svg { display: block; width: 100%; height: auto; }
+    </style>
+  </head>
+  <body>
+    <h1 class="page">Maquette de validation — suivi hebdomadaire</h1>
+    <p class="page">
+      À gauche, l'écran de saisie du samedi dans l'application (thème sombre, lilas ou lime selon le profil).
+      À droite, la page 1 du bilan PDF : document clair, pensé pour être lu et imprimé par le coach, avec les valeurs réelles d'Ottman.
+    </p>
+
+    <div class="scene">
+      <!-- ============ ÉCRAN DE SAISIE ============ -->
+      <figure style="margin: 0">
+        <div class="phone">
+          <div class="topbar">
+            <span class="mark">≡</span>
+            <strong>COACH</strong>
+            <span class="eyebrow">OTTMAN</span>
+          </div>
+
+          <p class="eyebrow">POINT DU SAMEDI</p>
+          <h2>Semaine 3 <em>du cycle</em></h2>
+          <div class="cycle">
+            <i class="done"></i><i class="now"></i><i></i><i></i><i></i><i></i><i></i><i></i>
+          </div>
+
+          <button class="ghost">Reporter la semaine dernière</button>
+
+          <div class="card">
+            <div class="field">
+              <span class="label"><b>Poids</b><small>initial 104,8 kg</small></span>
+              <span class="stepper"><button>−</button><span class="value">105,2<span> kg</span></span><button>+</button></span>
+              <span class="delta down">+1,1</span>
+            </div>
+            <div class="field">
+              <span class="label"><b>Tour de taille</b><small>S2 : 117,5 cm</small></span>
+              <span class="stepper"><button>−</button><span class="value">116<span> cm</span></span><button>+</button></span>
+              <span class="delta up">−1,5</span>
+            </div>
+            <div class="field">
+              <span class="label"><b>Buste</b><small>S2 : 109 cm</small></span>
+              <span class="stepper"><button>−</button><span class="value">108,5<span> cm</span></span><button>+</button></span>
+              <span class="delta up">−0,5</span>
+            </div>
+            <div class="field">
+              <span class="label"><b>Bras</b><small>S2 : D 35,5 / G 34</small><span class="side"><span>D 36</span><span>G 34,5</span></span></span>
+              <span class="delta up">+0,5</span>
+            </div>
+            <div class="field">
+              <span class="label"><b>Cuisses</b><small>S2 : D 62,5 / G 62</small><span class="side"><span>D 62,5</span><span>G 62</span></span></span>
+              <span class="delta flat">=</span>
+            </div>
+            <div class="field">
+              <span class="label"><b>Tour de cou</b><small>nouveau — estimation du gras</small></span>
+              <span class="stepper"><button>−</button><span class="value">42<span> cm</span></span><button>+</button></span>
+              <span class="delta flat">—</span>
+            </div>
+          </div>
+
+          <div class="warn">
+            <span>!</span>
+            <span><b>Semaine 1, tour de taille :</b> 147 puis 117,5 cm. Écart invraisemblable, la valeur a été écartée des tendances. Corrige-la si besoin.</span>
+          </div>
+
+          <button class="cta">Valider le point de la semaine</button>
+        </div>
+        <p class="caption">Écran de saisie — 390 px, une fois par semaine</p>
+      </figure>
+
+      <!-- ============ PAGE 1 DU BILAN ============ -->
+      <figure style="margin: 0">
+        <div class="sheet">
+          <div class="doc-head">
+            <div>
+              <h3>Bilan hebdomadaire</h3>
+              <p>Ottman — cycle en cours</p>
+            </div>
+            <div class="doc-tag">
+              <b>Semaine 3 / 8</b>
+              samedi 19 septembre 2026
+            </div>
+          </div>
+
+          <div class="kpis">
+            <div class="kpi">
+              <span>Poids</span>
+              <b>104,1 kg</b>
+              <small class="good">−0,6 kg cette semaine</small>
+            </div>
+            <div class="kpi">
+              <span>Depuis le début</span>
+              <b>−0,7 kg</b>
+              <small>104,8 → 104,1 en 2 semaines</small>
+            </div>
+            <div class="kpi">
+              <span>Vitesse</span>
+              <b>−0,35 kg</b>
+              <small>par semaine, soit −0,3 %</small>
+            </div>
+            <div class="kpi">
+              <span>Volume soulevé</span>
+              <b>+8 %</b>
+              <small class="good">sur 4 semaines</small>
+            </div>
+          </div>
+
+          <h4>Mensurations</h4>
+          <table>
+            <thead>
+              <tr>
+                <th>Zone</th>
+                <th class="num">Semaine 2</th>
+                <th class="num">Semaine 3</th>
+                <th class="num">Écart</th>
+                <th class="num">Depuis le début</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Tour de taille</td><td class="num">117,5</td><td class="num">116,0</td><td class="num pos">−1,5</td><td class="num pos">−1,5</td></tr>
+              <tr><td>Buste</td><td class="num">109,0</td><td class="num">108,5</td><td class="num pos">−0,5</td><td class="num pos">−3,5</td></tr>
+              <tr><td>Bras droit</td><td class="num">35,5</td><td class="num">36,0</td><td class="num pos">+0,5</td><td class="num pos">+1,0</td></tr>
+              <tr><td>Bras gauche</td><td class="num">34,0</td><td class="num">34,5</td><td class="num pos">+0,5</td><td class="num pos">+2,0</td></tr>
+              <tr><td>Cuisse droite</td><td class="num">62,5</td><td class="num">62,5</td><td class="num">=</td><td class="num pos">+1,5</td></tr>
+              <tr><td>Cuisse gauche</td><td class="num">62,0</td><td class="num">62,0</td><td class="num">=</td><td class="num pos">+2,0</td></tr>
+            </tbody>
+          </table>
+
+          <h4>Indicateurs</h4>
+          <table>
+            <thead>
+              <tr>
+                <th>Indicateur</th>
+                <th class="num">Semaine 2</th>
+                <th class="num">Semaine 3</th>
+                <th class="num">Écart</th>
+                <th class="note">Repère</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Tour de taille / hauteur</td><td class="num">0,67</td><td class="num">0,66</td><td class="num pos">−0,01</td><td class="note">attention dès 0,5</td></tr>
+              <tr><td>Indice de masse corporelle</td><td class="num">34,2</td><td class="num">34,0</td><td class="num pos">−0,2</td><td class="note">repère, pas un verdict</td></tr>
+              <tr><td>Masse grasse estimée</td><td class="num">—</td><td class="num">34,9 %</td><td class="num">—</td><td class="note">marge ±3 à 4 %</td></tr>
+            </tbody>
+          </table>
+
+          <h4>Évolution du poids</h4>
+          <svg viewBox="0 0 560 150" role="img" aria-label="Courbe du poids sur les semaines 1 à 3">
+            <line x1="0" y1="30" x2="560" y2="30" stroke="#eef2ef" stroke-width="1" />
+            <line x1="0" y1="75" x2="560" y2="75" stroke="#eef2ef" stroke-width="1" />
+            <line x1="0" y1="120" x2="560" y2="120" stroke="#eef2ef" stroke-width="1" />
+            <polyline points="20,42 200,50 380,72" fill="none" stroke="#5f9b3f" stroke-width="2.5" stroke-linecap="round" />
+            <polyline points="20,42 200,46 380,59" fill="none" stroke="#b8d9a0" stroke-width="2" stroke-dasharray="5 4" />
+            <circle cx="20" cy="42" r="4" fill="#5f9b3f" /><circle cx="200" cy="50" r="4" fill="#5f9b3f" /><circle cx="380" cy="72" r="4" fill="#5f9b3f" />
+            <text x="14" y="140" font-size="10" fill="#55655c">Init. 104,8</text>
+            <text x="180" y="140" font-size="10" fill="#55655c">S1 104,7</text>
+            <text x="358" y="140" font-size="10" fill="#55655c">S2 104,1</text>
+            <text x="470" y="140" font-size="10" fill="#55655c">S3 —</text>
+          </svg>
+          <p style="font-size:10.5px; color:#55655c; margin:6px 0 0">
+            Trait plein : poids. Pointillé : moyenne mobile sur quatre semaines — c'est elle qui montre la vraie tendance, pas la variation d'une semaine (hydratation, repas de la veille).
+          </p>
+
+          <h4>Lecture de la semaine</h4>
+          <div class="read">
+            <b>Recomposition en cours.</b> Le poids baisse (−0,7 kg depuis le début) et le tour de taille suit (−1,5 cm cette semaine),
+            pendant que les bras et les cuisses augmentent des deux côtés. Tu perds du gras et tu prends du muscle : c'est ce que les charges
+            confirment, avec un volume soulevé en hausse. Rythme sain, aucune alerte.
+          </div>
+
+          <div class="foot">
+            <span>Généré localement par Coach Ottman &amp; Laura — aucune donnée envoyée automatiquement</span>
+            <span>Page 1 / 4</span>
+          </div>
+        </div>
+        <p class="caption">Bilan PDF — page 1 : synthèse. Pages 2 à 4 : charges, ressenti, courbes.</p>
+      </figure>
+    </div>
+  </body>
+</html>
