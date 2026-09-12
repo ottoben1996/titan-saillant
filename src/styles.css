@@ -24,7 +24,7 @@
 .workout-actions{display:flex;align-items:center;gap:.45rem;flex-wrap:wrap}
 .exercise-kind{padding:.48rem .65rem;border-radius:99px;background:var(--accent);color:var(--accent-ink);font-size:0.75rem;font-weight:900;letter-spacing:.12em}
 .workout-actions .tutorial-link,.alternative-link{min-height:2rem;padding:.48rem .65rem}
-.alternative-link{display:flex;align-items:center;gap:.4rem;border-radius:99px;background:#e5a8f417;color:#efc8f8;font-size:0.75rem;font-weight:700}
+.alternative-link{display:flex;align-items:center;gap:.4rem;border-radius:99px;background:rgb(var(--accent-laura-rgb) / .09);color:var(--accent-laura);font-size:0.75rem;font-weight:700}
 .prescription-card.compact,.log-card.compact{margin:0;padding:.8rem 1rem;border-radius:1.15rem}
 .prescription-card.compact{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;justify-content:center}
 .prescription-card.compact .prescription-main{margin:.35rem 0}
@@ -542,9 +542,9 @@
   margin-top: .35rem;
   padding: .35rem .65rem;
   border-radius: 99px;
-  background: #e5a8f422;
-  border: 1px solid #e5a8f444;
-  color: #f1d4f8;
+  background: rgb(var(--accent-laura-rgb) / .13);
+  border: 1px solid rgb(var(--accent-laura-rgb) / .27);
+  color: var(--accent-laura);
   font-size:0.75rem;
   font-weight: 700;
 }
