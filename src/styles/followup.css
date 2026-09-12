@@ -541,18 +541,23 @@
 
 /* Impression : seul le document doit sortir, sur fond blanc, sans habillage. */
 @media print {
-  @page {
-    size: A4;
-    margin: 12mm;
-  }
-
+  /* Le fond sombre de l'application est porté par ses conteneurs, pas seulement
+     par <body> : sans ce rappel, la bande autour du document reste noire et les
+     derniers chiffres du tableau, qui débordent d'un rien, y deviennent
+     invisibles. */
   html,
-  body {
+  body,
+  #root,
+  .app,
+  .app-shell {
     background: #ffffff !important;
+    color: #16211c !important;
   }
 
+  /* Tout le chrome de l'application disparaît : il ne reste que le document. */
   .bilan-bar,
   .bottom-nav,
+  .topbar,
   .toast {
     display: none !important;
   }
@@ -568,7 +573,9 @@
   .bilan-doc {
     width: 100%;
     margin: 0;
-    padding: 0;
+    /* Un filet de marge intérieure : sans lui, le tableau de largeur 100 %
+       dépasse d'un cheveu le fond blanc du document. */
+    padding: 0 4px;
     border-radius: 0;
     box-shadow: none;
   }
@@ -579,6 +586,56 @@
   .bilan-charges {
     break-inside: avoid;
   }
+
+  /* Sur A4, le tableau doit tenir dans la largeur utile : sinon la dernière
+     colonne (« Début ») mord sur la marge et se fait couper. Largeurs fixes,
+     en-têtes qui peuvent passer à la ligne. */
+  .bilan-doc table {
+    table-layout: fixed;
+    width: 100%;
+    font-size: 12px;
+  }
+
+  .bilan-doc th {
+    white-space: normal;
+    font-size: 9.5px;
+    padding-left: 8px;
+  }
+
+  .bilan-doc td:first-child,
+  .bilan-doc th:first-child {
+    width: 32%;
+    white-space: normal;
+  }
+
+  .bilan-doc td.num,
+  .bilan-doc th.num {
+    padding-left: 8px;
+  }
+
+  /* Un filet de sécurité : aucun glyphe ne doit toucher le bord du cadre. */
+  .bilan-doc td:last-child,
+  .bilan-doc th:last-child {
+    padding-right: 6px;
+  }
+
+  .bilan-tag {
+    max-width: 45%;
+  }
+
+  .bilan-doc h3 {
+    font-size: 15px;
+    break-after: avoid;
+  }
+}
+
+/* Format du document imprimé.
+   ATTENTION : une règle @page placée DANS un bloc @media print est ignorée par le
+   navigateur — le PDF sortait alors au format US, et la dernière colonne du
+   tableau mordait sur la marge. Elle doit rester à la racine de la feuille. */
+@page {
+  size: A4 portrait;
+  margin: 12mm;
 }
 
 /* Sur un téléphone, le document ne doit jamais être tronqué ni défiler de côté :
