@@ -15,6 +15,17 @@ registerSW({
   onRegisteredSW: (_scriptUrl, registration) => {
     void registration?.update();
     window.addEventListener('focus', () => void registration?.update());
+
+    // Toute nouvelle version installée devient visible dans l'application, même
+    // hors séance : sinon rien ne signale qu'une version plus récente attend.
+    registration?.addEventListener('updatefound', () => {
+      const installing = registration.installing;
+      installing?.addEventListener('statechange', () => {
+        if (installing.state === 'installed' && navigator.serviceWorker.controller) {
+          window.dispatchEvent(new Event('coach-update-pending'));
+        }
+      });
+    });
   },
   onOfflineReady: () => window.dispatchEvent(new Event('coach-offline-ready')),
 });

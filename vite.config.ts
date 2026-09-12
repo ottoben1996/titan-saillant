@@ -6,6 +6,9 @@ export default defineConfig({
   // GitHub Pages sert le site sous /<depot>/ : le chemin est injecté au moment du
   // déploiement (VITE_BASE), et reste la racine en développement.
   base: process.env.VITE_BASE ?? '/',
+  // Version injectée au build : affichée dans Réglages pour vérifier d'un coup
+  // d'œil quelle version tourne réellement sur l'appareil.
+  define: { __BUILD_DATE__: JSON.stringify(new Date().toISOString()) },
   plugins: [
     react(),
     VitePWA({

@@ -26,6 +26,21 @@ interface SettingsScreenProps {
   onInstall: () => void;
   notificationPermission: NotificationPermission | 'unsupported';
   onEnableNotifications: () => void;
+  /** Force la vérification d'une nouvelle version (service worker). */
+  onCheckUpdate: () => void;
+}
+
+/** Version réellement embarquée dans cette copie de l'application. */
+function buildLabel(): string {
+  const date = new Date(__BUILD_DATE__);
+  if (Number.isNaN(date.getTime())) return 'inconnue';
+  return date.toLocaleString('fr-FR', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 }
 
 function describeSessions(counts: SessionCounts | null): string {
@@ -49,6 +64,7 @@ export function SettingsScreen({
   onInstall,
   notificationPermission,
   onEnableNotifications,
+  onCheckUpdate,
 }: SettingsScreenProps) {
   const fileInput = useRef<HTMLInputElement>(null);
   const [soundOn, setSoundOn] = useState(() => isSoundEnabled());
@@ -292,7 +308,17 @@ export function SettingsScreen({
                   : 'À activer'}
               </strong>
             </div>
+            <div>
+              <span>Version</span>
+              <strong className="ok">{buildLabel()}</strong>
+            </div>
           </div>
+
+          {/* Une mise à jour peut être vérifiée à la demande : plus besoin
+              d'attendre la vérification automatique au retour au premier plan. */}
+          <button type="button" className="secondary-button full update-check-btn" onClick={onCheckUpdate}>
+            Rechercher une mise à jour
+          </button>
 
           {notificationPermission === 'default' && (
             <button className="secondary-button full" onClick={onEnableNotifications}>

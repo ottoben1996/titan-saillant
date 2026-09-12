@@ -380,6 +380,36 @@ export default function App() {
     window.setTimeout(() => setNotice(''), 3500);
   };
 
+  /**
+   * Recherche une mise à jour à la demande, depuis Réglages : un geste
+   * explicite quand on veut vérifier au lieu d'attendre la vérification
+   * automatique (au retour au premier plan).
+   */
+  const checkForUpdate = () => {
+    if (!('serviceWorker' in navigator)) {
+      setNotice('Mise à jour indisponible dans ce navigateur.');
+      window.setTimeout(() => setNotice(''), 3500);
+      return;
+    }
+    void navigator.serviceWorker
+      .getRegistration()
+      .then((registration) => {
+        if (!registration) {
+          setNotice('Aucune version installée à mettre à jour.');
+          return undefined;
+        }
+        return registration.update().then(() => {
+          setNotice(
+            registration.installing || registration.waiting
+              ? 'Mise à jour trouvée : l’application va se recharger.'
+              : 'Application à jour.',
+          );
+        });
+      })
+      .catch(() => setNotice('Recherche impossible (connexion indisponible).'))
+      .finally(() => window.setTimeout(() => setNotice(''), 4000));
+  };
+
   const finishSet = async (values: { repetitions?: number; durationSeconds?: number; loadKg?: number }) => {
     if (!session || !selectedDay) return;
     const step = getNextStep(session, selectedDay);
@@ -658,6 +688,7 @@ export default function App() {
           onInstall={() => void installApp()}
           notificationPermission={notificationPermission}
           onEnableNotifications={() => void enableNotifications()}
+          onCheckUpdate={checkForUpdate}
         />
       )}
 
