@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Palette — Coach Ottman &amp; Laura</title>
+    <style>
+      :root {
+        --s0: #0b0f0e;
+        --s1: #121715;
+        --s2: #18201d;
+        --line: rgba(255, 255, 255, 0.09);
+        --t1: #f1f5f2;
+        --t2: #a9b7ae;
+        --t3: #78877e;
+        --ottman: #b8f36b;
+        --ottman-ink: #0e1710;
+        --ottman-soft: rgba(184, 243, 107, 0.12);
+        --laura: #d9a7f5;
+        --laura-ink: #1a1024;
+        --laura-soft: rgba(217, 167, 245, 0.12);
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        padding: 28px;
+        background: var(--s0);
+        color: var(--t1);
+        font: 15px/1.5 "Segoe UI", system-ui, sans-serif;
+      }
+      h1 { font-size: 22px; margin: 0 0 4px; letter-spacing: -0.02em; }
+      .lead { color: var(--t2); margin: 0 0 26px; font-size: 14px; }
+      .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; max-width: 1100px; }
+      .profile { border: 1px solid var(--line); border-radius: 16px; padding: 18px; background: var(--s1); }
+      .profile header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+      .avatar { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 14px; font-weight: 800; }
+      .profile h2 { margin: 0; font-size: 19px; letter-spacing: -0.02em; }
+      .profile header small { color: var(--t3); }
+      .eyebrow { margin: 0; color: var(--t3); font-size: 11px; font-weight: 700; letter-spacing: 0.14em; }
+      .card { border: 1px solid var(--line); border-radius: 14px; padding: 14px; background: var(--s2); margin-bottom: 12px; }
+      .big { font-size: 34px; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
+      .row { display: flex; align-items: baseline; gap: 10px; }
+      .cta { display: block; width: 100%; border: 0; border-radius: 12px; padding: 14px; font: inherit; font-weight: 800; cursor: pointer; }
+      .pill { display: inline-flex; align-items: center; gap: 8px; border-radius: 999px; padding: 8px 12px; font-size: 13px; font-weight: 700; }
+      .swatches { display: grid; gap: 6px; margin-top: 14px; }
+      .sw { display: grid; grid-template-columns: 34px 1fr auto; align-items: center; gap: 10px; font-size: 12px; color: var(--t2); }
+      .chip { height: 22px; border-radius: 6px; border: 1px solid var(--line); }
+      .mono { font-family: ui-monospace, Consolas, monospace; color: var(--t1); }
+      .ottman .avatar { background: var(--ottman); color: var(--ottman-ink); }
+      .ottman .cta { background: var(--ottman); color: var(--ottman-ink); }
+      .ottman .pill { background: var(--ottman-soft); color: var(--ottman); border: 1px solid rgba(184, 243, 107, 0.4); }
+      .ottman .accent { color: var(--ottman); }
+      .laura .avatar { background: var(--laura); color: var(--laura-ink); }
+      .laura .cta { background: var(--laura); color: var(--laura-ink); }
+      .laura .pill { background: var(--laura-soft); color: var(--laura); border: 1px solid rgba(217, 167, 245, 0.4); }
+      .laura .accent { color: var(--laura); }
+      .shared { margin-top: 24px; max-width: 1100px; border-top: 1px solid var(--line); padding-top: 18px; }
+      .shared .swatches { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    </style>
+  </head>
+  <body>
+    <h1>Deux identités, une seule application</h1>
+    <p class="lead">
+      Le fond, les textes et les règles de densité ne bougent pas. Seul l'accent change avec le profil actif :
+      bouton principal, chrono, compteur, avatar, sélection duo. Un seul accent à l'écran, comme aujourd'hui.
+    </p>
+
+    <div class="grid">
+      <section class="profile ottman">
+        <header>
+          <span class="avatar">O</span>
+          <div>
+            <h2>Ottman</h2>
+            <small>Force &amp; cardio — lime #B8F36B</small>
+          </div>
+        </header>
+        <div class="card">
+          <p class="eyebrow">SÉRIE DE TRAVAIL</p>
+          <div class="row"><span class="big accent">10</span><span style="color: var(--t2)">répétitions</span></div>
+        </div>
+        <div class="card">
+          <p class="eyebrow">COMPTEUR TEMPO</p>
+          <div class="row"><span class="big accent">00:40</span><span style="color: var(--t2)">En cours</span></div>
+        </div>
+        <p><span class="pill">Ottman · en cours</span></p>
+        <button class="cta">Valider la série</button>
+        <div class="swatches">
+          <div class="sw"><span class="chip" style="background: var(--ottman)"></span><span class="mono">#B8F36B</span><span>14,8:1 sur le fond</span></div>
+          <div class="sw"><span class="chip" style="background: var(--ottman-ink)"></span><span class="mono">#0E1710</span><span>encre du bouton</span></div>
+          <div class="sw"><span class="chip" style="background: var(--ottman-soft)"></span><span class="mono">rgba(184,243,107,.12)</span><span>voile</span></div>
+        </div>
+      </section>
+
+      <section class="profile laura">
+        <header>
+          <span class="avatar">L</span>
+          <div>
+            <h2>Laura</h2>
+            <small>Tonique &amp; cardio — lilas #D9A7F5</small>
+          </div>
+        </header>
+        <div class="card">
+          <p class="eyebrow">SÉRIE DE TRAVAIL</p>
+          <div class="row"><span class="big accent">12</span><span style="color: var(--t2)">répétitions</span></div>
+        </div>
+        <div class="card">
+          <p class="eyebrow">COMPTEUR TEMPO</p>
+          <div class="row"><span class="big accent">00:40</span><span style="color: var(--t2)">En cours</span></div>
+        </div>
+        <p><span class="pill">Laura · en cours</span></p>
+        <button class="cta">Valider la série</button>
+        <div class="swatches">
+          <div class="sw"><span class="chip" style="background: var(--laura)"></span><span class="mono">#D9A7F5</span><span>9,9:1 sur le fond</span></div>
+          <div class="sw"><span class="chip" style="background: var(--laura-ink)"></span><span class="mono">#1A1024</span><span>encre du bouton</span></div>
+          <div class="sw"><span class="chip" style="background: var(--laura-soft)"></span><span class="mono">rgba(217,167,245,.12)</span><span>voile</span></div>
+        </div>
+      </section>
+    </div>
+
+    <section class="shared">
+      <h2 style="font-size: 17px; margin: 0 0 10px">Commun aux deux (inchangé)</h2>
+      <div class="swatches">
+        <div class="sw"><span class="chip" style="background: #0b0f0e"></span><span class="mono">#0B0F0E</span><span>fond</span></div>
+        <div class="sw"><span class="chip" style="background: #121715"></span><span class="mono">#121715</span><span>cartes</span></div>
+        <div class="sw"><span class="chip" style="background: #18201d"></span><span class="mono">#18201D</span><span>éléments internes</span></div>
+        <div class="sw"><span class="chip" style="background: #f1f5f2"></span><span class="mono">#F1F5F2</span><span>texte principal</span></div>
+        <div class="sw"><span class="chip" style="background: #a9b7ae"></span><span class="mono">#A9B7AE</span><span>texte secondaire</span></div>
+        <div class="sw"><span class="chip" style="background: #78877e"></span><span class="mono">#78877E</span><span>texte discret</span></div>
+        <div class="sw"><span class="chip" style="background: #f3bd6b"></span><span class="mono">#F3BD6B</span><span>repos / alerte douce</span></div>
+        <div class="sw"><span class="chip" style="background: #ff9c9c"></span><span class="mono">#FF9C9C</span><span>suppression</span></div>
+        <div class="sw"><span class="chip" style="background: rgba(255,255,255,.09)"></span><span class="mono">blanc 9 %</span><span>bordures</span></div>
+      </div>
+    </section>
+  </body>
+</html>
