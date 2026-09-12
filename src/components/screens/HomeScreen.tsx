@@ -10,7 +10,7 @@ import {
   weeklyComparison,
   type WeekSlotState,
 } from '../../workout/summary';
-import { ArrowRight, Bolt, Check, Clock, Play } from '../ui/Icons';
+import { ArrowRight, Bolt, Check, Clock, Play, Trash } from '../ui/Icons';
 
 export const profileLabels: Record<ProfileId, string> = { ottman: 'Ottman', laura: 'Laura' };
 
@@ -34,6 +34,8 @@ interface HomeScreenProps {
   activeSession: WorkoutSession | null;
   onStart: (day: WorkoutDay) => void;
   onResume: () => void;
+  /** Supprime la séance en cours (lancée par erreur). */
+  onDiscard: () => void;
 }
 
 export function HomeScreen({
@@ -43,6 +45,7 @@ export function HomeScreen({
   activeSession,
   onStart,
   onResume,
+  onDiscard,
 }: HomeScreenProps) {
   const view = useMemo(() => {
     const now = new Date();
@@ -83,16 +86,26 @@ export function HomeScreen({
       </header>
 
       {view.isResuming && (
-        <button className="resume-banner" onClick={onResume}>
-          <span className="resume-icon">
-            <Play size={18} weight="fill" />
-          </span>
-          <span>
-            <strong>Séance en cours</strong>
-            <small>{activeSession?.loggedSets.length ?? 0} séries déjà validées — reprendre là où tu t’es arrêté</small>
-          </span>
-          <ArrowRight size={20} />
-        </button>
+        <div className="resume-banner-wrap">
+          <button className="resume-banner" onClick={onResume}>
+            <span className="resume-icon">
+              <Play size={18} weight="fill" />
+            </span>
+            <span>
+              <strong>Séance en cours</strong>
+              <small>{activeSession?.loggedSets.length ?? 0} séries déjà validées — reprendre là où tu t’es arrêté</small>
+            </span>
+            <ArrowRight size={20} />
+          </button>
+          <button
+            type="button"
+            className="resume-discard"
+            onClick={onDiscard}
+            aria-label="Supprimer la séance"
+          >
+            <Trash size={17} />
+          </button>
+        </div>
       )}
 
       {/* Action dominante : la séance du jour, ou l'état « semaine complète ». */}

@@ -9,6 +9,96 @@
 
 /* ============================================================== ACCUEIL === */
 
+/* Séance en cours : reprendre (action principale) ou supprimer (action
+   distincte, jamais imbriquée dans le bouton de reprise). */
+.resume-banner-wrap {
+  display: flex;
+  align-items: center;
+  gap: .45rem;
+}
+
+.resume-banner-wrap .resume-banner {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.resume-discard {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  min-width: 48px;
+  height: 48px;
+  min-height: 48px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-md, 10px);
+  background: var(--surface-1);
+  color: var(--text-2);
+}
+
+.resume-discard:hover,
+.resume-discard:focus-visible {
+  color: #FF9C9C;
+  border-color: rgba(255, 120, 120, .45);
+}
+
+.history-delete {
+  flex: none;
+  display: grid;
+  place-items: center;
+  min-width: 44px;
+  min-height: 44px;
+  border: 1px solid transparent;
+  border-radius: var(--r-md, 10px);
+  background: transparent;
+  color: var(--text-3);
+}
+
+.history-delete:hover,
+.history-delete:focus-visible {
+  color: #FF9C9C;
+  border-color: rgba(255, 120, 120, .4);
+  background: rgba(255, 120, 120, .06);
+}
+
+/* Action destructive du dialogue de sortie de séance : présente, jamais
+   confondue avec la mise en pause. */
+.abandon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  border: 1px solid rgba(255, 120, 120, .38);
+  border-radius: var(--r-md, 10px);
+  background: rgba(255, 120, 120, .08);
+  color: #FFB3B3;
+  font-weight: 600;
+}
+
+.abandon-button.full {
+  width: 100%;
+}
+
+.abandon-button:hover,
+.abandon-button:focus-visible {
+  background: rgba(255, 120, 120, .14);
+}
+
+/* Le compteur « 5 / 30 » ouvre la liste des exercices : il doit se lire comme
+   un bouton, sans prendre plus de place qu'avant. */
+.progress-pill-action {
+  display: inline-flex;
+  align-items: center;
+  gap: .25rem;
+  min-height: 24px;
+  cursor: pointer;
+}
+
+.progress-pill-action:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 /* Aucun espace mort au-dessus de l'action principale : l'en-tête est compact. */
 .home-content {
   padding-top: 1.1rem;
@@ -252,9 +342,9 @@
 .history-row {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
   min-height: 56px;
-  padding: 0.7rem 0.85rem;
+  padding: 0.7rem 0.7rem 0.7rem 0.85rem;
   border: 1px solid var(--line);
   border-radius: var(--r-md);
   background: var(--surface-1);
@@ -274,6 +364,10 @@
 .history-row-main strong {
   font-size: 0.875rem;
   font-weight: 560;
+  /* Le libellé de séance doit rester lisible en entier : il passe à la ligne
+     plutôt que d'être tronqué par le bouton de suppression. */
+  white-space: normal;
+  overflow-wrap: anywhere;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

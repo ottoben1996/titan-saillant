@@ -53,6 +53,9 @@ export const Gear = (p: IconProps) => (
   </Icon>
 );
 export const Leaf = (p: IconProps) => <Icon {...p}>M20 4C10 4 4 8 4 15c0 3 2 5 5 5 7 0 11-6 11-16ZM4 20c2-5 6-8 11-10</Icon>;
+export const List = (p: IconProps) => (
+  <Icon {...p}>M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01</Icon>
+);
 export const Minus = (p: IconProps) => <Icon {...p}>M5 12h14</Icon>;
 export const Person = (p: IconProps) => <Icon {...p}>M20 21a8 8 0 0 0-16 0m12-11a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z</Icon>;
 export const Play = (p: IconProps) => <Icon {...p}>m8 5 11 7-11 7V5Z</Icon>;

@@ -8,11 +8,13 @@ import {
   summarizeSession,
   workoutDayLabel,
 } from '../../workout/summary';
-import { ArrowLeft, Check, Clock, Repeat } from '../ui/Icons';
+import { ArrowLeft, Check, Clock, Repeat, Trash } from '../ui/Icons';
 
 interface HistoryScreenProps {
   history: WorkoutSession[];
   onBack: () => void;
+  /** Retire définitivement une séance de l'historique. */
+  onDelete: (sessionId: string) => void;
 }
 
 function sessionDateLabel(item: WorkoutSession): string {
@@ -23,7 +25,7 @@ function sessionDateLabel(item: WorkoutSession): string {
   });
 }
 
-export function HistoryScreen({ history, onBack }: HistoryScreenProps) {
+export function HistoryScreen({ history, onBack, onDelete }: HistoryScreenProps) {
   const groups = useMemo(() => groupSessionsByWeek(history), [history]);
 
   return (
@@ -85,6 +87,14 @@ export function HistoryScreen({ history, onBack }: HistoryScreenProps) {
                       <span className={done ? 'history-check done' : 'history-check'} aria-hidden="true">
                         <Check size={15} />
                       </span>
+                      <button
+                        type="button"
+                        className="history-delete"
+                        onClick={() => onDelete(item.id)}
+                        aria-label={`Supprimer la séance ${workoutDayLabel(item.dayId)} du ${sessionDateLabel(item)}`}
+                      >
+                        <Trash size={16} />
+                      </button>
                       <span className="sr-only">{done ? 'Séance terminée' : 'Séance en cours'}</span>
                     </article>
                   );

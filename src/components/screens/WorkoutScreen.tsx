@@ -12,8 +12,9 @@ import { formatLoadKg } from '../../workout/summary';
 import { parseSafeFloat, parseSafeInt } from '../../workout/sanitizer';
 import { RestTimer, formatDuration } from '../timers/RestTimer';
 import { ExerciseTimer } from '../timers/ExerciseTimer';
+import { SessionPlanSheet } from '../modals/SessionPlanSheet';
 import { PlateBadge } from '../ui/PlateBadge';
-import { ArrowRight, Barbell, Bolt, Check, Clock, Person, Repeat, Undo, Video } from '../ui/Icons';
+import { ArrowRight, Barbell, Bolt, Check, Clock, List, Person, Repeat, Undo, Video } from '../ui/Icons';
 import { CompletionFeedback } from './CompletionFeedback';
 
 function findGhostPerformance(
@@ -284,6 +285,8 @@ export function WorkoutScreen({
     [prescription?.loadKg, exercise?.id]
   );
   const [showWarmupRamp, setShowWarmupRamp] = useState(false);
+  // Liste des exercices consultable à tout moment pendant la séance.
+  const [planOpen, setPlanOpen] = useState(false);
 
   const partnerProfile: ProfileId | null = profile ? (profile === 'ottman' ? 'laura' : 'ottman') : null;
   const partnerDelta = useMemo(() => {
@@ -361,9 +364,15 @@ export function WorkoutScreen({
           <span className="session-elapsed" aria-label={`Durée totale de la séance ${formatDuration(elapsedSeconds)}`}>
             <Clock size={14} /> Total {formatDuration(elapsedSeconds)}
           </span>
-          <span className="progress-pill">
+          <button
+            type="button"
+            className="progress-pill progress-pill-action"
+            onClick={() => setPlanOpen(true)}
+            aria-label={`Voir la liste des exercices de la séance (${completedInDay + 1} sur ${totalSets})`}
+          >
+            <List size={14} />
             {completedInDay + 1} / {totalSets}
-          </span>
+          </button>
         </div>
       </div>
 
@@ -701,6 +710,15 @@ export function WorkoutScreen({
       <div className="next-hint">
         <ArrowRight size={16} /> Ensuite : {nextExercise?.name ?? 'fin de séance'}
       </div>
+
+      <SessionPlanSheet
+        open={planOpen}
+        onOpenChange={setPlanOpen}
+        dayName={day.name}
+        exercises={exercises}
+        loggedSets={session.loggedSets}
+        currentExerciseIndex={step.kind === 'exercise' ? step.exerciseIndex : undefined}
+      />
     </section>
   );
 }

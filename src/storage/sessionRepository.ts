@@ -9,6 +9,17 @@ export async function getActiveSession(profileId: ProfileId) {
 export async function listSessions(profileId: ProfileId) {
   return db.sessions.where('profileId').equals(profileId).reverse().sortBy('updatedAt');
 }
+/**
+ * Supprime définitivement une séance.
+ *
+ * Utilisé pour annuler une séance en cours (lancée par erreur) et pour retirer
+ * une séance de l'historique : dans les deux cas, l'utilisateur a demandé la
+ * disparition des données, on ne les conserve pas en « corbeille ».
+ */
+export async function deleteSession(sessionId: string) {
+  await db.sessions.delete(sessionId);
+}
+
 export async function deleteProfileData(profileId: ProfileId) {
   await db.sessions.where('profileId').equals(profileId).delete();
   await db.preferences.where('profileId').equals(profileId).delete();

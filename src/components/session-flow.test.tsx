@@ -26,7 +26,7 @@ import App from '../App';
 import { getProgram } from '../domain/programs';
 import type { WorkoutSession } from '../domain/types';
 import { db } from '../storage/db';
-import { listSessions, saveSession } from '../storage/sessionRepository';
+import { getActiveSession, listSessions, saveSession } from '../storage/sessionRepository';
 
 // Ces parcours pilotent une séance entière : lancés avec toute la suite en
 // parallèle, ils dépassent le délai par défaut de 5 s. Le délai est porté à 20 s
@@ -309,6 +309,8 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
     const resumeButton = screen.getByRole('button', { name: /séance en cours/i });
     expect(resumeButton).toHaveTextContent(/1 séries déjà validées/);
     expect(resumeButton).toHaveTextContent(/reprendre là où tu t’es arrêté/i);
+    // La même bannière propose de supprimer la séance, via une action distincte.
+    expect(screen.getByRole('button', { name: /^supprimer la séance$/i })).toBeInTheDocument();
 
     // --- La reprise ramène au bon exercice, à la bonne série.
     fireEvent.click(resumeButton);
@@ -455,4 +457,96 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
       expect(() => screen.getByLabelText(/répétitions/i)).not.toThrow();
     }
   );
+
+  /* ------------------------------------------------------------------ */
+  /*  Annulation et suppression de séance, liste des exercices          */
+  /* ------------------------------------------------------------------ */
+
+  it('[7] annuler une séance en cours : le dialogue de sortie propose l’annulation, puis rien n’est conservé', async () => {
+    await openAsOttman();
+    await startDayFromHome('Full Body A');
+    await validateSet();
+    expect(await listSessions('ottman')).toHaveLength(1);
+
+    // Sortie de séance : trois issues clairement distinctes.
+    fireEvent.click(screen.getByRole('button', { name: /quitter la séance/i }));
+    await flush();
+    const sortie = screen.getByRole('alertdialog');
+    expect(within(sortie).getByRole('button', { name: /mettre en pause/i })).toBeInTheDocument();
+    expect(within(sortie).getByRole('button', { name: /continuer la séance/i })).toBeInTheDocument();
+    fireEvent.click(within(sortie).getByRole('button', { name: /annuler la séance/i }));
+    await flush();
+
+    // Suppression = action destructive : confirmation explicite.
+    const confirmation = screen.getByRole('alertdialog');
+    expect(within(confirmation).getByRole('heading', { name: /annuler cette séance/i })).toBeInTheDocument();
+    fireEvent.click(within(confirmation).getByRole('button', { name: /^annuler la séance$/i }));
+    await flush();
+
+    expect(screen.getByRole('heading', { name: /bonjour ottman/i })).toBeInTheDocument();
+    expect(await listSessions('ottman')).toHaveLength(0);
+    expect(await getActiveSession('ottman')).toBeUndefined();
+  });
+
+  it('[8] mettre en pause conserve la séance, et l’accueil permet de la supprimer', async () => {
+    await openAsOttman();
+    await startDayFromHome('Full Body A');
+    await validateSet();
+
+    fireEvent.click(screen.getByRole('button', { name: /quitter la séance/i }));
+    await flush();
+    fireEvent.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: /mettre en pause/i }));
+    await flush();
+
+    // La pause conserve tout : la séance reste en cours dans le dépôt.
+    const enCours = await listSessions('ottman');
+    expect(enCours).toHaveLength(1);
+    expect(enCours[0].completedAt).toBeUndefined();
+
+    // Depuis l'accueil, l'action de suppression est distincte de la reprise.
+    fireEvent.click(screen.getByRole('button', { name: /^supprimer la séance$/i }));
+    await flush();
+    fireEvent.click(
+      within(screen.getByRole('alertdialog')).getByRole('button', { name: /^annuler la séance$/i })
+    );
+    await flush();
+
+    expect(await listSessions('ottman')).toHaveLength(0);
+    expect(screen.queryByText(/séance en cours/i)).toBeNull();
+  });
+
+  it('[9] liste des exercices : consultable à tout moment, dans l’ordre de la séance', async () => {
+    await openAsOttman();
+    await startDayFromHome('Full Body A');
+
+    const jour = getProgram('ottman').days.find((item) => item.id === 'full-body-a');
+    if (!jour) throw new Error('Séance « Full Body A » introuvable');
+    const plan = getWorkoutExercises(jour);
+
+    fireEvent.click(screen.getByRole('button', { name: /voir la liste des exercices/i }));
+    await flush();
+
+    const feuille = screen.getByRole('dialog');
+    const lignes = within(feuille).getAllByRole('listitem');
+    expect(lignes).toHaveLength(plan.length);
+    expect(within(feuille).getByText(plan[0].name)).toBeInTheDocument();
+    expect(within(feuille).getByText(plan[plan.length - 1].name)).toBeInTheDocument();
+
+    // Un seul mouvement en cours, les suivants annoncés comme à venir.
+    expect(within(feuille).getAllByText(/· EN COURS/)).toHaveLength(1);
+    expect(within(feuille).getAllByText(/· À VENIR/).length).toBeGreaterThan(0);
+    expect(within(lignes[0]).getByText(/· EN COURS/)).toBeInTheDocument();
+
+    // Elle se ferme et reste accessible en cours de séance.
+    fireEvent.keyDown(document, { key: 'Escape' });
+    await flush();
+    expect(screen.queryByRole('dialog')).toBeNull();
+
+    await validateSet();
+    fireEvent.click(screen.getByRole('button', { name: /voir la liste des exercices/i }));
+    await flush();
+    const feuille2 = screen.getByRole('dialog');
+    expect(within(feuille2).getByText(/· EN COURS/)).toBeInTheDocument();
+  });
 });
+

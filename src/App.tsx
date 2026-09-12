@@ -6,7 +6,7 @@ import { equipmentAlternatives } from './domain/alternatives';
 import { createRunner, completeSet, getNextStep, getWorkoutExercises } from './workout/runner';
 import { playTimerChime, timerTitle, vibrateTimer } from './workout/alerts';
 import { restoreRemainingSeconds } from './workout/timer';
-import { getActiveSession, listSessions, saveSession } from './storage/sessionRepository';
+import { deleteSession, getActiveSession, listSessions, saveSession } from './storage/sessionRepository';
 import { STORAGE_UNAVAILABLE_MESSAGE, withStorageGuard } from './storage/guard';
 import MustaphaApp from './mustapha/MustaphaApp';
 
@@ -66,6 +66,8 @@ export default function App() {
   const [storageMessage, setStorageMessage] = useState('');
   const [updateReady, setUpdateReady] = useState(false);
   const [confirmSwitchOpen, setConfirmSwitchOpen] = useState(false);
+  const [abandonOpen, setAbandonOpen] = useState(false);
+  const [sessionToDelete, setSessionToDelete] = useState<string | null>(null);
 
   const onStorageFailure = () => setStorageMessage(STORAGE_UNAVAILABLE_MESSAGE);
 
@@ -342,6 +344,42 @@ export default function App() {
     window.setTimeout(() => setNotice(''), 3500);
   };
 
+  /**
+   * Annule la séance en cours : elle a souvent été lancée par erreur, ou la
+   * journée ne s'y prête plus. Ses séries validées sont supprimées et elle ne
+   * rejoint ni l'historique ni la progression — contrairement à la mise en
+   * pause, qui conserve tout pour reprendre plus tard.
+   */
+  const abandonWorkout = async () => {
+    const target = session;
+    setAbandonOpen(false);
+    setExitPromptOpen(false);
+    setSession(null);
+    setSelectedDay(null);
+    setIsResting(false);
+    setScreen('home');
+    if (target) {
+      await withStorageGuard(deleteSession(target.id), onStorageFailure, undefined);
+      if (profile) await refreshHistory(profile);
+    }
+    setNotice('Séance annulée. Elle n’apparaîtra ni dans l’historique ni dans ta progression.');
+    window.setTimeout(() => setNotice(''), 4000);
+  };
+
+  /** Retire une séance de l'historique (lancée par erreur, doublon, séance abandonnée). */
+  const removeSession = async (sessionId: string) => {
+    setSessionToDelete(null);
+    await withStorageGuard(deleteSession(sessionId), onStorageFailure, undefined);
+    if (session?.id === sessionId) {
+      setSession(null);
+      setSelectedDay(null);
+      setScreen('home');
+    }
+    if (profile) await refreshHistory(profile);
+    setNotice('Séance supprimée.');
+    window.setTimeout(() => setNotice(''), 3500);
+  };
+
   const finishSet = async (values: { repetitions?: number; durationSeconds?: number; loadKg?: number }) => {
     if (!session || !selectedDay) return;
     const step = getNextStep(session, selectedDay);
@@ -569,6 +607,7 @@ export default function App() {
           activeSession={session}
           onStart={handleInitiateStart}
           onResume={resumeWorkout}
+          onDiscard={() => setAbandonOpen(true)}
         />
       )}
 
@@ -593,7 +632,13 @@ export default function App() {
         />
       )}
 
-      {screen === 'history' && <HistoryScreen history={history} onBack={() => setScreen('home')} />}
+      {screen === 'history' && (
+        <HistoryScreen
+          history={history}
+          onBack={() => setScreen('home')}
+          onDelete={(sessionId) => setSessionToDelete(sessionId)}
+        />
+      )}
 
       {screen === 'progression' && (
         <ProgressionScreen history={history} profile={profile} onBack={() => setScreen('home')} />
@@ -633,7 +678,40 @@ export default function App() {
         />
       )}
 
-      {exitPromptOpen && <ExitWorkoutDialog onCancel={() => setExitPromptOpen(false)} onPause={pauseWorkout} />}
+      {exitPromptOpen && (
+        <ExitWorkoutDialog
+          onCancel={() => setExitPromptOpen(false)}
+          onPause={pauseWorkout}
+          onAbandon={() => {
+            setExitPromptOpen(false);
+            setAbandonOpen(true);
+          }}
+        />
+      )}
+
+      {abandonOpen && (
+        <ConfirmDialog
+          eyebrow="SÉANCE EN COURS"
+          title="Annuler cette séance ?"
+          description="Les séries déjà validées seront supprimées : la séance ne figurera ni dans l’historique ni dans ta progression. Pour la reprendre plus tard, choisis plutôt « mettre en pause »."
+          confirmLabel="Annuler la séance"
+          cancelLabel="Garder la séance"
+          onConfirm={() => void abandonWorkout()}
+          onCancel={() => setAbandonOpen(false)}
+        />
+      )}
+
+      {sessionToDelete && (
+        <ConfirmDialog
+          eyebrow="HISTORIQUE"
+          title="Supprimer cette séance ?"
+          description="Elle disparaîtra de l’historique et de tes statistiques. Les autres séances ne sont pas touchées."
+          confirmLabel="Supprimer"
+          cancelLabel="Conserver"
+          onConfirm={() => void removeSession(sessionToDelete)}
+          onCancel={() => setSessionToDelete(null)}
+        />
+      )}
 
       {confirmSwitchOpen && (
         <ConfirmDialog
