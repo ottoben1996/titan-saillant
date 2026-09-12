@@ -112,6 +112,23 @@ export function ExerciseTimer({
     }
   }, [suspended, paused, running]);
 
+  /**
+   * Retour au premier plan : le navigateur a pu geler les minuteries pendant que
+   * l'application était en arrière-plan. On recolle immédiatement le décompte à
+   * l'horloge réelle — le temps continue de s'écouler quand on quitte l'app.
+   */
+  useEffect(() => {
+    const syncToClock = () => {
+      if (document.visibilityState === 'visible') controller.current?.refresh();
+    };
+    document.addEventListener('visibilitychange', syncToClock);
+    window.addEventListener('pageshow', syncToClock);
+    return () => {
+      document.removeEventListener('visibilitychange', syncToClock);
+      window.removeEventListener('pageshow', syncToClock);
+    };
+  }, []);
+
   const handleSkip = () => {
     controller.current?.cancel();
     setRunning(false);

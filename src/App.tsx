@@ -75,7 +75,6 @@ export default function App() {
   const [notice, setNotice] = useState('');
   const [exitPromptOpen, setExitPromptOpen] = useState(false);
 
-  const [documentHidden, setDocumentHidden] = useState(() => document.visibilityState !== 'visible');
   const [isOnline, setIsOnline] = useState(() => (typeof navigator === 'undefined' ? true : navigator.onLine));
   const [offlineReady, setOfflineReady] = useState(false);
   const [serviceWorkerReady, setServiceWorkerReady] = useState(false);
@@ -131,20 +130,6 @@ export default function App() {
       }
     });
   }, [profile]);
-
-  useEffect(() => {
-    const syncVisibility = () => setDocumentHidden(document.visibilityState !== 'visible');
-    const onPageShow = () => setDocumentHidden(false);
-    const onPageHide = () => setDocumentHidden(true);
-    document.addEventListener('visibilitychange', syncVisibility);
-    window.addEventListener('pageshow', onPageShow);
-    window.addEventListener('pagehide', onPageHide);
-    return () => {
-      document.removeEventListener('visibilitychange', syncVisibility);
-      window.removeEventListener('pageshow', onPageShow);
-      window.removeEventListener('pagehide', onPageHide);
-    };
-  }, []);
 
   useEffect(() => {
     const onOfflineReady = () => setOfflineReady(true);
@@ -684,7 +669,10 @@ export default function App() {
           history={history}
           resting={isResting}
           restSeconds={restSeconds}
-          timerSuspended={documentHidden || Boolean(tutorialId || alternativeId)}
+          /* Seuls les panneaux ouverts dans l'application suspendent le chrono.
+             Le passage en arrière-plan, lui, ne l'arrête plus : le temps réel
+             continue de s'écouler (voir ExerciseTimer et RestTimer). */
+          timerSuspended={Boolean(tutorialId || alternativeId)}
           modalOpen={Boolean(tutorialId || alternativeId)}
           onTimerStateChange={handleTimerStateChange}
           onTimerDone={notifyTimerDone}

@@ -119,6 +119,23 @@ export function RestTimer({
     }
   }, [suspended, paused]);
 
+  /**
+   * Retour au premier plan : le navigateur a pu geler les minuteries pendant que
+   * l'application était en arrière-plan. On recolle immédiatement le décompte à
+   * l'horloge réelle — le temps continue de s'écouler quand on quitte l'app.
+   */
+  useEffect(() => {
+    const syncToClock = () => {
+      if (document.visibilityState === 'visible') controller.current?.refresh();
+    };
+    document.addEventListener('visibilitychange', syncToClock);
+    window.addEventListener('pageshow', syncToClock);
+    return () => {
+      document.removeEventListener('visibilitychange', syncToClock);
+      window.removeEventListener('pageshow', syncToClock);
+    };
+  }, []);
+
   const handleAddPreset = (preset: AddRestPreset) => {
     triggerHaptic(25);
     const next = applyRestPreset({ remainingSeconds: remaining, totalSeconds: totalDuration }, preset);
