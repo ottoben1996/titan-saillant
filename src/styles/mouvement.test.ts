@@ -66,7 +66,15 @@ describe('couche matière et mouvement', () => {
     const repli = matiere.slice(matiere.indexOf('prefers-reduced-motion'));
     expect(repli).not.toBe('');
 
-    for (const cible of ['.topbar::before', '.topbar-titre', '.sheet-content', '.app-shell button', ':active']) {
+    for (const cible of [
+      '.topbar::before',
+      '.topbar-titre',
+      '.sheet-content',
+      '.app-shell button',
+      '[data-sens="pousse"]',
+      '[data-sens="revient"]',
+      ':active',
+    ]) {
       expect(repli, cible).toContain(cible);
     }
     expect(repli).toContain('transform: none');

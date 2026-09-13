@@ -236,3 +236,81 @@ html[data-replie="true"] .workout-heading h1 {
     transform: none;
   }
 }
+
+/* ------------------------------------------------- le passage d'un écran -- */
+
+/*
+ * Trois passages, trois significations, et une seule règle : iOS ne fait pas
+ * glisser ce qui n'est pas un déplacement. Changer d'onglet commute net, entrer
+ * dans un écran le fait venir de la droite, en sortir le ramène de la gauche.
+ *
+ * Seul l'écran qui arrive est animé : le sortant n'est plus monté. L'écran
+ * entrant part donc de la position où le sortant l'aurait laissé, ce qui donne
+ * la continuité sans garder deux écrans vivants — et sans rejouer leurs
+ * requêtes de stockage.
+ *
+ * On n'anime que l'opacité et la transformation. Aucun écran ne contient
+ * d'élément fixe (vérifié) : une transformation sur le conteneur ne peut donc
+ * pas déplacer une barre censée rester en place.
+ */
+@keyframes pousse {
+  from {
+    opacity: 0.82;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes revient {
+  from {
+    opacity: 0.82;
+    transform: translateX(-32%);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes commute {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.app-shell[data-sens="pousse"] > section,
+.app-shell[data-sens="pousse"] > .content {
+  animation: pousse 460ms var(--ressort) both;
+}
+
+.app-shell[data-sens="revient"] > section,
+.app-shell[data-sens="revient"] > .content {
+  animation: revient 420ms var(--ressort) both;
+}
+
+.app-shell[data-sens="onglet"] > section,
+.app-shell[data-sens="onglet"] > .content {
+  animation: commute 200ms ease-out both;
+}
+
+/* Pendant un glissement de retour, la page suit le doigt sans transition. */
+.app-shell {
+  touch-action: pan-y;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-shell[data-sens="pousse"] > section,
+  .app-shell[data-sens="pousse"] > .content,
+  .app-shell[data-sens="revient"] > section,
+  .app-shell[data-sens="revient"] > .content,
+  .app-shell[data-sens="onglet"] > section,
+  .app-shell[data-sens="onglet"] > .content {
+    animation: commute 120ms ease-out both;
+  }
+}

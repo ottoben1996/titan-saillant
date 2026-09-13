@@ -35,7 +35,9 @@ import { SettingsScreen } from './components/screens/SettingsScreen';
 import { WorkoutScreen } from './components/screens/WorkoutScreen';
 import { ConfirmDialog } from './components/ui/ConfirmDialog';
 import { Check } from './components/ui/Icons';
+import { useSensEcran } from './components/ui/transitionEcran';
 import { useEnTeteReplie } from './components/ui/useEnTeteReplie';
+import { useRetourAuBord } from './components/ui/useRetourAuBord';
 
 const profileKey = 'coach-active-profile';
 type BeforeInstallPromptEvent = Event & {
@@ -386,6 +388,12 @@ export default function App() {
     }
   };
 
+  // Sens du passage entre écrans : iOS commute net entre onglets, mais fait
+  // venir un écran ouvert depuis la droite. Le geste de retour au bord, lui,
+  // agit exactement comme le bouton de la barre du haut.
+  const sensEcran = useSensEcran(screen);
+  const retourBord = useRetourAuBord({ actif: screen !== 'home', onRetour: handleTopbarBack });
+
   if (!profile) return <ProfileChooser onChoose={chooseProfile} />;
 
   const program = getProgram(profile);
@@ -706,7 +714,9 @@ export default function App() {
     window.setTimeout(() => setNotice(''), 3500);
   };
 
-  const handleTopbarBack = () => {
+  // Déclaration hissée, et non constante : les hooks qui suivent l'appellent,
+  // et ils doivent être appelés avant le retour anticipé du choix de profil.
+  function handleTopbarBack() {
     if (tutorialId) return setTutorialId(null);
     if (alternativeId) return setAlternativeId(null);
     if (screen === 'workout') return setExitPromptOpen(true);
@@ -717,7 +727,7 @@ export default function App() {
       return;
     }
     setScreen('home');
-  };
+  }
 
   const topbarLabel =
     tutorialId || alternativeId
@@ -734,7 +744,12 @@ export default function App() {
       : null;
 
   return (
-    <main className={`app-shell ${screen === 'workout' ? 'workout-shell' : ''}`}>
+    <main
+      className={`app-shell ${screen === 'workout' ? 'workout-shell' : ''}`}
+      data-sens={sensEcran}
+      {...retourBord.props}
+      style={retourBord.decalage ? { translate: `${retourBord.decalage}px` } : undefined}
+    >
       {/* Un lecteur d'écran ne voit pas un changement de page : il faut le dire.
           `polite` attend la fin de la phrase en cours, `role="status"` évite
           d'interrompre une saisie. */}
