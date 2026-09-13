@@ -79,8 +79,7 @@ export const profileBody: Readonly<Record<ProfileId, ProfileBody>> = Object.free
   laura: { heightCm: 160, initialWeightKg: 84.05, sex: 'femme' },
 });
 
-export const measurementId = (profileId: ProfileId, cycle: number, week: number) =>
-  `${profileId}-c${cycle}-s${week}`;
+export const measurementId = (profileId: ProfileId, cycle: number, week: number) => `${profileId}-c${cycle}-s${week}`;
 
 /**
  * Historique de départ, repris de la feuille de suivi réelle (deux semaines).

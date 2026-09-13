@@ -20,18 +20,18 @@
 /* La séance doit tenir dans la hauteur réellement visible du téléphone. */
 .workout-shell {
   height: 100dvh;
-  padding-left: max(.75rem, env(safe-area-inset-left));
-  padding-right: max(.75rem, env(safe-area-inset-right));
+  padding-left: max(0.75rem, env(safe-area-inset-left));
+  padding-right: max(0.75rem, env(safe-area-inset-right));
   padding-bottom: env(safe-area-inset-bottom);
 }
 
 .workout-shell .topbar {
-  padding-top: calc(.65rem + env(safe-area-inset-top));
+  padding-top: calc(0.65rem + env(safe-area-inset-top));
 }
 
 /* --- barre de navigation ------------------------------------------------- */
 .bottom-nav {
-  bottom: calc(.5rem + env(safe-area-inset-bottom));
+  bottom: calc(0.5rem + env(safe-area-inset-bottom));
   width: min(calc(100% - 1.5rem), 30rem);
 }
 
@@ -124,7 +124,7 @@
      identifiable en salle, et l'accessibilité repose sur le texte. */
   .bottom-nav {
     justify-content: space-around;
-    padding: .35rem .4rem;
+    padding: 0.35rem 0.4rem;
   }
 
   .bottom-nav button {
@@ -132,8 +132,8 @@
     flex-direction: column;
     gap: 2px;
     min-height: 56px;
-    padding: .45rem .25rem;
-    font-size: .75rem;
+    padding: 0.45rem 0.25rem;
+    font-size: 0.75rem;
     line-height: 1.1;
   }
 
@@ -148,7 +148,7 @@
 
   /* La zone de séance garde ses marges internes cohérentes. */
   .workout-content {
-    padding-top: .25rem;
+    padding-top: 0.25rem;
   }
 
   /* Sélecteur de profil en séance et accès secondaires : cibles de 44 px.
@@ -156,12 +156,12 @@
   .workout-actions .tutorial-link,
   .workout-actions .alternative-link {
     min-height: 44px;
-    padding: .6rem .8rem;
+    padding: 0.6rem 0.8rem;
   }
 
   .duo-pill-btn {
     min-height: 44px;
-    padding: .55rem .8rem;
+    padding: 0.55rem 0.8rem;
   }
 
   .duo-switcher-bar {
@@ -171,7 +171,7 @@
   /* Lien d'attribution : lien de texte en ligne, simple confort de tap. */
   .asset-credits a,
   .settings-footnote a {
-    padding: .4rem 0;
+    padding: 0.4rem 0;
   }
 
   /* Modales en feuille basse : elles respectent la zone sûre inférieure. */

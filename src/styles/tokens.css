@@ -15,58 +15,60 @@
 
 /* Police auto-hébergée : deux sous-ensembles, aucune requête externe */
 @font-face {
-  font-family: 'Inter Variable';
+  font-family: "Inter Variable";
   font-style: normal;
   font-weight: 100 900;
   font-display: swap;
-  src: url('/fonts/inter-latin-var.woff2') format('woff2-variations');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+  src: url("/fonts/inter-latin-var.woff2") format("woff2-variations");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
     U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
     U+FEFF, U+FFFD;
 }
 
 @font-face {
-  font-family: 'Inter Variable';
+  font-family: "Inter Variable";
   font-style: normal;
   font-weight: 100 900;
   font-display: swap;
-  src: url('/fonts/inter-latin-ext-var.woff2') format('woff2-variations');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304,
+  src: url("/fonts/inter-latin-ext-var.woff2") format("woff2-variations");
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304,
     U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0,
     U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 
 :root {
   /* Surfaces */
-  --surface-0: #0B0F0E;
+  --surface-0: #0b0f0e;
   --surface-1: #121715;
-  --surface-2: #18201D;
-  --line: rgba(255, 255, 255, .09);
-  --line-strong: rgba(255, 255, 255, .16);
+  --surface-2: #18201d;
+  --line: rgba(255, 255, 255, 0.09);
+  --line-strong: rgba(255, 255, 255, 0.16);
 
   /* Texte */
-  --text-1: #F1F5F2;
-  --text-2: #A9B7AE;
-  --text-3: #78877E;
+  --text-1: #f1f5f2;
+  --text-2: #a9b7ae;
+  --text-3: #78877e;
 
   /* Accents — l'accent suit le profil actif (voir [data-profile] plus bas).
      Les canaux séparés permettent les voiles translucides sans coder la teinte
      en dur dans chaque composant. */
-  --accent: #B8F36B;
+  --accent: #b8f36b;
   --accent-rgb: 184 243 107;
-  --accent-ink: #0E1710;
-  --accent-2: #5FBF97;
+  --accent-ink: #0e1710;
+  --accent-2: #5fbf97;
   --accent-3: #243129;
-  --rest: #F3BD6B;
-  --danger: #E79292;
-  --profile-laura: #E3C0F7;
+  --rest: #f3bd6b;
+  --danger: #e79292;
+  --profile-laura: #e3c0f7;
 
   /* Laura : lilas pastel, même structure, teinte plus douce */
-  --accent-laura: #E3C0F7;
+  --accent-laura: #e3c0f7;
   --accent-laura-rgb: 227 192 247;
-  --accent-laura-ink: #1A1024;
-  --accent-laura-2: #A98BC4;
-  --accent-laura-3: #2A2434;
+  --accent-laura-ink: #1a1024;
+  --accent-laura-2: #a98bc4;
+  --accent-laura-3: #2a2434;
 
   /* Rayons */
   --r-sm: 6px;
@@ -74,30 +76,30 @@
   --r-lg: 14px;
 
   /* Mouvement */
-  --ease: cubic-bezier(.2, .8, .2, 1);
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
   --t-fast: 120ms;
   --t-mid: 180ms;
   --t-slow: 240ms;
 
   /* Élévation unique, réservée aux surfaces flottantes */
-  --elevation: 0 1px 0 rgba(255, 255, 255, .04) inset, 0 8px 24px rgba(0, 0, 0, .35);
+  --elevation: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 8px 24px rgba(0, 0, 0, 0.35);
 
   /* Typographie : Inter auto-hébergée (voir les @font-face ci-dessus) */
-  font-family: 'Inter Variable', Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-family: "Inter Variable", Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
 }
 
 /* ---------------------------------------------------------------- base ---- */
 body {
   background: var(--surface-0);
   color: var(--text-1);
-  font-family: 'Inter Variable', Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-family: "Inter Variable", Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-tap-highlight-color: transparent;
 }
 
 ::selection {
-  background: rgb(var(--accent-rgb) / .25);
+  background: rgb(var(--accent-rgb) / 0.25);
   color: var(--text-1);
 }
 
@@ -110,7 +112,7 @@ body {
 .app-shell button:focus-visible,
 .app-shell input:focus-visible,
 .app-shell select:focus-visible {
-  outline: 2px solid rgb(var(--accent-rgb) / .75);
+  outline: 2px solid rgb(var(--accent-rgb) / 0.75);
   outline-offset: 2px;
 }
 
@@ -126,41 +128,41 @@ body {
 .completion-screen h1 {
   font-size: clamp(1.75rem, 7vw, 2.5rem);
   line-height: 1.1;
-  letter-spacing: -.02em;
+  letter-spacing: -0.02em;
 }
 
 .page-heading h1 {
   font-size: clamp(1.5rem, 6vw, 2rem);
   line-height: 1.15;
-  letter-spacing: -.01em;
+  letter-spacing: -0.01em;
 }
 
 .workout-heading h1,
 .workout-content .workout-heading h1 {
   font-size: clamp(1.25rem, 5.5vw, 1.875rem);
   line-height: 1.15;
-  letter-spacing: -.01em;
+  letter-spacing: -0.01em;
 }
 
 .section-heading h2 {
   font-size: 1.125rem;
-  letter-spacing: -.01em;
+  letter-spacing: -0.01em;
 }
 
 .tutorial-modal h2 {
   font-size: 1.375rem;
-  letter-spacing: -.01em;
+  letter-spacing: -0.01em;
 }
 
 .tutorial-modal h3 {
-  font-size: .75rem;
-  letter-spacing: .12em;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
 }
 
 /* Chiffres de prescription : 40 px maximum, comme le chrono */
 .prescription-main strong {
   font-size: 2.5rem;
-  letter-spacing: -.02em;
+  letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
 }
 
@@ -170,7 +172,7 @@ body {
 
 .rest-orbit strong {
   font-size: 2.5rem;
-  letter-spacing: -.02em;
+  letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
 }
 
@@ -181,7 +183,7 @@ body {
 /* Indicateurs : compacts, lisibles, sans surdimensionnement */
 .metric-card strong {
   font-size: 1.5rem;
-  letter-spacing: -.02em;
+  letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
 }
 
@@ -246,7 +248,7 @@ body {
 
 .metric-card.accent span,
 .metric-card.accent small {
-  color: rgba(14, 23, 16, .72);
+  color: rgba(14, 23, 16, 0.72);
 }
 
 /* Tint par index : sans signification, on neutralise */
@@ -307,7 +309,7 @@ body {
 }
 
 .barbell-collar {
-  background: #55606A;
+  background: #55606a;
 }
 
 /* Boutons : rayons et transitions homogènes */
@@ -335,14 +337,17 @@ body {
 .profile-choice,
 .workout-card,
 .history-item {
-  transition: background var(--t-mid) var(--ease), border-color var(--t-mid) var(--ease),
-    color var(--t-mid) var(--ease), transform var(--t-fast) var(--ease);
+  transition:
+    background var(--t-mid) var(--ease),
+    border-color var(--t-mid) var(--ease),
+    color var(--t-mid) var(--ease),
+    transform var(--t-fast) var(--ease);
 }
 
 .primary-button:hover {
   transform: none;
   box-shadow: none;
-  background: #C4F884;
+  background: #c4f884;
 }
 
 .round-action:hover {
@@ -372,7 +377,7 @@ body {
 .connection-pill.offline {
   display: inline-flex;
   color: var(--rest);
-  background: rgba(243, 189, 107, .12);
+  background: rgba(243, 189, 107, 0.12);
 }
 
 .connection-pill.offline .connection-dot {
@@ -389,7 +394,7 @@ body {
    seule sa valeur porte l'accent. */
 .metric-card.accent {
   background: var(--surface-1);
-  border-color: rgb(var(--accent-rgb) / .28);
+  border-color: rgb(var(--accent-rgb) / 0.28);
   color: var(--text-1);
 }
 
@@ -405,7 +410,7 @@ body {
 /* Barre de progression : discrète, plus de rail lumineux décoratif */
 .progress-track {
   height: 3px;
-  background: rgba(255, 255, 255, .07);
+  background: rgba(255, 255, 255, 0.07);
 }
 
 /* Cible tactile minimale de l'action de lancement */
@@ -424,9 +429,11 @@ body {
   height: 24px;
   padding: 2px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, .12);
+  background: rgba(255, 255, 255, 0.12);
   border: 1px solid var(--line);
-  transition: background var(--t-mid) var(--ease), border-color var(--t-mid) var(--ease);
+  transition:
+    background var(--t-mid) var(--ease),
+    border-color var(--t-mid) var(--ease);
 }
 
 .toggle-row .toggle-pill i {
@@ -436,12 +443,14 @@ body {
   height: 18px;
   border-radius: 50%;
   background: var(--text-2);
-  transition: transform var(--t-mid) var(--ease), background var(--t-mid) var(--ease);
+  transition:
+    transform var(--t-mid) var(--ease),
+    background var(--t-mid) var(--ease);
 }
 
 .toggle-row .toggle-pill.on {
-  background: rgb(var(--accent-rgb) / .25);
-  border-color: rgb(var(--accent-rgb) / .45);
+  background: rgb(var(--accent-rgb) / 0.25);
+  border-color: rgb(var(--accent-rgb) / 0.45);
 }
 
 .toggle-row .toggle-pill.on i {
@@ -464,7 +473,7 @@ body {
 .last-session-strip strong {
   display: block;
   margin-top: 2px;
-  font-size: .9375rem;
+  font-size: 0.9375rem;
   font-weight: 590;
 }
 
@@ -472,14 +481,14 @@ body {
   display: block;
   margin-top: 2px;
   color: var(--text-2);
-  font-size: .75rem;
+  font-size: 0.75rem;
 }
 
 /* L'illustration du mouvement occupe l'espace laissé vide par la prescription :
    plus de zone morte de 300 px au milieu de l'écran de séance. */
 .prescription-card.compact {
   justify-content: flex-start;
-  gap: .35rem;
+  gap: 0.35rem;
 }
 
 .exercise-illustration {
@@ -488,8 +497,8 @@ body {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  gap: .5rem;
-  margin: .25rem 0 .5rem;
+  gap: 0.5rem;
+  margin: 0.25rem 0 0.5rem;
 }
 
 .exercise-illustration.single {
@@ -517,20 +526,20 @@ body {
 }
 
 .duo-pill-btn {
-  padding: .35rem .6rem;
-  font-size: .75rem;
+  padding: 0.35rem 0.6rem;
+  font-size: 0.75rem;
   min-height: 32px;
 }
 
 .duo-pill-badge {
-  font-size: .6875rem;
+  font-size: 0.6875rem;
 }
 
 .chip-tempo {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  border-color: rgb(var(--accent-rgb) / .35) !important;
+  border-color: rgb(var(--accent-rgb) / 0.35) !important;
   color: var(--accent) !important;
   font-weight: 590;
 }
@@ -564,12 +573,12 @@ body {
   width: min(100%, 72rem);
   margin: 0 auto 12px;
   padding: 12px 14px;
-  border: 1px solid rgba(231, 146, 146, .35);
+  border: 1px solid rgba(231, 146, 146, 0.35);
   border-left: 2px solid var(--danger);
   border-radius: var(--r-lg);
-  background: rgba(231, 146, 146, .10);
-  color: #F3D6D6;
-  font-size: .8125rem;
+  background: rgba(231, 146, 146, 0.1);
+  color: #f3d6d6;
+  font-size: 0.8125rem;
   line-height: 1.45;
 }
 
@@ -599,7 +608,7 @@ body {
   margin: 8px 0 12px;
   font-size: clamp(1.5rem, 6vw, 2rem);
   line-height: 1.15;
-  letter-spacing: -.01em;
+  letter-spacing: -0.01em;
 }
 
 .error-panel .primary-button {
@@ -612,7 +621,7 @@ body {
   border-radius: var(--r-sm);
   background: var(--surface-2);
   color: var(--text-3);
-  font-size: .75rem;
+  font-size: 0.75rem;
   font-family: ui-monospace, "SFMono-Regular", "Cascadia Mono", monospace;
   overflow-wrap: anywhere;
 }
@@ -630,7 +639,7 @@ body {
   border-radius: var(--r-lg);
   background: var(--surface-2);
   color: var(--text-2);
-  font-size: .8125rem;
+  font-size: 0.8125rem;
 }
 
 .update-banner button {
@@ -653,7 +662,7 @@ body {
 }
 
 .modal-backdrop {
-  background: rgba(0, 0, 0, .68);
+  background: rgba(0, 0, 0, 0.68);
 }
 
 .tutorial-modal {
@@ -663,9 +672,9 @@ body {
 }
 
 .safety-callout {
-  background: rgba(243, 189, 107, .10);
-  color: #E7CFA9;
-  border: 1px solid rgba(243, 189, 107, .22);
+  background: rgba(243, 189, 107, 0.1);
+  color: #e7cfa9;
+  border: 1px solid rgba(243, 189, 107, 0.22);
   border-radius: var(--r-md);
 }
 
@@ -684,7 +693,7 @@ body {
 
 /* Profil actif : Laura remplace l'accent lime par son lilas pastel.
    Un seul attribut sur <html> suffit — aucun composant ne connaît le profil. */
-:root[data-profile='laura'] {
+:root[data-profile="laura"] {
   --accent: var(--accent-laura);
   --accent-rgb: var(--accent-laura-rgb);
   --accent-ink: var(--accent-laura-ink);
@@ -695,7 +704,7 @@ body {
 /* Couleur choisie dans les réglages, une par profil.
    Ce bloc vient APRÈS celui du profil : à spécificité égale, il gagne. Les cinq
    paires couleur / encre sont mesurées à plus de 10:1 de contraste (seuil AAA : 7:1). */
-:root[data-accent='vert'] {
+:root[data-accent="vert"] {
   --accent: #b8f36b;
   --accent-rgb: 184 243 107;
   --accent-ink: #0e1710;
@@ -703,7 +712,7 @@ body {
   --accent-3: #2b3923;
 }
 
-:root[data-accent='rose'] {
+:root[data-accent="rose"] {
   --accent: #e3c0f7;
   --accent-rgb: 227 192 247;
   --accent-ink: #1a1024;
@@ -711,7 +720,7 @@ body {
   --accent-3: #323139;
 }
 
-:root[data-accent='bleu'] {
+:root[data-accent="bleu"] {
   --accent: #8fc7ff;
   --accent-rgb: 143 199 255;
   --accent-ink: #0a1622;
@@ -719,7 +728,7 @@ body {
   --accent-3: #24323a;
 }
 
-:root[data-accent='ambre'] {
+:root[data-accent="ambre"] {
   --accent: #f6c177;
   --accent-rgb: 246 193 119;
   --accent-ink: #1f1305;
@@ -727,7 +736,7 @@ body {
   --accent-3: #353125;
 }
 
-:root[data-accent='turquoise'] {
+:root[data-accent="turquoise"] {
   --accent: #7fe3d2;
   --accent-rgb: 127 227 210;
   --accent-ink: #04211d;

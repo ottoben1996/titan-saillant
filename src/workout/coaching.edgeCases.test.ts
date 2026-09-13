@@ -69,7 +69,12 @@ describe('coaching adaptatif — cas limites', () => {
   });
 
   it('se base sur la séance terminée la plus récente', () => {
-    const ancienneFacile = completed({ id: 'old', completedAt: '2026-09-01T09:00:00.000Z', perceivedExertion: 5, energy: 5 });
+    const ancienneFacile = completed({
+      id: 'old',
+      completedAt: '2026-09-01T09:00:00.000Z',
+      perceivedExertion: 5,
+      energy: 5,
+    });
     const recenteDure = completed({ id: 'new', completedAt: '2026-09-08T09:00:00.000Z', perceivedExertion: 9 });
 
     expect(getAdaptiveAdvice([ancienneFacile, recenteDure])?.recommendation).toBe('reduce');
@@ -77,7 +82,12 @@ describe('coaching adaptatif — cas limites', () => {
   });
 
   it('ignore une séance en cours plus récente que la dernière séance terminée', () => {
-    const ancienneFacile = completed({ id: 'old', completedAt: '2026-09-01T09:00:00.000Z', perceivedExertion: 5, energy: 5 });
+    const ancienneFacile = completed({
+      id: 'old',
+      completedAt: '2026-09-01T09:00:00.000Z',
+      perceivedExertion: 5,
+      energy: 5,
+    });
     const enCoursDure = inProgress({ id: 'running', updatedAt: '2026-09-10T09:00:00.000Z', perceivedExertion: 10 });
 
     expect(getAdaptiveAdvice([ancienneFacile, enCoursDure])?.recommendation).toBe('increase');

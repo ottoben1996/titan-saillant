@@ -84,15 +84,25 @@ describe('countdown', () => {
 
   it('restores elapsed time for a timer persisted while the app was open', () => {
     const now = Date.parse('2026-09-08T20:00:05.900Z');
-    expect(restoreRemainingSeconds({
-      remainingSeconds: 20,
-      paused: false,
-      updatedAt: '2026-09-08T20:00:02.100Z',
-    }, now)).toBe(17);
-    expect(restoreRemainingSeconds({
-      remainingSeconds: 20,
-      paused: true,
-      updatedAt: '2026-09-08T20:00:02.100Z',
-    }, now)).toBe(20);
+    expect(
+      restoreRemainingSeconds(
+        {
+          remainingSeconds: 20,
+          paused: false,
+          updatedAt: '2026-09-08T20:00:02.100Z',
+        },
+        now,
+      ),
+    ).toBe(17);
+    expect(
+      restoreRemainingSeconds(
+        {
+          remainingSeconds: 20,
+          paused: true,
+          updatedAt: '2026-09-08T20:00:02.100Z',
+        },
+        now,
+      ),
+    ).toBe(20);
   });
 });

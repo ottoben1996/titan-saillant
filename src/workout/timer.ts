@@ -16,7 +16,10 @@ export interface CountdownController {
   refresh(): number;
 }
 
-export function restoreRemainingSeconds(state: Pick<SessionTimerState, 'remainingSeconds' | 'paused' | 'updatedAt'>, now = Date.now()) {
+export function restoreRemainingSeconds(
+  state: Pick<SessionTimerState, 'remainingSeconds' | 'paused' | 'updatedAt'>,
+  now = Date.now(),
+) {
   if (state.paused) return Math.max(0, state.remainingSeconds);
   const updatedAtMs = Date.parse(state.updatedAt);
   // Une date corrompue (sauvegarde importée, données partielles) donnerait NaN :
@@ -26,7 +29,11 @@ export function restoreRemainingSeconds(state: Pick<SessionTimerState, 'remainin
   return Math.max(0, state.remainingSeconds - elapsedSeconds);
 }
 
-export function createCountdown(durationSeconds: number, onTick?: (remaining: number) => void, onDone?: () => void): CountdownController {
+export function createCountdown(
+  durationSeconds: number,
+  onTick?: (remaining: number) => void,
+  onDone?: () => void,
+): CountdownController {
   let end = Date.now() + durationSeconds * 1000;
   let paused = false;
   let finished = false;
@@ -48,10 +55,26 @@ export function createCountdown(durationSeconds: number, onTick?: (remaining: nu
   const timer = window.setInterval(tick, 250);
 
   return {
-    pause() { if (!paused) { remaining = Math.max(0, Math.ceil((end - Date.now()) / 1000)); paused = true; } },
-    resume() { if (paused) { end = Date.now() + remaining * 1000; paused = false; } },
-    cancel() { window.clearInterval(timer); },
-    getRemaining() { return remaining; },
-    refresh() { return tick(); },
+    pause() {
+      if (!paused) {
+        remaining = Math.max(0, Math.ceil((end - Date.now()) / 1000));
+        paused = true;
+      }
+    },
+    resume() {
+      if (paused) {
+        end = Date.now() + remaining * 1000;
+        paused = false;
+      }
+    },
+    cancel() {
+      window.clearInterval(timer);
+    },
+    getRemaining() {
+      return remaining;
+    },
+    refresh() {
+      return tick();
+    },
   };
 }

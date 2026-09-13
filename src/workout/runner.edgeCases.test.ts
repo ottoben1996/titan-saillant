@@ -65,7 +65,10 @@ describe('workout runner — cas limites', () => {
 
     const steps = getWorkoutSteps(day, createRunner(day, 'ottman'));
     expect(steps.map((step) => exercises[step.exerciseIndex!].id)).toEqual([
-      'exercice-a', 'exercice-a', 'exercice-b', 'cooldown-full-body-a',
+      'exercice-a',
+      'exercice-a',
+      'exercice-b',
+      'cooldown-full-body-a',
     ]);
 
     const finished = runToEnd(day, createRunner(day, 'ottman'));
@@ -83,7 +86,13 @@ describe('workout runner — cas limites', () => {
     const steps = getWorkoutSteps(day, createRunner(day, 'ottman'));
 
     expect(steps.map((step) => exercises[step.exerciseIndex!].id)).toEqual([
-      'circuit-a', 'circuit-b', 'circuit-a', 'circuit-b', 'circuit-a', 'circuit-b', 'cooldown-full-body-a',
+      'circuit-a',
+      'circuit-b',
+      'circuit-a',
+      'circuit-b',
+      'circuit-a',
+      'circuit-b',
+      'cooldown-full-body-a',
     ]);
     expect(steps.slice(0, 6).map((step) => step.setIndex)).toEqual([0, 0, 1, 1, 2, 2]);
   });
@@ -98,7 +107,12 @@ describe('workout runner — cas limites', () => {
 
     // 3 rounds : le second exercice n'a pas de 3e série, il est simplement omis.
     expect(steps.map((step) => exercises[step.exerciseIndex!].id)).toEqual([
-      'circuit-a', 'circuit-b', 'circuit-a', 'circuit-b', 'circuit-a', 'cooldown-full-body-a',
+      'circuit-a',
+      'circuit-b',
+      'circuit-a',
+      'circuit-b',
+      'circuit-a',
+      'cooldown-full-body-a',
     ]);
   });
 
@@ -115,16 +129,12 @@ describe('workout runner — cas limites', () => {
     expect(getNextStep(session, day)).toMatchObject(steps[target]);
 
     const exercises = getWorkoutExercises(day, session);
-    const next = completeSet(
-      session,
-      day,
-      logSet(exercises[steps[target].exerciseIndex!].id, steps[target].setIndex!),
-    );
+    const next = completeSet(session, day, logSet(exercises[steps[target].exerciseIndex!].id, steps[target].setIndex!));
     expect(next.currentStepIndex).toBe(target + 1);
     expect(getNextStep(next, day)).toMatchObject(steps[target + 1]);
   });
 
-  it("dernier exercice du dernier bloc : la planche précède le retour au calme", () => {
+  it('dernier exercice du dernier bloc : la planche précède le retour au calme', () => {
     const day = getProgram('ottman').days[0];
     const exercises = getWorkoutExercises(day, createRunner(day, 'ottman'));
     const steps = getWorkoutSteps(day, createRunner(day, 'ottman'));
@@ -144,13 +154,22 @@ describe('workout runner — cas limites', () => {
 
     // 3 exercices d'échauffement (coiffe, bosu, vélo) puis le premier circuit.
     expect(exercises.slice(0, 5).map((item) => item.id)).toEqual([
-      'coiffe-rotateurs', 'bosu', 'velo', 'jumping-jack', 'mountain-climber',
+      'coiffe-rotateurs',
+      'bosu',
+      'velo',
+      'jumping-jack',
+      'mountain-climber',
     ]);
     const circuit1 = steps
       .map((step) => exercises[step.exerciseIndex!].id)
       .filter((id) => id === 'jumping-jack' || id === 'mountain-climber');
     expect(circuit1).toEqual([
-      'jumping-jack', 'mountain-climber', 'jumping-jack', 'mountain-climber', 'jumping-jack', 'mountain-climber',
+      'jumping-jack',
+      'mountain-climber',
+      'jumping-jack',
+      'mountain-climber',
+      'jumping-jack',
+      'mountain-climber',
     ]);
 
     const finished = runToEnd(day, session);

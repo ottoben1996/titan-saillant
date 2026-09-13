@@ -47,11 +47,7 @@ export interface EtatSauvegarde {
   joursDepuisExport?: number;
 }
 
-export function etatSauvegarde(
-  profile: ProfileId,
-  sessions: number,
-  maintenant: Date = new Date(),
-): EtatSauvegarde {
+export function etatSauvegarde(profile: ProfileId, sessions: number, maintenant: Date = new Date()): EtatSauvegarde {
   if (sessions < sessionsAvantRappel) return { proposer: false };
 
   const report = lireDate(cleReport(profile));

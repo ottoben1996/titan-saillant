@@ -1,46 +1,38 @@
-import { Suspense, lazy, useEffect, useState } from 'react';
-import type { ProfileId, SessionTimerState, WorkoutDay, WorkoutSession } from './domain/types';
-import { getProgram } from './domain/programs';
-import type { AccentId } from './domain/palettes';
-import { lireAccent, enregistrerAccent } from './storage/accentPreference';
-import { serieAssiduite } from './workout/assiduite';
-import { tutorials } from './domain/tutorials';
-import { equipmentAlternatives } from './domain/alternatives';
-import { createRunner, completeSet, getNextStep, getWorkoutExercises } from './workout/runner';
-import { playTimerChime, timerTitle, vibrateTimer } from './workout/alerts';
-import { restoreRemainingSeconds } from './workout/timer';
-import { deleteSession, getActiveSession, listSessions, saveSession } from './storage/sessionRepository';
-import {
-  listMeasurements,
-  saveMeasurement,
-  seedMeasurementsIfEmpty,
-} from './storage/measurementRepository';
-import type { WeeklyMeasurement } from './domain/measurements';
-import { FollowupScreen } from './components/screens/FollowupScreen';
+import { useEffect, useState } from 'react';
 import { BilanScreen } from './components/screens/BilanScreen';
-import { STORAGE_UNAVAILABLE_MESSAGE, withStorageGuard } from './storage/guard';
-import { etatSauvegarde, reporterSauvegarde } from './storage/backupReminder';
+import { FollowupScreen } from './components/screens/FollowupScreen';
+import { equipmentAlternatives } from './domain/alternatives';
+import type { WeeklyMeasurement } from './domain/measurements';
+import type { AccentId } from './domain/palettes';
+import { getProgram } from './domain/programs';
+import { tutorials } from './domain/tutorials';
+import type { ProfileId, SessionTimerState, WorkoutDay, WorkoutSession } from './domain/types';
+import { enregistrerAccent, lireAccent } from './storage/accentPreference';
 import { telechargerSauvegarde } from './storage/backupFile';
-/**
- * L'espace MUSTAPHA n'est chargé que si on l'ouvre.
- *
- * Il était importé en dur : son code partait dans le paquet initial de
- * l'application Ottman, pour toutes les personnes, à chaque ouverture.
- */
-const MustaphaApp = lazy(() => import('./mustapha/MustaphaApp'));
+import { etatSauvegarde, reporterSauvegarde } from './storage/backupReminder';
+import { STORAGE_UNAVAILABLE_MESSAGE, withStorageGuard } from './storage/guard';
+import { listMeasurements, saveMeasurement, seedMeasurementsIfEmpty } from './storage/measurementRepository';
+import { deleteSession, getActiveSession, listSessions, saveSession } from './storage/sessionRepository';
+import { playTimerChime, timerTitle, vibrateTimer } from './workout/alerts';
+import { serieAssiduite } from './workout/assiduite';
+import { completeSet, createRunner, getNextStep, getWorkoutExercises } from './workout/runner';
+import { restoreRemainingSeconds } from './workout/timer';
 
-import { TopBar } from './components/layout/TopBar';
+// L'espace MUSTAPHA est aiguillé depuis main.tsx, avant le montage : un retour
+// anticipé ici placerait tous les hooks de cette application sous condition.
+
 import { BottomNav, type Screen } from './components/layout/BottomNav';
-import { ProfileChooser } from './components/screens/ProfileChooser';
-import { HomeScreen } from './components/screens/HomeScreen';
-import { WorkoutScreen } from './components/screens/WorkoutScreen';
+import { TopBar } from './components/layout/TopBar';
+import { AlternativeModal } from './components/modals/AlternativeModal';
+import { EnergyCheckinModal, type EnergyLevel } from './components/modals/EnergyCheckinModal';
+import { ExitWorkoutDialog } from './components/modals/ExitWorkoutDialog';
+import { TutorialModal } from './components/modals/TutorialModal';
 import { HistoryScreen } from './components/screens/HistoryScreen';
+import { HomeScreen } from './components/screens/HomeScreen';
+import { ProfileChooser } from './components/screens/ProfileChooser';
 import { ProgressionScreen } from './components/screens/ProgressionScreen';
 import { SettingsScreen } from './components/screens/SettingsScreen';
-import { TutorialModal } from './components/modals/TutorialModal';
-import { AlternativeModal } from './components/modals/AlternativeModal';
-import { ExitWorkoutDialog } from './components/modals/ExitWorkoutDialog';
-import { EnergyCheckinModal, type EnergyLevel } from './components/modals/EnergyCheckinModal';
+import { WorkoutScreen } from './components/screens/WorkoutScreen';
 import { ConfirmDialog } from './components/ui/ConfirmDialog';
 import { Check } from './components/ui/Icons';
 
@@ -51,14 +43,6 @@ type BeforeInstallPromptEvent = Event & {
 };
 
 export default function App() {
-  if (window.location.pathname === '/mustapha' || window.location.pathname.startsWith('/mustapha/')) {
-    return (
-      <Suspense fallback={<div className="app-shell" aria-busy="true" />}>
-        <MustaphaApp />
-      </Suspense>
-    );
-  }
-
   const [profile, setProfile] = useState<ProfileId | null>(() => {
     const saved = localStorage.getItem(profileKey);
     return saved === 'ottman' || saved === 'laura' ? saved : null;
@@ -156,7 +140,7 @@ export default function App() {
   const [serviceWorkerReady, setServiceWorkerReady] = useState(false);
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission | 'unsupported'>(() =>
-    typeof Notification === 'undefined' ? 'unsupported' : Notification.permission
+    typeof Notification === 'undefined' ? 'unsupported' : Notification.permission,
   );
 
   const [storageMessage, setStorageMessage] = useState('');
@@ -341,7 +325,11 @@ export default function App() {
   const switchDuoProfile = async (target: ProfileId) => {
     if (target === profile) return;
     if (session) {
-      await withStorageGuard(saveSession({ ...session, updatedAt: new Date().toISOString() }), onStorageFailure, undefined);
+      await withStorageGuard(
+        saveSession({ ...session, updatedAt: new Date().toISOString() }),
+        onStorageFailure,
+        undefined,
+      );
     }
     localStorage.setItem(profileKey, target);
     setProfile(target);
@@ -611,7 +599,7 @@ export default function App() {
       persist(updated);
     }
 
-    if (!state || state.kind !== 'rest' || state.remainingSeconds <= 0) {
+    if (state?.kind !== 'rest' || state.remainingSeconds <= 0) {
       setIsResting(false);
       setRestSeconds(0);
     } else {
@@ -621,7 +609,9 @@ export default function App() {
 
   const notifyTimerDone = (kind: 'rest' | 'tempo' = 'rest') => {
     const message =
-      kind === 'tempo' ? 'Temps terminé. Tu peux valider la série.' : 'Repos terminé. Tu peux reprendre la prochaine série.';
+      kind === 'tempo'
+        ? 'Temps terminé. Tu peux valider la série.'
+        : 'Repos terminé. Tu peux reprendre la prochaine série.';
 
     vibrateTimer(kind);
     playTimerChime(kind);
@@ -666,7 +656,12 @@ export default function App() {
     window.setTimeout(() => setNotice(''), 3500);
   };
 
-  const finishWorkout = async (feedback?: Pick<WorkoutSession, 'perceivedExertion' | 'energy' | 'pain' | 'painLocation' | 'loadConsigne' | 'notes'>) => {
+  const finishWorkout = async (
+    feedback?: Pick<
+      WorkoutSession,
+      'perceivedExertion' | 'energy' | 'pain' | 'painLocation' | 'loadConsigne' | 'notes'
+    >,
+  ) => {
     if (session) {
       const updated: WorkoutSession = {
         ...session,
@@ -704,10 +699,10 @@ export default function App() {
     tutorialId || alternativeId
       ? 'Retour à la séance'
       : screen === 'workout'
-      ? 'Quitter la séance'
-      : screen === 'home'
-      ? 'Changer de profil'
-      : 'Retour à l’accueil';
+        ? 'Quitter la séance'
+        : screen === 'home'
+          ? 'Changer de profil'
+          : 'Retour à l’accueil';
 
   const currentExerciseForAlternative =
     alternativeId && selectedDay && session
@@ -852,9 +847,7 @@ export default function App() {
       )}
 
       {/* Le bilan est un document : aucune navigation ne doit apparaître dessus. */}
-      {screen !== 'workout' && screen !== 'bilan' && (
-        <BottomNav currentScreen={screen} onNavigate={setScreen} />
-      )}
+      {screen !== 'workout' && screen !== 'bilan' && <BottomNav currentScreen={screen} onNavigate={setScreen} />}
 
       {tutorialId && tutorials[tutorialId] && (
         <TutorialModal tutorial={tutorials[tutorialId]} onClose={() => setTutorialId(null)} />

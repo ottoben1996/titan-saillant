@@ -1,5 +1,5 @@
-﻿import { describe, expect, it, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+﻿import { fireEvent, render, screen } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
 import { RestTimer } from './RestTimer';
 
 describe('RestTimer', () => {
@@ -15,7 +15,7 @@ describe('RestTimer', () => {
         suspended={false}
         onStateChange={onStateChange}
         onDone={onDone}
-      />
+      />,
     );
 
     expect(screen.getByText('01:30')).toBeInTheDocument();
@@ -36,7 +36,7 @@ describe('RestTimer', () => {
         suspended={false}
         onStateChange={onStateChange}
         onDone={onDone}
-      />
+      />,
     );
 
     expect(screen.getByText('01:00')).toBeInTheDocument();
@@ -59,7 +59,7 @@ describe('RestTimer', () => {
         suspended={false}
         onStateChange={onStateChange}
         onDone={onDone}
-      />
+      />,
     );
 
     const skipBtn = screen.getByRole('button', { name: /passer/i });

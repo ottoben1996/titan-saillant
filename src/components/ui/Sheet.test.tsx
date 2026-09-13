@@ -1,6 +1,6 @@
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from './Sheet';
 
 function ControlledSheet({ onOpenChange }: { onOpenChange?: (open: boolean) => void }) {

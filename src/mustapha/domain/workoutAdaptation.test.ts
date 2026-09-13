@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { getWorkoutExercises, getWorkoutModeLabel } from './workoutAdaptation';
 import { trainingPlan } from './plan';
+import { getWorkoutExercises, getWorkoutModeLabel } from './workoutAdaptation';
 
 describe('MUSTAPHA workout adaptations', () => {
   const day = trainingPlan.weeks[0].days[0];

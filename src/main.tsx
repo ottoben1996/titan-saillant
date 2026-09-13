@@ -1,6 +1,6 @@
-import { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
 import { registerSW } from 'virtual:pwa-register';
+import { lazy, StrictMode, Suspense } from 'react';
+import { createRoot } from 'react-dom/client';
 import App from './App';
 import { AppErrorBoundary } from './components/layout/ErrorBoundary';
 import './styles.css';
@@ -77,10 +77,25 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('coach-force-update', () => void forceUpdate());
 }
 
+/**
+ * L'espace MUSTAPHA n'est chargé que si on l'ouvre : son code ne part plus dans
+ * le paquet initial de l'application Ottman, pour toutes les personnes, à
+ * chaque ouverture.
+ */
+const MustaphaApp = lazy(() => import('./mustapha/MustaphaApp'));
+
+const estEspaceMustapha = window.location.pathname.startsWith('/mustapha');
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <AppErrorBoundary>
-      <App />
+      {estEspaceMustapha ? (
+        <Suspense fallback={<div className="app-shell" aria-busy="true" />}>
+          <MustaphaApp />
+        </Suspense>
+      ) : (
+        <App />
+      )}
     </AppErrorBoundary>
   </StrictMode>,
 );

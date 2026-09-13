@@ -14,7 +14,7 @@
 .resume-banner-wrap {
   display: flex;
   align-items: center;
-  gap: .45rem;
+  gap: 0.45rem;
 }
 
 .resume-banner-wrap .resume-banner {
@@ -38,8 +38,8 @@
 
 .resume-discard:hover,
 .resume-discard:focus-visible {
-  color: #FF9C9C;
-  border-color: rgba(255, 120, 120, .45);
+  color: #ff9c9c;
+  border-color: rgba(255, 120, 120, 0.45);
 }
 
 .history-delete {
@@ -56,9 +56,9 @@
 
 .history-delete:hover,
 .history-delete:focus-visible {
-  color: #FF9C9C;
-  border-color: rgba(255, 120, 120, .4);
-  background: rgba(255, 120, 120, .06);
+  color: #ff9c9c;
+  border-color: rgba(255, 120, 120, 0.4);
+  background: rgba(255, 120, 120, 0.06);
 }
 
 /* Action destructive du dialogue de sortie de séance : présente, jamais
@@ -68,10 +68,10 @@
   align-items: center;
   justify-content: center;
   min-height: 44px;
-  border: 1px solid rgba(255, 120, 120, .38);
+  border: 1px solid rgba(255, 120, 120, 0.38);
   border-radius: var(--r-md, 10px);
-  background: rgba(255, 120, 120, .08);
-  color: #FFB3B3;
+  background: rgba(255, 120, 120, 0.08);
+  color: #ffb3b3;
   font-weight: 600;
 }
 
@@ -81,7 +81,7 @@
 
 .abandon-button:hover,
 .abandon-button:focus-visible {
-  background: rgba(255, 120, 120, .14);
+  background: rgba(255, 120, 120, 0.14);
 }
 
 /* Le compteur « 5 / 30 » ouvre la liste des exercices : il doit se lire comme
@@ -89,7 +89,7 @@
 .progress-pill-action {
   display: inline-flex;
   align-items: center;
-  gap: .25rem;
+  gap: 0.25rem;
   min-height: 24px;
   cursor: pointer;
 }
@@ -207,7 +207,9 @@
   border-radius: var(--r-md);
   background: var(--surface-1);
   text-align: left;
-  transition: border-color var(--t-mid) var(--ease), background var(--t-mid) var(--ease);
+  transition:
+    border-color var(--t-mid) var(--ease),
+    background var(--t-mid) var(--ease);
 }
 
 .week-slot:hover {
@@ -366,7 +368,6 @@
   font-weight: 560;
   /* Le libellé de séance doit rester lisible en entier : il passe à la ligne
      plutôt que d'être tronqué par le bouton de suppression. */
-  white-space: normal;
   overflow-wrap: anywhere;
   white-space: nowrap;
   overflow: hidden;
@@ -836,7 +837,7 @@
   border: 1px solid rgba(231, 146, 146, 0.45);
   border-radius: var(--r-md);
   background: rgba(231, 146, 146, 0.14);
-  color: #F3D6D6;
+  color: #f3d6d6;
   font-weight: 700;
 }
 
@@ -1013,7 +1014,9 @@
 .accent-choice.on {
   border-color: var(--accent);
   color: var(--text-1);
-  box-shadow: 0 0 0 1px var(--accent), 0 0 14px rgb(var(--accent-rgb) / 0.25);
+  box-shadow:
+    0 0 0 1px var(--accent),
+    0 0 14px rgb(var(--accent-rgb) / 0.25);
 }
 
 .accent-dot {
@@ -1024,7 +1027,7 @@
 }
 
 .accent-choice.on .accent-dot::after {
-  content: '';
+  content: "";
   display: block;
   width: 8px;
   height: 8px;

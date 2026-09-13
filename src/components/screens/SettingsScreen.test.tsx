@@ -5,11 +5,11 @@
  * de Laura, et que choisir une couleur remonte bien jusqu'à l'application.
  */
 import 'fake-indexeddb/auto';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
-import { SettingsScreen } from './SettingsScreen';
-import { db } from '../../storage/db';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { AccentId } from '../../domain/palettes';
+import { db } from '../../storage/db';
+import { SettingsScreen } from './SettingsScreen';
 
 const baseProps = {
   onBack: vi.fn(),

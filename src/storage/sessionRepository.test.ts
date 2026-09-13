@@ -29,7 +29,9 @@ describe('dépôt des séances', () => {
   });
 
   it('ne retient comme séance active que la dernière non terminée', async () => {
-    await saveSession(makeSession({ id: 'terminee', completedAt: '2026-09-02T10:00:00.000Z', updatedAt: '2026-09-09T10:00:00.000Z' }));
+    await saveSession(
+      makeSession({ id: 'terminee', completedAt: '2026-09-02T10:00:00.000Z', updatedAt: '2026-09-09T10:00:00.000Z' }),
+    );
     await saveSession(makeSession({ id: 'ancienne-active', updatedAt: '2026-09-03T10:00:00.000Z' }));
     await saveSession(makeSession({ id: 'active-recente', updatedAt: '2026-09-08T10:00:00.000Z' }));
 

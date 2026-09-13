@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { getTrainingDays, getSessionLabel } from './domain/programGenerator';
-import { getMealPlanForProfile } from './domain/mealGenerator';
 import { getCoachMessage } from './domain/coachTone';
+import { getMealPlanForProfile } from './domain/mealGenerator';
+import { getSessionLabel, getTrainingDays } from './domain/programGenerator';
 
 const base = { goal: 'recomposition' as const, allergies: [], excludedFoods: [], availableDays: [] };
 
@@ -10,7 +10,7 @@ describe('MUSTAPHA personalization', () => {
     for (const count of [2, 3, 4, 5, 6] as const) {
       const days = getTrainingDays({ ...base, weeklySessions: count });
       expect(days).toHaveLength(count);
-      expect(new Set(days.map(day => day.id)).size).toBe(count);
+      expect(new Set(days.map((day) => day.id)).size).toBe(count);
       expect(getSessionLabel({ weeklySessions: count })).toContain(`${count} séances`);
     }
   });
@@ -20,14 +20,27 @@ describe('MUSTAPHA personalization', () => {
   });
 
   it('generates sessions according to the selected split', () => {
-    expect(getTrainingDays({ ...base, split: 'full-body', weeklySessions: 3 }).map(day => day.name)).toEqual(['Full body A', 'Full body B', 'Full body C']);
-    expect(getTrainingDays({ ...base, split: 'ppl', weeklySessions: 3 }).map(day => day.name)).toEqual(['Push', 'Pull', 'Legs']);
-    expect(getTrainingDays({ ...base, split: 'upper-lower', weeklySessions: 4 }).map(day => day.name)).toEqual(['Upper A', 'Lower A', 'Upper B', 'Lower B']);
+    expect(getTrainingDays({ ...base, split: 'full-body', weeklySessions: 3 }).map((day) => day.name)).toEqual([
+      'Full body A',
+      'Full body B',
+      'Full body C',
+    ]);
+    expect(getTrainingDays({ ...base, split: 'ppl', weeklySessions: 3 }).map((day) => day.name)).toEqual([
+      'Push',
+      'Pull',
+      'Legs',
+    ]);
+    expect(getTrainingDays({ ...base, split: 'upper-lower', weeklySessions: 4 }).map((day) => day.name)).toEqual([
+      'Upper A',
+      'Lower A',
+      'Upper B',
+      'Lower B',
+    ]);
   });
 
   it('filters meals containing an allergy or excluded food', () => {
     const meals = getMealPlanForProfile({ ...base, allergies: ['lait'] });
-    expect(meals.every(meal => !meal.allergens.includes('lait'))).toBe(true);
+    expect(meals.every((meal) => !meal.allergens.includes('lait'))).toBe(true);
   });
 
   it('supports a safe fictional directive mode', () => {

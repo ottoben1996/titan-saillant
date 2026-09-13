@@ -30,7 +30,7 @@ export function ProfileChooser({ onChoose }: ProfileChooserProps) {
           PROFILES.map(async (profile) => {
             const sessions = await listSessions(profile.id);
             return [profile.id, totalsForWeek(sessions, now).sessions] as const;
-          })
+          }),
         );
         if (!cancelled) setWeekCounts(Object.fromEntries(entries) as Record<ProfileId, number>);
       } catch {
@@ -51,7 +51,8 @@ export function ProfileChooser({ onChoose }: ProfileChooserProps) {
         </div>
         <p className="eyebrow">COACH · HORS LIGNE</p>
         <h1>
-          Ta séance,<br />
+          Ta séance,
+          <br />
           <em>sans friction.</em>
           <span className="sr-only">Choisis ton profil</span>
         </h1>
@@ -60,12 +61,7 @@ export function ProfileChooser({ onChoose }: ProfileChooserProps) {
         </p>
         <div className="profile-actions">
           {PROFILES.map((profile) => (
-            <button
-              className="profile-choice"
-              type="button"
-              key={profile.id}
-              onClick={() => onChoose(profile.id)}
-            >
+            <button className="profile-choice" type="button" key={profile.id} onClick={() => onChoose(profile.id)}>
               <span className={`avatar avatar-${profile.id}`}>{profile.name[0]}</span>
               <span>
                 <strong>{profile.name}</strong>

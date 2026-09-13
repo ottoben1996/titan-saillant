@@ -15,10 +15,7 @@ export interface PlateDelta {
   platesPerSide: PlateCount[];
 }
 
-export function calculatePlateDelta(
-  fromTotalKg: number,
-  toTotalKg: number
-): PlateDelta {
+export function calculatePlateDelta(fromTotalKg: number, toTotalKg: number): PlateDelta {
   const diff = Math.round((toTotalKg - fromTotalKg) * 100) / 100;
 
   if (Math.abs(diff) < 0.1) {

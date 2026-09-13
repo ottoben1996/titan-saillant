@@ -51,10 +51,7 @@ export function isCompleted(session: WorkoutSession): boolean {
 /* ------------------------------------------------------ mesures d'une séance */
 
 export function sessionVolume(session: WorkoutSession): number {
-  return session.loggedSets.reduce(
-    (total, set) => total + (set.actualLoadKg ?? 0) * (set.actualRepetitions ?? 0),
-    0
-  );
+  return session.loggedSets.reduce((total, set) => total + (set.actualLoadKg ?? 0) * (set.actualRepetitions ?? 0), 0);
 }
 
 export function sessionSetCount(session: WorkoutSession): number {
@@ -107,24 +104,23 @@ export interface SessionTotals {
 const EMPTY_TOTALS: SessionTotals = { sessions: 0, volumeKg: 0, sets: 0, activeSeconds: 0 };
 
 /** Totaux des séances terminées dont l'horodatage tombe dans [start, end[. */
-export function totalsBetween(
-  history: readonly WorkoutSession[],
-  start: Date,
-  end: Date
-): SessionTotals {
+export function totalsBetween(history: readonly WorkoutSession[], start: Date, end: Date): SessionTotals {
   const from = start.getTime();
   const to = end.getTime();
-  return history.reduce<SessionTotals>((totals, session) => {
-    if (!isCompleted(session)) return totals;
-    const at = sessionTimestamp(session);
-    if (at < from || at >= to) return totals;
-    return {
-      sessions: totals.sessions + 1,
-      volumeKg: totals.volumeKg + sessionVolume(session),
-      sets: totals.sets + sessionSetCount(session),
-      activeSeconds: totals.activeSeconds + sessionActiveSeconds(session),
-    };
-  }, { ...EMPTY_TOTALS });
+  return history.reduce<SessionTotals>(
+    (totals, session) => {
+      if (!isCompleted(session)) return totals;
+      const at = sessionTimestamp(session);
+      if (at < from || at >= to) return totals;
+      return {
+        sessions: totals.sessions + 1,
+        volumeKg: totals.volumeKg + sessionVolume(session),
+        sets: totals.sets + sessionSetCount(session),
+        activeSeconds: totals.activeSeconds + sessionActiveSeconds(session),
+      };
+    },
+    { ...EMPTY_TOTALS },
+  );
 }
 
 /** Totaux des séances terminées de la semaine contenant `now`. */
@@ -152,16 +148,12 @@ export function historyTotals(history: readonly WorkoutSession[]): HistoryTotals
       activeSeconds: totals.activeSeconds + sessionActiveSeconds(session),
       bestLoadKg: Math.max(totals.bestLoadKg, sessionBestLoadKg(session)),
     }),
-    { sessions: 0, volumeKg: 0, sets: 0, activeSeconds: 0, bestLoadKg: 0 }
+    { sessions: 0, volumeKg: 0, sets: 0, activeSeconds: 0, bestLoadKg: 0 },
   );
 }
 
 /** Volume réalisé sur les `days` derniers jours (fenêtre glissante, aujourd'hui inclus). */
-export function volumeLastDays(
-  history: readonly WorkoutSession[],
-  now: Date,
-  days = 7
-): number {
+export function volumeLastDays(history: readonly WorkoutSession[], now: Date, days = 7): number {
   const from = now.getTime() - days * DAY_MS;
   return history
     .filter((session) => isCompleted(session) && sessionTimestamp(session) >= from)
@@ -187,10 +179,7 @@ function percentDelta(current: number, previous: number): number | null {
 }
 
 /** Comparaison chiffrée de la semaine en cours avec la semaine précédente. */
-export function weeklyComparison(
-  history: readonly WorkoutSession[],
-  now: Date = new Date()
-): WeeklyComparison {
+export function weeklyComparison(history: readonly WorkoutSession[], now: Date = new Date()): WeeklyComparison {
   const weekStart = startOfWeek(now);
   const previousStart = addDays(weekStart, -7);
   const current = totalsBetween(history, weekStart, addDays(weekStart, 7));
@@ -227,7 +216,7 @@ export interface WeekSlot {
 export function weekSlots(
   days: readonly WorkoutDay[],
   history: readonly WorkoutSession[],
-  now: Date = new Date()
+  now: Date = new Date(),
 ): WeekSlot[] {
   const start = startOfWeek(now);
   const end = addDays(start, 7);
@@ -270,10 +259,7 @@ function weekLabel(start: Date, now: Date): string {
 }
 
 /** Regroupe les séances par semaine, la plus récente d'abord. */
-export function groupSessionsByWeek(
-  history: readonly WorkoutSession[],
-  now: Date = new Date()
-): WeekGroup[] {
+export function groupSessionsByWeek(history: readonly WorkoutSession[], now: Date = new Date()): WeekGroup[] {
   const groups = new Map<number, WeekGroup>();
   history.forEach((session) => {
     const at = new Date(sessionTimestamp(session));
@@ -306,10 +292,7 @@ export interface TrendPoint {
 }
 
 /** Les `limit` dernières séances terminées, dans l'ordre chronologique. */
-export function volumeTrendPoints(
-  history: readonly WorkoutSession[],
-  limit = 8
-): TrendPoint[] {
+export function volumeTrendPoints(history: readonly WorkoutSession[], limit = 8): TrendPoint[] {
   return history
     .filter(isCompleted)
     .map((session) => ({ session, at: sessionTimestamp(session) }))
@@ -333,10 +316,7 @@ export interface PersonalRecord {
 }
 
 /** Meilleure charge par mouvement, triée décroissante, limitée aux `limit` premiers. */
-export function personalRecords(
-  history: readonly WorkoutSession[],
-  limit = 5
-): PersonalRecord[] {
+export function personalRecords(history: readonly WorkoutSession[], limit = 5): PersonalRecord[] {
   const best = new Map<string, PersonalRecord>();
   history
     .filter(isCompleted)

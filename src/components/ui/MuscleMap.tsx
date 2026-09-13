@@ -71,12 +71,7 @@ function toIds(muscles: readonly string[]): MuscleId[] {
   return ids;
 }
 
-export function MuscleMap({
-  primaryMuscles = [],
-  secondaryMuscles = [],
-  size = 'md',
-  className = '',
-}: MuscleMapProps) {
+export function MuscleMap({ primaryMuscles = [], secondaryMuscles = [], size = 'md', className = '' }: MuscleMapProps) {
   const titleId = useId();
   const descId = useId();
 
@@ -117,7 +112,7 @@ export function MuscleMap({
   return (
     <div
       className={`muscle-map-wrapper ${className}`.trim()}
-      role="group"
+      role="img"
       aria-labelledby={titleId}
       aria-describedby={descId}
     >
@@ -132,10 +127,17 @@ export function MuscleMap({
         {/* VUE ANTERIEURE (FACE) */}
         <div className="muscle-figure">
           <span className="figure-label">FACE</span>
-          <svg viewBox="0 0 100 160" className="muscle-svg" width={width / 2} height={height}>
+          <svg viewBox="0 0 100 160" className="muscle-svg" width={width / 2} height={height} role="img">
+            <title>Vue de face des muscles sollicités</title>
             <defs>
               <filter id="glow-titan" x="-20%" y="-20%" width="140%" height="140%">
-                <feDropShadow dx="0" dy="0" stdDeviation="1.5" style={{ floodColor: 'var(--accent)' }} floodOpacity="0.6" />
+                <feDropShadow
+                  dx="0"
+                  dy="0"
+                  stdDeviation="1.5"
+                  style={{ floodColor: 'var(--accent)' }}
+                  floodOpacity="0.6"
+                />
               </filter>
             </defs>
             {/* Silhouette / Tête */}
@@ -191,11 +193,7 @@ export function MuscleMap({
             />
 
             {/* Abdominaux */}
-            <path
-              d="M44 41 L56 41 L55 64 L45 64 Z"
-              style={{ fill: getColor('abs') }}
-              opacity={getOpacity('abs')}
-            />
+            <path d="M44 41 L56 41 L55 64 L45 64 Z" style={{ fill: getColor('abs') }} opacity={getOpacity('abs')} />
 
             {/* Quadriceps */}
             <path
@@ -226,7 +224,8 @@ export function MuscleMap({
         {/* VUE POSTERIEURE (DOS) */}
         <div className="muscle-figure">
           <span className="figure-label">DOS</span>
-          <svg viewBox="0 0 100 160" className="muscle-svg" width={width / 2} height={height}>
+          <svg viewBox="0 0 100 160" className="muscle-svg" width={width / 2} height={height} role="img">
+            <title>Vue de dos des muscles sollicités</title>
             {/* Tête dos */}
             <circle cx="50" cy="12" r="8" fill="#141d18" stroke="#2a3d32" strokeWidth="1" />
             <path d="M46 20 L54 20 L55 24 L45 24 Z" fill="#18231d" />
@@ -275,11 +274,7 @@ export function MuscleMap({
             />
 
             {/* Lombaires */}
-            <path
-              d="M45 55 L55 55 L54 65 L46 65 Z"
-              fill={getColor('lower-back')}
-              opacity={getOpacity('lower-back')}
-            />
+            <path d="M45 55 L55 55 L54 65 L46 65 Z" fill={getColor('lower-back')} opacity={getOpacity('lower-back')} />
 
             {/* Fessiers */}
             <path

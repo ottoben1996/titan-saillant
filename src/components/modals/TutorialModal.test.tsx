@@ -1,7 +1,7 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
-import { TutorialModal } from './TutorialModal';
+import { fireEvent, render, screen } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
 import { tutorials } from '../../domain/tutorials';
+import { TutorialModal } from './TutorialModal';
 
 describe('TutorialModal (YouTube Shorts In-App)', () => {
   const tutorial = tutorials['presse-cuisses-inclinee'];

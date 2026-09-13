@@ -1,5 +1,5 @@
+import { type AccentId, accentParDefaut, estAccent } from '../domain/palettes';
 import type { ProfileId } from '../domain/types';
-import { accentParDefaut, estAccent, type AccentId } from '../domain/palettes';
 
 /**
  * Couleur choisie dans les réglages, une par profil.

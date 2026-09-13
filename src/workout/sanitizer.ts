@@ -3,12 +3,7 @@
  * Résout le problème des claviers mobiles français (virgule décimale convertie en NaN).
  */
 
-export function parseSafeFloat(
-  input: string | number | undefined | null,
-  fallback = 0,
-  min = 0,
-  max = 500
-): number {
+export function parseSafeFloat(input: string | number | undefined | null, fallback = 0, min = 0, max = 500): number {
   if (input === undefined || input === null) return fallback;
   if (typeof input === 'number') {
     if (!Number.isFinite(input)) return fallback;
@@ -26,12 +21,7 @@ export function parseSafeFloat(
   return Math.max(min, Math.min(max, Math.round(parsed * 100) / 100));
 }
 
-export function parseSafeInt(
-  input: string | number | undefined | null,
-  fallback = 0,
-  min = 0,
-  max = 1000
-): number {
+export function parseSafeInt(input: string | number | undefined | null, fallback = 0, min = 0, max = 1000): number {
   if (input === undefined || input === null) return fallback;
   if (typeof input === 'number') {
     if (!Number.isFinite(input)) return fallback;

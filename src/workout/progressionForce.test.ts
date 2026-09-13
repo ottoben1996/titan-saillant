@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { progressionForce } from './progressionForce';
 import { getProgram } from '../domain/programs';
 import type { WorkoutSession } from '../domain/types';
+import { progressionForce } from './progressionForce';
 
 const programme = getProgram('ottman');
 // Presse à cuisse : deux séries d'échauffement (indices 0 et 1) puis trois séries de travail (2, 3, 4).
@@ -19,8 +19,20 @@ const seancePresse = (date: string, charge: number, id: string, avecEchauffement
     loggedSets: [
       ...(avecEchauffement
         ? [
-            { exerciseId: 'presse-cuisses-inclinee', setIndex: 0, actualRepetitions: 10, actualLoadKg: 50, completedAt: date },
-            { exerciseId: 'presse-cuisses-inclinee', setIndex: 1, actualRepetitions: 10, actualLoadKg: 80, completedAt: date },
+            {
+              exerciseId: 'presse-cuisses-inclinee',
+              setIndex: 0,
+              actualRepetitions: 10,
+              actualLoadKg: 50,
+              completedAt: date,
+            },
+            {
+              exerciseId: 'presse-cuisses-inclinee',
+              setIndex: 1,
+              actualRepetitions: 10,
+              actualLoadKg: 80,
+              completedAt: date,
+            },
           ]
         : []),
       ...[2, 3, 4].map((setIndex) => ({

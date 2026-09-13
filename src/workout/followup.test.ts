@@ -2,17 +2,17 @@ import { describe, expect, it } from 'vitest';
 import { measurementId, starterMeasurements, type WeeklyMeasurement } from '../domain/measurements';
 import {
   bodyMassIndex,
-  seancesDeLaSemaine,
-  formFromEnergy,
-  weeklyCheckinSummary,
   buildWeeklyReading,
+  formFromEnergy,
   implausibleZones,
   lastExerciseLoads,
   movingAverage,
   navyBodyFat,
   nextTargetWeek,
   relativeFatMass,
+  seancesDeLaSemaine,
   waistToHeight,
+  weeklyCheckinSummary,
   weightVelocity,
   zoneDelta,
 } from './followup';
@@ -136,7 +136,10 @@ describe('suivi hebdomadaire', () => {
       { id: 'apres-le-point', completedAt: '2026-09-12T16:00:00.000Z' },
       { id: 'sans-date' },
     ];
-    const semaine = seancesDeLaSemaine(seances, { depuis: '2026-09-05T09:00:00.000Z', jusqua: '2026-09-12T09:00:00.000Z' });
+    const semaine = seancesDeLaSemaine(seances, {
+      depuis: '2026-09-05T09:00:00.000Z',
+      jusqua: '2026-09-12T09:00:00.000Z',
+    });
 
     expect(semaine.map((s) => s.id)).toEqual(['debut-de-semaine', 'veille', 'matin-du-point']);
   });

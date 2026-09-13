@@ -1,36 +1,34 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import type { ProfileId, SessionTimerState, WorkoutDay, WorkoutSession } from '../../domain/types';
 import { equipmentAlternatives } from '../../domain/alternatives';
-import { tutorials } from '../../domain/tutorials';
 import { exerciseMedia } from '../../domain/media';
 import { getProgram } from '../../domain/programs';
-import { getNextStep, getWorkoutExercises, getWorkoutSteps } from '../../workout/runner';
-import { computeProgressiveOverload, demandeAllegement } from '../../workout/progressionEngine';
-import { generateWarmupRamp } from '../../workout/warmupRamp';
+import { tutorials } from '../../domain/tutorials';
+import type { ProfileId, SessionTimerState, WorkoutDay, WorkoutSession } from '../../domain/types';
 import { calculatePlateDelta } from '../../workout/duoManager';
-import { formatLoadKg } from '../../workout/summary';
 import { etiquettePalier, paliersDeCharge } from '../../workout/loadSteps';
+import { computeProgressiveOverload, demandeAllegement } from '../../workout/progressionEngine';
+import { getNextStep, getWorkoutExercises, getWorkoutSteps } from '../../workout/runner';
 import { parseSafeFloat, parseSafeInt } from '../../workout/sanitizer';
-import { RestTimer, formatDuration } from '../timers/RestTimer';
-import { ExerciseTimer } from '../timers/ExerciseTimer';
+import { formatLoadKg } from '../../workout/summary';
+import { generateWarmupRamp } from '../../workout/warmupRamp';
 import { SessionPlanSheet } from '../modals/SessionPlanSheet';
-import { PlateBadge } from '../ui/PlateBadge';
+import { ExerciseTimer } from '../timers/ExerciseTimer';
+import { formatDuration, RestTimer } from '../timers/RestTimer';
 import { ArrowRight, Barbell, Bolt, Check, Clock, List, Person, Repeat, Undo, Video } from '../ui/Icons';
+import { PlateBadge } from '../ui/PlateBadge';
 import { CompletionFeedback } from './CompletionFeedback';
 
 function findGhostPerformance(
   history: WorkoutSession[],
   exerciseId: string,
-  setIndex: number
+  setIndex: number,
 ): { loadKg?: number; repetitions?: number; durationSeconds?: number } | null {
   if (!history || history.length === 0) return null;
   const sorted = [...history].sort(
-    (a, b) => Date.parse(b.completedAt ?? b.startedAt) - Date.parse(a.completedAt ?? a.startedAt)
+    (a, b) => Date.parse(b.completedAt ?? b.startedAt) - Date.parse(a.completedAt ?? a.startedAt),
   );
   for (const s of sorted) {
-    const matching = s.loggedSets.find(
-      (set) => set.exerciseId === exerciseId && set.setIndex === setIndex
-    );
+    const matching = s.loggedSets.find((set) => set.exerciseId === exerciseId && set.setIndex === setIndex);
     if (
       matching &&
       ((matching.actualLoadKg !== undefined && Number.isFinite(matching.actualLoadKg)) ||
@@ -53,7 +51,9 @@ function findGhostPerformance(
       return {
         loadKg: Number.isFinite(anyMatching.actualLoadKg) ? anyMatching.actualLoadKg : undefined,
         repetitions: Number.isFinite(anyMatching.actualRepetitions) ? anyMatching.actualRepetitions : undefined,
-        durationSeconds: Number.isFinite(anyMatching.actualDurationSeconds) ? anyMatching.actualDurationSeconds : undefined,
+        durationSeconds: Number.isFinite(anyMatching.actualDurationSeconds)
+          ? anyMatching.actualDurationSeconds
+          : undefined,
       };
     }
   }
@@ -67,11 +67,7 @@ function formatFrenchNumber(value: number): string {
 }
 
 /** Résumé lisible d'une performance passée : « 20 kg × 10 », « 45 s », « 12 répétitions ». */
-function formatGhostPerformance(ghost: {
-  loadKg?: number;
-  repetitions?: number;
-  durationSeconds?: number;
-}): string {
+function formatGhostPerformance(ghost: { loadKg?: number; repetitions?: number; durationSeconds?: number }): string {
   if (ghost.durationSeconds !== undefined) {
     return ghost.loadKg !== undefined
       ? `${formatFrenchNumber(ghost.loadKg)} kg × ${ghost.durationSeconds} s`
@@ -90,10 +86,7 @@ function formatGhostPerformance(ghost: {
  * Renvoie `null` quand la comparaison n'a pas de sens (aucune charge saisie ou
  * aucune charge de référence) ; « identique » quand les deux charges sont égales.
  */
-function formatGhostDelta(
-  currentLoadKg: number,
-  ghostLoadKg: number
-): { label: string; atParity: boolean } | null {
+function formatGhostDelta(currentLoadKg: number, ghostLoadKg: number): { label: string; atParity: boolean } | null {
   if (!Number.isFinite(currentLoadKg) || !Number.isFinite(ghostLoadKg) || ghostLoadKg <= 0) return null;
   const diff = Math.round((currentLoadKg - ghostLoadKg) * 100) / 100;
   if (diff === 0) return { label: 'identique', atParity: true };
@@ -117,7 +110,12 @@ interface WorkoutScreenProps {
   onTutorial: (id: string) => void;
   onAlternative: (id: string) => void;
   onRevertAlternative?: (id: string) => void;
-  onFinish: (feedback?: Pick<WorkoutSession, 'perceivedExertion' | 'energy' | 'pain' | 'painLocation' | 'loadConsigne' | 'notes'>) => Promise<void>;
+  onFinish: (
+    feedback?: Pick<
+      WorkoutSession,
+      'perceivedExertion' | 'energy' | 'pain' | 'painLocation' | 'loadConsigne' | 'notes'
+    >,
+  ) => Promise<void>;
 }
 
 export function WorkoutScreen({
@@ -141,8 +139,7 @@ export function WorkoutScreen({
   const steps = getWorkoutSteps(day, session);
   const exercises = getWorkoutExercises(day, session);
   const step = getNextStep(session, day);
-  const exercise =
-    step.kind === 'exercise' && step.exerciseIndex !== undefined ? exercises[step.exerciseIndex] : null;
+  const exercise = step.kind === 'exercise' && step.exerciseIndex !== undefined ? exercises[step.exerciseIndex] : null;
   const prescription = exercise && step.setIndex !== undefined ? exercise.sets[step.setIndex] : null;
 
   /** Paliers du mouvement en cours : larges sur les jambes, fins sur le haut du corps. */
@@ -159,7 +156,7 @@ export function WorkoutScreen({
 
   const isComplete = step.kind === 'complete';
   const [elapsedSeconds, setElapsedSeconds] = useState(() =>
-    Math.max(0, Math.floor((Date.now() - Date.parse(session.startedAt)) / 1000))
+    Math.max(0, Math.floor((Date.now() - Date.parse(session.startedAt)) / 1000)),
   );
 
   const stepKey = `${exercise?.id ?? 'none'}-${step.setIndex ?? 0}`;
@@ -168,13 +165,14 @@ export function WorkoutScreen({
     setTempoSkipped(false);
     setReps(prescription?.repetitions?.toString() ?? '');
     const suggestedAltLoad = activeAlternative?.suggestedLoadKg?.(prescription?.loadKg);
-    setLoad(suggestedAltLoad ? suggestedAltLoad.toString() : prescription?.loadKg?.toString() ?? '');
+    setLoad(suggestedAltLoad ? suggestedAltLoad.toString() : (prescription?.loadKg?.toString() ?? ''));
     setDuration(prescription?.durationSeconds?.toString() ?? '');
   }, [stepKey, activeAlternative]);
 
   useEffect(() => {
     if (isComplete) return;
-    const update = () => setElapsedSeconds(Math.max(0, Math.floor((Date.now() - Date.parse(session.startedAt)) / 1000)));
+    const update = () =>
+      setElapsedSeconds(Math.max(0, Math.floor((Date.now() - Date.parse(session.startedAt)) / 1000)));
     update();
     const interval = window.setInterval(update, 1000);
     return () => window.clearInterval(interval);
@@ -184,13 +182,12 @@ export function WorkoutScreen({
     exercise?.kind === 'warmup'
       ? 'ÉCHAUFFEMENT'
       : exercise?.kind === 'cooldown'
-      ? 'RETOUR AU CALME'
-      : prescription?.phase === 'warmup'
-      ? 'SÉRIE D’ÉCHAUFFEMENT'
-      : exercise?.circuitId
-      ? exercise.circuitId.replace('-', ' ').toUpperCase()
-      : 'SÉRIE DE TRAVAIL';
-
+        ? 'RETOUR AU CALME'
+        : prescription?.phase === 'warmup'
+          ? 'SÉRIE D’ÉCHAUFFEMENT'
+          : exercise?.circuitId
+            ? exercise.circuitId.replace('-', ' ').toUpperCase()
+            : 'SÉRIE DE TRAVAIL';
 
   // Haptique légère à chaque ajustement
   const triggerHaptic = (ms = 25) => {
@@ -263,7 +260,10 @@ export function WorkoutScreen({
   const movementMedia = exercise ? exerciseMedia[exercise.id] : undefined;
 
   // Calcul de la surcharge progressive & performance précédente (Ghost Data) - mémoïsé
-  const progression = useMemo(() => (exercise ? computeProgressiveOverload(exercise, history) : null), [exercise?.id, history]);
+  const progression = useMemo(
+    () => (exercise ? computeProgressiveOverload(exercise, history) : null),
+    [exercise?.id, history],
+  );
   /** L'athlète a demandé d'alléger à son dernier passage sur ce mouvement. */
   const allegementDemande = useMemo(
     () => (exercise ? demandeAllegement(exercise, history) : false),
@@ -271,7 +271,7 @@ export function WorkoutScreen({
   );
   const ghostPerf = useMemo(
     () => (exercise && step.setIndex !== undefined ? findGhostPerformance(history, exercise.id, step.setIndex) : null),
-    [exercise?.id, step.setIndex, history]
+    [exercise?.id, step.setIndex, history],
   );
   const currentLoadVal = parseSafeFloat(load, 0);
   const ghostSummary = ghostPerf ? formatGhostPerformance(ghostPerf) : '';
@@ -286,12 +286,12 @@ export function WorkoutScreen({
           (candidate) =>
             candidate.kind === 'exercise' &&
             candidate.exerciseIndex === step.exerciseIndex &&
-            (candidate.sequenceIndex ?? 0) >= (step.sequenceIndex ?? 0)
+            (candidate.sequenceIndex ?? 0) >= (step.sequenceIndex ?? 0),
         ).length
       : 0;
   const warmupSteps = useMemo(
     () => (prescription?.loadKg ? generateWarmupRamp(prescription.loadKg, exercise?.id) : []),
-    [prescription?.loadKg, exercise?.id]
+    [prescription?.loadKg, exercise?.id],
   );
   const [showWarmupRamp, setShowWarmupRamp] = useState(false);
   // Liste des exercices consultable à tout moment pendant la séance.
@@ -320,13 +320,15 @@ export function WorkoutScreen({
     <section className="content workout-content">
       {onSwitchDuoProfile && (
         <div className="duo-wrapper">
-          <div className="duo-switcher-bar" aria-label="Mode Duo Tour par tour">
+          <div className="duo-switcher-bar">
             <button
               type="button"
               className={`duo-pill-btn ${profile === 'ottman' ? 'active' : ''}`}
               onClick={() => onSwitchDuoProfile('ottman')}
             >
-              <span><Bolt size={15} /> Ottman</span>
+              <span>
+                <Bolt size={15} /> Ottman
+              </span>
               {profile === 'ottman' && <span className="duo-pill-badge">en cours</span>}
             </button>
             <button
@@ -334,12 +336,14 @@ export function WorkoutScreen({
               className={`duo-pill-btn ${profile === 'laura' ? 'active' : ''}`}
               onClick={() => onSwitchDuoProfile('laura')}
             >
-              <span><Person size={15} /> Laura</span>
+              <span>
+                <Person size={15} /> Laura
+              </span>
               {profile === 'laura' && <span className="duo-pill-badge">en cours</span>}
             </button>
           </div>
           {partnerDelta && partnerDelta.action !== 'keep' && (
-            <div className="duo-delta-banner" aria-label="Différentiel disques partagés">
+            <div className="duo-delta-banner">
               <span>
                 Vers <strong>{partnerProfile === 'ottman' ? 'Ottman' : 'Laura'}</strong> : {partnerDelta.summaryLabel}
               </span>
@@ -358,11 +362,7 @@ export function WorkoutScreen({
             <div className="alternative-active-badge">
               <span>Alternative active (original : {exercise?.name})</span>
               {onRevertAlternative && (
-                <button
-                  type="button"
-                  className="revert-alt-btn"
-                  onClick={() => onRevertAlternative(exercise!.id)}
-                >
+                <button type="button" className="revert-alt-btn" onClick={() => onRevertAlternative(exercise!.id)}>
                   <Undo size={13} /> Revenir à la machine
                 </button>
               )}
@@ -370,7 +370,7 @@ export function WorkoutScreen({
           )}
         </div>
         <div className="workout-status">
-          <span className="session-elapsed" aria-label={`Durée totale de la séance ${formatDuration(elapsedSeconds)}`}>
+          <span className="session-elapsed">
             <Clock size={14} /> Total {formatDuration(elapsedSeconds)}
           </span>
           <button
@@ -392,18 +392,18 @@ export function WorkoutScreen({
       {exercise && prescription && (
         <>
           {(tutorials[exercise.id] || (equipmentAlternatives[exercise.id] && !activeAlternative)) && (
-          <div className="workout-actions">
-            {tutorials[exercise.id] && (
-              <button type="button" className="tutorial-link" onClick={() => onTutorial(exercise.id)}>
-                <Video size={18} /> Tutoriel
-              </button>
-            )}
-            {equipmentAlternatives[exercise.id] && !activeAlternative && (
-              <button type="button" className="alternative-link" onClick={() => onAlternative(exercise.id)}>
-                <Barbell size={18} /> Machine indisponible ?
-              </button>
-            )}
-          </div>
+            <div className="workout-actions">
+              {tutorials[exercise.id] && (
+                <button type="button" className="tutorial-link" onClick={() => onTutorial(exercise.id)}>
+                  <Video size={18} /> Tutoriel
+                </button>
+              )}
+              {equipmentAlternatives[exercise.id] && !activeAlternative && (
+                <button type="button" className="alternative-link" onClick={() => onAlternative(exercise.id)}>
+                  <Barbell size={18} /> Machine indisponible ?
+                </button>
+              )}
+            </div>
           )}
 
           <div className="prescription-card compact">
@@ -451,7 +451,9 @@ export function WorkoutScreen({
                 </>
               )}
               {prescription.loadKg !== undefined && (
-                <b>{formatLoadKg(activeAlternative?.suggestedLoadKg?.(prescription.loadKg) ?? prescription.loadKg)} kg</b>
+                <b>
+                  {formatLoadKg(activeAlternative?.suggestedLoadKg?.(prescription.loadKg) ?? prescription.loadKg)} kg
+                </b>
               )}
             </div>
 
@@ -467,10 +469,7 @@ export function WorkoutScreen({
 
             {/* Calculateur de disques par côté avec tare automatique */}
             {prescription.loadKg !== undefined && prescription.loadKg >= 20 && !activeAlternative && (
-              <PlateBadge
-                totalLoadKg={currentLoadVal || prescription.loadKg}
-                exerciseId={exercise.id}
-              />
+              <PlateBadge totalLoadKg={currentLoadVal || prescription.loadKg} exerciseId={exercise.id} />
             )}
 
             {/* Surcharge progressive conseillée : par l'aisance, ou parce qu'elle a été demandée */}
@@ -485,7 +484,8 @@ export function WorkoutScreen({
                     </>
                   ) : (
                     <>
-                      Objectif suggéré : <strong>{progression.suggestedLoadKg} kg</strong> (+{progression.incrementKg} kg)
+                      Objectif suggéré : <strong>{progression.suggestedLoadKg} kg</strong> (+{progression.incrementKg}{' '}
+                      kg)
                     </>
                   )}
                 </span>
@@ -502,8 +502,8 @@ export function WorkoutScreen({
             {/* Demande d'allègement : la charge prescrite ne bouge pas, mais on le dit */}
             {allegementDemande && prescription.phase !== 'warmup' && (
               <p className="progression-allgement">
-                Tu as demandé d’alléger la dernière fois. La charge reste celle du coach : soigne la technique et
-                arrête la série dès que l’effort dépasse 8 sur 10.
+                Tu as demandé d’alléger la dernière fois. La charge reste celle du coach : soigne la technique et arrête
+                la série dès que l’effort dépasse 8 sur 10.
               </p>
             )}
 
@@ -516,7 +516,9 @@ export function WorkoutScreen({
                   onClick={() => setShowWarmupRamp((v) => !v)}
                   aria-expanded={showWarmupRamp}
                 >
-                  <span><Bolt size={16} /> Montée en gamme conseillée ({warmupSteps.length} paliers)</span>
+                  <span>
+                    <Bolt size={16} /> Montée en gamme conseillée ({warmupSteps.length} paliers)
+                  </span>
                   <small>{showWarmupRamp ? 'Masquer' : 'Afficher'}</small>
                 </button>
                 {showWarmupRamp && (
@@ -524,9 +526,15 @@ export function WorkoutScreen({
                     {warmupSteps.map((ws) => (
                       <div key={ws.stepIndex} className="warmup-ramp-step">
                         <div className="warmup-ramp-info">
-                          <span className="warmup-ramp-badge">Palier {ws.stepIndex} · {ws.percentage}%</span>
-                          <strong>{formatLoadKg(ws.loadKg)} kg × {ws.repetitions} réps</strong>
-                          <small>{ws.purpose} · Repos {ws.restSeconds}s</small>
+                          <span className="warmup-ramp-badge">
+                            Palier {ws.stepIndex} · {ws.percentage}%
+                          </span>
+                          <strong>
+                            {formatLoadKg(ws.loadKg)} kg × {ws.repetitions} réps
+                          </strong>
+                          <small>
+                            {ws.purpose} · Repos {ws.restSeconds}s
+                          </small>
                         </div>
                         <button
                           type="button"
@@ -563,7 +571,7 @@ export function WorkoutScreen({
               />
 
               {exercise && prescription && (
-                <div className="rest-next-preview-card" aria-label="À préparer pendant ton repos">
+                <div className="rest-next-preview-card" role="group" aria-label="À préparer pendant ton repos">
                   <div className="rest-next-header">
                     <span className="rest-next-badge">PROCHAINE SÉRIE</span>
                     <span className="rest-next-series">Série {(step.setIndex ?? 0) + 1}</span>
@@ -574,15 +582,15 @@ export function WorkoutScreen({
                       {remainingForExercise > 1
                         ? `${remainingForExercise} séries restantes`
                         : remainingForExercise === 1
-                        ? 'Dernière série de l’exercice'
-                        : ''}
+                          ? 'Dernière série de l’exercice'
+                          : ''}
                     </span>
                     <span className="rest-next-target">
                       {prescription.durationSeconds !== undefined
                         ? `${prescription.durationSeconds} s`
                         : prescription.repetitions !== undefined
-                        ? `${prescription.repetitions} répétitions`
-                        : prescription.loadLabel ?? ''}
+                          ? `${prescription.repetitions} répétitions`
+                          : (prescription.loadLabel ?? '')}
                     </span>
                   </div>
                   {prescription.loadKg !== undefined && (
@@ -591,10 +599,7 @@ export function WorkoutScreen({
                         Charge prévue : <strong>{formatLoadKg(prescription.loadKg)} kg</strong>
                       </span>
                       {prescription.loadKg >= 20 && (
-                        <PlateBadge
-                          totalLoadKg={prescription.loadKg}
-                          exerciseId={exercise.id}
-                        />
+                        <PlateBadge totalLoadKg={prescription.loadKg} exerciseId={exercise.id} />
                       )}
                     </div>
                   )}
@@ -632,20 +637,13 @@ export function WorkoutScreen({
               {/* Repère de la dernière fois : visible juste au-dessus du champ,
                   avec l'écart par rapport à la charge saisie. */}
               {ghostPerf && ghostSummary && (
-                <div
-                  className="ghost-perf-strip"
-                  aria-label={`Dernière fois : ${ghostSummary}${
-                    ghostDelta ? ` — ${ghostDelta.label}` : ''
-                  }`}
-                >
+                <div className="ghost-perf-strip">
                   <Repeat size={14} className="ghost-icon" />
                   <span className="ghost-perf-text">
                     Dernière fois : <strong>{ghostSummary}</strong>
                   </span>
                   {ghostDelta && (
-                    <span className={`ghost-delta${ghostDelta.atParity ? ' at-parity' : ''}`}>
-                      {ghostDelta.label}
-                    </span>
+                    <span className={`ghost-delta${ghostDelta.atParity ? ' at-parity' : ''}`}>{ghostDelta.label}</span>
                   )}
                 </div>
               )}
@@ -748,8 +746,7 @@ export function WorkoutScreen({
                 onClick={() => void handleCompleteSet()}
                 disabled={isSubmitting}
               >
-                <Check size={20} weight="bold" />{' '}
-                {isSubmitting ? 'Enregistrement…' : 'Valider la série'}
+                <Check size={20} weight="bold" /> {isSubmitting ? 'Enregistrement…' : 'Valider la série'}
               </button>
             </div>
           )}

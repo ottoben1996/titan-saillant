@@ -1,15 +1,22 @@
 import type { ExercisePrescription, LoggedSet, ProfileId, WorkoutDay, WorkoutSession } from '../domain/types';
 
-export type RunnerStep = { kind: 'exercise' | 'complete'; exerciseIndex?: number; setIndex?: number; sequenceIndex?: number };
+export type RunnerStep = {
+  kind: 'exercise' | 'complete';
+  exerciseIndex?: number;
+  setIndex?: number;
+  sequenceIndex?: number;
+};
 
 const cooldownExercise = (day: WorkoutDay): ExercisePrescription => ({
   id: `cooldown-${day.id}`,
   name: day.cooldown.name,
   kind: 'cooldown',
-  sets: [{
-    durationSeconds: day.cooldown.durationSeconds,
-    loadLabel: day.cooldown.loadLabel,
-  }],
+  sets: [
+    {
+      durationSeconds: day.cooldown.durationSeconds,
+      loadLabel: day.cooldown.loadLabel,
+    },
+  ],
   notes: day.cooldown.loadLabel,
 });
 
@@ -26,7 +33,9 @@ export function getWorkoutSteps(day: WorkoutDay, session?: WorkoutSession): read
   while (exerciseIndex < exercises.length) {
     const exercise = exercises[exerciseIndex];
     if (!exercise.circuitId) {
-      exercise.sets.forEach((_, setIndex) => steps.push({ kind: 'exercise', exerciseIndex, setIndex, sequenceIndex: steps.length }));
+      exercise.sets.forEach((_, setIndex) => {
+        steps.push({ kind: 'exercise', exerciseIndex, setIndex, sequenceIndex: steps.length });
+      });
       exerciseIndex += 1;
       continue;
     }
@@ -37,7 +46,7 @@ export function getWorkoutSteps(day: WorkoutDay, session?: WorkoutSession): read
       circuitIndexes.push(exerciseIndex);
       exerciseIndex += 1;
     }
-    const rounds = Math.max(...circuitIndexes.map(index => exercises[index].sets.length));
+    const rounds = Math.max(...circuitIndexes.map((index) => exercises[index].sets.length));
     for (let setIndex = 0; setIndex < rounds; setIndex += 1) {
       for (const index of circuitIndexes) {
         if (exercises[index].sets[setIndex]) {
@@ -65,14 +74,18 @@ export function createRunner(day: WorkoutDay, profileId: ProfileId): WorkoutSess
     loggedSets: [],
   };
 }
-export function completeSet(session: WorkoutSession, day: WorkoutDay, actual: Omit<LoggedSet, 'completedAt'>): WorkoutSession {
+export function completeSet(
+  session: WorkoutSession,
+  day: WorkoutDay,
+  actual: Omit<LoggedSet, 'completedAt'>,
+): WorkoutSession {
   const current = getNextStep(session, day);
   if (
-    current.kind !== 'exercise'
-    || current.exerciseIndex === undefined
-    || current.setIndex === undefined
-    || actual.exerciseId !== getWorkoutExercises(day, session)[current.exerciseIndex]?.id
-    || actual.setIndex !== current.setIndex
+    current.kind !== 'exercise' ||
+    current.exerciseIndex === undefined ||
+    current.setIndex === undefined ||
+    actual.exerciseId !== getWorkoutExercises(day, session)[current.exerciseIndex]?.id ||
+    actual.setIndex !== current.setIndex
   ) {
     return session;
   }
@@ -93,8 +106,10 @@ export function completeSet(session: WorkoutSession, day: WorkoutDay, actual: Om
   } else {
     const exercise = day.exercises[next.currentExerciseIndex];
     if (next.currentSetIndex + 1 < exercise.sets.length) next.currentSetIndex += 1;
-    else if (next.currentExerciseIndex + 1 < day.exercises.length) { next.currentExerciseIndex += 1; next.currentSetIndex = 0; }
-    else next.completedAt = new Date().toISOString();
+    else if (next.currentExerciseIndex + 1 < day.exercises.length) {
+      next.currentExerciseIndex += 1;
+      next.currentSetIndex = 0;
+    } else next.completedAt = new Date().toISOString();
   }
   next.updatedAt = new Date().toISOString();
   return next;

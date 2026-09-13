@@ -1,4 +1,4 @@
-import type { WorkoutSession, ExercisePrescription } from '../domain/types';
+import type { ExercisePrescription, WorkoutSession } from '../domain/types';
 
 export interface ProgressionSuggestion {
   exerciseId: string;
@@ -47,7 +47,7 @@ export function demandeAllegement(exercise: ExercisePrescription, history: reado
  */
 export function computeProgressiveOverload(
   exercise: ExercisePrescription,
-  history: readonly WorkoutSession[]
+  history: readonly WorkoutSession[],
 ): ProgressionSuggestion | null {
   const targetWorkSets = exercise.sets.filter((s) => s.phase !== 'warmup');
   if (targetWorkSets.length === 0) return null;
@@ -74,7 +74,7 @@ export function computeProgressiveOverload(
 
   for (const session of completedSessions) {
     const sets = session.loggedSets.filter(
-      (s) => s.exerciseId === exercise.id && workingSetIndexes.includes(s.setIndex)
+      (s) => s.exerciseId === exercise.id && workingSetIndexes.includes(s.setIndex),
     );
     if (sets.length >= targetWorkSets.length) {
       // Vérifier si toutes les séries de travail ont atteint ou dépassé les répétitions cibles
@@ -85,12 +85,11 @@ export function computeProgressiveOverload(
           s.actualRepetitions >= targetReps &&
           typeof s.actualLoadKg === 'number' &&
           Number.isFinite(s.actualLoadKg) &&
-          s.actualLoadKg >= basePrescribedLoad
+          s.actualLoadKg >= basePrescribedLoad,
       );
 
       // Si RPE était <= 7 ou feedback positif
-      const comfortable =
-        session.perceivedExertion === undefined || session.perceivedExertion <= 7;
+      const comfortable = session.perceivedExertion === undefined || session.perceivedExertion <= 7;
       const noPain = !session.pain || session.pain.toLowerCase() === 'aucune';
 
       // L'athlète peut demander explicitement à charger plus : sa demande tient
@@ -110,9 +109,10 @@ export function computeProgressiveOverload(
           suggestedLoadKg,
           incrementKg: increment,
           source: demande && !comfortable ? 'demande' : 'aisance',
-          reason: demande && !comfortable
-            ? `Tu as demandé à charger plus après avoir validé les ${targetWorkSets.length} séries. On monte d'un palier et on surveille l'effort ressenti.`
-            : `Toutes les séries (${targetWorkSets.length}×${targetReps}) validées avec aisance lors de ta dernière séance.`,
+          reason:
+            demande && !comfortable
+              ? `Tu as demandé à charger plus après avoir validé les ${targetWorkSets.length} séries. On monte d'un palier et on surveille l'effort ressenti.`
+              : `Toutes les séries (${targetWorkSets.length}×${targetReps}) validées avec aisance lors de ta dernière séance.`,
         };
       }
 

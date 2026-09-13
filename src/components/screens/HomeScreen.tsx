@@ -1,15 +1,15 @@
 import { useMemo } from 'react';
+import type { getProgram } from '../../domain/programs';
 import type { ProfileId, WorkoutDay, WorkoutSession } from '../../domain/types';
 import type { SerieAssiduite } from '../../workout/assiduite';
-import { getProgram } from '../../domain/programs';
 import { getWorkoutSteps } from '../../workout/runner';
 import {
   formatVolume,
   startOfWeek,
   volumeLastDays,
-  weekSlots,
-  weeklyComparison,
   type WeekSlotState,
+  weeklyComparison,
+  weekSlots,
 } from '../../workout/summary';
 import { ArrowRight, Bolt, Check, Clock, DownloadSimple, Play, Trash } from '../ui/Icons';
 
@@ -17,7 +17,7 @@ export const profileLabels: Record<ProfileId, string> = { ottman: 'Ottman', laur
 
 const SLOT_STATES: Record<WeekSlotState, string> = {
   done: 'Terminée',
-  today: "Aujourd’hui",
+  today: 'Aujourd’hui',
   upcoming: 'À venir',
 };
 
@@ -99,22 +99,19 @@ export function HomeScreen({
 
       {view.isResuming && (
         <div className="resume-banner-wrap">
-          <button className="resume-banner" onClick={onResume}>
+          <button className="resume-banner" onClick={onResume} type="button">
             <span className="resume-icon">
               <Play size={18} weight="fill" />
             </span>
             <span>
               <strong>Séance en cours</strong>
-              <small>{activeSession?.loggedSets.length ?? 0} séries déjà validées — reprendre là où tu t’es arrêté</small>
+              <small>
+                {activeSession?.loggedSets.length ?? 0} séries déjà validées — reprendre là où tu t’es arrêté
+              </small>
             </span>
             <ArrowRight size={20} />
           </button>
-          <button
-            type="button"
-            className="resume-discard"
-            onClick={onDiscard}
-            aria-label="Supprimer la séance"
-          >
+          <button type="button" className="resume-discard" onClick={onDiscard} aria-label="Supprimer la séance">
             <Trash size={17} />
           </button>
         </div>
@@ -160,10 +157,7 @@ export function HomeScreen({
             <span className="today-meta">
               <Clock size={16} /> ≈ {estimatedMinutes(todaySlot.day)} min
             </span>
-            <button
-              className="primary-button today-cta"
-              onClick={() => onStart(todaySlot.day)}
-            >
+            <button className="primary-button today-cta" onClick={() => onStart(todaySlot.day)} type="button">
               <Play size={18} weight="fill" /> Démarrer
             </button>
           </div>
@@ -191,17 +185,14 @@ export function HomeScreen({
                 : 'Aucune semaine complète'}
             </strong>
           </div>
-          <div className="streak-weeks">
-            {serie.semaines.map((semaine, index) => (
+          {/* Le détail semaine par semaine est déjà écrit juste au-dessus : ces
+              points le répètent visuellement, ils n'ajoutent rien à lire. */}
+          <div className="streak-weeks" aria-hidden="true">
+            {serie.semaines.map((semaine) => (
               <i
                 key={semaine.decalage}
                 className={semaine.faite ? 'fait' : ''}
                 title={`${semaine.seances} séance${semaine.seances > 1 ? 's' : ''} sur ${semaine.prevues}`}
-                aria-label={
-                  index === serie.semaines.length - 1
-                    ? `Cette semaine : ${semaine.seances} séances sur ${semaine.prevues}`
-                    : `Il y a ${serie.semaines.length - 1 - index} semaines : ${semaine.seances} séances sur ${semaine.prevues}`
-                }
               >
                 {semaine.faite ? <Check size={12} weight="bold" /> : null}
               </i>

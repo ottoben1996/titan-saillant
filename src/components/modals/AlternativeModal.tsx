@@ -42,7 +42,9 @@ export function AlternativeModal({
         </div>
         <h3>Garde la prescription</h3>
         <p>{alternative.setup}</p>
-        <div className="safety-callout"><Warning size={16} /> {alternative.caution}</div>
+        <div className="safety-callout">
+          <Warning size={16} /> {alternative.caution}
+        </div>
         <p className="alternative-note">
           Cette alternative ne modifie pas ton programme : elle te permet de continuer la séance quand le matériel
           prescrit est indisponible.

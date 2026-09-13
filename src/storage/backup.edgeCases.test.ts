@@ -9,7 +9,11 @@ afterEach(async () => {
   await db.preferences.clear();
 });
 
-const sessionOf = (id: string, profileId: 'ottman' | 'laura', overrides: Partial<WorkoutSession> = {}): WorkoutSession => ({
+const sessionOf = (
+  id: string,
+  profileId: 'ottman' | 'laura',
+  overrides: Partial<WorkoutSession> = {},
+): WorkoutSession => ({
   id,
   profileId,
   dayId: 'full-body-a',
@@ -20,7 +24,15 @@ const sessionOf = (id: string, profileId: 'ottman' | 'laura', overrides: Partial
   completedAt: '2026-09-05T11:00:00.000Z',
   currentExerciseIndex: 0,
   currentSetIndex: 0,
-  loggedSets: [{ exerciseId: 'presse-cuisses-inclinee', setIndex: 0, actualRepetitions: 10, actualLoadKg: 110, completedAt: '2026-09-05T10:30:00.000Z' }],
+  loggedSets: [
+    {
+      exerciseId: 'presse-cuisses-inclinee',
+      setIndex: 0,
+      actualRepetitions: 10,
+      actualLoadKg: 110,
+      completedAt: '2026-09-05T10:30:00.000Z',
+    },
+  ],
   ...overrides,
 });
 
@@ -87,10 +99,12 @@ describe('sauvegardes de profil — cas limites', () => {
   });
 
   it('refuse une sauvegarde dont le tableau de séances est absent ou mal formé', async () => {
-    await expect(importProfileData(JSON.stringify({ profileId: 'ottman', preferences: [] }), 'ottman'))
-      .rejects.toThrow(/invalide/i);
-    await expect(importProfileData(JSON.stringify({ profileId: 'ottman', sessions: 'nope', preferences: [] }), 'ottman'))
-      .rejects.toThrow(/invalide/i);
+    await expect(importProfileData(JSON.stringify({ profileId: 'ottman', preferences: [] }), 'ottman')).rejects.toThrow(
+      /invalide/i,
+    );
+    await expect(
+      importProfileData(JSON.stringify({ profileId: 'ottman', sessions: 'nope', preferences: [] }), 'ottman'),
+    ).rejects.toThrow(/invalide/i);
     expect(await db.sessions.count()).toBe(0);
   });
 
@@ -111,10 +125,12 @@ describe('sauvegardes de profil — cas limites', () => {
       version: 2,
       profileId: 'ottman',
       exportedAt: '2026-09-08T20:00:00.000Z',
-      sessions: [{
-        ...sessionOf('o-1', 'ottman'),
-        loggedSets: [{ exerciseId: 'x', setIndex: 'zéro', completedAt: 'nope' }],
-      }],
+      sessions: [
+        {
+          ...sessionOf('o-1', 'ottman'),
+          loggedSets: [{ exerciseId: 'x', setIndex: 'zéro', completedAt: 'nope' }],
+        },
+      ],
       preferences: [],
     });
     await expect(importProfileData(backup, 'ottman')).rejects.toThrow(/invalide/i);

@@ -18,16 +18,21 @@ const isIsoDate = (value: unknown) => typeof value === 'string' && Number.isFini
 function isValidSession(value: unknown): value is WorkoutSession {
   if (!value || typeof value !== 'object') return false;
   const candidate = value as Partial<WorkoutSession>;
-  return typeof candidate.id === 'string'
-    && isProfileId(candidate.profileId)
-    && (candidate.dayId === 'full-body-a' || candidate.dayId === 'full-body-b' || candidate.dayId === 'cardio')
-    && isIsoDate(candidate.startedAt)
-    && isIsoDate(candidate.updatedAt)
-    && Array.isArray(candidate.loggedSets)
-    && candidate.loggedSets.every((set) => Boolean(set)
-      && typeof set.exerciseId === 'string'
-      && Number.isInteger(set.setIndex)
-      && isIsoDate(set.completedAt));
+  return (
+    typeof candidate.id === 'string' &&
+    isProfileId(candidate.profileId) &&
+    (candidate.dayId === 'full-body-a' || candidate.dayId === 'full-body-b' || candidate.dayId === 'cardio') &&
+    isIsoDate(candidate.startedAt) &&
+    isIsoDate(candidate.updatedAt) &&
+    Array.isArray(candidate.loggedSets) &&
+    candidate.loggedSets.every(
+      (set) =>
+        Boolean(set) &&
+        typeof set.exerciseId === 'string' &&
+        Number.isInteger(set.setIndex) &&
+        isIsoDate(set.completedAt),
+    )
+  );
 }
 
 export async function exportProfileData(profileId: ProfileId) {
@@ -60,7 +65,9 @@ export async function importProfileData(json: string, profileId: ProfileId) {
   }
   const sessions = candidate.sessions.filter((session) => session.profileId === profileId);
   const preferences = Array.isArray(candidate.preferences)
-    ? candidate.preferences.filter((preference) => preference?.profileId === profileId && typeof preference.key === 'string')
+    ? candidate.preferences.filter(
+        (preference) => preference?.profileId === profileId && typeof preference.key === 'string',
+      )
     : [];
   await db.transaction('rw', db.sessions, db.preferences, async () => {
     for (const session of sessions) {

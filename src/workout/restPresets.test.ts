@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import {
-  REST_PRESETS,
-  REST_SKIP_PRESET,
   applyRestPreset,
   normalizeRestSeconds,
-  restProgressRatio,
+  REST_PRESETS,
+  REST_SKIP_PRESET,
   type RestPreset,
+  restProgressRatio,
 } from './restPresets';
 
 const presetById = (id: RestPreset['id']) => {

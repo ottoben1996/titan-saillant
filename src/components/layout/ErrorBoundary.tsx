@@ -46,8 +46,8 @@ export class AppErrorBoundary extends Component<Props, State> {
           <p className="eyebrow">ERREUR D’AFFICHAGE</p>
           <h1>L’écran n’a pas pu s’afficher.</h1>
           <p className="intro">
-            Ta séance et ton historique sont enregistrés sur cet appareil, rien n’est perdu. Recharge
-            l’application pour reprendre là où tu t’es arrêté.
+            Ta séance et ton historique sont enregistrés sur cet appareil, rien n’est perdu. Recharge l’application pour
+            reprendre là où tu t’es arrêté.
           </p>
           <p className="error-detail">{this.state.message}</p>
           <button className="primary-button full" type="button" onClick={this.reload}>

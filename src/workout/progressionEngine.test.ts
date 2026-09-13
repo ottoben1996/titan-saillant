@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { computeProgressiveOverload } from './progressionEngine';
 import type { ExercisePrescription, WorkoutSession } from '../domain/types';
+import { computeProgressiveOverload } from './progressionEngine';
 
 describe('computeProgressiveOverload', () => {
   const mockExercise: ExercisePrescription = {
@@ -29,9 +29,27 @@ describe('computeProgressiveOverload', () => {
         perceivedExertion: 6,
         pain: 'Aucune',
         loggedSets: [
-          { exerciseId: 'presse-cuisses-inclinee', setIndex: 0, actualRepetitions: 10, actualLoadKg: 110, completedAt: '' },
-          { exerciseId: 'presse-cuisses-inclinee', setIndex: 1, actualRepetitions: 10, actualLoadKg: 110, completedAt: '' },
-          { exerciseId: 'presse-cuisses-inclinee', setIndex: 2, actualRepetitions: 10, actualLoadKg: 110, completedAt: '' },
+          {
+            exerciseId: 'presse-cuisses-inclinee',
+            setIndex: 0,
+            actualRepetitions: 10,
+            actualLoadKg: 110,
+            completedAt: '',
+          },
+          {
+            exerciseId: 'presse-cuisses-inclinee',
+            setIndex: 1,
+            actualRepetitions: 10,
+            actualLoadKg: 110,
+            completedAt: '',
+          },
+          {
+            exerciseId: 'presse-cuisses-inclinee',
+            setIndex: 2,
+            actualRepetitions: 10,
+            actualLoadKg: 110,
+            completedAt: '',
+          },
         ],
       },
     ];
@@ -56,9 +74,27 @@ describe('computeProgressiveOverload', () => {
         currentSetIndex: 0,
         perceivedExertion: 9, // Effort trop dur
         loggedSets: [
-          { exerciseId: 'presse-cuisses-inclinee', setIndex: 0, actualRepetitions: 10, actualLoadKg: 110, completedAt: '' },
-          { exerciseId: 'presse-cuisses-inclinee', setIndex: 1, actualRepetitions: 10, actualLoadKg: 110, completedAt: '' },
-          { exerciseId: 'presse-cuisses-inclinee', setIndex: 2, actualRepetitions: 10, actualLoadKg: 110, completedAt: '' },
+          {
+            exerciseId: 'presse-cuisses-inclinee',
+            setIndex: 0,
+            actualRepetitions: 10,
+            actualLoadKg: 110,
+            completedAt: '',
+          },
+          {
+            exerciseId: 'presse-cuisses-inclinee',
+            setIndex: 1,
+            actualRepetitions: 10,
+            actualLoadKg: 110,
+            completedAt: '',
+          },
+          {
+            exerciseId: 'presse-cuisses-inclinee',
+            setIndex: 2,
+            actualRepetitions: 10,
+            actualLoadKg: 110,
+            completedAt: '',
+          },
         ],
       },
     ];

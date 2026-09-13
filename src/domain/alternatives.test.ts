@@ -11,7 +11,19 @@ describe('equipment alternatives', () => {
   });
 
   it('offers a fallback for every prescribed machine or cardio apparatus', () => {
-    for (const exerciseId of ['presse-cuisses-inclinee', 'leg-curl-allonge', 'chest-press', 'tirage-horizontal', 'squat-smith', 'leg-extension', 'developpe-couche-machine', 'tirage-vertical', 'skierg', 'rameur', 'velo']) {
+    for (const exerciseId of [
+      'presse-cuisses-inclinee',
+      'leg-curl-allonge',
+      'chest-press',
+      'tirage-horizontal',
+      'squat-smith',
+      'leg-extension',
+      'developpe-couche-machine',
+      'tirage-vertical',
+      'skierg',
+      'rameur',
+      'velo',
+    ]) {
       expect(equipmentAlternatives[exerciseId]).toBeDefined();
     }
   });

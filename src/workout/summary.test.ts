@@ -11,6 +11,7 @@ describe('formatLoadKg', () => {
     expect(formatLoadKg(Number.NaN)).toBe('—');
   });
 });
+
 import type { WorkoutDay, WorkoutSession } from '../domain/types';
 import {
   addDays,
@@ -34,15 +35,14 @@ import {
   totalsForWeek,
   volumeLastDays,
   volumeTrendPoints,
-  weekSlots,
   weeklyComparison,
+  weekSlots,
   workoutDayLabel,
 } from './summary';
 
 /* Repères fixes : la semaine de référence va du lundi 7 au dimanche 13 septembre 2026. */
 const NOW = new Date(2026, 8, 9, 12, 0, 0); // mercredi 9 septembre 2026
-const local = (y: number, m: number, d: number, h = 9, min = 0) =>
-  new Date(y, m - 1, d, h, min, 0, 0).toISOString();
+const local = (y: number, m: number, d: number, h = 9, min = 0) => new Date(y, m - 1, d, h, min, 0, 0).toISOString();
 
 const session = (overrides: Partial<WorkoutSession> = {}): WorkoutSession => ({
   id: 's1',
@@ -164,10 +164,20 @@ describe('volumeLastDays', () => {
 describe('totaux et comparaison hebdomadaire', () => {
   const history: WorkoutSession[] = [
     // Semaine en cours : 1 000 + 500 de volume, 2 séances
-    session({ id: 'w1', dayId: 'full-body-a', completedAt: local(2026, 9, 8), loggedSets: sets({ reps: 10, load: 100 }) }),
+    session({
+      id: 'w1',
+      dayId: 'full-body-a',
+      completedAt: local(2026, 9, 8),
+      loggedSets: sets({ reps: 10, load: 100 }),
+    }),
     session({ id: 'w2', dayId: 'cardio', completedAt: local(2026, 9, 9, 8), loggedSets: sets({ reps: 10, load: 50 }) }),
     // Semaine précédente : 400 de volume, 1 séance
-    session({ id: 'p1', dayId: 'full-body-b', completedAt: local(2026, 9, 2), loggedSets: sets({ reps: 10, load: 40 }) }),
+    session({
+      id: 'p1',
+      dayId: 'full-body-b',
+      completedAt: local(2026, 9, 2),
+      loggedSets: sets({ reps: 10, load: 40 }),
+    }),
     // Séance en cours : jamais comptée
     session({ id: 'active', completedAt: undefined, loggedSets: sets({ reps: 10, load: 999 }) }),
   ];
@@ -199,7 +209,7 @@ describe('totaux et comparaison hebdomadaire', () => {
   it('annonce l’absence de comparaison quand la semaine précédente est vide', () => {
     const comparison = weeklyComparison(
       [session({ completedAt: local(2026, 9, 8), loggedSets: sets({ reps: 10, load: 10 }) })],
-      NOW
+      NOW,
     );
     expect(comparison.previous.sessions).toBe(0);
     expect(comparison.volumeDeltaPct).toBeNull();
@@ -210,11 +220,7 @@ describe('totaux et comparaison hebdomadaire', () => {
 
 describe('weekSlots', () => {
   it('marque terminé, aujourd’hui puis à venir dans l’ordre du programme', () => {
-    const slots = weekSlots(
-      PROGRAM_DAYS,
-      [session({ dayId: 'full-body-a', completedAt: local(2026, 9, 8) })],
-      NOW
-    );
+    const slots = weekSlots(PROGRAM_DAYS, [session({ dayId: 'full-body-a', completedAt: local(2026, 9, 8) })], NOW);
     expect(slots.map((slot) => slot.state)).toEqual(['done', 'today', 'upcoming']);
     expect(slots[1].day.id).toBe('full-body-b');
   });
@@ -226,18 +232,14 @@ describe('weekSlots', () => {
         session({ id: 'a', dayId: 'cardio', completedAt: local(2026, 9, 8) }),
         session({ id: 'b', dayId: 'cardio', completedAt: local(2026, 9, 9) }),
       ],
-      NOW
+      NOW,
     );
     expect(slots[2].state).toBe('done');
     expect(slots[2].completedAt).toBe(local(2026, 9, 9));
   });
 
   it('ignore les séances des semaines précédentes', () => {
-    const slots = weekSlots(
-      PROGRAM_DAYS,
-      [session({ dayId: 'full-body-a', completedAt: local(2026, 8, 31) })],
-      NOW
-    );
+    const slots = weekSlots(PROGRAM_DAYS, [session({ dayId: 'full-body-a', completedAt: local(2026, 8, 31) })], NOW);
     expect(slots.map((slot) => slot.state)).toEqual(['today', 'upcoming', 'upcoming']);
   });
 
@@ -245,9 +247,9 @@ describe('weekSlots', () => {
     const slots = weekSlots(
       PROGRAM_DAYS,
       PROGRAM_DAYS.map((item, index) =>
-        session({ id: `s${index}`, dayId: item.id, completedAt: local(2026, 9, 7 + index) })
+        session({ id: `s${index}`, dayId: item.id, completedAt: local(2026, 9, 7 + index) }),
       ),
-      NOW
+      NOW,
     );
     expect(slots.map((slot) => slot.state)).toEqual(['done', 'done', 'done']);
   });
@@ -256,11 +258,8 @@ describe('weekSlots', () => {
 describe('groupSessionsByWeek', () => {
   it('isole la semaine en cours et nomme les semaines passées', () => {
     const groups = groupSessionsByWeek(
-      [
-        session({ id: 'old', completedAt: local(2026, 9, 1) }),
-        session({ id: 'new', completedAt: local(2026, 9, 9) }),
-      ],
-      NOW
+      [session({ id: 'old', completedAt: local(2026, 9, 1) }), session({ id: 'new', completedAt: local(2026, 9, 9) })],
+      NOW,
     );
     expect(groups).toHaveLength(2);
     expect(groups[0].label).toBe('Cette semaine');
@@ -276,7 +275,7 @@ describe('groupSessionsByWeek', () => {
         session({ id: 'mercredi', completedAt: local(2026, 9, 9) }),
         session({ id: 'mardi', completedAt: local(2026, 9, 8) }),
       ],
-      NOW
+      NOW,
     );
     expect(groups[0].sessions.map((item) => item.id)).toEqual(['mercredi', 'mardi', 'lundi']);
   });
@@ -300,14 +299,14 @@ describe('tendances et records', () => {
         session({ id: 'a', completedAt: local(2026, 9, 7), loggedSets: sets({ reps: 10, load: 10 }) }),
         session({ id: 'b', completedAt: local(2026, 9, 8), loggedSets: sets({ reps: 10, load: 20 }) }),
       ],
-      8
+      8,
     );
     expect(points.map((point) => point.volume)).toEqual([100, 200, 300]);
   });
 
   it('limite la tendance aux dernières séances', () => {
     const history = Array.from({ length: 12 }, (_, index) =>
-      session({ id: `s${index}`, completedAt: local(2026, 9, 1 + (index % 9)) })
+      session({ id: `s${index}`, completedAt: local(2026, 9, 1 + (index % 9)) }),
     );
     expect(volumeTrendPoints(history, 8)).toHaveLength(8);
   });
@@ -316,13 +315,31 @@ describe('tendances et records', () => {
     const history = [
       session({
         loggedSets: [
-          { exerciseId: 'chest-press', setIndex: 0, actualLoadKg: 45, actualRepetitions: 12, completedAt: local(2026, 9, 8) },
-          { exerciseId: 'tirage-horizontal', setIndex: 0, actualLoadKg: 50, actualRepetitions: 8, completedAt: local(2026, 9, 8) },
+          {
+            exerciseId: 'chest-press',
+            setIndex: 0,
+            actualLoadKg: 45,
+            actualRepetitions: 12,
+            completedAt: local(2026, 9, 8),
+          },
+          {
+            exerciseId: 'tirage-horizontal',
+            setIndex: 0,
+            actualLoadKg: 50,
+            actualRepetitions: 8,
+            completedAt: local(2026, 9, 8),
+          },
         ],
       }),
       session({
         loggedSets: [
-          { exerciseId: 'chest-press', setIndex: 0, actualLoadKg: 52, actualRepetitions: 10, completedAt: local(2026, 9, 9) },
+          {
+            exerciseId: 'chest-press',
+            setIndex: 0,
+            actualLoadKg: 52,
+            actualRepetitions: 10,
+            completedAt: local(2026, 9, 9),
+          },
         ],
       }),
     ];

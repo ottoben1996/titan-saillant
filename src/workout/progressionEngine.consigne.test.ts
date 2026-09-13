@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { demandeAllegement, computeProgressiveOverload } from './progressionEngine';
 import type { ExercisePrescription, LoadConsigne, WorkoutSession } from '../domain/types';
+import { computeProgressiveOverload, demandeAllegement } from './progressionEngine';
 
 const exercice: ExercisePrescription = {
   id: 'presse-cuisses-inclinee',
@@ -53,7 +53,9 @@ describe('la consigne du quiz entre dans la décision', () => {
   });
 
   it('n’autorise jamais à progresser après une gêne, même demandé', () => {
-    expect(computeProgressiveOverload(exercice, [seance({ rpe: 9, pain: 'Douleur', consigne: 'increase' })])).toBeNull();
+    expect(
+      computeProgressiveOverload(exercice, [seance({ rpe: 9, pain: 'Douleur', consigne: 'increase' })]),
+    ).toBeNull();
   });
 
   it('bloque la progression quand l’athlète a demandé d’alléger', () => {

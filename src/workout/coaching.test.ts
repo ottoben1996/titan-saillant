@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { getAdaptiveAdvice } from './coaching';
 import type { WorkoutSession } from '../domain/types';
+import { getAdaptiveAdvice } from './coaching';
 
 const session = (overrides: Partial<WorkoutSession> = {}): WorkoutSession => ({
   id: 's1',

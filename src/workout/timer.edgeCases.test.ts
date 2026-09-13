@@ -9,56 +9,46 @@ describe('restoreRemainingSeconds — cas limites', () => {
   const now = Date.parse('2026-09-08T20:00:10.000Z');
 
   it('décompte le temps écoulé depuis la dernière mise à jour', () => {
-    expect(restoreRemainingSeconds(
-      { remainingSeconds: 20, paused: false, updatedAt: '2026-09-08T20:00:05.000Z' },
-      now,
-    )).toBe(15);
+    expect(
+      restoreRemainingSeconds({ remainingSeconds: 20, paused: false, updatedAt: '2026-09-08T20:00:05.000Z' }, now),
+    ).toBe(15);
   });
 
   it('ne descend jamais sous zéro quand le temps écoulé dépasse le restant', () => {
-    expect(restoreRemainingSeconds(
-      { remainingSeconds: 5, paused: false, updatedAt: '2026-09-08T20:00:00.000Z' },
-      now,
-    )).toBe(0);
+    expect(
+      restoreRemainingSeconds({ remainingSeconds: 5, paused: false, updatedAt: '2026-09-08T20:00:00.000Z' }, now),
+    ).toBe(0);
   });
 
   it('renvoie zéro pour un restant négatif, en pause ou non', () => {
-    expect(restoreRemainingSeconds(
-      { remainingSeconds: -12, paused: true, updatedAt: '2026-09-08T20:00:05.000Z' },
-      now,
-    )).toBe(0);
-    expect(restoreRemainingSeconds(
-      { remainingSeconds: -12, paused: false, updatedAt: '2026-09-08T20:00:05.000Z' },
-      now,
-    )).toBe(0);
+    expect(
+      restoreRemainingSeconds({ remainingSeconds: -12, paused: true, updatedAt: '2026-09-08T20:00:05.000Z' }, now),
+    ).toBe(0);
+    expect(
+      restoreRemainingSeconds({ remainingSeconds: -12, paused: false, updatedAt: '2026-09-08T20:00:05.000Z' }, now),
+    ).toBe(0);
   });
 
   it('renvoie zéro pour un restant à zéro', () => {
-    expect(restoreRemainingSeconds(
-      { remainingSeconds: 0, paused: false, updatedAt: '2026-09-08T20:00:00.000Z' },
-      now,
-    )).toBe(0);
+    expect(
+      restoreRemainingSeconds({ remainingSeconds: 0, paused: false, updatedAt: '2026-09-08T20:00:00.000Z' }, now),
+    ).toBe(0);
   });
 
   it('ne pénalise pas une horloge en avance (updatedAt dans le futur)', () => {
-    expect(restoreRemainingSeconds(
-      { remainingSeconds: 30, paused: false, updatedAt: '2026-09-08T20:01:00.000Z' },
-      now,
-    )).toBe(30);
+    expect(
+      restoreRemainingSeconds({ remainingSeconds: 30, paused: false, updatedAt: '2026-09-08T20:01:00.000Z' }, now),
+    ).toBe(30);
   });
 
   it('ignore le temps écoulé quand le chrono est en pause', () => {
-    expect(restoreRemainingSeconds(
-      { remainingSeconds: 18, paused: true, updatedAt: '2026-09-08T20:00:00.000Z' },
-      now,
-    )).toBe(18);
+    expect(
+      restoreRemainingSeconds({ remainingSeconds: 18, paused: true, updatedAt: '2026-09-08T20:00:00.000Z' }, now),
+    ).toBe(18);
   });
 
   it('reste fini (pas de NaN) face à une date corrompue', () => {
-    const restored = restoreRemainingSeconds(
-      { remainingSeconds: 30, paused: false, updatedAt: 'pas-une-date' },
-      now,
-    );
+    const restored = restoreRemainingSeconds({ remainingSeconds: 30, paused: false, updatedAt: 'pas-une-date' }, now);
     expect(Number.isFinite(restored)).toBe(true);
     expect(restored).toBe(30);
   });

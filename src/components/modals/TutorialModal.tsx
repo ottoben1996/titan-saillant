@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import type { Tutorial } from '../../domain/types';
 import { exerciseMedia } from '../../domain/media';
+import type { Tutorial } from '../../domain/types';
 import { ArrowLeft, ArrowRight, ArrowUpRight, Barbell, Bolt, Play, Repeat, Timer, Video, Warning } from '../ui/Icons';
-import { Sheet, SheetContent, SheetTitle } from '../ui/Sheet';
 import { MuscleMap } from '../ui/MuscleMap';
+import { Sheet, SheetContent, SheetTitle } from '../ui/Sheet';
 
 interface TutorialModalProps {
   tutorial: Tutorial;
@@ -14,13 +14,11 @@ export function TutorialModal({ tutorial, onClose }: TutorialModalProps) {
   const media = exerciseMedia[tutorial.exerciseId];
   const [activeFrame, setActiveFrame] = useState<'start' | 'peak'>('start');
   const [isAnimating, setIsAnimating] = useState(true);
-  const [isOnline, setIsOnline] = useState(
-    typeof navigator !== 'undefined' ? navigator.onLine : true
-  );
+  const [isOnline, setIsOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine : true);
 
   const hasShort = Boolean(tutorial.youtubeShortId);
   const [activeTab, setActiveTab] = useState<'video' | 'anatomy'>(() =>
-    hasShort && (typeof navigator === 'undefined' || navigator.onLine) ? 'video' : 'anatomy'
+    hasShort && (typeof navigator === 'undefined' || navigator.onLine) ? 'video' : 'anatomy',
   );
 
   // Monitor online / offline changes

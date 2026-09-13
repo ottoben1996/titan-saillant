@@ -1,9 +1,9 @@
-import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
 import { PlateBadge } from './PlateBadge';
 
 describe('PlateBadge', () => {
-  it("affiche les disques par côté pour une charge exacte", () => {
+  it('affiche les disques par côté pour une charge exacte', () => {
     // 100 kg avec une barre de 20 kg -> 40 kg par côté -> 2 × 20 kg
     const { container } = render(<PlateBadge totalLoadKg={100} barWeightKg={20} />);
 
@@ -19,12 +19,10 @@ describe('PlateBadge', () => {
     expect(discs[0]?.textContent).toContain('20');
     // Pas d'état d'alerte quand la charge tombe juste
     expect(container.querySelector('.plate-badge-warning')).toBeNull();
-    expect(
-      screen.getByRole('group', { name: /charge exacte/i })
-    ).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: /charge exacte/i })).toBeInTheDocument();
   });
 
-  it("signale explicitement une charge qui ne tombe pas juste", () => {
+  it('signale explicitement une charge qui ne tombe pas juste', () => {
     // 101 kg avec une barre de 20 kg -> 40,5 kg/côté -> 40 kg + 0,5 kg manquant par côté
     const { container } = render(<PlateBadge totalLoadKg={101} barWeightKg={20} />);
 
@@ -35,18 +33,14 @@ describe('PlateBadge', () => {
     expect(warning?.textContent).toContain('1 kg');
     // Ce qui est réellement chargé reste affiché
     expect(screen.getByText('100 kg')).toBeInTheDocument();
-    expect(
-      screen.getByRole('group', { name: /non exacte/i })
-    ).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: /non exacte/i })).toBeInTheDocument();
   });
 
   it('ordonne les disques du plus lourd au plus léger', () => {
     // 150 kg, barre 20 -> 65 kg/côté -> 20×3 + 5×1
     const { container } = render(<PlateBadge totalLoadKg={150} barWeightKg={20} />);
 
-    const labels = Array.from(container.querySelectorAll('.plate-disc')).map(
-      (el) => el.textContent ?? ''
-    );
+    const labels = Array.from(container.querySelectorAll('.plate-disc')).map((el) => el.textContent ?? '');
     expect(labels).toHaveLength(2);
     expect(labels[0]).toContain('20');
     expect(labels[1]).toContain('5');

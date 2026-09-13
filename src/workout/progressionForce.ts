@@ -21,8 +21,7 @@ export interface ProgressionExercice {
   stagnation: boolean;
 }
 
-const estTravail = (exercise: ExercisePrescription, setIndex: number) =>
-  exercise.sets[setIndex]?.phase !== 'warmup';
+const estTravail = (exercise: ExercisePrescription, setIndex: number) => exercise.sets[setIndex]?.phase !== 'warmup';
 
 /** Charge la plus lourde réellement validée sur les séries de travail d'une séance. */
 function chargeDeLaSeance(session: WorkoutSession, exercise: ExercisePrescription): number | undefined {
@@ -33,10 +32,7 @@ function chargeDeLaSeance(session: WorkoutSession, exercise: ExercisePrescriptio
   return charges.length > 0 ? Math.max(...charges) : undefined;
 }
 
-export function progressionForce(
-  history: readonly WorkoutSession[],
-  program: WorkoutPlan,
-): ProgressionExercice[] {
+export function progressionForce(history: readonly WorkoutSession[], program: WorkoutPlan): ProgressionExercice[] {
   const exercices = new Map<string, ExercisePrescription>();
   for (const jour of program.days) {
     for (const exercise of jour.exercises) {

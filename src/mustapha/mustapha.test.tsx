@@ -1,11 +1,18 @@
 import 'fake-indexeddb/auto';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import MustaphaApp from './MustaphaApp';
-import { mustaphaDb } from './storage/db';
-import { exportMustaphaData, getActiveSession, importMustaphaData, saveProfile, saveSession, saveShopping } from './storage/repository';
 import { recipes, trainingPlan } from './domain/plan';
 import type { MustaphaProfile, WorkoutSession } from './domain/types';
+import MustaphaApp from './MustaphaApp';
+import { mustaphaDb } from './storage/db';
+import {
+  exportMustaphaData,
+  getActiveSession,
+  importMustaphaData,
+  saveProfile,
+  saveSession,
+  saveShopping,
+} from './storage/repository';
 
 const profile: MustaphaProfile = {
   id: 'mustapha',
@@ -38,7 +45,7 @@ const activeSession = (overrides: Partial<WorkoutSession> = {}): WorkoutSession 
 });
 
 afterEach(async () => {
-  await Promise.all(mustaphaDb.tables.map(table => table.clear()));
+  await Promise.all(mustaphaDb.tables.map((table) => table.clear()));
   localStorage.clear();
 });
 
@@ -51,17 +58,42 @@ describe('MUSTAPHA COACH', () => {
     fireEvent.click(screen.getByRole('button', { name: /continuer/i }));
     fireEvent.click(screen.getByRole('button', { name: /générer mon programme/i }));
     await waitFor(() => expect(screen.getByRole('heading', { name: /bonjour mustapha/i })).toBeInTheDocument());
-    expect(await mustaphaDb.profiles.get('mustapha')).toMatchObject({ id: 'mustapha', firstName: 'Mustapha', coachTone: 'dictator-rp', split: 'full-body', weeklySessions: 3 });
+    expect(await mustaphaDb.profiles.get('mustapha')).toMatchObject({
+      id: 'mustapha',
+      firstName: 'Mustapha',
+      coachTone: 'dictator-rp',
+      split: 'full-body',
+      weeklySessions: 3,
+    });
   });
 
   it('garde un plan immuable sur 8 semaines et des recettes filtrables', () => {
     expect(trainingPlan.weeks).toHaveLength(8);
     expect(Object.isFrozen(trainingPlan)).toBe(true);
-    expect(recipes.filter(recipe => recipe.tags.includes('protéiné')).length).toBeGreaterThan(0);
+    expect(recipes.filter((recipe) => recipe.tags.includes('protéiné')).length).toBeGreaterThan(0);
   });
 
   it('exporte et restaure une sauvegarde Mustapha indépendante', async () => {
-    await importMustaphaData(JSON.stringify({ profile: { id: 'mustapha', firstName: 'Mustapha', level: 'beginner', goal: 'recomposition', availableDays: [], equipment: [], dietaryConstraints: [], allergies: [], excludedFoods: [], trackingMode: 'portions', consent: true, healthWarningAcknowledged: true, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() } }));
+    await importMustaphaData(
+      JSON.stringify({
+        profile: {
+          id: 'mustapha',
+          firstName: 'Mustapha',
+          level: 'beginner',
+          goal: 'recomposition',
+          availableDays: [],
+          equipment: [],
+          dietaryConstraints: [],
+          allergies: [],
+          excludedFoods: [],
+          trackingMode: 'portions',
+          consent: true,
+          healthWarningAcknowledged: true,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+      }),
+    );
     const backup = await exportMustaphaData();
     expect(backup).toContain('"profile"');
     await mustaphaDb.profiles.clear();
@@ -93,7 +125,9 @@ describe('MUSTAPHA COACH', () => {
     const list = await mustaphaDb.shopping.get('mustapha-main');
     expect(list?.items[0]).toMatchObject({ name: 'Riz', quantity: 160, checked: false });
     await saveShopping({ ...list!, items: [{ ...list!.items[0], checked: true, quantity: 320 }] });
-    expect(await mustaphaDb.shopping.get('mustapha-main')).toMatchObject({ items: [{ name: 'Riz', quantity: 320, checked: true }] });
+    expect(await mustaphaDb.shopping.get('mustapha-main')).toMatchObject({
+      items: [{ name: 'Riz', quantity: 320, checked: true }],
+    });
     expect(await mustaphaDb.profiles.get('mustapha')).toBeUndefined();
   });
 });

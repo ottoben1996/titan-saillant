@@ -125,7 +125,15 @@ export interface RecipeIngredient {
   name: string;
   quantity: number;
   unit: string;
-  aisle: 'fruits-legumes' | 'viandes-poissons' | 'produits-laitiers' | 'epicerie' | 'surgeles' | 'sauces-condiments' | 'boissons' | 'autres';
+  aisle:
+    | 'fruits-legumes'
+    | 'viandes-poissons'
+    | 'produits-laitiers'
+    | 'epicerie'
+    | 'surgeles'
+    | 'sauces-condiments'
+    | 'boissons'
+    | 'autres';
 }
 
 export interface Recipe {

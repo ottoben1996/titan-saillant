@@ -1,6 +1,6 @@
-import { db } from './db';
 import { starterMeasurements, type WeeklyMeasurement } from '../domain/measurements';
 import type { ProfileId } from '../domain/types';
+import { db } from './db';
 
 /** Points hebdomadaires d'un profil, du plus ancien au plus récent. */
 export async function listMeasurements(profileId: ProfileId) {

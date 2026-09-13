@@ -21,7 +21,8 @@ export function getAdaptiveAdvice(history: readonly WorkoutSession[]): AdaptiveA
     return {
       recommendation: 'reduce',
       title: 'Priorité à la sécurité',
-      message: 'Une gêne ou une douleur a été signalée. Garde la charge ou réduis-la, et arrête l’exercice si la douleur est vive ou inhabituelle.',
+      message:
+        'Une gêne ou une douleur a été signalée. Garde la charge ou réduis-la, et arrête l’exercice si la douleur est vive ou inhabituelle.',
       safety: true,
     };
   }
@@ -32,7 +33,8 @@ export function getAdaptiveAdvice(history: readonly WorkoutSession[]): AdaptiveA
     return {
       recommendation: 'reduce',
       title: 'Allège la prochaine séance',
-      message: 'L’effort était très élevé. Maintiens la technique et réduis légèrement la charge ou le volume au prochain passage.',
+      message:
+        'L’effort était très élevé. Maintiens la technique et réduis légèrement la charge ou le volume au prochain passage.',
       safety: false,
     };
   }
@@ -40,7 +42,8 @@ export function getAdaptiveAdvice(history: readonly WorkoutSession[]): AdaptiveA
     return {
       recommendation: 'increase',
       title: 'Tu peux progresser',
-      message: 'La séance semble bien maîtrisée. Si la technique reste propre, augmente très progressivement la charge lors de la prochaine séance.',
+      message:
+        'La séance semble bien maîtrisée. Si la technique reste propre, augmente très progressivement la charge lors de la prochaine séance.',
       safety: false,
     };
   }

@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
+import { type AccentId, accents } from '../../domain/palettes';
 import type { ProfileId } from '../../domain/types';
 import { importProfileData } from '../../storage/backup';
 import { telechargerCalendrierSuivi, telechargerSauvegarde } from '../../storage/backupFile';
-import { deleteProfileData, listSessions } from '../../storage/sessionRepository';
-import { ArrowLeft, ArrowRight, DownloadSimple, Timer, Trash, Warning } from '../ui/Icons';
-import { isSoundEnabled, playTimerChime, setSoundEnabled } from '../../workout/alerts';
 import { debutDePause, mettreEnPause, reprendreCycle } from '../../storage/cyclePause';
-import { accents, type AccentId } from '../../domain/palettes';
+import { deleteProfileData, listSessions } from '../../storage/sessionRepository';
+import { isSoundEnabled, playTimerChime, setSoundEnabled } from '../../workout/alerts';
+import { ArrowLeft, ArrowRight, DownloadSimple, Timer, Trash, Warning } from '../ui/Icons';
 import { profileLabels } from './HomeScreen';
 
 const ERASE_WORD = 'SUPPRIMER';
@@ -117,7 +117,7 @@ export function SettingsScreen({
       onNotice(
         error instanceof Error && error.message.includes('autre profil')
           ? error.message
-          : 'Fichier de sauvegarde invalide.'
+          : 'Fichier de sauvegarde invalide.',
       );
     }
   };
@@ -149,7 +149,7 @@ export function SettingsScreen({
           <p className="eyebrow">ESPACE PERSONNEL</p>
           <h1>Réglages</h1>
         </div>
-        <button className="text-button" onClick={onBack}>
+        <button className="text-button" onClick={onBack} type="button">
           <ArrowLeft size={16} /> Retour
         </button>
       </div>
@@ -163,7 +163,7 @@ export function SettingsScreen({
             {counts ? ` · ${describeSessions(counts)}` : ''}
           </small>
         </div>
-        <button className="text-button" onClick={onSwitch}>
+        <button className="text-button" onClick={onSwitch} type="button">
           Changer
         </button>
       </div>
@@ -212,7 +212,9 @@ export function SettingsScreen({
           <div className="settings-row">
             <div>
               <strong>Point du samedi</strong>
-              <small>Huit rendez-vous de 30 minutes, avec un rappel 30 minutes avant, dans le calendrier du téléphone.</small>
+              <small>
+                Huit rendez-vous de 30 minutes, avec un rappel 30 minutes avant, dans le calendrier du téléphone.
+              </small>
             </div>
           </div>
         </div>
@@ -229,9 +231,7 @@ export function SettingsScreen({
       <section className="settings-section">
         <h2 className="settings-title">Ma couleur</h2>
         {/* Clin d'œil : la couleur de Laura n'a pas été choisie par quelqu'un d'autre. */}
-        {profile === 'laura' && (
-          <p className="accent-teaser">Parce qu'Ottman te connaît pas, choisis par toi-même.</p>
-        )}
+        {profile === 'laura' && <p className="accent-teaser">Parce qu'Ottman te connaît pas, choisis par toi-même.</p>}
         <div className="accent-choices" role="radiogroup" aria-label="Couleur de l'application">
           {accents.map((item) => (
             <button
@@ -263,6 +263,7 @@ export function SettingsScreen({
               if (next) playTimerChime('rest');
               onNotice(next ? 'Signal sonore activé.' : 'Signal sonore coupé.');
             }}
+            type="button"
           >
             <Timer size={21} />
             <span>
@@ -280,7 +281,7 @@ export function SettingsScreen({
       <section className="settings-section">
         <h2 className="settings-title">Mes données</h2>
         <div className="settings-list">
-          <button onClick={download}>
+          <button onClick={download} type="button">
             <DownloadSimple size={21} />
             <span>
               <strong>Exporter mes données</strong>
@@ -288,7 +289,7 @@ export function SettingsScreen({
             </span>
             <ArrowRight size={18} />
           </button>
-          <button onClick={() => fileInput.current?.click()}>
+          <button onClick={() => fileInput.current?.click()} type="button">
             <DownloadSimple size={21} />
             <span>
               <strong>Importer une sauvegarde</strong>
@@ -304,7 +305,7 @@ export function SettingsScreen({
             onChange={(e) => e.target.files?.[0] && void importFile(e.target.files[0])}
           />
           {!eraseConfirming && (
-            <button className="danger-row" onClick={() => setEraseConfirming(true)}>
+            <button className="danger-row" onClick={() => setEraseConfirming(true)} type="button">
               <Trash size={21} />
               <span>
                 <strong>Effacer ce profil</strong>
@@ -323,13 +324,11 @@ export function SettingsScreen({
             </div>
             <p className="danger-lead">
               Cette action supprime le profil de <strong>{profileLabels[profile]}</strong> et{' '}
-              <strong>{describeSessions(counts)}</strong>. Aucune récupération n’est possible : pense à
-              exporter une sauvegarde avant de continuer.
+              <strong>{describeSessions(counts)}</strong>. Aucune récupération n’est possible : pense à exporter une
+              sauvegarde avant de continuer.
             </p>
             <label className="danger-word">
-              <span>
-                Écris « {ERASE_WORD} » pour confirmer
-              </span>
+              <span>Écris « {ERASE_WORD} » pour confirmer</span>
               <input
                 type="text"
                 value={eraseWord}
@@ -341,10 +340,15 @@ export function SettingsScreen({
               />
             </label>
             <div className="danger-actions">
-              <button className="secondary-button" onClick={cancelErase} disabled={erasing}>
+              <button className="secondary-button" onClick={cancelErase} disabled={erasing} type="button">
                 Annuler
               </button>
-              <button className="danger-button" onClick={() => void erase()} disabled={!eraseConfirmed || erasing}>
+              <button
+                className="danger-button"
+                onClick={() => void erase()}
+                disabled={!eraseConfirmed || erasing}
+                type="button"
+              >
                 {erasing ? 'Suppression…' : 'Effacer définitivement'}
               </button>
             </div>
@@ -382,20 +386,16 @@ export function SettingsScreen({
               <span>Alertes de minuteur</span>
               <strong
                 className={
-                  notificationPermission === 'granted'
-                    ? 'ok'
-                    : notificationPermission === 'denied'
-                    ? 'warning'
-                    : ''
+                  notificationPermission === 'granted' ? 'ok' : notificationPermission === 'denied' ? 'warning' : ''
                 }
               >
                 {notificationPermission === 'unsupported'
                   ? 'Non disponibles'
                   : notificationPermission === 'granted'
-                  ? 'Activées'
-                  : notificationPermission === 'denied'
-                  ? 'Bloquées'
-                  : 'À activer'}
+                    ? 'Activées'
+                    : notificationPermission === 'denied'
+                      ? 'Bloquées'
+                      : 'À activer'}
               </strong>
             </div>
             <div>
@@ -411,21 +411,19 @@ export function SettingsScreen({
           </button>
 
           {notificationPermission === 'default' && (
-            <button className="secondary-button full" onClick={onEnableNotifications}>
+            <button className="secondary-button full" onClick={onEnableNotifications} type="button">
               <Timer size={18} /> Activer les alertes système
             </button>
           )}
           {installAvailable && (
-            <button className="primary-button full" onClick={onInstall}>
+            <button className="primary-button full" onClick={onInstall} type="button">
               <DownloadSimple size={18} /> Installer Coach sur cet appareil
             </button>
           )}
         </div>
       </section>
 
-      <p className="settings-footnote">
-        Coach hors ligne · tes données restent dans le navigateur de cet appareil.
-      </p>
+      <p className="settings-footnote">Coach hors ligne · tes données restent dans le navigateur de cet appareil.</p>
       <p className="settings-footnote">
         Illustrations d’exercices :{' '}
         <a href="https://repdb.co" target="_blank" rel="noreferrer">

@@ -22,7 +22,7 @@ const tutorial = (
     secondaryMuscles?: string[];
     tempoRecommended?: string;
     keyCue?: string;
-  }
+  },
 ): Tutorial => ({
   exerciseId,
   title,
@@ -62,7 +62,7 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
       primaryMuscles: ['Épaules'],
       tempoRecommended: '2-1-2-0',
       keyCue: 'Le coude ne bouge pas, seul l’avant-bras tourne',
-    }
+    },
   ),
   bosu: tutorial(
     'bosu',
@@ -89,7 +89,7 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
       youtubeShortId: 'MGNzdT5eiRo',
       primaryMuscles: ['Jambes', 'Gainage'],
       keyCue: 'Regard fixe devant, appui au centre du bosu',
-    }
+    },
   ),
   rameur: tutorial(
     'rameur',
@@ -118,7 +118,7 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
       secondaryMuscles: ['Bras'],
       tempoRecommended: 'Cadence régulière : tirage puissant, retour fluide',
       keyCue: 'Jambes, buste, bras à l’aller ; l’inverse au retour',
-    }
+    },
   ),
   velo: tutorial(
     'velo',
@@ -145,7 +145,7 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
       youtubeShortId: 'eHlLVxr6N_U',
       primaryMuscles: ['Jambes'],
       keyCue: 'Jambes régulières, haut du corps relâché',
-    }
+    },
   ),
   'presse-cuisses-inclinee': tutorial(
     'presse-cuisses-inclinee',
@@ -174,7 +174,7 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
       secondaryMuscles: ['Ischio-jambiers', 'Mollets'],
       tempoRecommended: '3-0-1-0',
       keyCue: 'Talons bien vissés au plateau, bas du dos collé',
-    }
+    },
   ),
   'leg-curl-allonge': tutorial(
     'leg-curl-allonge',
@@ -202,7 +202,7 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
       primaryMuscles: ['Ischio-jambiers'],
       tempoRecommended: '3-0-1-1',
       keyCue: 'Bassin collé au banc, contraction une seconde en haut',
-    }
+    },
   ),
   'chest-press': tutorial(
     'chest-press',
@@ -231,7 +231,7 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
       secondaryMuscles: ['Épaules', 'Triceps'],
       tempoRecommended: '2-0-1-0',
       keyCue: 'Omoplates serrées avant chaque poussée',
-    }
+    },
   ),
   'tirage-horizontal': tutorial(
     'tirage-horizontal',
@@ -260,7 +260,7 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
       secondaryMuscles: ['Biceps', 'Trapèzes'],
       tempoRecommended: '2-1-1-0',
       keyCue: 'Coudes vers l’arrière, omoplates serrées',
-    }
+    },
   ),
   'jumping-jack': tutorial(
     'jumping-jack',
@@ -287,7 +287,7 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
       youtubeShortId: 'FVltHbdTZQ0',
       primaryMuscles: ['Cardio', 'Jambes'],
       keyCue: 'Réception souple, respiration continue',
-    }
+    },
   ),
   'gainage-planche': tutorial(
     'gainage-planche',
@@ -315,7 +315,7 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
       primaryMuscles: ['Abdominaux'],
       secondaryMuscles: ['Épaules'],
       keyCue: 'Une ligne des talons à la tête, respiration calme',
-    }
+    },
   ),
   'squat-smith': tutorial(
     'squat-smith',
@@ -344,7 +344,7 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
       secondaryMuscles: ['Ischio-jambiers'],
       tempoRecommended: '3-1-1-0',
       keyCue: 'Genoux dans l’axe des orteils, buste solide',
-    }
+    },
   ),
   'leg-extension': tutorial(
     'leg-extension',
@@ -372,7 +372,7 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
       primaryMuscles: ['Quadriceps'],
       tempoRecommended: '2-0-1-1',
       keyCue: 'Contraction tenue une seconde, retour contrôlé',
-    }
+    },
   ),
   'developpe-couche-machine': tutorial(
     'developpe-couche-machine',
@@ -401,7 +401,7 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
       secondaryMuscles: ['Triceps', 'Épaules'],
       tempoRecommended: '3-1-1-0',
       keyCue: 'Cage thoracique bombée, omoplates serrées',
-    }
+    },
   ),
   'tirage-vertical': tutorial(
     'tirage-vertical',
@@ -430,7 +430,7 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
       secondaryMuscles: ['Biceps', 'Épaules'],
       tempoRecommended: '3-0-1-0',
       keyCue: 'Épaules basses d’abord, coudes ensuite',
-    }
+    },
   ),
   skierg: tutorial(
     'skierg',
@@ -458,7 +458,7 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
       primaryMuscles: ['Dos', 'Bras'],
       secondaryMuscles: ['Cardio'],
       keyCue: 'Bras, buste et jambes ensemble sur le tirage',
-    }
+    },
   ),
   'hollow-hold': tutorial(
     'hollow-hold',
@@ -485,7 +485,7 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
       youtubeShortId: 'SMpasIMw7LE',
       primaryMuscles: ['Abdominaux'],
       keyCue: 'Bas du dos plaqué, ventre rentré',
-    }
+    },
   ),
   'mountain-climber': tutorial(
     'mountain-climber',
@@ -512,7 +512,7 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
       youtubeShortId: 'x7Kr-V67T7k',
       primaryMuscles: ['Abdominaux', 'Cardio'],
       keyCue: 'Bassin bas, épaules au-dessus des mains',
-    }
+    },
   ),
   'sit-to-stand': tutorial(
     'sit-to-stand',
@@ -539,7 +539,7 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
       youtubeShortId: '8gkfe4aTE-0',
       primaryMuscles: ['Quadriceps', 'Fessiers'],
       keyCue: 'Pousse dans les pieds, contrôle la descente',
-    }
+    },
   ),
   crunches: tutorial(
     'crunches',
@@ -567,7 +567,7 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
       primaryMuscles: ['Abdominaux'],
       tempoRecommended: '2-1-2-0',
       keyCue: 'Mains légères aux tempes, ventre qui enroule',
-    }
+    },
   ),
   'developpe-clavicule': tutorial(
     'developpe-clavicule',
@@ -596,7 +596,7 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
       secondaryMuscles: ['Triceps', 'Pectoraux'],
       tempoRecommended: '3-0-1-0',
       keyCue: 'Coudes à 45° du buste, poussée sous contrôle',
-    }
+    },
   ),
   'cooldown-full-body-a': tutorial(
     'cooldown-full-body-a',
@@ -622,7 +622,7 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
     {
       primaryMuscles: ['Cardio'],
       keyCue: 'Cinq minutes sans forcer, arrêt attaché au départ',
-    }
+    },
   ),
   'cooldown-full-body-b': tutorial(
     'cooldown-full-body-b',
@@ -648,7 +648,7 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
     {
       primaryMuscles: ['Cardio'],
       keyCue: 'Marche rapide jamais courue, fin en douceur',
-    }
+    },
   ),
   'cooldown-cardio': tutorial(
     'cooldown-cardio',
@@ -674,6 +674,6 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
     {
       primaryMuscles: ['Cardio'],
       keyCue: 'Redescendre l’allure pour retrouver le souffle',
-    }
+    },
   ),
 };

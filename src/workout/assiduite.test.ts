@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { serieAssiduite } from './assiduite';
 import { getProgram } from '../domain/programs';
 import type { WorkoutSession } from '../domain/types';
+import { serieAssiduite } from './assiduite';
 
 const JOUR = 86_400_000;
 const maintenant = new Date(2026, 8, 12, 9, 0, 0); // samedi 12 septembre 2026
@@ -31,7 +31,11 @@ const semaineComplete = (jours: number, marque: string) => [
 
 describe('série d’assiduité', () => {
   it('compte les semaines complètes consécutives', () => {
-    const historique = [...semaineComplete(1, 'cette'), ...semaineComplete(8, 'avant'), ...semaineComplete(15, 'encore')];
+    const historique = [
+      ...semaineComplete(1, 'cette'),
+      ...semaineComplete(8, 'avant'),
+      ...semaineComplete(15, 'encore'),
+    ];
     const serie = serieAssiduite(historique, programme, maintenant);
 
     expect(serie.semainesConsecutives).toBe(3);

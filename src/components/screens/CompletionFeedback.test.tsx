@@ -6,10 +6,11 @@
  * n'est conservée que lorsqu'il y a une gêne, et qu'un athlète pressé peut
  * terminer sans rien renseigner.
  */
-import { describe, expect, it, vi } from 'vitest';
+
 import { fireEvent, render, screen } from '@testing-library/react';
-import { CompletionFeedback } from './CompletionFeedback';
+import { describe, expect, it, vi } from 'vitest';
 import type { WorkoutSession } from '../../domain/types';
+import { CompletionFeedback } from './CompletionFeedback';
 
 const session = (over: Partial<WorkoutSession> = {}): WorkoutSession =>
   ({

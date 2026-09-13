@@ -18,11 +18,7 @@ export function roundToNearestIncrement(val: number, increment = 2.5): number {
   return Math.round(val / increment) * increment;
 }
 
-export function generateWarmupRamp(
-  workingLoadKg: number,
-  exerciseId?: string,
-  baseBarKg = 0
-): WarmupStep[] {
+export function generateWarmupRamp(workingLoadKg: number, exerciseId?: string, baseBarKg = 0): WarmupStep[] {
   if (!workingLoadKg || workingLoadKg < 30) {
     return [];
   }

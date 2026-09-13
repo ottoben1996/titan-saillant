@@ -1,18 +1,22 @@
 import { useEffect, useRef, useState } from 'react';
 import type { SessionTimerState } from '../../domain/types';
-import { createCountdown, type CountdownController } from '../../workout/timer';
-import { getTimerAnnouncement } from '../../workout/timerAnnouncements';
 import {
+  type AddRestPreset,
+  applyRestPreset,
   REST_PRESETS,
   REST_SKIP_PRESET,
-  applyRestPreset,
   restProgressRatio,
-  type AddRestPreset,
 } from '../../workout/restPresets';
+import { type CountdownController, createCountdown } from '../../workout/timer';
+import { getTimerAnnouncement } from '../../workout/timerAnnouncements';
 import { Play, Timer, X } from '../ui/Icons';
 
 export const formatDuration = (seconds: number) =>
-  `${Math.floor(seconds / 60).toString().padStart(2, '0')}:${Math.max(0, seconds % 60).toString().padStart(2, '0')}`;
+  `${Math.floor(seconds / 60)
+    .toString()
+    .padStart(2, '0')}:${Math.max(0, seconds % 60)
+    .toString()
+    .padStart(2, '0')}`;
 
 interface RestTimerProps {
   exerciseId: string;
@@ -89,7 +93,7 @@ export function RestTimer({
         setPaused(false);
         onStateChangeRef.current(null);
         onDone();
-      }
+      },
     );
 
     controller.current = timer;
@@ -156,7 +160,7 @@ export function RestTimer({
         setPaused(false);
         onStateChangeRef.current(null);
         onDone();
-      }
+      },
     );
     controller.current = timer;
     if (paused) {
@@ -194,7 +198,7 @@ export function RestTimer({
     }
   };
 
-  const progressTotal = totalDuration > 0 ? totalDuration : (seconds > 0 ? seconds : 60);
+  const progressTotal = totalDuration > 0 ? totalDuration : seconds > 0 ? seconds : 60;
   const radius = 52;
   const circumference = 2 * Math.PI * radius;
   const progressRatio = restProgressRatio({ remainingSeconds: remaining, totalSeconds: progressTotal });

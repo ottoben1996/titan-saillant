@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { SessionTimerState } from '../../domain/types';
-import { createCountdown, type CountdownController } from '../../workout/timer';
+import { type CountdownController, createCountdown } from '../../workout/timer';
 import { getTimerAnnouncement } from '../../workout/timerAnnouncements';
 import { Play, Repeat, X } from '../ui/Icons';
 import { formatDuration } from './RestTimer';
@@ -60,7 +60,7 @@ export function ExerciseTimer({
     controller.current?.cancel();
     lastPublishedRef.current = null;
     const isReset = resetNonce > 0;
-    const start = isReset ? durationSeconds : initialState?.remainingSeconds ?? durationSeconds;
+    const start = isReset ? durationSeconds : (initialState?.remainingSeconds ?? durationSeconds);
     const initialStarted = isReset ? false : initialState ? initialState.started !== false : false;
     const initialPaused = isReset || !initialStarted || (initialState?.paused ?? false);
     setRemaining(start);
@@ -80,7 +80,7 @@ export function ExerciseTimer({
         setRemaining(0);
         publish(0, true);
         onDone();
-      }
+      },
     );
 
     controller.current = timer;
@@ -173,12 +173,12 @@ export function ExerciseTimer({
           {remaining === 0
             ? 'Temps terminé'
             : suspended
-            ? 'En pause · écran masqué'
-            : !started
-            ? 'Prêt à démarrer'
-            : paused
-            ? 'En pause'
-            : 'En cours'}
+              ? 'En pause · écran masqué'
+              : !started
+                ? 'Prêt à démarrer'
+                : paused
+                  ? 'En pause'
+                  : 'En cours'}
         </small>
       </div>
       {/* Temps écoulé : « Passer » et « Démarrer » n'ont plus d'objet, on ne garde

@@ -1,35 +1,29 @@
 import { useMemo } from 'react';
-import type { ProfileId, WorkoutSession } from '../../domain/types';
-import { getProgram } from '../../domain/programs';
 import { exerciseLabel } from '../../domain/labels';
-import { getAdaptiveAdvice, type AdaptiveAdvice } from '../../workout/coaching';
+import type { WeeklyMeasurement } from '../../domain/measurements';
+import { getProgram } from '../../domain/programs';
+import type { ProfileId, WorkoutSession } from '../../domain/types';
+import { type AdaptiveAdvice, getAdaptiveAdvice } from '../../workout/coaching';
+import { nextTargetWeek } from '../../workout/followup';
 import {
+  formatLoadKg,
   formatMinutes,
   formatSignedInt,
   formatSignedKg,
-  formatLoadKg,
   formatSignedPercent,
   formatVolume,
   historyTotals,
   personalRecords,
+  type TrendPoint,
   volumeTrendPoints,
   weeklyComparison,
-  type TrendPoint,
 } from '../../workout/summary';
 import { ArrowLeft, ArrowRight, Bolt, ChartLine, ChevronRight, TrendDown, TrendUp, Warning } from '../ui/Icons';
 import { profileLabels } from './HomeScreen';
-import { nextTargetWeek } from '../../workout/followup';
-import type { WeeklyMeasurement } from '../../domain/measurements';
 
 /* ------------------------------------------------------------------ graphe -- */
 
-function VolumeTrendChart({
-  points,
-  dataKey,
-}: {
-  points: TrendPoint[];
-  dataKey: 'volume' | 'sets';
-}) {
+function VolumeTrendChart({ points, dataKey }: { points: TrendPoint[]; dataKey: 'volume' | 'sets' }) {
   const width = 640;
   const height = 200;
   const padding = { top: 16, right: 12, bottom: 30, left: 12 };
@@ -69,10 +63,24 @@ function VolumeTrendChart({
           strokeWidth="1"
         />
         <path d={area} style={{ fill: 'rgb(var(--accent-rgb) / 0.10)' }} />
-        <path d={line} fill="none" style={{ stroke: 'var(--accent)' }} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+        <path
+          d={line}
+          fill="none"
+          style={{ stroke: 'var(--accent)' }}
+          strokeWidth="3"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
         {coords.map((point) => (
           <g key={point.sessionId}>
-            <circle cx={point.x} cy={point.y} r="3.5" fill="#0B0F0E" style={{ stroke: 'var(--accent)' }} strokeWidth="2.5" />
+            <circle
+              cx={point.x}
+              cy={point.y}
+              r="3.5"
+              fill="#0B0F0E"
+              style={{ stroke: 'var(--accent)' }}
+              strokeWidth="2.5"
+            />
             <text x={point.x} y={height - 8} textAnchor="middle" fill="#78877E" fontSize="12">
               {point.label}
             </text>
@@ -93,11 +101,7 @@ function VolumeTrendChart({
 
 function AdaptiveAdviceCard({ advice }: { advice: AdaptiveAdvice }) {
   const label =
-    advice.recommendation === 'increase'
-      ? 'PROGRESSER'
-      : advice.recommendation === 'reduce'
-      ? 'RÉDUIRE'
-      : 'MAINTENIR';
+    advice.recommendation === 'increase' ? 'PROGRESSER' : advice.recommendation === 'reduce' ? 'RÉDUIRE' : 'MAINTENIR';
   return (
     <div className={`adaptive-advice ${advice.safety ? 'safety' : ''}`}>
       <div>
@@ -131,19 +135,13 @@ interface ProgressionScreenProps {
   onOpenFollowup: () => void;
 }
 
-export function ProgressionScreen({
-  history,
-  profile,
-  measurements,
-  onBack,
-  onOpenFollowup,
-}: ProgressionScreenProps) {
+export function ProgressionScreen({ history, profile, measurements, onBack, onOpenFollowup }: ProgressionScreenProps) {
   const view = useMemo(() => {
     const now = new Date();
     const completed = history.filter((item) => item.completedAt);
     const program = getProgram(profile);
     const exerciseNames = new Map(
-      program.days.flatMap((item) => item.exercises).map((exercise) => [exercise.id, exercise.name])
+      program.days.flatMap((item) => item.exercises).map((exercise) => [exercise.id, exercise.name]),
     );
     return {
       completed,
@@ -178,13 +176,13 @@ export function ProgressionScreen({
           <p className="eyebrow">TON PARCOURS · {profileLabels[profile].toUpperCase()}</p>
           <h1>Progression</h1>
         </div>
-        <button className="text-button" onClick={onBack}>
+        <button className="text-button" onClick={onBack} type="button">
           <ArrowLeft size={16} /> Accueil
         </button>
       </div>
       <p className="intro progression-intro">
-        Un aperçu de tes séances enregistrées sur cet appareil. Les données restent privées et séparées de
-        l’autre profil.
+        Un aperçu de tes séances enregistrées sur cet appareil. Les données restent privées et séparées de l’autre
+        profil.
       </p>
 
       {/* Point du samedi : l'entrée vers le suivi hebdomadaire, au même endroit
@@ -195,12 +193,16 @@ export function ProgressionScreen({
         </span>
         <span className="followup-cta-text">
           <strong>
-            {pointAJour ? `Semaine ${pointTarget.week} déjà renseignée` : `Point du samedi — semaine ${pointTarget.week}`}
+            {pointAJour
+              ? `Semaine ${pointTarget.week} déjà renseignée`
+              : `Point du samedi — semaine ${pointTarget.week}`}
           </strong>
           <small>
             {dernierPoint
               ? `Dernier relevé : ${
-                  typeof dernierPoint.weightKg === 'number' ? `${formatLoadKg(dernierPoint.weightKg)} kg` : 'poids non renseigné'
+                  typeof dernierPoint.weightKg === 'number'
+                    ? `${formatLoadKg(dernierPoint.weightKg)} kg`
+                    : 'poids non renseigné'
                 }${typeof dernierPoint.waistCm === 'number' ? ` · taille ${formatLoadKg(dernierPoint.waistCm)} cm` : ''}`
               : 'Mensurations et poids, une fois par semaine'}
           </small>
@@ -213,7 +215,7 @@ export function ProgressionScreen({
           <ChartLine size={34} />
           <h2>Aucune donnée de progression</h2>
           <p>Termine une première séance pour voir apparaître tes repères et ta tendance de volume.</p>
-          <button className="primary-button empty-cta" onClick={onBack}>
+          <button className="primary-button empty-cta" onClick={onBack} type="button">
             Retour à l’accueil
           </button>
         </div>
@@ -280,7 +282,7 @@ export function ProgressionScreen({
                 <small>
                   {week.previous.volumeKg > 0
                     ? `${formatVolume(week.current.volumeKg)} cette semaine vs ${formatVolume(
-                        week.previous.volumeKg
+                        week.previous.volumeKg,
                       )} la semaine dernière`
                     : 'Rien à comparer pour l’instant'}
                 </small>
@@ -313,8 +315,7 @@ export function ProgressionScreen({
               <>
                 {!hasVolume && (
                   <p className="muted-copy">
-                    Aucune charge renseignée pour l’instant : la tendance affiche les séries validées par
-                    séance.
+                    Aucune charge renseignée pour l’instant : la tendance affiche les séries validées par séance.
                   </p>
                 )}
                 <VolumeTrendChart points={view.points} dataKey={hasVolume ? 'volume' : 'sets'} />
@@ -333,9 +334,7 @@ export function ProgressionScreen({
               </span>
             </div>
             {view.records.length === 0 ? (
-              <p className="muted-copy">
-                Renseigne une charge réelle pendant tes séries pour créer tes records.
-              </p>
+              <p className="muted-copy">Renseigne une charge réelle pendant tes séries pour créer tes records.</p>
             ) : (
               <div className="records-list">
                 {view.records.map((record, index) => (
@@ -349,7 +348,9 @@ export function ProgressionScreen({
                           : `${record.repetitions} s tenues`}
                       </small>
                     </div>
-                    <span className="record-value">{record.loadKg > 0 ? `${formatLoadKg(record.loadKg)} kg` : '—'}</span>
+                    <span className="record-value">
+                      {record.loadKg > 0 ? `${formatLoadKg(record.loadKg)} kg` : '—'}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -363,8 +364,8 @@ export function ProgressionScreen({
             <div>
               <strong>Comment lire ces chiffres</strong>
               <p>
-                Le volume (charge × répétitions) mesure le travail total. Une meilleure charge sur le même
-                mouvement signale une progression réelle, même si la séance paraît plus courte.
+                Le volume (charge × répétitions) mesure le travail total. Une meilleure charge sur le même mouvement
+                signale une progression réelle, même si la séance paraît plus courte.
               </p>
             </div>
           </div>

@@ -63,7 +63,10 @@ export function EnergyCheckinModal({ day, profileName, onConfirm, onSkip }: Ener
         {selectedLevel === 'low' && (
           <div className="energy-notice">
             <Clock size={16} />
-            <span>Les temps de repos seront majorés de 20 % (par exemple, 120 s passent à 145 s) pour préserver ta fraîcheur.</span>
+            <span>
+              Les temps de repos seront majorés de 20 % (par exemple, 120 s passent à 145 s) pour préserver ta
+              fraîcheur.
+            </span>
           </div>
         )}
 

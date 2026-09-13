@@ -1,6 +1,6 @@
-import type { LoadConsigne } from '../domain/types';
-import type { WeeklyMeasurement, MeasurementZone, ProfileBody } from '../domain/measurements';
+import type { MeasurementZone, ProfileBody, WeeklyMeasurement } from '../domain/measurements';
 import { cycleLengthWeeks as cycleLengthWeeksCurrent, measurementZones, profileBody } from '../domain/measurements';
+import type { LoadConsigne } from '../domain/types';
 
 /**
  * Écarts invraisemblables d'une semaine à l'autre.
@@ -76,7 +76,10 @@ export function zoneDelta(
   return arrondi(b - a);
 }
 
-export function implausibleZones(current: WeeklyMeasurement, previous: WeeklyMeasurement | undefined): MeasurementZone[] {
+export function implausibleZones(
+  current: WeeklyMeasurement,
+  previous: WeeklyMeasurement | undefined,
+): MeasurementZone[] {
   if (!previous) return [];
   return measurementZones
     .map((zone) => zone.key)
@@ -277,7 +280,11 @@ export interface ExerciseLoad {
  * (« Paramètres / Séance 1 ») : l'application l'a déjà, série par série.
  */
 export function lastExerciseLoads(
-  sessions: readonly { dayId: string; completedAt?: string; loggedSets: readonly { exerciseId: string; actualLoadKg?: number }[] }[],
+  sessions: readonly {
+    dayId: string;
+    completedAt?: string;
+    loggedSets: readonly { exerciseId: string; actualLoadKg?: number }[];
+  }[],
   dayId: string,
 ): ExerciseLoad[] {
   const done = sessions
@@ -342,8 +349,10 @@ export function buildWeeklyReading(options: {
   const cuisseDroite = zoneDelta(previous, current, 'thighRightCm');
   const cuisseGauche = zoneDelta(previous, current, 'thighLeftCm');
   const velocity = weightVelocity(previous ? [previous, current] : [current]);
-  const rfm = typeof current.waistCm === 'number' ? relativeFatMass(body.sex, body.heightCm, current.waistCm) : undefined;
-  const rfmPremier = first && typeof first.waistCm === 'number' ? relativeFatMass(body.sex, body.heightCm, first.waistCm) : undefined;
+  const rfm =
+    typeof current.waistCm === 'number' ? relativeFatMass(body.sex, body.heightCm, current.waistCm) : undefined;
+  const rfmPremier =
+    first && typeof first.waistCm === 'number' ? relativeFatMass(body.sex, body.heightCm, first.waistCm) : undefined;
 
   const busteSemaine = zoneDelta(previous, current, 'chestCm');
   const zonesMuscle = [brasDroit, brasGauche, cuisseDroite, cuisseGauche].filter(
@@ -383,7 +392,9 @@ export function buildWeeklyReading(options: {
   } else if (typeof poidsSemaine === 'number' && poidsSemaine < 0) {
     observations.push(`Le poids baisse de ${formatNombre(Math.abs(poidsSemaine))} kg cette semaine.`);
   } else if (typeof poidsSemaine === 'number' && poidsSemaine > 0) {
-    observations.push(`Le poids remonte de ${formatNombre(poidsSemaine)} kg cette semaine — à confirmer la semaine prochaine avant d'en tirer une conclusion.`);
+    observations.push(
+      `Le poids remonte de ${formatNombre(poidsSemaine)} kg cette semaine — à confirmer la semaine prochaine avant d'en tirer une conclusion.`,
+    );
   }
 
   if (typeof poidsCycle === 'number' && poidsCycle !== 0) {
@@ -407,7 +418,9 @@ export function buildWeeklyReading(options: {
   }
 
   if (typeof sessionsThisWeek === 'number' && sessionsThisWeek > 0) {
-    observations.push(`${sessionsThisWeek} séance${sessionsThisWeek > 1 ? 's' : ''} enregistrée${sessionsThisWeek > 1 ? 's' : ''} cette semaine.`);
+    observations.push(
+      `${sessionsThisWeek} séance${sessionsThisWeek > 1 ? 's' : ''} enregistrée${sessionsThisWeek > 1 ? 's' : ''} cette semaine.`,
+    );
   }
 
   return {

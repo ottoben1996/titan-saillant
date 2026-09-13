@@ -1,5 +1,5 @@
-﻿import { describe, expect, it, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+﻿import { fireEvent, render, screen } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
 import { ExerciseTimer } from './ExerciseTimer';
 
 describe('ExerciseTimer (Compteur Tempo)', () => {
@@ -17,7 +17,7 @@ describe('ExerciseTimer (Compteur Tempo)', () => {
         onStateChange={onStateChange}
         onDone={onDone}
         onSkip={onSkip}
-      />
+      />,
     );
 
     expect(screen.getByText('COMPTEUR TEMPO')).toBeInTheDocument();
@@ -40,7 +40,7 @@ describe('ExerciseTimer (Compteur Tempo)', () => {
         onStateChange={onStateChange}
         onDone={onDone}
         onSkip={onSkip}
-      />
+      />,
     );
 
     const skipButton = screen.getByRole('button', { name: /passer/i });
@@ -63,7 +63,7 @@ describe('ExerciseTimer (Compteur Tempo)', () => {
         suspended={false}
         onStateChange={onStateChange}
         onDone={onDone}
-      />
+      />,
     );
 
     const startBtn = screen.getByRole('button', { name: /démarrer/i });

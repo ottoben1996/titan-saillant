@@ -1,0 +1,7 @@
+# Fins de ligne figées : le dépôt vit en LF, quel que soit le poste de travail.
+* text=auto eol=lf
+*.png binary
+*.webp binary
+*.jpg binary
+*.woff2 binary
+*.pdf binary

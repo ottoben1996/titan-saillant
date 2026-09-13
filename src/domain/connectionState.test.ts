@@ -21,12 +21,18 @@ describe('describeConnectionState', () => {
   });
 
   it('reste utilisable hors ligne sans réseau quand le précache est prêt', () => {
-    expect(describeConnectionState({ isOnline: false, offlineReady: true, serviceWorkerReady: true }).usableOffline).toBe(true);
+    expect(
+      describeConnectionState({ isOnline: false, offlineReady: true, serviceWorkerReady: true }).usableOffline,
+    ).toBe(true);
   });
 
   it('marque la préparation hors ligne comme « en attente » si un seul signal est reçu', () => {
-    expect(describeConnectionState({ isOnline: true, offlineReady: true, serviceWorkerReady: false }).offlineReadiness).toBe('pending');
-    expect(describeConnectionState({ isOnline: true, offlineReady: false, serviceWorkerReady: true }).offlineReadiness).toBe('pending');
+    expect(
+      describeConnectionState({ isOnline: true, offlineReady: true, serviceWorkerReady: false }).offlineReadiness,
+    ).toBe('pending');
+    expect(
+      describeConnectionState({ isOnline: true, offlineReady: false, serviceWorkerReady: true }).offlineReadiness,
+    ).toBe('pending');
   });
 
   it('marque la préparation hors ligne comme « inconnue » sans aucun signal', () => {
@@ -36,7 +42,11 @@ describe('describeConnectionState', () => {
   });
 
   it('n’est pas utilisable hors ligne tant que les deux signaux ne sont pas réunis', () => {
-    expect(describeConnectionState({ isOnline: false, offlineReady: true, serviceWorkerReady: false }).usableOffline).toBe(false);
-    expect(describeConnectionState({ isOnline: false, offlineReady: false, serviceWorkerReady: true }).usableOffline).toBe(false);
+    expect(
+      describeConnectionState({ isOnline: false, offlineReady: true, serviceWorkerReady: false }).usableOffline,
+    ).toBe(false);
+    expect(
+      describeConnectionState({ isOnline: false, offlineReady: false, serviceWorkerReady: true }).usableOffline,
+    ).toBe(false);
   });
 });

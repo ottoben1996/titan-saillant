@@ -126,9 +126,7 @@ export function CompletionFeedback({ session, onFinish }: CompletionFeedbackProp
               </button>
             ))}
           </div>
-          <small className="quiz-help">
-            {rpe ? `${rpe}/10` : '1 = très facile, 10 = effort maximal'}
-          </small>
+          <small className="quiz-help">{rpe ? `${rpe}/10` : '1 = très facile, 10 = effort maximal'}</small>
         </div>
 
         <div className="quiz-question">
@@ -210,10 +208,10 @@ export function CompletionFeedback({ session, onFinish }: CompletionFeedbackProp
 
       {/* 3. L'appel à l'action : dernier écran vu après une séance. */}
       <div className="bilan-actions">
-        <button className="primary-button full" onClick={() => void submit()} disabled={saving}>
+        <button className="primary-button full" onClick={() => void submit()} disabled={saving} type="button">
           {saving ? 'Enregistrement…' : 'Enregistrer et terminer'} <ArrowRight size={19} />
         </button>
-        <button className="secondary-button full" onClick={() => void submit(true)} disabled={saving}>
+        <button className="secondary-button full" onClick={() => void submit(true)} disabled={saving} type="button">
           Terminer sans renseigner le ressenti
         </button>
       </div>

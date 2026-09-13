@@ -20,8 +20,8 @@
  *    continue de fonctionner pendant les faux chronos.
  */
 import 'fake-indexeddb/auto';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import App from '../App';
 import { getProgram } from '../domain/programs';
 import type { WorkoutSession } from '../domain/types';
@@ -32,6 +32,7 @@ import { getActiveSession, listSessions, saveSession } from '../storage/sessionR
 // parallèle, ils dépassent le délai par défaut de 5 s. Le délai est porté à 20 s
 // pour ce fichier uniquement, sans toucher aux autres suites.
 vi.setConfig({ testTimeout: 20_000 });
+
 import { completeSet, createRunner, getNextStep, getWorkoutExercises } from '../workout/runner';
 
 /* ------------------------------------------------------------------ outils -- */
@@ -423,52 +424,46 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
    |  signalera qu'il faut le repasser en `it`.                                  |
    \* ------------------------------------------------------------------------- */
 
-  it(
-    '[6] démarrer une 2e séance clôture la précédente : une seule séance reste en cours (orpheline corrigée)',
-    async () => {
-      await openAsOttman();
-      await startDayFromHome('Full Body A');
-      await validateSet(); // une série validée → la séance A existe en base
+  it('[6] démarrer une 2e séance clôture la précédente : une seule séance reste en cours (orpheline corrigée)', async () => {
+    await openAsOttman();
+    await startDayFromHome('Full Body A');
+    await validateSet(); // une série validée → la séance A existe en base
 
-      // Mise en pause de la séance A : elle reste « en cours » dans le dépôt.
-      fireEvent.click(screen.getByRole('button', { name: /quitter la séance/i }));
-      await flush();
-      fireEvent.click(screen.getByRole('button', { name: /mettre en pause/i }));
-      await flush();
+    // Mise en pause de la séance A : elle reste « en cours » dans le dépôt.
+    fireEvent.click(screen.getByRole('button', { name: /quitter la séance/i }));
+    await flush();
+    fireEvent.click(screen.getByRole('button', { name: /mettre en pause/i }));
+    await flush();
 
-      // Depuis l'accueil, l'utilisateur peut démarrer un AUTRE créneau :
-      // le bandeau de reprise n'empêche pas le rail de semaine d'être cliquable
-      // et confirmWorkoutStart (App.tsx:279) ne vérifie aucune séance en cours.
-      fireEvent.click(screen.getByRole('button', { name: /full body b/i }));
-      await flush();
-      fireEvent.click(screen.getByRole('button', { name: /démarrer full body b/i }));
-      await flush();
+    // Depuis l'accueil, l'utilisateur peut démarrer un AUTRE créneau :
+    // le bandeau de reprise n'empêche pas le rail de semaine d'être cliquable
+    // et confirmWorkoutStart (App.tsx:279) ne vérifie aucune séance en cours.
+    fireEvent.click(screen.getByRole('button', { name: /full body b/i }));
+    await flush();
+    fireEvent.click(screen.getByRole('button', { name: /démarrer full body b/i }));
+    await flush();
 
-      // La séance B est bien ouverte : les deux séances de musculation partagent
-      // le même échauffement, on vérifie donc la séance réellement en base plutôt
-      // qu'un titre d'exercice, plus robuste et plus proche du comportement attendu.
-      expect(document.querySelector('.workout-shell')).not.toBeNull();
-      const inProgress = (await listSessions('ottman')).filter((item) => !item.completedAt);
-      expect(inProgress).toHaveLength(1);
-      expect(inProgress[0].dayId).toBe('full-body-b');
-      expect(inProgress[0].loggedSets).toHaveLength(0);
-    }
-  );
+    // La séance B est bien ouverte : les deux séances de musculation partagent
+    // le même échauffement, on vérifie donc la séance réellement en base plutôt
+    // qu'un titre d'exercice, plus robuste et plus proche du comportement attendu.
+    expect(document.querySelector('.workout-shell')).not.toBeNull();
+    const inProgress = (await listSessions('ottman')).filter((item) => !item.completedAt);
+    expect(inProgress).toHaveLength(1);
+    expect(inProgress[0].dayId).toBe('full-body-b');
+    expect(inProgress[0].loggedSets).toHaveLength(0);
+  });
 
-  it(
-    '[6b] les champs de saisie portent un nom accessible (accessibilité corrigée)',
-    async () => {
-      await openAsOttman();
-      await startDayFromHome('Full Body A');
+  it('[6b] les champs de saisie portent un nom accessible (accessibilité corrigée)', async () => {
+    await openAsOttman();
+    await startDayFromHome('Full Body A');
 
-      // Le libellé « Répétitions » est un simple <span> (WorkoutScreen.tsx:625) posé
-      // à côté du champ : ni <label>, ni aria-label, ni aria-labelledby. Le champ
-      // n'a donc aucun nom accessible (idem « Charge (kg) » ligne 645 et
-      // « Durée (secondes) » ligne 604). Un lecteur d'écran annonce « champ de saisie »
-      // sans dire ce qu'il mesure.
-      expect(() => screen.getByLabelText(/répétitions/i)).not.toThrow();
-    }
-  );
+    // Le libellé « Répétitions » est un simple <span> (WorkoutScreen.tsx:625) posé
+    // à côté du champ : ni <label>, ni aria-label, ni aria-labelledby. Le champ
+    // n'a donc aucun nom accessible (idem « Charge (kg) » ligne 645 et
+    // « Durée (secondes) » ligne 604). Un lecteur d'écran annonce « champ de saisie »
+    // sans dire ce qu'il mesure.
+    expect(() => screen.getByLabelText(/répétitions/i)).not.toThrow();
+  });
 
   /* ------------------------------------------------------------------ */
   /*  Annulation et suppression de séance, liste des exercices          */
@@ -518,9 +513,7 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
     // Depuis l'accueil, l'action de suppression est distincte de la reprise.
     fireEvent.click(screen.getByRole('button', { name: /^supprimer la séance$/i }));
     await flush();
-    fireEvent.click(
-      within(screen.getByRole('alertdialog')).getByRole('button', { name: /^annuler la séance$/i })
-    );
+    fireEvent.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: /^annuler la séance$/i }));
     await flush();
 
     expect(await listSessions('ottman')).toHaveLength(0);
@@ -561,4 +554,3 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
     expect(within(feuille2).getByText(/· EN COURS/)).toBeInTheDocument();
   });
 });
-

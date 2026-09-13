@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
+import { getWorkoutExercises } from '../workout/runner';
 import { getProgram } from './programs';
 import { tutorials } from './tutorials';
-import { getWorkoutExercises } from '../workout/runner';
 
 const entries = Object.entries(tutorials);
 
@@ -36,7 +36,7 @@ describe('tutoriels (contenu pédagogique)', () => {
 
   it('couvre chaque identifiant d’exercice du programme, retour au calme compris', () => {
     const missing = prescribedExerciseIds().filter(
-      id => !TOLERATED_WITHOUT_TUTORIAL.includes(id) && tutorials[id] === undefined
+      (id) => !TOLERATED_WITHOUT_TUTORIAL.includes(id) && tutorials[id] === undefined,
     );
     expect(missing, `tutoriels manquants : ${missing.join(', ')}`).toEqual([]);
   });
@@ -74,7 +74,7 @@ describe('tutoriels (contenu pédagogique)', () => {
         ...tutorial.commonMistakes,
         ...tutorial.safety,
         tutorial.keyCue ?? '',
-      ].filter(text => text.trim() !== '');
+      ].filter((text) => text.trim() !== '');
       for (const text of texts) {
         const owner = seen.get(text);
         expect(owner, `texte dupliqué entre « ${owner} » et « ${key} » : ${text}`).toBeUndefined();
@@ -92,7 +92,7 @@ describe('tutoriels (contenu pédagogique)', () => {
   });
 
   it('ne tolère aucune exception de couverture sans tutoriel', () => {
-    const uncovered = prescribedExerciseIds().filter(id => tutorials[id] === undefined);
-    expect(uncovered).toEqual(TOLERATED_WITHOUT_TUTORIAL.filter(id => tutorials[id] === undefined));
+    const uncovered = prescribedExerciseIds().filter((id) => tutorials[id] === undefined);
+    expect(uncovered).toEqual(TOLERATED_WITHOUT_TUTORIAL.filter((id) => tutorials[id] === undefined));
   });
 });

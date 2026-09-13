@@ -1,5 +1,5 @@
-import { Warning } from './Icons';
 import { calculatePlates } from '../../workout/plateCalculator';
+import { Warning } from './Icons';
 
 interface PlateBadgeProps {
   totalLoadKg: number;
@@ -33,9 +33,7 @@ function roundKg(value: number): number {
 /** 40 -> "40" ; 2.5 -> "2,5" ; 1.25 -> "1,25" (format FR, séparateur virgule). */
 function formatKg(value: number): string {
   const rounded = roundKg(value);
-  return Number.isInteger(rounded)
-    ? String(rounded)
-    : rounded.toFixed(2).replace(/0$/, '').replace('.', ',');
+  return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(2).replace(/0$/, '').replace('.', ',');
 }
 
 /**
@@ -46,11 +44,7 @@ export function PlateBadge({ totalLoadKg, exerciseId, barWeightKg }: PlateBadgeP
   if (!Number.isFinite(totalLoadKg) || totalLoadKg < 20) return null;
 
   const effectiveBarWeight =
-    barWeightKg !== undefined
-      ? barWeightKg
-      : exerciseId
-        ? (FALLBACK_BAR_KG_BY_EXERCISE[exerciseId] ?? 0)
-        : 0;
+    barWeightKg !== undefined ? barWeightKg : exerciseId ? (FALLBACK_BAR_KG_BY_EXERCISE[exerciseId] ?? 0) : 0;
 
   const breakdown = calculatePlates(totalLoadKg, effectiveBarWeight);
   const { platesPerSide, remainderKg, weightPerSideKg } = breakdown;
@@ -64,9 +58,7 @@ export function PlateBadge({ totalLoadKg, exerciseId, barWeightKg }: PlateBadgeP
   const achievedTotalKg = roundKg(totalLoadKg - 2 * remainderKg);
   const shortfallTotalKg = roundKg(2 * remainderKg);
 
-  const discSummary = platesPerSide
-    .map((item) => `${item.count} × ${formatKg(item.plateKg)} kg`)
-    .join(', ');
+  const discSummary = platesPerSide.map((item) => `${item.count} × ${formatKg(item.plateKg)} kg`).join(', ');
 
   const accessibleLabel = [
     `Chargement par côté : ${formatKg(achievablePerSideKg)} kg par côté`,
@@ -81,7 +73,7 @@ export function PlateBadge({ totalLoadKg, exerciseId, barWeightKg }: PlateBadgeP
   return (
     <div
       className={`plate-badge-container${isExact ? '' : ' plate-badge-inexact'}`}
-      role="group"
+      role="img"
       aria-label={accessibleLabel}
     >
       <div className="plate-badge-head">
@@ -94,9 +86,7 @@ export function PlateBadge({ totalLoadKg, exerciseId, barWeightKg }: PlateBadgeP
       <div className="plate-badge-hero">
         <span className="plate-side-value">{formatKg(achievablePerSideKg)}</span>
         <span className="plate-side-unit">kg / côté</span>
-        {effectiveBarWeight > 0 && (
-          <span className="plate-bar-note">barre {formatKg(effectiveBarWeight)} kg</span>
-        )}
+        {effectiveBarWeight > 0 && <span className="plate-bar-note">barre {formatKg(effectiveBarWeight)} kg</span>}
       </div>
 
       <div className="plate-sleeve-visual" aria-hidden="true">
@@ -134,9 +124,8 @@ export function PlateBadge({ totalLoadKg, exerciseId, barWeightKg }: PlateBadgeP
         <div className="plate-badge-warning" role="status">
           <Warning size={16} />
           <span>
-            <strong>Charge non exacte</strong> — il manque{' '}
-            <strong>{formatKg(shortfallTotalKg)} kg</strong> (cible {formatKg(totalLoadKg)} kg).
-            Chargé : {formatKg(achievedTotalKg)} kg.
+            <strong>Charge non exacte</strong> — il manque <strong>{formatKg(shortfallTotalKg)} kg</strong> (cible{' '}
+            {formatKg(totalLoadKg)} kg). Chargé : {formatKg(achievedTotalKg)} kg.
           </span>
         </div>
       )}

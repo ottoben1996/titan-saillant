@@ -35,7 +35,7 @@ export function HistoryScreen({ history, onBack, onDelete }: HistoryScreenProps)
           <p className="eyebrow">TON PARCOURS</p>
           <h1>Historique</h1>
         </div>
-        <button className="text-button" onClick={onBack}>
+        <button className="text-button" onClick={onBack} type="button">
           <ArrowLeft size={16} /> Accueil
         </button>
       </div>
@@ -45,7 +45,7 @@ export function HistoryScreen({ history, onBack, onDelete }: HistoryScreenProps)
           <Repeat size={34} />
           <h2>Aucune séance enregistrée</h2>
           <p>Ta première séance apparaîtra ici, avec sa durée, tes séries validées et ton ressenti.</p>
-          <button className="primary-button empty-cta" onClick={onBack}>
+          <button className="primary-button empty-cta" onClick={onBack} type="button">
             Choisir ma séance
           </button>
         </div>

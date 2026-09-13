@@ -1,26 +1,27 @@
 import { useMemo } from 'react';
 import { cycleLengthWeeks, measurementZones, profileBody, type WeeklyMeasurement } from '../../domain/measurements';
-import type { LoadConsigne } from '../../domain/types';
-import type { ProfileId, WorkoutSession } from '../../domain/types';
 import { getProgram } from '../../domain/programs';
+import type { LoadConsigne, ProfileId, WorkoutSession } from '../../domain/types';
 import {
   bodyMassIndex,
   buildWeeklyReading,
   firstOfCycle,
   formatNombre,
+  formFromEnergy,
   isExcluded,
-  movingAverage,
   lastExerciseLoads,
+  movingAverage,
   navyBodyFat,
   previousMeasurement,
   relativeFatMass,
+  seancesDeLaSemaine,
   waistToHeight,
+  weeklyCheckinSummary,
   weightVelocity,
   zoneDelta,
 } from '../../workout/followup';
-import { sessionVolume, workoutDayLabel } from '../../workout/summary';
-import { formFromEnergy, seancesDeLaSemaine, weeklyCheckinSummary } from '../../workout/followup';
 import { progressionForce } from '../../workout/progressionForce';
+import { sessionVolume, workoutDayLabel } from '../../workout/summary';
 import { ArrowLeft, DownloadSimple } from '../ui/Icons';
 
 interface BilanScreenProps {
@@ -45,14 +46,27 @@ function Sparkline({ charges }: { charges: readonly number[] }) {
   const min = Math.min(...charges);
   const max = Math.max(...charges);
   const etendue = max - min || 1;
-  const x = (index: number) => (charges.length === 1 ? largeur / 2 : 2 + (index * (largeur - 4)) / (charges.length - 1));
+  const x = (index: number) =>
+    charges.length === 1 ? largeur / 2 : 2 + (index * (largeur - 4)) / (charges.length - 1);
   const y = (valeur: number) => hauteur - 3 - ((valeur - min) / etendue) * (hauteur - 6);
   const trace = charges.map((charge, index) => `${x(index)},${y(charge)}`).join(' ');
   const stable = min === max;
 
   return (
-    <svg viewBox={`0 0 ${largeur} ${hauteur}`} width={largeur} height={hauteur} role="img" aria-label={`${charges.length} passages, de ${min} à ${max} kilos`}>
-      <polyline points={trace} fill="none" stroke={stable ? '#97a49e' : '#5f9b3f'} strokeWidth="2" strokeLinecap="round" />
+    <svg
+      viewBox={`0 0 ${largeur} ${hauteur}`}
+      width={largeur}
+      height={hauteur}
+      role="img"
+      aria-label={`${charges.length} passages, de ${min} à ${max} kilos`}
+    >
+      <polyline
+        points={trace}
+        fill="none"
+        stroke={stable ? '#97a49e' : '#5f9b3f'}
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }
@@ -83,7 +97,8 @@ function Courbe({
   const marge = Math.max(0.6, (max - min) * 0.25);
   const bas = min - marge;
   const haut = max + marge;
-  const x = (index: number) => (points.length === 1 ? largeur / 2 : 20 + (index * (largeur - 40)) / (points.length - 1));
+  const x = (index: number) =>
+    points.length === 1 ? largeur / 2 : 20 + (index * (largeur - 40)) / (points.length - 1);
   const y = (value: number) => hauteur - 30 - ((value - bas) / (haut - bas)) * (hauteur - 50);
   const trace = points.map((point, index) => `${x(index)},${y(point.value)}`).join(' ');
   const traceMoyenne = (moyenne ?? [])
@@ -103,7 +118,14 @@ function Courbe({
           <line x1="0" y1={y(cible)} x2={largeur} y2={y(cible)} stroke="#d9c9a8" strokeDasharray="4 4" />
         )}
         {traceMoyenne.length > 0 && (
-          <polyline points={traceMoyenne} fill="none" stroke="#3f7dbf" strokeWidth="2" strokeDasharray="6 4" strokeLinecap="round" />
+          <polyline
+            points={traceMoyenne}
+            fill="none"
+            stroke="#3f7dbf"
+            strokeWidth="2"
+            strokeDasharray="6 4"
+            strokeLinecap="round"
+          />
         )}
         <polyline points={trace} fill="none" stroke="#5f9b3f" strokeWidth="2.5" strokeLinecap="round" />
         {points.map((point, index) => (
@@ -154,8 +176,7 @@ export function BilanScreen({ profileId, measurements, current, sessions, onBack
   const velocity = weightVelocity(jusqua);
 
   const tailleCourante = current.waistCm;
-  const rfm =
-    typeof tailleCourante === 'number' ? relativeFatMass(body.sex, body.heightCm, tailleCourante) : undefined;
+  const rfm = typeof tailleCourante === 'number' ? relativeFatMass(body.sex, body.heightCm, tailleCourante) : undefined;
   const rfmCycle =
     first && typeof first.waistCm === 'number' && first.id !== current.id
       ? relativeFatMass(body.sex, body.heightCm, first.waistCm)
@@ -185,7 +206,10 @@ export function BilanScreen({ profileId, measurements, current, sessions, onBack
     })
     .filter((entree) => entree.lignes.length > 0);
 
-  const volumeSemaine = sessions.reduce((total, session) => (session.completedAt ? total + sessionVolume(session) : total), 0);
+  const volumeSemaine = sessions.reduce(
+    (total, session) => (session.completedAt ? total + sessionVolume(session) : total),
+    0,
+  );
 
   /** Poids relevés, du plus ancien au plus récent, sans les valeurs écartées. */
   const poidsPoints = jusqua
@@ -195,7 +219,10 @@ export function BilanScreen({ profileId, measurements, current, sessions, onBack
    * Moyenne mobile sur quatre semaines : elle lisse le bruit d'hydratation, qui
    * fait varier le poids d'un jour à l'autre sans rien dire de la tendance.
    */
-  const moyennePoids = movingAverage(poidsPoints.map((point) => point.value), 4);
+  const moyennePoids = movingAverage(
+    poidsPoints.map((point) => point.value),
+    4,
+  );
   const lectureMoyenne = (() => {
     const dernier = poidsPoints.at(-1)?.value;
     const moyenneActuelle = moyennePoids.at(-1);
@@ -229,18 +256,22 @@ export function BilanScreen({ profileId, measurements, current, sessions, onBack
 
   const poids = typeof current.weightKg === 'number' ? current.weightKg : undefined;
   const bmi = poids !== undefined ? bodyMassIndex(poids, body.heightCm) : undefined;
-  const bmiCycle = first && typeof first.weightKg === 'number' ? bodyMassIndex(first.weightKg, body.heightCm) : undefined;
+  const bmiCycle =
+    first && typeof first.weightKg === 'number' ? bodyMassIndex(first.weightKg, body.heightCm) : undefined;
   /** Écart arrondi, ou rien : jamais de « NaN » ni de fausse précision. */
   const ecart = (a: number | undefined, b: number | undefined, facteur: number) =>
     a === undefined || b === undefined ? undefined : Math.round((a - b) * facteur) / facteur;
   const rth = typeof tailleCourante === 'number' ? waistToHeight(tailleCourante, body.heightCm) : undefined;
   // Une semaine dont la valeur a été écartée pour invraisemblance ne sert ni de
   // comparaison ni de repère : mieux vaut un tiret qu'un chiffre faux.
-  const tailleCycle = first && typeof first.waistCm === 'number' && !isExcluded(first, 'waistCm') ? first.waistCm : undefined;
-  const tailleAvant = previous && typeof previous.waistCm === 'number' && !isExcluded(previous, 'waistCm') ? previous.waistCm : undefined;
+  const tailleCycle =
+    first && typeof first.waistCm === 'number' && !isExcluded(first, 'waistCm') ? first.waistCm : undefined;
+  const tailleAvant =
+    previous && typeof previous.waistCm === 'number' && !isExcluded(previous, 'waistCm') ? previous.waistCm : undefined;
   const rthCycle = tailleCycle !== undefined ? waistToHeight(tailleCycle, body.heightCm) : undefined;
   const avantRth = tailleAvant !== undefined ? waistToHeight(tailleAvant, body.heightCm) : undefined;
-  const avantBmi = previous && typeof previous.weightKg === 'number' ? bodyMassIndex(previous.weightKg, body.heightCm) : undefined;
+  const avantBmi =
+    previous && typeof previous.weightKg === 'number' ? bodyMassIndex(previous.weightKg, body.heightCm) : undefined;
   const avantRfm = tailleAvant !== undefined ? relativeFatMass(body.sex, body.heightCm, tailleAvant) : undefined;
 
   /** Signe moins typographique (−) et non le trait d'union du clavier : c'est la
@@ -292,14 +323,14 @@ export function BilanScreen({ profileId, measurements, current, sessions, onBack
         </header>
 
         {/* Ce que le coach a répondu au bilan précédent : la boucle se referme. */}
-      {previous?.coachNote && (
-        <div className="bilan-coach">
-          <b>Ce que le coach a répondu — semaine {previous.week}</b>
-          <p>« {previous.coachNote} »</p>
-        </div>
-      )}
+        {previous?.coachNote && (
+          <div className="bilan-coach">
+            <b>Ce que le coach a répondu — semaine {previous.week}</b>
+            <p>« {previous.coachNote} »</p>
+          </div>
+        )}
 
-      <div className="bilan-kpis">
+        <div className="bilan-kpis">
           <div>
             <span>Poids</span>
             <b>{poids !== undefined ? `${formatNombre(poids)} kg` : '—'}</b>
@@ -344,10 +375,10 @@ export function BilanScreen({ profileId, measurements, current, sessions, onBack
                   <td>{zone.label}</td>
                   <td className="num">{typeof avant === 'number' ? formatNombre(avant) : '—'}</td>
                   <td className="num">{typeof valeur === 'number' ? formatNombre(valeur) : '—'}</td>
-                  <td className={`num ${classeDelta(ecart, zone.key === 'waistCm' || zone.key === 'chestCm' ? false : true)}`}>
+                  <td className={`num ${classeDelta(ecart, !(zone.key === 'waistCm' || zone.key === 'chestCm'))}`}>
                     {ecart === undefined ? '—' : ecart === 0 ? '=' : deltaAffiche(ecart)}
                   </td>
-                  <td className={`num ${classeDelta(cycle, zone.key === 'waistCm' || zone.key === 'chestCm' ? false : true)}`}>
+                  <td className={`num ${classeDelta(cycle, !(zone.key === 'waistCm' || zone.key === 'chestCm'))}`}>
                     {cycle === undefined ? '—' : cycle === 0 ? '=' : deltaAffiche(cycle)}
                   </td>
                 </tr>
@@ -357,8 +388,8 @@ export function BilanScreen({ profileId, measurements, current, sessions, onBack
         </table>
 
         <p className="bilan-note">
-          « S2 » désigne la semaine précédente, « Début » l'écart depuis la première semaine du cycle. Un tiret
-          signale une semaine sans mesure comparable (valeur manquante ou écartée).
+          « S2 » désigne la semaine précédente, « Début » l'écart depuis la première semaine du cycle. Un tiret signale
+          une semaine sans mesure comparable (valeur manquante ou écartée).
         </p>
 
         <h3>Indicateurs</h3>
@@ -472,10 +503,16 @@ export function BilanScreen({ profileId, measurements, current, sessions, onBack
                     {entree.lignes.map((ligne) => (
                       <tr key={ligne.exerciseId}>
                         <td>{ligne.nom}</td>
-                        <td className="num">{ligne.previous !== undefined ? `${formatNombre(ligne.previous)} kg` : '—'}</td>
+                        <td className="num">
+                          {ligne.previous !== undefined ? `${formatNombre(ligne.previous)} kg` : '—'}
+                        </td>
                         <td className="num">{ligne.last !== undefined ? `${formatNombre(ligne.last)} kg` : '—'}</td>
                         <td className={`num ${classeDelta(ligne.delta, true)}`}>
-                          {ligne.delta === undefined ? '—' : ligne.delta === 0 ? '=' : `${ligne.delta > 0 ? '+' : ''}${formatNombre(ligne.delta)} kg`}
+                          {ligne.delta === undefined
+                            ? '—'
+                            : ligne.delta === 0
+                              ? '='
+                              : `${ligne.delta > 0 ? '+' : ''}${formatNombre(ligne.delta)} kg`}
                         </td>
                       </tr>
                     ))}
@@ -580,7 +617,10 @@ export function BilanScreen({ profileId, measurements, current, sessions, onBack
             )}
             {ressenti.notes.length > 0 && (
               <p className="bilan-note">
-                Notes : {ressenti.notes.map((item) => `${workoutDayLabel(item.dayId).toLowerCase()} — « ${item.notes} »`).join(' · ')}
+                Notes :{' '}
+                {ressenti.notes
+                  .map((item) => `${workoutDayLabel(item.dayId).toLowerCase()} — « ${item.notes} »`)
+                  .join(' · ')}
               </p>
             )}
           </>

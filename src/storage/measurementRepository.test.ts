@@ -1,5 +1,6 @@
 import 'fake-indexeddb/auto';
-import { describe, expect, it, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { measurementId, type WeeklyMeasurement } from '../domain/measurements';
 import { db } from './db';
 import {
   deleteMeasurement,
@@ -8,7 +9,6 @@ import {
   saveMeasurement,
   seedMeasurementsIfEmpty,
 } from './measurementRepository';
-import { measurementId, type WeeklyMeasurement } from '../domain/measurements';
 
 const semaine = (week: number, weightKg: number): WeeklyMeasurement => ({
   id: measurementId('ottman', 1, week),

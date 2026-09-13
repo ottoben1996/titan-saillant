@@ -1,5 +1,12 @@
 import Dexie, { type Table } from 'dexie';
-import type { AppPreferences, BodyMetric, MealPlan, MustaphaProfile, ShoppingList, WorkoutSession } from '../domain/types';
+import type {
+  AppPreferences,
+  BodyMetric,
+  MealPlan,
+  MustaphaProfile,
+  ShoppingList,
+  WorkoutSession,
+} from '../domain/types';
 
 export class MustaphaDatabase extends Dexie {
   profiles!: Table<MustaphaProfile, string>;

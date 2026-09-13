@@ -1,8 +1,12 @@
 import Dexie, { type Table } from 'dexie';
-import type { ProfileId, WorkoutSession } from '../domain/types';
 import type { WeeklyMeasurement } from '../domain/measurements';
+import type { ProfileId, WorkoutSession } from '../domain/types';
 
-export interface PreferenceRecord { profileId: ProfileId; key: string; value: unknown }
+export interface PreferenceRecord {
+  profileId: ProfileId;
+  key: string;
+  value: unknown;
+}
 
 export class CoachDatabase extends Dexie {
   sessions!: Table<WorkoutSession, string>;

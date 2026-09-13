@@ -25,7 +25,7 @@ export const AVAILABLE_PLATES = [20, 10, 5, 2.5, 1.25] as const;
 export function calculatePlates(
   totalWeightKg: number,
   barWeightKg = 0,
-  availablePlates: readonly number[] = AVAILABLE_PLATES
+  availablePlates: readonly number[] = AVAILABLE_PLATES,
 ): PlateBreakdown {
   if (totalWeightKg <= 0) {
     return {

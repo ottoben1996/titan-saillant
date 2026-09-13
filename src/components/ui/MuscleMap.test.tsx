@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
 import { MuscleMap, normalizeMuscle } from './MuscleMap';
 
 describe('normalizeMuscle', () => {
@@ -19,7 +19,7 @@ describe('normalizeMuscle', () => {
 describe('MuscleMap component', () => {
   it('affiche la silhouette Face et Dos avec les muscles primaires colorés', () => {
     const { container } = render(
-      <MuscleMap primaryMuscles={['Pectoraux', 'Triceps']} secondaryMuscles={['Épaules']} />
+      <MuscleMap primaryMuscles={['Pectoraux', 'Triceps']} secondaryMuscles={['Épaules']} />,
     );
     expect(container.querySelector('.muscle-map-wrapper')).not.toBeNull();
     const svgs = container.querySelectorAll('.muscle-svg');
@@ -31,10 +31,10 @@ describe('MuscleMap component', () => {
 
   it('expose un rôle, un titre et une alternative textuelle listant les muscles', () => {
     const { container } = render(
-      <MuscleMap primaryMuscles={['Pectoraux', 'Triceps']} secondaryMuscles={['Épaules']} />
+      <MuscleMap primaryMuscles={['Pectoraux', 'Triceps']} secondaryMuscles={['Épaules']} />,
     );
 
-    const group = screen.getByRole('group', { name: 'Muscles sollicités' });
+    const group = screen.getByRole('img', { name: 'Muscles sollicités' });
     const describedBy = group.getAttribute('aria-describedby');
     expect(describedBy).toBeTruthy();
 
@@ -58,7 +58,7 @@ describe('MuscleMap component', () => {
 
   it('ne produit pas de description vide quand aucun muscle n’est fourni', () => {
     render(<MuscleMap />);
-    const group = screen.getByRole('group', { name: 'Muscles sollicités' });
+    const group = screen.getByRole('img', { name: 'Muscles sollicités' });
     const describedBy = group.getAttribute('aria-describedby');
     const altText = document.getElementById(describedBy as string)?.textContent ?? '';
     expect(altText).toContain('Aucun muscle');

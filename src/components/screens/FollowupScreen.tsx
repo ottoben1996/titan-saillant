@@ -1,16 +1,16 @@
 import { useMemo, useState } from 'react';
 import {
   cycleLengthWeeks,
+  type MeasurementZone,
   measurementId,
   measurementZones,
   profileBody,
-  type MeasurementZone,
   type WeeklyMeasurement,
 } from '../../domain/measurements';
 import type { ProfileId } from '../../domain/types';
 import { debutDePause } from '../../storage/cyclePause';
 import { implausibleZones, nextTargetWeek, previousMeasurement, zoneDelta } from '../../workout/followup';
-import { Check, Plus, Minus, Repeat, ArrowLeft, ChartLine, Warning } from '../ui/Icons';
+import { ArrowLeft, ChartLine, Check, Minus, Plus, Repeat, Warning } from '../ui/Icons';
 
 interface FollowupScreenProps {
   profileId: ProfileId;
@@ -92,7 +92,7 @@ export function FollowupScreen({
     const next: Record<string, string> = {};
     for (const zone of measurementZones) {
       const value = reference?.[zone.key];
-      next[zone.key] = typeof value === 'number' ? String(value).replace('.', ',') : draft[zone.key] ?? '';
+      next[zone.key] = typeof value === 'number' ? String(value).replace('.', ',') : (draft[zone.key] ?? '');
     }
     setDraft(next);
     setEnregistre(false);
@@ -113,10 +113,7 @@ export function FollowupScreen({
     return measurement;
   }, [draft, profileId, target.cycle, target.week]);
 
-  const invraisemblables = useMemo(
-    () => implausibleZones(brouillon, reference),
-    [brouillon, reference],
-  );
+  const invraisemblables = useMemo(() => implausibleZones(brouillon, reference), [brouillon, reference]);
   const rien = measurementZones.every((zone) => toNumber(draft[zone.key] ?? '') === undefined);
 
   const valider = () => {
@@ -159,17 +156,11 @@ export function FollowupScreen({
       <h1>
         Semaine {target.week} <em>du cycle {target.cycle}</em>
       </h1>
-      <div className="cycle-track" aria-label={`Semaine ${target.week} sur ${cycleLengthWeeks}`}>
+      <div className="cycle-track" role="img" aria-label={`Semaine ${target.week} sur ${cycleLengthWeeks}`}>
         {Array.from({ length: cycleLengthWeeks }, (_, index) => {
           const week = index + 1;
           const done = week < target.week;
-          return (
-            <i
-              key={week}
-              className={done ? 'done' : week === target.week ? 'now' : ''}
-              aria-hidden="true"
-            />
-          );
+          return <i key={week} className={done ? 'done' : week === target.week ? 'now' : ''} aria-hidden="true" />;
         })}
       </div>
 
@@ -243,8 +234,8 @@ export function FollowupScreen({
         <div className="followup-warning" role="status">
           <Warning size={15} />
           <span>
-            Écart invraisemblable sur {invraisemblables.length > 1 ? 'ces zones' : 'cette zone'}. La valeur est
-            gardée mais écartée des tendances : vérifie la mesure avant de valider.
+            Écart invraisemblable sur {invraisemblables.length > 1 ? 'ces zones' : 'cette zone'}. La valeur est gardée
+            mais écartée des tendances : vérifie la mesure avant de valider.
           </span>
         </div>
       )}
