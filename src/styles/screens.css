@@ -90,7 +90,12 @@
   display: inline-flex;
   align-items: center;
   gap: var(--sp-2);
-  min-height: 24px;
+  /* 44 px, le plancher tactile du projet. À 24 px cette pastille mesurait 31 px
+     de haut une fois le rembourrage compté : « 1 / 26 » est le raccourci vers la
+     liste des exercices, et c'est la cible qu'on vise en plein milieu d'une
+     série, essoufflé, avec des doigts moites. */
+  min-height: 44px;
+  padding-inline: var(--sp-4);
   cursor: pointer;
 }
 
