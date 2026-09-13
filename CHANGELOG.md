@@ -64,6 +64,13 @@ Trois lots issus de la revue des dix experts, livrés et vérifiés en ligne.
   séances du cycle.
 
 ### Corrigé
+- **La sauvegarde ne contenait pas les points du samedi.** Le fichier exporté
+  transportait les séances et les préférences, pas les mesures ni les notes du
+  coach : une restauration effaçait donc tout le suivi dans la durée, et le
+  rappel de sauvegarde protégeait ce qui se refait en une séance plutôt que ce
+  qui ne se refait pas. L'export et la restauration couvrent désormais les
+  mesures, et un fichier abîmé est refusé en nommant le champ fautif au lieu
+  d'entrer à moitié dans la base. Les sauvegardes précédentes restent lisibles.
 - Chemins d'assets de l'espace MUSTAPHA : absolus, ils renvoyaient une erreur 404
   sur le site publié en sous-dossier.
 - Plage de dates iCalendar repliée selon la norme, sans quoi le texte aurait été

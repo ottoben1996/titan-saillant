@@ -74,7 +74,7 @@ describe('sauvegardes de profil — cas limites', () => {
     ]);
 
     const payload = JSON.parse(await exportProfileData('ottman'));
-    expect(payload.version).toBe(2);
+    expect(payload.version).toBe(3);
     expect(payload.profileId).toBe('ottman');
     expect(Number.isFinite(Date.parse(payload.exportedAt))).toBe(true);
     expect(payload.sessions.map((item: WorkoutSession) => item.id)).toEqual(['o-1']);
@@ -188,5 +188,66 @@ describe('sauvegardes de profil — cas limites', () => {
 
     expect(await db.sessions.count()).toBe(1);
     expect(await db.preferences.count()).toBe(1);
+  });
+});
+
+describe('les points du samedi survivent à une sauvegarde', () => {
+  it('exporte et restaure les mesures, notes du coach comprises', async () => {
+    await db.measurements.clear();
+    await db.measurements.put({
+      id: 'ottman-c1-s3',
+      profileId: 'ottman',
+      cycle: 1,
+      week: 3,
+      measuredOn: '2026-09-12T08:00:00.000Z',
+      weightKg: 103.8,
+      waistCm: 116,
+      coachNote: 'On garde les charges et on soigne le gainage.',
+      excluded: ['chestCm'],
+    });
+    await db.measurements.put({
+      id: 'laura-c1-s3',
+      profileId: 'laura',
+      cycle: 1,
+      week: 3,
+      weightKg: 82.4,
+    });
+
+    const sauvegarde = await exportProfileData('ottman');
+    // Le défaut d'origine : les mesures ne partaient pas du tout.
+    expect(sauvegarde).toContain('ottman-c1-s3');
+    expect(sauvegarde).toContain('gainage');
+
+    await db.measurements.clear();
+    await importProfileData(sauvegarde, 'ottman');
+
+    const restaurees = await db.measurements.toArray();
+    expect(restaurees).toHaveLength(1);
+    expect(restaurees[0].id).toBe('ottman-c1-s3');
+    expect(restaurees[0].coachNote).toBe('On garde les charges et on soigne le gainage.');
+    expect(restaurees[0].excluded).toEqual(['chestCm']);
+  });
+
+  it('lit encore une sauvegarde de la version précédente, sans mesures', async () => {
+    const ancienne = JSON.stringify({
+      version: 2,
+      profileId: 'ottman',
+      exportedAt: '2026-01-01T00:00:00.000Z',
+      sessions: [],
+      preferences: [],
+    });
+
+    await expect(importProfileData(ancienne, 'ottman')).resolves.toBeUndefined();
+  });
+
+  it('refuse une mesure incohérente en nommant le champ fautif', async () => {
+    const abimee = JSON.stringify({
+      version: 3,
+      profileId: 'ottman',
+      sessions: [],
+      measurements: [{ id: 'x', profileId: 'ottman', cycle: 1, week: 'trois' }],
+    });
+
+    await expect(importProfileData(abimee, 'ottman')).rejects.toThrow(/semaine|week|invalide/i);
   });
 });
