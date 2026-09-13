@@ -5,7 +5,7 @@ import { tutorials } from '../../domain/tutorials';
 import { exerciseMedia } from '../../domain/media';
 import { getProgram } from '../../domain/programs';
 import { getNextStep, getWorkoutExercises, getWorkoutSteps } from '../../workout/runner';
-import { computeProgressiveOverload } from '../../workout/progressionEngine';
+import { computeProgressiveOverload, demandeAllegement } from '../../workout/progressionEngine';
 import { generateWarmupRamp } from '../../workout/warmupRamp';
 import { calculatePlateDelta } from '../../workout/duoManager';
 import { formatLoadKg } from '../../workout/summary';
@@ -264,6 +264,11 @@ export function WorkoutScreen({
 
   // Calcul de la surcharge progressive & performance précédente (Ghost Data) - mémoïsé
   const progression = useMemo(() => (exercise ? computeProgressiveOverload(exercise, history) : null), [exercise?.id, history]);
+  /** L'athlète a demandé d'alléger à son dernier passage sur ce mouvement. */
+  const allegementDemande = useMemo(
+    () => (exercise ? demandeAllegement(exercise, history) : false),
+    [exercise?.id, history],
+  );
   const ghostPerf = useMemo(
     () => (exercise && step.setIndex !== undefined ? findGhostPerformance(history, exercise.id, step.setIndex) : null),
     [exercise?.id, step.setIndex, history]
@@ -468,12 +473,21 @@ export function WorkoutScreen({
               />
             )}
 
-            {/* Surcharge progressive conseillée */}
+            {/* Surcharge progressive conseillée : par l'aisance, ou parce qu'elle a été demandée */}
             {progression && prescription.phase !== 'warmup' && (
               <div className="progression-hint-banner">
-                <span className="prog-pill">Défi coach</span>
+                <span className="prog-pill">{progression.source === 'demande' ? 'Ta consigne' : 'Défi coach'}</span>
                 <span>
-                  Objectif suggéré : <strong>{progression.suggestedLoadKg} kg</strong> (+{progression.incrementKg} kg)
+                  {progression.source === 'demande' ? (
+                    <>
+                      Tu avais demandé à charger plus : <strong>{progression.suggestedLoadKg} kg</strong> (+
+                      {progression.incrementKg} kg)
+                    </>
+                  ) : (
+                    <>
+                      Objectif suggéré : <strong>{progression.suggestedLoadKg} kg</strong> (+{progression.incrementKg} kg)
+                    </>
+                  )}
                 </span>
                 <button
                   type="button"
@@ -483,6 +497,14 @@ export function WorkoutScreen({
                   Appliquer
                 </button>
               </div>
+            )}
+
+            {/* Demande d'allègement : la charge prescrite ne bouge pas, mais on le dit */}
+            {allegementDemande && prescription.phase !== 'warmup' && (
+              <p className="progression-allgement">
+                Tu as demandé d’alléger la dernière fois. La charge reste celle du coach : soigne la technique et
+                arrête la série dès que l’effort dépasse 8 sur 10.
+              </p>
             )}
 
             {/* Montée en gamme conseillée (Warm-up Ramp-up) */}

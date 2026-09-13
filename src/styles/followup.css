@@ -483,6 +483,78 @@
   font-weight: 700;
 }
 
+.bilan-coach {
+  margin: 0 0 16px;
+  padding: 11px 13px;
+  border-left: 3px solid #b98cc9;
+  border-radius: 0 10px 10px 0;
+  background: #f6eefa;
+}
+
+.bilan-coach b {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #6b4a78;
+}
+
+.bilan-coach p {
+  margin: 0;
+  font-size: 13.5px;
+  font-style: italic;
+}
+
+/* Reprendre la valeur précédente d'un appui : cible large, texte discret. */
+.followup-reuse {
+  padding: 4px 6px;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-3);
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.followup-coach {
+  display: grid;
+  gap: 6px;
+}
+
+.followup-coach > span {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.followup-coach small {
+  display: block;
+  color: var(--text-3);
+  font-size: 11.5px;
+  font-weight: 500;
+}
+
+.followup-coach textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-1);
+  color: var(--text-1);
+  font: inherit;
+  resize: vertical;
+}
+
+.progression-allgement {
+  margin: 0;
+  padding: 10px 12px;
+  border-left: 3px solid var(--rest);
+  border-radius: 0 10px 10px 0;
+  background: var(--surface-2);
+  color: var(--text-2);
+  font-size: 12.5px;
+}
+
 .bilan-chart-legende {
   display: flex;
   align-items: center;

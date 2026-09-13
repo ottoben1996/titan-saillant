@@ -20,6 +20,7 @@ import {
 } from '../../workout/followup';
 import { sessionVolume, workoutDayLabel } from '../../workout/summary';
 import { formFromEnergy, seancesDeLaSemaine, weeklyCheckinSummary } from '../../workout/followup';
+import { progressionForce } from '../../workout/progressionForce';
 import { ArrowLeft, DownloadSimple } from '../ui/Icons';
 
 interface BilanScreenProps {
@@ -31,6 +32,31 @@ interface BilanScreenProps {
 }
 
 /** Courbe simple, sans dépendance : les points, une ligne, jamais de décoration. */
+/**
+ * Courbe miniature d'une progression de charge.
+ *
+ * Un simple trait suffit : à cette taille, un axe et une échelle seraient
+ * illisibles. La pente dit tout, le chiffre à droite la quantifie.
+ */
+function Sparkline({ charges }: { charges: readonly number[] }) {
+  if (charges.length === 0) return null;
+  const largeur = 70;
+  const hauteur = 18;
+  const min = Math.min(...charges);
+  const max = Math.max(...charges);
+  const etendue = max - min || 1;
+  const x = (index: number) => (charges.length === 1 ? largeur / 2 : 2 + (index * (largeur - 4)) / (charges.length - 1));
+  const y = (valeur: number) => hauteur - 3 - ((valeur - min) / etendue) * (hauteur - 6);
+  const trace = charges.map((charge, index) => `${x(index)},${y(charge)}`).join(' ');
+  const stable = min === max;
+
+  return (
+    <svg viewBox={`0 0 ${largeur} ${hauteur}`} width={largeur} height={hauteur} role="img" aria-label={`${charges.length} passages, de ${min} à ${max} kilos`}>
+      <polyline points={trace} fill="none" stroke={stable ? '#97a49e' : '#5f9b3f'} strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 function Courbe({
   titre,
   unite,
@@ -183,6 +209,10 @@ export function BilanScreen({ profileId, measurements, current, sessions, onBack
   })();
 
   /** Séances terminées de la semaine, pour la page « Ressenti ». */
+  /** Charge la plus lourde par exercice, du premier au dernier passage du cycle. */
+  const force = progressionForce(sessions, getProgram(profileId));
+  const stagnations = force.filter((item) => item.stagnation);
+
   const seancesSemaine = seancesDeLaSemaine(sessions, {
     depuis: previous?.measuredOn,
     jusqua: current.measuredOn,
@@ -261,7 +291,15 @@ export function BilanScreen({ profileId, measurements, current, sessions, onBack
           </div>
         </header>
 
-        <div className="bilan-kpis">
+        {/* Ce que le coach a répondu au bilan précédent : la boucle se referme. */}
+      {previous?.coachNote && (
+        <div className="bilan-coach">
+          <b>Ce que le coach a répondu — semaine {previous.week}</b>
+          <p>« {previous.coachNote} »</p>
+        </div>
+      )}
+
+      <div className="bilan-kpis">
           <div>
             <span>Poids</span>
             <b>{poids !== undefined ? `${formatNombre(poids)} kg` : '—'}</b>
@@ -448,6 +486,42 @@ export function BilanScreen({ profileId, measurements, current, sessions, onBack
             <p className="bilan-note">
               Charges les plus lourdes réellement validées, relevées automatiquement dans les séances enregistrées.
               Volume soulevé sur l'ensemble du suivi : {Math.round(volumeSemaine).toLocaleString('fr-FR')} kg.
+            </p>
+          </>
+        )}
+
+        {force.length > 0 && (
+          <>
+            <h3>Force par exercice</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Exercice</th>
+                  <th className="num">Passages</th>
+                  <th className="num">Écart</th>
+                </tr>
+              </thead>
+              <tbody>
+                {force.map((item) => (
+                  <tr key={item.exerciseId}>
+                    <td>{item.nom}</td>
+                    <td className="num">
+                      <Sparkline charges={item.charges} />
+                    </td>
+                    <td className="num">
+                      {item.ecart === undefined
+                        ? `${formatNombre(item.dernier ?? 0)} kg`
+                        : `${item.ecart > 0 ? '+' : ''}${formatNombre(item.ecart)} kg`}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <p className="bilan-note">
+              Charge la plus lourde réellement validée à chaque passage, séries d'échauffement exclues.
+              {stagnations.length > 0
+                ? ` Sans progression depuis trois passages : ${stagnations.map((item) => item.nom.toLowerCase()).join(', ')}.`
+                : ''}
             </p>
           </>
         )}

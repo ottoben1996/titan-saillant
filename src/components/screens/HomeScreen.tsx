@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import type { ProfileId, WorkoutDay, WorkoutSession } from '../../domain/types';
+import type { SerieAssiduite } from '../../workout/assiduite';
 import { getProgram } from '../../domain/programs';
 import { getWorkoutSteps } from '../../workout/runner';
 import {
@@ -36,6 +37,8 @@ interface HomeScreenProps {
   onResume: () => void;
   /** Supprime la séance en cours (lancée par erreur). */
   onDiscard: () => void;
+  /** Série de semaines complètes, calculée par l'application. */
+  serie?: SerieAssiduite;
   /** Présent seulement quand les données méritent d'être mises à l'abri. */
   sauvegarde?: {
     sessions: number;
@@ -54,6 +57,7 @@ export function HomeScreen({
   onResume,
   onDiscard,
   sauvegarde,
+  serie,
 }: HomeScreenProps) {
   const view = useMemo(() => {
     const now = new Date();
@@ -174,6 +178,39 @@ export function HomeScreen({
             Rien d’obligatoire aujourd’hui. Tu peux refaire une séance si tu te sens frais.
           </p>
         </article>
+      )}
+
+      {/* Série de semaines complètes : un repère de régularité, jamais un score. */}
+      {serie && serie.seancesFaites > 0 && (
+        <aside className="streak-card">
+          <div className="streak-head">
+            <p className="eyebrow">RÉGULARITÉ</p>
+            <strong>
+              {serie.semainesConsecutives > 0
+                ? `${serie.semainesConsecutives} semaine${serie.semainesConsecutives > 1 ? 's' : ''} d’affilée`
+                : 'Aucune semaine complète'}
+            </strong>
+          </div>
+          <div className="streak-weeks">
+            {serie.semaines.map((semaine, index) => (
+              <i
+                key={semaine.decalage}
+                className={semaine.faite ? 'fait' : ''}
+                title={`${semaine.seances} séance${semaine.seances > 1 ? 's' : ''} sur ${semaine.prevues}`}
+                aria-label={
+                  index === serie.semaines.length - 1
+                    ? `Cette semaine : ${semaine.seances} séances sur ${semaine.prevues}`
+                    : `Il y a ${serie.semaines.length - 1 - index} semaines : ${semaine.seances} séances sur ${semaine.prevues}`
+                }
+              >
+                {semaine.faite ? <Check size={12} weight="bold" /> : null}
+              </i>
+            ))}
+          </div>
+          <small>
+            {serie.seancesFaites} séances sur les huit dernières semaines · trois séances valident une semaine.
+          </small>
+        </aside>
       )}
 
       {/* Rail de la semaine : état explicite de chaque créneau. */}

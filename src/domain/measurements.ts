@@ -61,6 +61,8 @@ export interface WeeklyMeasurement {
    * les courbes.
    */
   excluded?: MeasurementZone[];
+  /** Ce que le coach a répondu à ce bilan, recopié à la main par l'athlète. */
+  coachNote?: string;
 }
 
 export const cycleLengthWeeks = 8;

@@ -3,6 +3,7 @@ import type { ProfileId, SessionTimerState, WorkoutDay, WorkoutSession } from '.
 import { getProgram } from './domain/programs';
 import type { AccentId } from './domain/palettes';
 import { lireAccent, enregistrerAccent } from './storage/accentPreference';
+import { serieAssiduite } from './workout/assiduite';
 import { tutorials } from './domain/tutorials';
 import { equipmentAlternatives } from './domain/alternatives';
 import { createRunner, completeSet, getNextStep, getWorkoutExercises } from './workout/runner';
@@ -742,6 +743,7 @@ export default function App() {
           onStart={handleInitiateStart}
           onResume={resumeWorkout}
           onDiscard={() => setAbandonOpen(true)}
+          serie={serieAssiduite(history, program, new Date())}
           sauvegarde={
             rappelSauvegarde.proposer
               ? {

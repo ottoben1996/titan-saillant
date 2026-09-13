@@ -70,6 +70,8 @@ export function FollowupScreen({
     return initial;
   });
   const [enregistre, setEnregistre] = useState(false);
+  /** Réponse du coach, collée à la main après son retour. */
+  const [retourCoach, setRetourCoach] = useState(() => existing?.coachNote ?? '');
 
   const setValue = (zone: MeasurementZone, raw: string) => {
     setDraft((current) => ({ ...current, [zone]: raw.replace(/[^0-9,.]/g, '') }));
@@ -116,7 +118,11 @@ export function FollowupScreen({
 
   const valider = () => {
     if (rien) return;
-    const point = { ...brouillon, excluded: invraisemblables.length > 0 ? invraisemblables : undefined };
+    const point = {
+      ...brouillon,
+      coachNote: retourCoach.trim() || undefined,
+      excluded: invraisemblables.length > 0 ? invraisemblables : undefined,
+    };
     onSave(point);
     setSemaineEnregistree(point);
     setEnregistre(true);
@@ -172,11 +178,22 @@ export function FollowupScreen({
             <div className={`followup-field${alarming ? ' alarming' : ''}`} key={zone.key}>
               <span className="followup-label">
                 <b>{zone.label}</b>
-                <small>
-                  {reference && typeof reference[zone.key] === 'number'
-                    ? `S${reference.week} : ${afficher(reference[zone.key])} ${zone.unit}`
-                    : 'premier relevé'}
-                </small>
+                {reference && typeof reference[zone.key] === 'number' ? (
+                  <button
+                    type="button"
+                    className="followup-reuse"
+                    // Reprendre la valeur précédente d'un appui : trois mensurations
+                    // sur huit bougent réellement chaque semaine.
+                    onClick={() => setValue(zone.key, afficher(reference[zone.key] as number))}
+                    aria-label={`Reprendre la valeur de la semaine ${reference.week} pour ${zone.label} : ${afficher(
+                      reference[zone.key] as number,
+                    )} ${zone.unit}`}
+                  >
+                    S{reference.week} : {afficher(reference[zone.key])} {zone.unit}
+                  </button>
+                ) : (
+                  <small>premier relevé</small>
+                )}
               </span>
               <span className="followup-stepper">
                 <button
@@ -232,7 +249,20 @@ export function FollowupScreen({
         </span>
       </div>
 
-      <button type="button" className="primary-button full" onClick={valider} disabled={rien}>
+      <label className="followup-coach">
+        <span>
+          Ce que le coach a répondu (facultatif)
+          <small>Repris en tête du bilan de la semaine prochaine.</small>
+        </span>
+        <textarea
+          value={retourCoach}
+          onChange={(event) => setRetourCoach(event.target.value)}
+          rows={2}
+          placeholder="Colle ici sa réponse de la semaine…"
+        />
+      </label>
+
+      <button className="primary-button full" type="button" onClick={valider} disabled={rien}>
         <Check size={16} /> {existing ? 'Mettre à jour la semaine' : 'Valider le point de la semaine'}
       </button>
 
