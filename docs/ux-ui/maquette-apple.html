@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Proposition — l'application en matière iOS</title>
+<style>
+/* ============================================================================
+   PROPOSITION DE MAQUETTE — Coach Ottman & Laura, traitement « iOS ».
+
+   Fichier autonome, hors du paquet publié (docs/ n'est jamais construit).
+   Jetons copiés de src/styles/tokens.css : les couleurs sont les vraies, pas
+   des approximations. Les données sont celles d'Ottman et de Laura, pas des
+   exemples : sur des valeurs réelles, on voit tout de suite si la lecture est
+   juste.
+
+   Les effets sont RÉELS, pas dessinés : la matière se pose au défilement, les
+   écrans glissent au doigt, la feuille se tire. Une capture ne montre pas un
+   ressort ; cette page, si.
+   ========================================================================== */
+:root {
+  --surface-0: #0b0f0e;
+  --surface-1: #121715;
+  --surface-2: #18201d;
+  --line: rgba(255, 255, 255, 0.09);
+  --line-strong: rgba(255, 255, 255, 0.16);
+  --text-1: #f1f5f2;
+  --text-2: #a9b7ae;
+  --text-3: #78877e;
+  --accent: #b8f36b;
+  --accent-rgb: 184 243 107;
+  --accent-ink: #0e1710;
+  --rest: #f3bd6b;
+  --danger: #e79292;
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 14px;
+  --elevation: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 8px 24px rgba(0, 0, 0, 0.35);
+
+  /* Les trois ressorts, calculés (voir src/styles/matiere.css). */
+  --ressort: linear(0, 0.0196 2.5%, 0.0684 5%, 0.1344 7.5%, 0.2093 10%, 0.2873 12.5%, 0.3644 15%, 0.438 17.5%, 0.5068 20%, 0.5699 22.5%, 0.6268 25%, 0.6778 27.5%, 0.7229 30%, 0.7625 32.5%, 0.7971 35%, 0.8272 37.5%, 0.8532 40%, 0.8756 42.5%, 0.8948 45%, 0.9112 47.5%, 0.9251 50%, 0.937 52.5%, 0.9471 55%, 0.9556 57.5%, 0.9628 60%, 0.9689 62.5%, 0.974 65%, 0.9783 67.5%, 0.9819 70%, 0.9849 72.5%, 0.9874 75%, 0.9896 77.5%, 0.9913 80%, 0.9928 82.5%, 0.994 85%, 0.995 87.5%, 0.9959 90%, 0.9966 92.5%, 0.9972 95%, 0.9977 97.5%, 1 100%);
+  --ressort-vif: linear(0, 0.0162 2.5%, 0.0591 5%, 0.121 7.5%, 0.1954 10%, 0.2771 12.5%, 0.3618 15%, 0.4462 17.5%, 0.5277 20%, 0.6045 22.5%, 0.6753 25%, 0.7393 27.5%, 0.7962 30%, 0.8459 32.5%, 0.8886 35%, 0.9246 37.5%, 0.9543 40%, 0.9785 42.5%, 0.9975 45%, 1.0121 47.5%, 1.0228 50%, 1.0303 52.5%, 1.0351 55%, 1.0376 57.5%, 1.0384 60%, 1.0378 62.5%, 1.0362 65%, 1.0338 67.5%, 1.031 70%, 1.0278 72.5%, 1.0246 75%, 1.0213 77.5%, 1.0182 80%, 1.0152 82.5%, 1.0125 85%, 1.0101 87.5%, 1.0079 90%, 1.0059 92.5%, 1.0043 95%, 1.0029 97.5%, 1 100%);
+  --ressort-rebond: linear(0, 0.0108 2.5%, 0.0409 5%, 0.087 7.5%, 0.1459 10%, 0.2146 12.5%, 0.2902 15%, 0.3701 17.5%, 0.4522 20%, 0.5343 22.5%, 0.6147 25%, 0.692 27.5%, 0.7649 30%, 0.8326 32.5%, 0.8943 35%, 0.9497 37.5%, 0.9983 40%, 1.0402 42.5%, 1.0753 45%, 1.104 47.5%, 1.1264 50%, 1.1431 52.5%, 1.1544 55%, 1.1609 57.5%, 1.163 60%, 1.1615 62.5%, 1.1567 65%, 1.1493 67.5%, 1.1398 70%, 1.1287 72.5%, 1.1164 75%, 1.1034 77.5%, 1.0901 80%, 1.0767 82.5%, 1.0635 85%, 1.0509 87.5%, 1.039 90%, 1.0279 92.5%, 1.0178 95%, 1.0087 97.5%, 1 100%);
+
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+html { background: #060909; }
+
+body {
+  margin: 0;
+  padding: 32px 24px 80px;
+  background: #060909;
+  color: var(--text-1);
+  font-family: "Inter Variable", Inter, "SF Pro Text", "Segoe UI", system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.entete { max-width: 1180px; margin: 0 auto 28px; }
+.entete h1 { margin: 0 0 8px; font-size: 26px; letter-spacing: -0.02em; }
+.entete p { margin: 0; max-width: 66ch; color: var(--text-2); font-size: 14px; line-height: 1.6; }
+.entete strong { color: var(--text-1); font-weight: 600; }
+
+/* -------------------------------------------------------------- commandes -- */
+
+.commandes {
+  max-width: 1180px;
+  margin: 0 auto 28px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.onglet, .bascule, .profil-bouton {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: var(--surface-1);
+  color: var(--text-2);
+  font: inherit;
+  font-size: 13px;
+  padding: 9px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: transform 340ms var(--ressort-vif), background-color 180ms ease, color 180ms ease, border-color 180ms ease;
+}
+.onglet:active, .bascule:active, .profil-bouton:active { transform: scale(0.97); }
+.onglet.actif { background: var(--accent); border-color: transparent; color: var(--accent-ink); font-weight: 600; }
+.bascule.actif { background: rgb(var(--accent-rgb) / 0.16); border-color: rgb(var(--accent-rgb) / 0.4); color: var(--text-1); }
+.duo { display: flex; gap: 8px; margin-left: auto; }
+.profil-bouton.actif { background: var(--accent); border-color: transparent; color: var(--accent-ink); font-weight: 600; }
+
+/* ------------------------------------------------------------- la scene ---- */
+
+.scene {
+  max-width: 1180px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 400px) minmax(0, 1fr);
+  gap: 40px;
+  align-items: start;
+}
+@media (max-width: 900px) { .scene { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---------------------------------------------------------- le telephone --- */
+
+.telephone {
+  position: relative;
+  width: 390px;
+  height: 844px;
+  border-radius: 54px;
+  background: #000;
+  padding: 12px;
+  box-shadow: 0 0 0 1px var(--line-strong), var(--elevation);
+  margin: 0 auto;
+}
+.telephone::after {
+  /* L'encoche. Sa hauteur compte : c'est elle qui fait réserver l'espace. */
+  content: '';
+  position: absolute;
+  top: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 108px;
+  height: 30px;
+  background: #000;
+  border-radius: 999px;
+  z-index: 40;
+  pointer-events: none;
+}
+
+.cadre {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 44px;
+  overflow: hidden;
+  background: var(--surface-0);
+  isolation: isolate;
+}
+
+/* Les écrans sont des couches empilées : c'est ce qui permet de les faire
+   glisser latéralement, exactement comme une pile de navigation iOS. */
+.ecran {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-0);
+  transition: transform 520ms var(--ressort), opacity 200ms ease;
+  will-change: transform;
+}
+.ecran.derriere { opacity: 0; pointer-events: none; }
+.ecran.glisse { transition: none; }
+
+.defilement {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  padding: 0 16px calc(96px + env(safe-area-inset-bottom));
+  scrollbar-width: none;
+}
+.defilement::-webkit-scrollbar { display: none; }
+
+/* ------------------------------------------------------ la matiere (barre) -- */
+
+.barre-haut {
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 54px 16px 12px;
+  margin: 0 -16px 8px;
+}
+.barre-haut::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--surface-0) 72%, transparent);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+  box-shadow: inset 0 -1px 0 var(--line);
+  opacity: 0;
+  transition: opacity 220ms var(--ressort);
+  pointer-events: none;
+}
+.barre-haut > * { position: relative; z-index: 1; }
+.barre-haut.poses::before { opacity: 1; }
+
+.marque { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 800; letter-spacing: 0.16em; color: var(--accent); transition: opacity 220ms var(--ressort); }
+.marque .pastille-marque { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 10px; background: rgb(var(--accent-rgb) / 0.14); }
+.barre-titre {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-1);
+  opacity: 0;
+  transition: opacity 220ms var(--ressort);
+  white-space: nowrap;
+}
+.barre-haut.poses .barre-titre { opacity: 1; }
+.barre-haut.poses .marque { opacity: 0; }
+
+.sein { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-3); }
+.sein i { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+/* ------------------------------------------------------------ grand titre -- */
+
+.grand-titre { margin: 4px 0 20px; transition: opacity 220ms var(--ressort), transform 220ms var(--ressort); }
+.grand-titre .surtitre { margin: 0 0 6px; font-size: 11px; letter-spacing: 0.14em; color: var(--text-3); font-weight: 600; }
+.grand-titre h2 { margin: 0; font-size: 30px; letter-spacing: -0.03em; line-height: 1.1; }
+.barre-haut.poses ~ .defilement .grand-titre,
+.defilement:has(.barre-haut.poses) .grand-titre { opacity: 0; transform: translateY(-6px); }
+
+/* ---------------------------------------------------------------- cartes --- */
+
+.carte {
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.carte.tete { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.carte h3 { margin: 0 0 4px; font-size: 15px; letter-spacing: -0.01em; }
+.carte p { margin: 0; color: var(--text-2); font-size: 13px; line-height: 1.5; }
+.carte .etiquette { font-size: 11px; letter-spacing: 0.12em; color: var(--text-3); font-weight: 600; text-transform: uppercase; }
+
+.chiffres { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
+.chiffres > div { background: var(--surface-1); border: 1px solid var(--line); border-radius: var(--r-md); padding: 12px; }
+.chiffres b { display: block; font-size: 20px; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.chiffres span { font-size: 11px; color: var(--text-3); }
+
+.rail { display: flex; gap: 6px; margin-top: 10px; }
+.rail i { flex: 1; height: 34px; border-radius: 6px; background: var(--surface-2); border: 1px solid var(--line); transition: background-color 220ms ease; }
+.rail i.faite { background: rgb(var(--accent-rgb) / 0.22); border-color: rgb(var(--accent-rgb) / 0.35); }
+.rail i.encours { background: rgb(var(--accent-rgb) / 0.5); border-color: transparent; }
+
+/* ------------------------------------------------------- controle segmente - */
+
+.segmente { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; padding: 3px; border-radius: 10px; background: var(--surface-2); border: 1px solid var(--line); margin-bottom: 14px; }
+.segmente .curseur { position: absolute; top: 3px; bottom: 3px; left: 3px; width: calc((100% - 6px) / 3); border-radius: 7px; background: var(--text-2); opacity: 0.18; transition: transform 420ms var(--ressort); }
+.segmente button { position: relative; z-index: 1; appearance: none; background: none; border: 0; color: var(--text-2); font: inherit; font-size: 12px; font-weight: 600; padding: 7px 0; border-radius: 7px; cursor: pointer; transition: color 180ms ease, transform 340ms var(--ressort-vif); }
+.segmente button:active { transform: scale(0.96); }
+.segmente button.actif { color: var(--text-1); }
+
+/* ------------------------------------------------------------ graphique ---- */
+
+.courbe { width: 100%; height: 150px; display: block; }
+.courbe path { fill: none; stroke-linejoin: round; stroke-linecap: round; }
+.courbe .trait { stroke: var(--accent); stroke-width: 2.5; }
+.courbe .moyenne { stroke: var(--text-3); stroke-width: 1.5; stroke-dasharray: 4 4; }
+.courbe .aire { fill: rgb(var(--accent-rgb) / 0.08); stroke: none; }
+.courbe circle { fill: var(--surface-0); stroke: var(--accent); stroke-width: 2.5; }
+.legende-courbe { display: flex; gap: 14px; font-size: 11px; color: var(--text-3); margin-top: 8px; }
+.legende-courbe span { display: flex; align-items: center; gap: 6px; }
+.legende-courbe i { width: 14px; height: 2px; border-radius: 2px; background: var(--accent); }
+.legende-courbe .pointille { background: repeating-linear-gradient(90deg, var(--text-3) 0 4px, transparent 4px 8px); }
+
+/* -------------------------------------------------------------- la seance -- */
+
+.serie { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: var(--r-md); border: 1px solid var(--line); background: var(--surface-1); margin-bottom: 8px; transition: background-color 220ms ease, border-color 220ms ease; }
+.serie.faite { background: rgb(var(--accent-rgb) / 0.08); border-color: rgb(var(--accent-rgb) / 0.3); }
+.serie .poids { font-variant-numeric: tabular-nums; font-weight: 600; }
+.serie .repet { margin-left: auto; color: var(--text-2); font-size: 13px; font-variant-numeric: tabular-nums; }
+.serie .coche { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); }
+.serie .numero { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--surface-2); color: var(--text-2); font-size: 12px; font-weight: 600; }
+.serie.encours { border-color: var(--accent); background: rgb(var(--accent-rgb) / 0.04); }
+
+/* Scellé de validation : une coche qui se pose, puis s'efface. */
+.scelle { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
+.scelle div {
+  display: grid;
+  place-items: center;
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  background: rgb(var(--accent-rgb) / 0.16);
+  border: 2px solid var(--accent);
+  color: var(--accent);
+  opacity: 0;
+  transform: scale(0.6);
+}
+.scelle.joue div { animation: scelle 900ms var(--ressort-rebond) forwards; }
+@keyframes scelle { 0% { opacity: 0; transform: scale(0.6); } 25% { opacity: 1; transform: scale(1); } 70% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.5); } }
+
+/* -------------------------------------------------------- activite de repos - */
+
+/* La proposition la plus utile de cette page : le repos reste visible pendant
+   qu'on fait autre chose. Aujourd'hui, changer d'écran cache le chrono. */
+.activite {
+  margin: 0 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--rest) 14%, var(--surface-1));
+  border: 1px solid color-mix(in srgb, var(--rest) 40%, transparent);
+  color: var(--text-1);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.activite .anneau { position: relative; width: 22px; height: 22px; }
+.activite .anneau svg { transform: rotate(-90deg); }
+.activite .anneau circle { fill: none; stroke-width: 3; }
+.activite .anneau .fond { stroke: color-mix(in srgb, var(--rest) 30%, transparent); }
+.activite .anneau .reste { stroke: var(--rest); stroke-linecap: round; }
+.activite b { margin-left: auto; font-weight: 600; }
+
+/* ------------------------------------------------- barre d'action (seance) - */
+
+.action {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  z-index: 20;
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 22px;
+  background: color-mix(in srgb, var(--surface-1) 82%, transparent);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--line-strong);
+  box-shadow: var(--elevation);
+}
+.bouton {
+  flex: 1;
+  appearance: none;
+  border: 0;
+  border-radius: 14px;
+  padding: 15px 16px;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  background: var(--accent);
+  color: var(--accent-ink);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: transform 340ms var(--ressort-vif);
+  min-height: 50px;
+}
+.bouton:active { transform: scale(0.972); transition-duration: 90ms; transition-timing-function: ease-out; }
+.bouton.discret { flex: 0 0 auto; background: var(--surface-2); color: var(--text-2); border: 1px solid var(--line); padding: 15px 18px; }
+
+/* ----------------------------------------------------- liste groupee (iOS) - */
+
+.groupe { border-radius: var(--r-lg); overflow: hidden; border: 1px solid var(--line); margin-bottom: 18px; background: var(--surface-1); }
+.groupe .intitule { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3); font-weight: 600; padding: 0 4px 8px; }
+@media (prefers-reduced-motion: no-preference) { .groupe .intitule { margin-top: 0; } }
+.rangee { display: flex; align-items: center; gap: 12px; padding: 14px 16px; min-height: 52px; font-size: 14px; border-bottom: 1px solid var(--line); transition: background-color 160ms ease, transform 340ms var(--ressort-vif); }
+.rangee:last-child { border-bottom: 0; }
+.rangee:active { background: var(--surface-2); }
+.rangee .valeur { margin-left: auto; color: var(--text-3); font-size: 13px; }
+.rangee .chevron { color: var(--text-3); flex: 0 0 auto; }
+
+.interrupteur { position: relative; margin-left: auto; width: 50px; height: 30px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--line); cursor: pointer; transition: background-color 220ms ease, border-color 220ms ease; }
+.interrupteur i { position: absolute; top: 2px; left: 2px; width: 24px; height: 24px; border-radius: 50%; background: var(--text-3); transition: transform 420ms var(--ressort), background-color 220ms ease; }
+.interrupteur.allume { background: var(--accent); border-color: transparent; }
+.interrupteur.allume i { transform: translateX(20px); background: #fff; }
+
+/* ----------------------------------------------------- feuille a ancrages -- */
+
+.voile { position: absolute; inset: 0; z-index: 30; background: rgba(0, 0, 0, 0.5); opacity: 0; pointer-events: none; transition: opacity 220ms ease; }
+.voile.ouvert { opacity: 1; pointer-events: auto; }
+
+.feuille {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 31;
+  height: 92%;
+  border-radius: 26px 26px 0 0;
+  background: var(--surface-1);
+  border-top: 1px solid var(--line-strong);
+  box-shadow: 0 -20px 50px rgba(0, 0, 0, 0.5);
+  transform: translateY(100%);
+  transition: transform 520ms var(--ressort);
+  display: flex;
+  flex-direction: column;
+  will-change: transform;
+}
+.feuille.ouverte { transform: translateY(0); }
+.feuille.ouverte.demi { transform: translateY(46%); }
+.feuille.glisse { transition: none; }
+.feuille .poignee { margin: 8px auto 4px; width: 40px; height: 5px; border-radius: 999px; background: var(--line-strong); cursor: grab; touch-action: none; }
+.feuille .contenu { padding: 8px 16px 24px; overflow-y: auto; }
+
+/* --------------------------------------------------------- les reperes ----- */
+
+.repere {
+  position: absolute;
+  z-index: 25;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--accent);
+  color: var(--accent-ink);
+  box-shadow: 0 0 0 3px rgb(var(--accent-rgb) / 0.25);
+  opacity: 0;
+  transform: scale(0.6);
+  transition: opacity 200ms ease, transform 340ms var(--ressort-vif);
+  pointer-events: none;
+}
+.reperes-visibles .repere { opacity: 1; transform: scale(1); }
+.repere.propose { background: #7cc4ff; color: #06202f; box-shadow: 0 0 0 3px rgba(124, 196, 255, 0.25); }
+
+/* ------------------------------------------------------------- le panneau -- */
+
+.panneau h2 { font-size: 17px; margin: 0 0 6px; letter-spacing: -0.01em; }
+.panneau > p { color: var(--text-2); font-size: 13px; line-height: 1.6; margin: 0 0 20px; }
+
+.liste-propositions { list-style: none; margin: 0 0 26px; padding: 0; display: grid; gap: 10px; }
+.liste-propositions li { display: flex; gap: 12px; padding: 14px 16px; background: var(--surface-1); border: 1px solid var(--line); border-radius: var(--r-md); }
+.liste-propositions .puce { flex: 0 0 auto; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 11px; font-weight: 700; background: #7cc4ff; color: #06202f; }
+.liste-propositions .puce.fait { background: var(--accent); color: var(--accent-ink); }
+.liste-propositions h4 { margin: 0 0 3px; font-size: 14px; }
+.liste-propositions p { margin: 0; font-size: 12.5px; color: var(--text-2); line-height: 1.55; }
+.liste-propositions .etat { display: inline-block; margin-top: 6px; font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 600; color: #7cc4ff; }
+.liste-propositions .etat.fait { color: var(--accent); }
+
+.etapes { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+.etapes li { display: flex; gap: 12px; font-size: 13px; color: var(--text-2); line-height: 1.55; }
+.etapes b { color: var(--text-1); font-weight: 600; }
+.etapes .num { flex: 0 0 auto; width: 20px; height: 20px; border-radius: 50%; background: var(--surface-2); border: 1px solid var(--line); display: grid; place-items: center; font-size: 11px; color: var(--text-2); }
+
+.note { margin-top: 22px; padding: 14px 16px; border-radius: var(--r-md); background: rgb(var(--accent-rgb) / 0.06); border: 1px solid rgb(var(--accent-rgb) / 0.2); font-size: 12.5px; color: var(--text-2); line-height: 1.6; }
+.note b { color: var(--text-1); }
+
+/* ------------------------------------------------------------ mouvement ---- */
+
+@media (prefers-reduced-motion: reduce) {
+  .ecran, .feuille, .carte, .rangee, .bouton, .onglet, .bascule, .profil-bouton, .barre-haut::before, .barre-titre, .marque, .grand-titre, .segmente .curseur, .interrupteur i, .repere {
+    transition: none;
+  }
+  .bouton:active, .onglet:active, .serie .coche { transform: none; }
+  .scelle.joue div { animation: none; opacity: 1; }
+}
+</style>
+</head>
+<body>
+
+<header class="entete">
+  <h1>L'application en matière iOS — proposition</h1>
+  <p>
+    Cette page n'est pas une capture : <strong>les effets y sont réels</strong>. Fais défiler un écran,
+    touche les séries, ouvre la feuille, change d'onglet — les écrans glissent au doigt et le retour se
+    fait depuis le bord, comme dans une pile de navigation iOS. Les valeurs sont celles d'Ottman et de
+    Laura. <strong>Rien de l'application n'a été modifié</strong> : c'est une proposition à valider.
+  </p>
+</header>
+
+<div class="commandes">
+  <button class="onglet actif" type="button" data-vers="accueil">Accueil</button>
+  <button class="onglet" type="button" data-vers="seance">Séance</button>
+  <button class="onglet" type="button" data-vers="progression">Progression</button>
+  <button class="onglet" type="button" data-vers="reglages">Réglages</button>
+  <button class="bascule actif" type="button" id="bascule-reperes">Repères affichés</button>
+  <div class="duo">
+    <button class="profil-bouton actif" type="button" data-profil="ottman">Ottman</button>
+    <button class="profil-bouton" type="button" data-profil="laura">Laura</button>
+  </div>
+</div>
+
+<main class="scene">
+  <figure class="telephone" style="margin:0">
+    <div class="cadre reperes-visibles" id="cadre">
+
+      <!-- =================================================== accueil ===== -->
+      <section class="ecran" id="ecran-accueil">
+        <div class="defilement">
+          <div class="barre-haut">
+            <div class="marque"><span class="pastille-marque">⚡</span> COACH</div>
+            <span class="barre-titre">Accueil</span>
+            <div class="sein"><i></i> En ligne</div>
+          </div>
+
+          <div class="grand-titre">
+            <p class="surtitre">SEMAINE DU 7 SEPTEMBRE</p>
+            <h2>Bonjour Ottman</h2>
+          </div>
+
+          <div class="carte">
+            <p class="etiquette">Séance du jour</p>
+            <h3>Full Body A</h3>
+            <p>4 exercices · environ 55 min · dernière fois il y a 3 jours</p>
+          </div>
+
+          <div class="chiffres">
+            <div><b>104,1</b><span>kg</span></div>
+            <div><b>117,5</b><span>tour de taille</span></div>
+            <div><b>3</b><span>semaines de suite</span></div>
+          </div>
+
+          <div class="carte">
+            <p class="etiquette">Conseil du coach</p>
+            <p>La presse monte régulièrement. Garde la même charge cette semaine et soigne la descente.</p>
+          </div>
+
+          <div class="carte">
+            <p class="etiquette">Cette semaine</p>
+            <div class="serie faite"><span class="coche">✓</span><span class="poids">Full Body B</span><span class="repet">4 exercices</span></div>
+            <div class="serie"><span class="numero">A</span><span class="poids">Full Body A</span><span class="repet">aujourd'hui</span></div>
+          </div>
+
+          <div class="carte">
+            <p class="etiquette">Régularité · 8 semaines</p>
+            <div class="rail">
+              <i class="faite"></i><i class="faite"></i><i></i><i class="faite"></i>
+              <i class="faite"></i><i class="faite"></i><i class="faite"></i><i class="encours"></i>
+            </div>
+            <p style="margin-top:10px">3 semaines complètes de suite. La barre pleine est la semaine en cours.</p>
+          </div>
+
+          <div class="carte">
+            <p class="etiquette">Ton suivi</p>
+            <p>9 séances · jamais sauvegardé. Exporte pour ne rien perdre si ce téléphone disparaît.</p>
+          </div>
+
+          <!-- repere 1 : la matiere -->
+          <span class="repere fait" style="top:70px;right:22px">1</span>
+          <span class="repere fait" style="top:150px;right:22px">2</span>
+        </div>
+      </section>
+
+      <!-- ==================================================== seance ===== -->
+      <section class="ecran derriere" id="ecran-seance">
+        <div class="defilement">
+          <div class="barre-haut">
+            <div class="marque"><span class="pastille-marque">⚡</span> COACH</div>
+            <span class="barre-titre">Séance en cours</span>
+            <div class="sein"><i></i> En ligne</div>
+          </div>
+
+          <div class="grand-titre">
+            <p class="surtitre">FULL BODY A · EXERCICE 1 SUR 4</p>
+            <h2>Presse à cuisses</h2>
+          </div>
+
+          <div class="serie faite"><span class="coche">✓</span><span class="poids">110 kg</span><span class="repet">12 reps</span></div>
+          <div class="serie faite"><span class="coche">✓</span><span class="poids">110 kg</span><span class="repet">12 reps</span></div>
+          <div class="serie encours"><span class="numero">3</span><span class="poids">110 kg</span><span class="repet">12 reps prévues</span></div>
+          <div class="serie"><span class="numero">4</span><span class="poids">110 kg</span><span class="repet">12 reps prévues</span></div>
+
+          <div class="carte" style="margin-top:14px">
+            <p class="etiquette">Ensuite dans la séance</p>
+            <div class="serie"><span class="numero">2</span><span class="poids">Leg curl allongé</span><span class="repet">50 kg</span></div>
+            <div class="serie"><span class="numero">3</span><span class="poids">Chest press</span><span class="repet">45 kg</span></div>
+            <div class="serie"><span class="numero">4</span><span class="poids">Tirage horizontal</span><span class="repet">45 kg</span></div>
+          </div>
+
+          <!-- repere 3 : l'activite de repos -->
+          <!-- repere 4 : la barre d'action -->
+        </div>
+
+        <span class="repere propose" style="top:300px;left:22px">3</span>
+        <span class="repere propose" style="bottom:96px;left:22px">4</span>
+        <div class="action">
+          <button class="bouton discret" type="button">Passer</button>
+          <button class="bouton" type="button" id="valider">✓ Valider la série</button>
+        </div>
+        <div class="scelle" id="scelle"><div>✓</div></div>
+      </section>
+
+      <!-- =============================================== progression ===== -->
+      <section class="ecran derriere" id="ecran-progression">
+        <div class="defilement">
+          <div class="barre-haut">
+            <div class="marque"><span class="pastille-marque">⚡</span> COACH</div>
+            <span class="barre-titre">Progression</span>
+            <div class="sein"><i></i> En ligne</div>
+          </div>
+
+          <div class="grand-titre">
+            <p class="surtitre">CYCLE 1 · 8 SEMAINES</p>
+            <h2>Progression</h2>
+          </div>
+
+          <!-- repere 5 : le controle segmente -->
+          <div class="segmente" id="segmente">
+            <span class="curseur" id="curseur"></span>
+            <button type="button" class="actif" data-position="0">8 semaines</button>
+            <button type="button" data-position="1">3 mois</button>
+            <button type="button" data-position="2">Tout</button>
+          </div>
+
+          <div class="carte">
+            <p class="etiquette">Poids</p>
+            <svg class="courbe" viewBox="0 0 320 150" preserveAspectRatio="none" aria-hidden="true">
+              <path class="aire" d="M10,60 L90,58 L170,64 L250,72 L310,88 L310,150 L10,150 Z" />
+              <path class="trait" d="M10,60 L90,58 L170,64 L250,72 L310,88" />
+              <path class="moyenne" d="M10,56 L90,60 L170,66 L250,78 L310,94" />
+              <circle cx="10" cy="60" r="3.5" />
+              <circle cx="90" cy="58" r="3.5" />
+              <circle cx="170" cy="64" r="3.5" />
+              <circle cx="250" cy="72" r="3.5" />
+              <circle cx="310" cy="88" r="3.5" />
+            </svg>
+            <div class="legende-courbe">
+              <span><i></i> pesée</span>
+              <span><i class="pointille"></i> moyenne mobile</span>
+            </div>
+            <p style="margin-top:10px">104,8 → 104,1 kg sur 3 semaines. La moyenne mobile lisse le bruit d'hydratation.</p>
+          </div>
+
+          <div class="carte">
+            <p class="etiquette">Tour de taille</p>
+            <p><b>117,5 cm</b> — la valeur de 147 cm saisie la première semaine est écartée des tendances.</p>
+          </div>
+
+          <div class="carte">
+            <p class="etiquette">Force par exercice</p>
+            <div class="serie"><span class="poids">Presse à cuisses</span><span class="repet">110 → 110 kg</span></div>
+            <div class="serie"><span class="poids">Chest press</span><span class="repet">40 → 45 kg</span></div>
+            <div class="serie"><span class="poids">Tirage horizontal</span><span class="repet">45 → 45 kg</span></div>
+          </div>
+
+          <div class="carte">
+            <p class="etiquette">Point du samedi</p>
+            <p>Prochain rendez-vous samedi matin. Le bilan de la semaine 3 part au coach en PDF.</p>
+          </div>
+          <span class="repere propose" style="top:210px;right:22px">5</span>
+        </div>
+      </section>
+
+      <!-- ================================================== reglages ===== -->
+      <section class="ecran derriere" id="ecran-reglages">
+        <div class="defilement">
+          <div class="barre-haut">
+            <div class="marque"><span class="pastille-marque">⚡</span> COACH</div>
+            <span class="barre-titre">Réglages</span>
+            <div class="sein"><i></i> En ligne</div>
+          </div>
+
+          <div class="grand-titre">
+            <p class="surtitre">ESPACE D'OTTMAN</p>
+            <h2>Réglages</h2>
+          </div>
+
+          <!-- repere 6 : cellules groupees a la iOS -->
+          <div class="groupe">
+            <div class="intitule">Cycle</div>
+            <div class="rangee"><span>Semaine en cours</span><span class="valeur">Semaine 3</span><span class="chevron">›</span></div>
+            <div class="rangee"><span>Pause du cycle</span><span class="valeur">Reprendre</span><span class="chevron">›</span></div>
+          </div>
+
+          <div class="groupe">
+            <div class="intitule">Préférences</div>
+            <div class="rangee"><span>Signal sonore de fin de repos</span><span class="interrupteur allume"><i></i></span></div>
+            <div class="rangee"><span>Vibrer à la validation</span><span class="interrupteur allume"><i></i></span></div>
+          </div>
+
+          <div class="groupe">
+            <div class="intitule">Mes données</div>
+            <div class="rangee"><span>Exporter ma sauvegarde</span><span class="chevron">›</span></div>
+            <div class="rangee"><span>Importer une sauvegarde</span><span class="chevron">›</span></div>
+            <div class="rangee"><span>Journal des erreurs</span><span class="valeur">Aucune</span><span class="chevron">›</span></div>
+          </div>
+
+          <div class="groupe">
+            <div class="intitule">Installation</div>
+            <div class="rangee"><span>Ajouter à l'écran d'accueil</span><span class="chevron">›</span></div>
+          </div>
+
+          <div class="groupe">
+            <div class="intitule">Application</div>
+            <div class="rangee"><span>Version</span><span class="valeur">1.4.0</span></div>
+            <div class="rangee"><span>Rechercher une mise à jour</span><span class="chevron">›</span></div>
+          </div>
+          <span class="repere propose" style="top:196px;right:22px">6</span>
+        </div>
+      </section>
+
+      <!-- ================================ feuille a points d'ancrage ===== -->
+      <div class="voile" id="voile"></div>
+      <div class="feuille" id="feuille">
+        <div class="poignee" id="poignee"></div>
+        <div class="contenu">
+          <p class="etiquette" style="font-size:11px;letter-spacing:0.12em;color:var(--text-3);font-weight:600">SÉANCE DU JOUR</p>
+          <h2 style="margin:6px 0 4px;font-size:22px;letter-spacing:-0.02em">Full Body A</h2>
+          <p style="color:var(--text-2);font-size:13px;margin:0 0 18px">4 exercices · environ 55 min</p>
+          <div class="serie"><span class="numero">1</span><span class="poids">Presse à cuisses</span><span class="repet">110 kg</span></div>
+          <div class="serie"><span class="numero">2</span><span class="poids">Leg curl allongé</span><span class="repet">50 kg</span></div>
+          <div class="serie"><span class="numero">3</span><span class="poids">Chest press</span><span class="repet">45 kg</span></div>
+          <div class="serie"><span class="numero">4</span><span class="poids">Tirage horizontal</span><span class="repet">45 kg</span></div>
+          <div class="carte" style="margin-top:16px">
+            <p>Deux positions : à mi-hauteur, la feuille laisse voir l'écran derrière ; déployée, elle occupe tout.
+            Elle se tire au doigt et se referme d'un geste.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </figure>
+
+  <!-- ============================================== le panneau de decision -->
+  <aside class="panneau">
+    <h2>Ce que cette page propose</h2>
+    <p>
+      Six points, dont un déjà en place depuis hier soir. Les repères numérotés se désactivent avec le bouton
+      en haut — utiles pour discuter, gênants pour juger de l'aspect.
+    </p>
+
+    <ul class="liste-propositions">
+      <li>
+        <span class="puce fait">1</span>
+        <div>
+          <h4>La matière sur la barre du haut</h4>
+          <p>Elle se pose quand le contenu passe dessous : flou de 20 px, saturation à 180 %, filet d'un pixel.
+          Le titre de l'écran prend alors la place de la marque.</p>
+          <span class="etat fait">En place</span>
+        </div>
+      </li>
+      <li>
+        <span class="puce fait">2</span>
+        <div>
+          <h4>Le grand titre qui s'efface</h4>
+          <p>Il remonte de six pixels et s'efface pendant que le titre de la barre apparaît. Aucune taille de
+          police animée : la remise en page par image se voit sur un téléphone.</p>
+          <span class="etat fait">En place</span>
+        </div>
+      </li>
+      <li>
+        <span class="puce">3</span>
+        <div>
+          <h4>Le repos qui reste visible</h4>
+          <p>Une activité en tête d'écran pendant que le chrono tourne, y compris si on va consulter la
+          progression. Aujourd'hui, changer d'écran perd le compte à rebours de vue.</p>
+          <span class="etat">Proposé — 1 h</span>
+        </div>
+      </li>
+      <li>
+        <span class="puce">4</span>
+        <div>
+          <h4>La barre d'action en bas de la séance</h4>
+          <p>« Valider la série » descend sous le pouce, dans une barre qui reste posée. Sur 4 séries de 4
+          exercices, c'est une vingtaine d'appuis par séance, une main occupée.</p>
+          <span class="etat">Proposé — 1 h 30</span>
+        </div>
+      </li>
+      <li>
+        <span class="puce">5</span>
+        <div>
+          <h4>Le contrôle segmenté dans la progression</h4>
+          <p>8 semaines, 3 mois, tout — un indicateur qui glisse au ressort sous le doigt. Il n'existe
+          aujourd'hui aucun sélecteur de période : les courbes montrent toujours le cycle entier.</p>
+          <span class="etat">Proposé — 2 h</span>
+        </div>
+      </li>
+      <li>
+        <span class="puce">6</span>
+        <div>
+          <h4>Les listes groupées à la iOS dans les réglages</h4>
+          <p>Des blocs de cellules séparées par un filet, valeur à droite, chevron d'un côté. Aujourd'hui,
+          chaque réglage est une carte indépendante avec sa propre bordure.</p>
+          <span class="etat">Proposé — 2 h</span>
+        </div>
+      </li>
+    </ul>
+
+    <h2>Et la transition, qui n'a pas de repère</h2>
+    <p style="margin-bottom:18px">
+      Clique les onglets en haut : les écrans glissent latéralement au ressort, l'écran quitté reste
+      visible derrière. Depuis l'écran Séance, fais glisser ton doigt depuis le bord gauche vers la
+      droite : le retour s'accompagne en direct, et se relâche si tu changes d'avis.
+    </p>
+
+    <h2>Par étapes, chacune utilisable seule</h2>
+    <ol class="etapes">
+      <li><span class="num">1</span><span><b>La transition latérale et le retour au bord.</b> C'est le geste qui manque le plus : aujourd'hui les écrans se remplacent par un fondu, sans continuité.</span></li>
+      <li><span class="num">2</span><span><b>La barre d'action et le repos visible.</b> Les deux touches qui changent vraiment une séance en salle.</span></li>
+      <li><span class="num">3</span><span><b>Le contrôle segmenté et les listes groupées.</b> Du raffinement d'écran, à faire quand le reste est éprouvé.</span></li>
+    </ol>
+
+    <div class="note">
+      <b>Aucun fichier de l'application n'a été touché.</b> La transition, la barre d'action, le segment et les
+      listes groupées sont des propositions : le repère bleu dit ce qui reste à construire, le vert ce qui est
+      déjà en ligne. Tout ce qui est dessiné ici se fait sans dépendance nouvelle — le paquet reste à 144 Ko
+      sur les 165 autorisés.
+    </div>
+  </aside>
+</main>
+
+<script>
+(() => {
+  const cadre = document.getElementById('cadre');
+  const ecrans = ['accueil', 'seance', 'progression', 'reglages'];
+  const onglets = [...document.querySelectorAll('.onglet')];
+  let courant = 0;
+
+  /* ------------------------------------------------- la pile de navigation -- */
+
+  // Position de chaque couche : l'écran courant à 0, ceux quittés à gauche, les
+  // autres à droite. C'est la disposition d'une pile iOS.
+  function placer(anime = true) {
+    ecrans.forEach((nom, i) => {
+      const element = document.getElementById('ecran-' + nom);
+      const decalage = i < courant ? '-30%' : i > courant ? '100%' : '0';
+      element.classList.toggle('glisse', !anime);
+      element.style.transform = 'translateX(' + decalage + ')';
+      element.classList.toggle('derriere', i !== courant);
+      if (!anime) requestAnimationFrame(() => element.classList.remove('glisse'));
+    });
+    onglets.forEach((o, i) => o.classList.toggle('actif', i === courant));
+  }
+
+  onglets.forEach((onglet, i) => {
+    onglet.addEventListener('click', () => {
+      if (i === courant) return;
+      courant = i;
+      placer(true);
+    });
+  });
+
+  /* ------------------------------------- le retour par glissement du bord -- */
+
+  // Le geste se déclenche dans les 28 premiers pixels de l'écran. Au-delà de
+  // 35 % de la largeur, il va au bout ; en deçà, il revient.
+  let depart = null;
+  cadre.addEventListener('pointerdown', (evenement) => {
+    const zone = cadre.getBoundingClientRect();
+    const depuisBord = evenement.clientX - zone.left;
+    if (depuisBord > 28 || courant === 0) return;
+    depart = { x: evenement.clientX, largeur: zone.width };
+    cadre.setPointerCapture(evenement.pointerId);
+  });
+
+  cadre.addEventListener('pointermove', (evenement) => {
+    if (!depart) return;
+    const parcouru = Math.max(0, evenement.clientX - depart.x);
+    const ratio = parcouru / depart.largeur;
+    const precedent = document.getElementById('ecran-' + ecrans[courant - 1]);
+    const actuel = document.getElementById('ecran-' + ecrans[courant]);
+    precedent.classList.add('glisse');
+    actuel.classList.add('glisse');
+    precedent.style.transform = 'translateX(' + (-30 + 30 * Math.min(1, ratio / 0.7)) + '%)';
+    actuel.style.transform = 'translateX(' + ratio * 100 + '%)';
+  });
+
+  function relacher(evenement) {
+    if (!depart) return;
+    const ratio = Math.max(0, evenement.clientX - depart.x) / depart.largeur;
+    depart = null;
+    if (ratio > 0.35) courant -= 1;
+    placer(true);
+  }
+  cadre.addEventListener('pointerup', relacher);
+  cadre.addEventListener('pointercancel', relacher);
+
+  /* ----------------------------------------------------- le controle segmente */
+
+  const segmente = document.getElementById('segmente');
+  const curseur = document.getElementById('curseur');
+  if (segmente) {
+    segmente.querySelectorAll('button').forEach((bouton) => {
+      bouton.addEventListener('click', () => {
+        const position = Number(bouton.dataset.position);
+        curseur.style.transform = 'translateX(' + position * 100 + '%)';
+        segmente.querySelectorAll('button').forEach((autre) => autre.classList.toggle('actif', autre === bouton));
+      });
+    });
+  }
+
+  /* --------------------------------------------- la matiere, ecran par ecran */
+
+  // Chaque écran a son propre conteneur de défilement, donc son propre état.
+  document.querySelectorAll('.defilement').forEach((zone) => {
+    const barre = zone.querySelector('.barre-haut');
+    const lire = () => barre.classList.toggle('poses', zone.scrollTop > 12);
+    lire();
+    zone.addEventListener('scroll', lire, { passive: true });
+  });
+
+  /* --------------------------------------------------- la feuille a ancrages */
+
+  const feuille = document.getElementById('feuille');
+  const voile = document.getElementById('voile');
+  const poignee = document.getElementById('poignee');
+  let glisse = null;
+
+  document.querySelectorAll('.carte').forEach((carte) => {
+    if (!/Séance du jour/.test(carte.textContent)) return;
+    carte.style.cursor = 'pointer';
+    carte.addEventListener('click', () => {
+      feuille.classList.add('ouverte');
+      voile.classList.add('ouvert');
+    });
+  });
+  voile.addEventListener('click', () => {
+    feuille.classList.remove('ouverte', 'demi');
+    voile.classList.remove('ouvert');
+  });
+
+  poignee.addEventListener('pointerdown', (evenement) => {
+    glisse = { y: evenement.clientY, base: feuille.classList.contains('demi') ? 0.46 * feuille.offsetHeight : 0 };
+    feuille.classList.add('glisse');
+    poignee.setPointerCapture(evenement.pointerId);
+  });
+  poignee.addEventListener('pointermove', (evenement) => {
+    if (!glisse) return;
+    const parcouru = Math.max(0, evenement.clientY - glisse.y + glisse.base);
+    feuille.style.transform = 'translateY(' + parcouru + 'px)';
+  });
+  poignee.addEventListener('pointerup', (evenement) => {
+    if (!glisse) return;
+    const parcouru = evenement.clientY - glisse.y;
+    const hauteur = feuille.offsetHeight;
+    feuille.classList.remove('glisse');
+    feuille.style.transform = '';
+    if (parcouru > hauteur * 0.3) {
+      feuille.classList.remove('ouverte', 'demi');
+      voile.classList.remove('ouvert');
+    } else if (parcouru < -hauteur * 0.08) {
+      feuille.classList.add('demi');
+    } else {
+      feuille.classList.remove('demi');
+    }
+    glisse = null;
+  });
+
+  /* ---------------------------------------------------- le scelle de validation */
+
+  const bouton = document.getElementById('valider');
+  const scelle = document.getElementById('scelle');
+  bouton?.addEventListener('click', () => {
+    scelle.classList.remove('joue');
+    requestAnimationFrame(() => scelle.classList.add('joue'));
+    const prochaine = document.querySelector('#ecran-seance .serie:not(.faite)');
+    if (prochaine) prochaine.classList.add('faite');
+  });
+
+  /* ---------------------------------------------------------------- commandes */
+
+  document.getElementById('bascule-reperes').addEventListener('click', (evenement) => {
+    const visible = cadre.classList.toggle('reperes-visibles');
+    evenement.currentTarget.classList.toggle('actif', visible);
+    evenement.currentTarget.textContent = visible ? 'Repères affichés' : 'Repères masqués';
+  });
+
+  // L'accent suit le profil : la lilas de Laura, le vert d'Ottman.
+  const accents = {
+    ottman: { accent: '#b8f36b', rgb: '184 243 107', ink: '#0e1710' },
+    laura: { accent: '#e3c0f7', rgb: '227 192 247', ink: '#1a1024' }
+  };
+  document.querySelectorAll('.profil-bouton').forEach((bouton) => {
+    bouton.addEventListener('click', () => {
+      const profil = accents[bouton.dataset.profil];
+      cadre.style.setProperty('--accent', profil.accent);
+      cadre.style.setProperty('--accent-rgb', profil.rgb);
+      cadre.style.setProperty('--accent-ink', profil.ink);
+      document.querySelectorAll('.profil-bouton').forEach((autre) => autre.classList.toggle('actif', autre === bouton));
+    });
+  });
+
+  placer(false);
+})();
+</script>
+</body>
+</html>
