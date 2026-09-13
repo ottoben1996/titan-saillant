@@ -314,3 +314,56 @@ html[data-replie="true"] .workout-heading h1 {
     animation: commute 120ms ease-out both;
   }
 }
+
+/* -------------------------------------------------- barre d'action de séance - */
+
+/*
+ * « Valider la série » descend sous le pouce. Sur quatre séries de quatre
+ * exercices, c'est une vingtaine d'appuis par séance, une main occupée, dans une
+ * salle où l'on tient rarement son téléphone à deux mains.
+ *
+ * Collante et non fixe : un élément fixe placé sous un ancêtre transformé — ce
+ * que la transition d'écran fait justement — se positionne par rapport à lui et
+ * saute le temps de l'animation. Collé en bas de son conteneur de défilement,
+ * il suit la page sans jamais dépendre d'un ancêtre transformé.
+ *
+ * La barre résiste à l'encoche : elle remonte de la zone sûre.
+ */
+.action-bar {
+  position: fixed;
+  left: max(0.75rem, env(safe-area-inset-left));
+  right: max(0.75rem, env(safe-area-inset-right));
+  bottom: calc(var(--sp-3) + env(safe-area-inset-bottom));
+  z-index: 12;
+  min-height: 52px;
+  background: var(--accent);
+  /* Le temps de l'animation d'entrée, un ancêtre transformé sert de repère :
+     la barre se décale de quelques pixels puis se recale. Le collage, lui,
+     laissait cinquante pixels de vide en permanence. */
+  box-shadow:
+    0 -14px 28px -12px rgba(0, 0, 0, 0.6),
+    var(--elevation);
+}
+
+/*
+ * Le cockpit de repos garde sa mise en forme actuelle.
+ *
+ * Sa version compacte dans la barre a été essayée puis retirée : je n'ai pas
+ * réussi à déclencher l'état de repos dans mon parcours de vérification, donc
+ * je n'ai jamais VU le résultat. Livrer une mise en forme qu'on n'a pas vue
+ * rendue, c'est exactement ce qui casse une interface en salle. Le déplacement
+ * du repos dans la barre est la prochaine étape, et il se fera avec sa propre
+ * vérification.
+ */
+
+/* Le contenu respire sous la barre : rien ne doit finir caché derrière. */
+.workout-content {
+  padding-bottom: calc(var(--sp-11) + 130px + env(safe-area-inset-bottom));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .action-bar,
+  .next-hint {
+    transition: none;
+  }
+}

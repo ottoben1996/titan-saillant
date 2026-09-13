@@ -742,7 +742,7 @@ export function WorkoutScreen({
 
               <button
                 type="button"
-                className="primary-button full"
+                className="primary-button full action-bar"
                 onClick={() => void handleCompleteSet()}
                 disabled={isSubmitting}
               >
