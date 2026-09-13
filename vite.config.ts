@@ -40,6 +40,9 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
+    // L'environnement de navigateur simulé coûtait 70 % du temps de la suite :
+    // un par fichier. Ce banc le partage par groupe de tests.
+    pool: 'vmThreads',
     setupFiles: './src/test/setup.ts',
     coverage: {
       provider: 'v8',

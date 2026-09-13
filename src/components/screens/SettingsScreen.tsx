@@ -4,6 +4,7 @@ import type { ProfileId } from '../../domain/types';
 import { importProfileData } from '../../storage/backup';
 import { telechargerCalendrierSuivi, telechargerSauvegarde } from '../../storage/backupFile';
 import { debutDePause, mettreEnPause, reprendreCycle } from '../../storage/cyclePause';
+import { journalEnTexte, lireErreurs, viderErreurs } from '../../storage/journalErreurs';
 import { deleteProfileData, listSessions } from '../../storage/sessionRepository';
 import { isSoundEnabled, playTimerChime, setSoundEnabled } from '../../workout/alerts';
 import { ArrowLeft, ArrowRight, DownloadSimple, Timer, Trash, Warning } from '../ui/Icons';
@@ -76,6 +77,19 @@ export function SettingsScreen({
 }: SettingsScreenProps) {
   const fileInput = useRef<HTMLInputElement>(null);
   const [soundOn, setSoundOn] = useState(() => isSoundEnabled());
+  /** Journal local des erreurs : combien, et depuis quand. */
+  const [erreurs, setErreurs] = useState(() => lireErreurs());
+  /** Consignes d'installation : la seule voie possible sur iPhone. */
+  const aInstaller = (() => {
+    if (typeof window === 'undefined') return false;
+    const estIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    // `matchMedia` n'existe pas dans tous les environnements : on ne suppose rien.
+    const enPleinEcran =
+      typeof window.matchMedia === 'function' && window.matchMedia('(display-mode: standalone)').matches;
+    const dejaInstalle = enPleinEcran || (navigator as Navigator & { standalone?: boolean }).standalone === true;
+    return estIOS && !dejaInstalle;
+  })();
+
   /** Cycle en pause : la date de mise en pause, ou rien. */
   const [pause, setPause] = useState<Date | undefined>(() => debutDePause(profile));
   const [counts, setCounts] = useState<SessionCounts | null>(null);
@@ -356,6 +370,24 @@ export function SettingsScreen({
         )}
       </section>
 
+      {/* ------------------------------------------------ installation iOS --- */}
+      {aInstaller && (
+        <section className="settings-section">
+          <h2 className="settings-title">Installer l’application</h2>
+          <div className="settings-list">
+            <div className="settings-row">
+              <span>
+                <strong>Sur iPhone, l’invite automatique n’existe pas</strong>
+                <small>
+                  Ouvre cette page dans Safari, appuie sur Partager, puis sur « Sur l’écran d’accueil ». L’application
+                  s’ouvrira ensuite en plein écran, et le point du samedi fonctionnera hors connexion.
+                </small>
+              </span>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* ------------------------------------------------------- application -- */}
       <section className="settings-section">
         <h2 className="settings-title">Application</h2>
@@ -409,6 +441,50 @@ export function SettingsScreen({
           <button type="button" className="secondary-button full update-check-btn" onClick={onCheckUpdate}>
             Rechercher une mise à jour
           </button>
+
+          {/* Sans serveur, une erreur attrapée était montrée puis oubliée :
+              aucune trace, donc aucun diagnostic possible après coup. */}
+          <div className="settings-row error-log-row">
+            <span>
+              <strong>
+                {erreurs.length === 0
+                  ? 'Aucune erreur enregistrée'
+                  : `${erreurs.length} erreur${erreurs.length > 1 ? 's' : ''} enregistrée${erreurs.length > 1 ? 's' : ''}`}
+              </strong>
+              <small>
+                {erreurs.length === 0
+                  ? 'Le journal reste vide tant que tout se passe bien.'
+                  : 'Conservé sur cet appareil, sans jamais quitter le téléphone.'}
+              </small>
+            </span>
+            {erreurs.length > 0 && (
+              <span className="error-log-actions">
+                <button
+                  type="button"
+                  className="text-button"
+                  onClick={() => {
+                    void navigator.clipboard
+                      ?.writeText(journalEnTexte(erreurs))
+                      .then(() => onNotice('Journal copié.'))
+                      .catch(() => onNotice('Copie impossible sur ce navigateur.'));
+                  }}
+                >
+                  Copier
+                </button>
+                <button
+                  type="button"
+                  className="text-button"
+                  onClick={() => {
+                    viderErreurs();
+                    setErreurs([]);
+                    onNotice('Journal vidé.');
+                  }}
+                >
+                  Vider
+                </button>
+              </span>
+            )}
+          </div>
 
           {notificationPermission === 'default' && (
             <button className="secondary-button full" onClick={onEnableNotifications} type="button">

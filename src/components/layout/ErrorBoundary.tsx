@@ -1,4 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
+import { enregistrerErreur } from '../../storage/journalErreurs';
 
 /**
  * Filet de sécurité d'affichage.
@@ -29,8 +30,10 @@ export class AppErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: unknown, info: ErrorInfo): void {
-    // Trace locale uniquement : aucune donnée ne quitte l'appareil.
-    console.error('[Coach] erreur de rendu', error, info.componentStack);
+    // Trace locale uniquement : aucune donnée ne quitte l'appareil. Le journal
+    // la conserve pour qu'on puisse diagnostiquer après coup, sans serveur.
+    const message = error instanceof Error ? error.message : String(error);
+    enregistrerErreur(message, info.componentStack ?? 'rendu');
   }
 
   private reload = () => {

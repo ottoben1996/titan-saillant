@@ -151,6 +151,18 @@ export default function App() {
 
   const onStorageFailure = () => setStorageMessage(STORAGE_UNAVAILABLE_MESSAGE);
 
+  /** Ce qu'un lecteur d'écran annonce quand on change d'écran. */
+  const libellesEcran: Record<Screen, string> = {
+    home: 'Accueil',
+    workout: 'Séance en cours',
+    history: 'Historique des séances',
+    progression: 'Progression',
+    followup: 'Point du samedi',
+    bilan: 'Bilan de la semaine',
+    settings: 'Réglages',
+  };
+  const libelleEcran = `${profile === 'laura' ? 'Espace de Laura' : profile === 'ottman' ? 'Espace d\u2019Ottman' : 'Choix du profil'}, ${libellesEcran[screen] ?? ''}`;
+
   const persist = (sessionToSave: WorkoutSession) =>
     void withStorageGuard(saveSession(sessionToSave), onStorageFailure, undefined);
 
@@ -711,6 +723,12 @@ export default function App() {
 
   return (
     <main className={`app-shell ${screen === 'workout' ? 'workout-shell' : ''}`}>
+      {/* Un lecteur d'écran ne voit pas un changement de page : il faut le dire.
+          `polite` attend la fin de la phrase en cours, `role="status"` évite
+          d'interrompre une saisie. */}
+      <p className="sr-only" role="status" aria-live="polite">
+        {libelleEcran}
+      </p>
       <TopBar
         onBack={handleTopbarBack}
         backLabel={topbarLabel}

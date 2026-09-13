@@ -9,6 +9,7 @@ import {
   workoutDayLabel,
 } from '../../workout/summary';
 import { ArrowLeft, Check, Clock, Repeat, Trash } from '../ui/Icons';
+import { useListeAnimee } from '../ui/useListeAnimee';
 
 interface HistoryScreenProps {
   history: WorkoutSession[];
@@ -27,6 +28,9 @@ function sessionDateLabel(item: WorkoutSession): string {
 
 export function HistoryScreen({ history, onBack, onDelete }: HistoryScreenProps) {
   const groups = useMemo(() => groupSessionsByWeek(history), [history]);
+  // Une ligne supprimée qui disparaît d'un coup laisse un doute : on laisse la
+  // liste se replacer sous le doigt.
+  const listeAnimee = useListeAnimee();
 
   return (
     <section className="content">
@@ -59,7 +63,7 @@ export function HistoryScreen({ history, onBack, onDelete }: HistoryScreenProps)
                   {group.sessions.length} séance{group.sessions.length > 1 ? 's' : ''}
                 </span>
               </div>
-              <div className="history-list">
+              <div className="history-list" ref={listeAnimee}>
                 {group.sessions.map((item) => {
                   const summary = summarizeSession(item);
                   const done = Boolean(item.completedAt);

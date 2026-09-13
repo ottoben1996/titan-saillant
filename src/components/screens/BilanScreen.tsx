@@ -23,6 +23,7 @@ import {
 import { progressionForce } from '../../workout/progressionForce';
 import { sessionVolume, workoutDayLabel } from '../../workout/summary';
 import { ArrowLeft, DownloadSimple } from '../ui/Icons';
+import { NombreAnime } from '../ui/NombreAnime';
 
 interface BilanScreenProps {
   profileId: ProfileId;
@@ -333,7 +334,7 @@ export function BilanScreen({ profileId, measurements, current, sessions, onBack
         <div className="bilan-kpis">
           <div>
             <span>Poids</span>
-            <b>{poids !== undefined ? `${formatNombre(poids)} kg` : '—'}</b>
+            <b>{poids !== undefined ? <NombreAnime valeur={poids} suffixe="kg" /> : '—'}</b>
             <small>départ {formatNombre(body.initialWeightKg, 2)} kg</small>
           </div>
           <div>
