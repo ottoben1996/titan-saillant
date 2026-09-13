@@ -691,3 +691,46 @@ body {
   --accent-2: var(--accent-laura-2);
   --accent-3: var(--accent-laura-3);
 }
+
+/* Couleur choisie dans les réglages, une par profil.
+   Ce bloc vient APRÈS celui du profil : à spécificité égale, il gagne. Les cinq
+   paires couleur / encre sont mesurées à plus de 10:1 de contraste (seuil AAA : 7:1). */
+:root[data-accent='vert'] {
+  --accent: #b8f36b;
+  --accent-rgb: 184 243 107;
+  --accent-ink: #0e1710;
+  --accent-2: #97c758;
+  --accent-3: #2b3923;
+}
+
+:root[data-accent='rose'] {
+  --accent: #e3c0f7;
+  --accent-rgb: 227 192 247;
+  --accent-ink: #1a1024;
+  --accent-2: #ba9dcb;
+  --accent-3: #323139;
+}
+
+:root[data-accent='bleu'] {
+  --accent: #8fc7ff;
+  --accent-rgb: 143 199 255;
+  --accent-ink: #0a1622;
+  --accent-2: #75a3d1;
+  --accent-3: #24323a;
+}
+
+:root[data-accent='ambre'] {
+  --accent: #f6c177;
+  --accent-rgb: 246 193 119;
+  --accent-ink: #1f1305;
+  --accent-2: #ca9e62;
+  --accent-3: #353125;
+}
+
+:root[data-accent='turquoise'] {
+  --accent: #7fe3d2;
+  --accent-rgb: 127 227 210;
+  --accent-ink: #04211d;
+  --accent-2: #68baac;
+  --accent-3: #223733;
+}

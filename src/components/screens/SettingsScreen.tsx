@@ -4,6 +4,7 @@ import { exportProfileData, importProfileData } from '../../storage/backup';
 import { deleteProfileData, listSessions } from '../../storage/sessionRepository';
 import { ArrowLeft, ArrowRight, DownloadSimple, Timer, Trash, Warning } from '../ui/Icons';
 import { isSoundEnabled, playTimerChime, setSoundEnabled } from '../../workout/alerts';
+import { accents, type AccentId } from '../../domain/palettes';
 import { profileLabels } from './HomeScreen';
 
 const ERASE_WORD = 'SUPPRIMER';
@@ -15,6 +16,9 @@ interface SessionCounts {
 
 interface SettingsScreenProps {
   profile: ProfileId;
+  /** Couleur choisie par ce profil, appliquée immédiatement. */
+  accent: AccentId;
+  onAccentChange: (accent: AccentId) => void;
   onBack: () => void;
   onSwitch: () => void;
   onNotice: (notice: string) => void;
@@ -52,6 +56,8 @@ function describeSessions(counts: SessionCounts | null): string {
 }
 
 export function SettingsScreen({
+  accent,
+  onAccentChange,
   profile,
   onBack,
   onSwitch,
@@ -158,6 +164,30 @@ export function SettingsScreen({
           Changer
         </button>
       </div>
+
+      {/* --------------------------------------------------- ma couleur ------ */}
+      <section className="settings-section">
+        <h2 className="settings-title">Ma couleur</h2>
+        {/* Clin d'œil : la couleur de Laura n'a pas été choisie par quelqu'un d'autre. */}
+        {profile === 'laura' && (
+          <p className="accent-teaser">Parce qu'Ottman te connaît pas, choisis par toi-même.</p>
+        )}
+        <div className="accent-choices" role="radiogroup" aria-label="Couleur de l'application">
+          {accents.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              role="radio"
+              aria-checked={accent === item.id}
+              className={`accent-choice${accent === item.id ? ' on' : ''}`}
+              onClick={() => onAccentChange(item.id)}
+            >
+              <span className="accent-dot" style={{ background: item.accent }} aria-hidden="true" />
+              {item.label}
+            </button>
+          ))}
+        </div>
+      </section>
 
       {/* ------------------------------------------------------ préférences -- */}
       <section className="settings-section">

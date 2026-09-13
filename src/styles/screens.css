@@ -979,3 +979,56 @@
 .quiz-notes textarea {
   resize: vertical;
 }
+
+/* --- Choix de la couleur ---------------------------------------------------
+   Cinq pastilles, la couleur réelle à l'écran : on choisit ce qu'on voit, pas
+   une étiquette. Cible de 44 px, marque de sélection à l'anneau + au texte. */
+.accent-teaser {
+  margin: 0 0 10px;
+  color: var(--text-2);
+  font-size: 13px;
+  font-style: italic;
+}
+
+.accent-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.accent-choice {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 8px 14px 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-1);
+  color: var(--text-2);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.accent-choice.on {
+  border-color: var(--accent);
+  color: var(--text-1);
+  box-shadow: 0 0 0 1px var(--accent), 0 0 14px rgb(var(--accent-rgb) / 0.25);
+}
+
+.accent-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid rgb(255 255 255 / 0.18);
+}
+
+.accent-choice.on .accent-dot::after {
+  content: '';
+  display: block;
+  width: 8px;
+  height: 8px;
+  margin: 6px auto 0;
+  border-radius: 50%;
+  background: var(--surface-0);
+}

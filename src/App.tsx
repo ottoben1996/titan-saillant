@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import type { ProfileId, SessionTimerState, WorkoutDay, WorkoutSession } from './domain/types';
 import { getProgram } from './domain/programs';
+import type { AccentId } from './domain/palettes';
+import { lireAccent, enregistrerAccent } from './storage/accentPreference';
 import { tutorials } from './domain/tutorials';
 import { equipmentAlternatives } from './domain/alternatives';
 import { createRunner, completeSet, getNextStep, getWorkoutExercises } from './workout/runner';
@@ -56,19 +58,35 @@ export default function App() {
    * La couleur de la barre système suit aussi, sinon le navigateur garderait
    * le vert lime au-dessus d'une interface lilas.
    */
+  /** Couleur d'affichage du profil actif, choisie dans les réglages. */
+  const [accent, setAccent] = useState<AccentId>(() => (profile ? lireAccent(profile) : 'vert'));
+
   useEffect(() => {
     const root = document.documentElement;
     if (profile) {
       root.dataset.profile = profile;
+      // La couleur choisie dans les réglages prend le pas sur celle du profil.
+      root.dataset.accent = accent;
     } else {
       delete root.dataset.profile;
+      delete root.dataset.accent;
     }
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta) {
-      const accent = getComputedStyle(root).getPropertyValue('--accent').trim();
-      if (accent) meta.setAttribute('content', accent);
+      const accentApplique = getComputedStyle(root).getPropertyValue('--accent').trim();
+      if (accentApplique) meta.setAttribute('content', accentApplique);
     }
+  }, [profile, accent]);
+
+  /** À chaque changement de profil, on reprend la couleur que ce profil a choisie. */
+  useEffect(() => {
+    if (profile) setAccent(lireAccent(profile));
   }, [profile]);
+
+  const changerAccent = (choisi: AccentId) => {
+    setAccent(choisi);
+    if (profile) enregistrerAccent(profile, choisi);
+  };
 
   const [screen, setScreen] = useState<Screen>('home');
   /** Points hebdomadaires du profil actif, du plus ancien au plus récent. */
@@ -759,6 +777,8 @@ export default function App() {
       {screen === 'settings' && (
         <SettingsScreen
           profile={profile}
+          accent={accent}
+          onAccentChange={changerAccent}
           onBack={() => setScreen('home')}
           onSwitch={leaveProfile}
           onNotice={setNotice}
