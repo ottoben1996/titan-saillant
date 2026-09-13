@@ -447,33 +447,23 @@
  * qu'on ouvre en pleine série, essoufflé, une main sur la barre : il mérite la
  * même cible que le reste.
  */
-.warmup-ramp-toggle {
+\.warmup-ramp-toggle {
+  /* Le bouton existe déjà dans styles.css, avec sa teinte d'accent : on ne
+     touche qu'à ce qui manquait, la hauteur. Ma première version redéfinissait
+     aussi les couleurs et effaçait l'accent — c'est la feuille servie qui l'a
+     montré, pas mes yeux. */
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--sp-3);
-  width: 100%;
   min-height: 44px;
-  padding: var(--sp-2) var(--sp-4);
-  border: 1px solid var(--line);
-  border-radius: var(--r-md);
-  background: var(--surface-2);
-  color: var(--text-2);
+  padding-block: var(--sp-2);
   font: inherit;
-  font-size: var(--fs-3);
-  cursor: pointer;
-  transition:
-    transform 340ms var(--ressort-vif),
-    background-color 180ms ease;
+  transition: transform 340ms var(--ressort-vif);
 }
 
 .warmup-ramp-toggle:active {
   transform: scale(0.985);
-}
-
-.warmup-ramp-toggle small {
-  color: var(--text-3);
-  font-size: var(--fs-1);
 }
 
 @media (prefers-reduced-motion: reduce) {
