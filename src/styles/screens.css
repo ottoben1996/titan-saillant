@@ -220,9 +220,10 @@
   color: var(--text-1);
   font-size: var(--fs-3);
   font-weight: 560;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  /* Un nom de séance passe à la ligne plutôt que d'être tronqué : la colonne
+     fait cent dix pixels et « Full Body A » n'y tient pas toujours avec son
+     badge de durée. */
+  overflow-wrap: anywhere;
 }
 
 .week-slot-state {
@@ -367,11 +368,11 @@
   font-size: var(--fs-4);
   font-weight: 560;
   /* Le libellé de séance doit rester lisible en entier : il passe à la ligne
-     plutôt que d'être tronqué par le bouton de suppression. */
+     plutôt que d'être tronqué par le bouton de suppression.
+     Les trois lignes de troncature qui suivaient ont été retirées : le
+     commentaire annonçait depuis un moment un comportement que le code
+     démentait, et « Full Body A » sortait bel et bien en « Full Bod… ». */
   overflow-wrap: anywhere;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .history-row-main small {
@@ -609,9 +610,9 @@
 .record-main strong {
   font-size: var(--fs-3);
   font-weight: 560;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  /* « Développé couché machine convergente » ne tiendra jamais sur une ligne
+     dans une colonne de téléphone : il passe à la ligne, en entier. */
+  overflow-wrap: anywhere;
 }
 
 .record-main small {
