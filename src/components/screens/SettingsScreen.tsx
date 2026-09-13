@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { ProfileId } from '../../domain/types';
-import { exportProfileData, importProfileData } from '../../storage/backup';
+import { importProfileData } from '../../storage/backup';
+import { telechargerCalendrierSuivi, telechargerSauvegarde } from '../../storage/backupFile';
 import { deleteProfileData, listSessions } from '../../storage/sessionRepository';
 import { ArrowLeft, ArrowRight, DownloadSimple, Timer, Trash, Warning } from '../ui/Icons';
 import { isSoundEnabled, playTimerChime, setSoundEnabled } from '../../workout/alerts';
@@ -95,14 +96,13 @@ export function SettingsScreen({
   }, [profile]);
 
   const download = async () => {
-    const blob = new Blob([await exportProfileData(profile)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement('a');
-    anchor.href = url;
-    anchor.download = `coach-${profile}.json`;
-    anchor.click();
-    URL.revokeObjectURL(url);
+    await telechargerSauvegarde(profile);
     onNotice('Sauvegarde exportée.');
+  };
+
+  const ajouterAuCalendrier = () => {
+    telechargerCalendrierSuivi(profile);
+    onNotice('Fichier prêt : ouvre-le pour inscrire les huit rendez-vous.');
   };
 
   const importFile = async (file: File) => {
@@ -164,6 +164,26 @@ export function SettingsScreen({
           Changer
         </button>
       </div>
+
+      {/* ----------------------------------------------------- rappels ------- */}
+      <section className="settings-section">
+        <h2 className="settings-title">Rappels</h2>
+        <div className="settings-list">
+          <div className="settings-row">
+            <div>
+              <strong>Point du samedi</strong>
+              <small>Huit rendez-vous de 30 minutes, avec un rappel 30 minutes avant, dans le calendrier du téléphone.</small>
+            </div>
+          </div>
+        </div>
+        <button type="button" className="secondary-button full" onClick={ajouterAuCalendrier}>
+          <Timer size={16} /> Ajouter à mon calendrier
+        </button>
+        <p className="settings-footnote">
+          Aucune notification serveur : le rappel vient du calendrier du téléphone, qui ne rate jamais une alerte, même
+          application fermée.
+        </p>
+      </section>
 
       {/* --------------------------------------------------- ma couleur ------ */}
       <section className="settings-section">

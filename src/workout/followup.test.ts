@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { measurementId, starterMeasurements, type WeeklyMeasurement } from '../domain/measurements';
 import {
   bodyMassIndex,
+  seancesDeLaSemaine,
   formFromEnergy,
   weeklyCheckinSummary,
   buildWeeklyReading,
@@ -124,6 +125,26 @@ describe('suivi hebdomadaire', () => {
     expect(presse?.last).toBe(115);
     expect(presse?.previous).toBe(110);
     expect(presse?.delta).toBe(5);
+  });
+
+  it('ne retient que les séances de la semaine du point', () => {
+    const seances = [
+      { id: 'avant', completedAt: '2026-09-01T10:00:00.000Z' },
+      { id: 'debut-de-semaine', completedAt: '2026-09-07T10:00:00.000Z' },
+      { id: 'veille', completedAt: '2026-09-11T18:00:00.000Z' },
+      { id: 'matin-du-point', completedAt: '2026-09-12T07:00:00.000Z' },
+      { id: 'apres-le-point', completedAt: '2026-09-12T16:00:00.000Z' },
+      { id: 'sans-date' },
+    ];
+    const semaine = seancesDeLaSemaine(seances, { depuis: '2026-09-05T09:00:00.000Z', jusqua: '2026-09-12T09:00:00.000Z' });
+
+    expect(semaine.map((s) => s.id)).toEqual(['debut-de-semaine', 'veille', 'matin-du-point']);
+  });
+
+  it('n’invente rien quand la semaine n’a pas de date', () => {
+    const seances = [{ id: 'a', completedAt: '2026-09-07T10:00:00.000Z' }];
+    expect(seancesDeLaSemaine(seances, {})).toEqual([]);
+    expect(seancesDeLaSemaine(seances, { jusqua: '2026-09-12T09:00:00.000Z' })).toHaveLength(1);
   });
 
   it('traduit la forme ressentie en langage parlé', () => {

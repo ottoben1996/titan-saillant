@@ -483,6 +483,29 @@
   font-weight: 700;
 }
 
+.bilan-chart-legende {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bilan-chart-legende span {
+  display: inline-block;
+  width: 18px;
+  height: 0;
+  border-top-width: 2px;
+  border-top-style: solid;
+}
+
+.bilan-chart-legende .trait-plein {
+  border-top-color: #5f9b3f;
+}
+
+.bilan-chart-legende .trait-moyenne {
+  border-top-color: #3f7dbf;
+  border-top-style: dashed;
+}
+
 .bilan-chart {
   margin: 4px 0 10px;
 }

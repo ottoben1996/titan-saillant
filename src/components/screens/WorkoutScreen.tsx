@@ -9,6 +9,7 @@ import { computeProgressiveOverload } from '../../workout/progressionEngine';
 import { generateWarmupRamp } from '../../workout/warmupRamp';
 import { calculatePlateDelta } from '../../workout/duoManager';
 import { formatLoadKg } from '../../workout/summary';
+import { etiquettePalier, paliersDeCharge } from '../../workout/loadSteps';
 import { parseSafeFloat, parseSafeInt } from '../../workout/sanitizer';
 import { RestTimer, formatDuration } from '../timers/RestTimer';
 import { ExerciseTimer } from '../timers/ExerciseTimer';
@@ -143,6 +144,9 @@ export function WorkoutScreen({
   const exercise =
     step.kind === 'exercise' && step.exerciseIndex !== undefined ? exercises[step.exerciseIndex] : null;
   const prescription = exercise && step.setIndex !== undefined ? exercise.sets[step.setIndex] : null;
+
+  /** Paliers du mouvement en cours : larges sur les jambes, fins sur le haut du corps. */
+  const paliers = paliersDeCharge(exercise?.id ?? '');
 
   const isAlternativeActive = Boolean(exercise && session.alternativesUsed?.includes(exercise.id));
   const activeAlternative = isAlternativeActive && exercise ? equipmentAlternatives[exercise.id] : null;
@@ -672,11 +676,21 @@ export function WorkoutScreen({
                   <div className="stepper-group">
                     <span className="stepper-label">Charge (kg)</span>
                     <div className="stepper-controls">
-                      <button type="button" className="step-btn" onClick={() => handleAdjustLoad(-5)}>
-                        -5
+                      <button
+                        type="button"
+                        className="step-btn"
+                        aria-label={`Diminuer la charge de ${etiquettePalier(paliers.grand)} kg`}
+                        onClick={() => handleAdjustLoad(-paliers.grand)}
+                      >
+                        −{etiquettePalier(paliers.grand)}
                       </button>
-                      <button type="button" className="step-btn" onClick={() => handleAdjustLoad(-2.5)}>
-                        -2.5
+                      <button
+                        type="button"
+                        className="step-btn"
+                        aria-label={`Diminuer la charge de ${etiquettePalier(paliers.fin)} kg`}
+                        onClick={() => handleAdjustLoad(-paliers.fin)}
+                      >
+                        −{etiquettePalier(paliers.fin)}
                       </button>
                       <input
                         aria-label="Charge (kg)"
@@ -685,11 +699,21 @@ export function WorkoutScreen({
                         value={load}
                         onChange={(e) => setLoad(e.target.value)}
                       />
-                      <button type="button" className="step-btn" onClick={() => handleAdjustLoad(+2.5)}>
-                        +2.5
+                      <button
+                        type="button"
+                        className="step-btn"
+                        aria-label={`Augmenter la charge de ${etiquettePalier(paliers.fin)} kg`}
+                        onClick={() => handleAdjustLoad(+paliers.fin)}
+                      >
+                        +{etiquettePalier(paliers.fin)}
                       </button>
-                      <button type="button" className="step-btn" onClick={() => handleAdjustLoad(+5)}>
-                        +5
+                      <button
+                        type="button"
+                        className="step-btn"
+                        aria-label={`Augmenter la charge de ${etiquettePalier(paliers.grand)} kg`}
+                        onClick={() => handleAdjustLoad(+paliers.grand)}
+                      >
+                        +{etiquettePalier(paliers.grand)}
                       </button>
                     </div>
                   </div>

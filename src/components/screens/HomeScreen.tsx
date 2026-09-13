@@ -10,7 +10,7 @@ import {
   weeklyComparison,
   type WeekSlotState,
 } from '../../workout/summary';
-import { ArrowRight, Bolt, Check, Clock, Play, Trash } from '../ui/Icons';
+import { ArrowRight, Bolt, Check, Clock, DownloadSimple, Play, Trash } from '../ui/Icons';
 
 export const profileLabels: Record<ProfileId, string> = { ottman: 'Ottman', laura: 'Laura' };
 
@@ -36,6 +36,13 @@ interface HomeScreenProps {
   onResume: () => void;
   /** Supprime la séance en cours (lancée par erreur). */
   onDiscard: () => void;
+  /** Présent seulement quand les données méritent d'être mises à l'abri. */
+  sauvegarde?: {
+    sessions: number;
+    joursDepuisExport?: number;
+    onExport: () => void;
+    onLater: () => void;
+  };
 }
 
 export function HomeScreen({
@@ -46,6 +53,7 @@ export function HomeScreen({
   onStart,
   onResume,
   onDiscard,
+  sauvegarde,
 }: HomeScreenProps) {
   const view = useMemo(() => {
     const now = new Date();
@@ -106,6 +114,30 @@ export function HomeScreen({
             <Trash size={17} />
           </button>
         </div>
+      )}
+
+      {/* Le suivi ne vit que dans ce téléphone : on propose de le mettre à l'abri. */}
+      {sauvegarde && (
+        <aside className="backup-card">
+          <div>
+            <p className="eyebrow">SAUVEGARDE</p>
+            <strong>Ton suivi n'existe que sur ce téléphone</strong>
+            <small>
+              {sauvegarde.sessions} séances enregistrées
+              {sauvegarde.joursDepuisExport !== undefined
+                ? ` · dernière sauvegarde il y a ${sauvegarde.joursDepuisExport} jours`
+                : ' · jamais sauvegardé'}
+            </small>
+          </div>
+          <div className="backup-actions">
+            <button type="button" className="primary-button" onClick={sauvegarde.onExport}>
+              <DownloadSimple size={16} /> Exporter
+            </button>
+            <button type="button" className="text-button" onClick={sauvegarde.onLater}>
+              Plus tard
+            </button>
+          </div>
+        </aside>
       )}
 
       {/* Action dominante : la séance du jour, ou l'état « semaine complète ». */}

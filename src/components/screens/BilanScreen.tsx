@@ -9,6 +9,7 @@ import {
   firstOfCycle,
   formatNombre,
   isExcluded,
+  movingAverage,
   lastExerciseLoads,
   navyBodyFat,
   previousMeasurement,
@@ -18,7 +19,7 @@ import {
   zoneDelta,
 } from '../../workout/followup';
 import { sessionVolume, workoutDayLabel } from '../../workout/summary';
-import { formFromEnergy, weeklyCheckinSummary } from '../../workout/followup';
+import { formFromEnergy, seancesDeLaSemaine, weeklyCheckinSummary } from '../../workout/followup';
 import { ArrowLeft, DownloadSimple } from '../ui/Icons';
 
 interface BilanScreenProps {
@@ -35,11 +36,17 @@ function Courbe({
   unite,
   points,
   cible,
+  moyenne,
+  note,
 }: {
   titre: string;
   unite: string;
   points: readonly { label: string; value: number }[];
   cible?: number;
+  /** Moyenne mobile, alignée sur les points. Lisse le bruit d'une semaine. */
+  moyenne?: readonly (number | undefined)[];
+  /** Phrase de lecture affichée sous la courbe. */
+  note?: string;
 }) {
   if (points.length === 0) return null;
   const largeur = 560;
@@ -53,6 +60,10 @@ function Courbe({
   const x = (index: number) => (points.length === 1 ? largeur / 2 : 20 + (index * (largeur - 40)) / (points.length - 1));
   const y = (value: number) => hauteur - 30 - ((value - bas) / (haut - bas)) * (hauteur - 50);
   const trace = points.map((point, index) => `${x(index)},${y(point.value)}`).join(' ');
+  const traceMoyenne = (moyenne ?? [])
+    .map((valeur, index) => (valeur === undefined ? null : `${x(index)},${y(valeur)}`))
+    .filter((segment): segment is string => segment !== null)
+    .join(' ');
 
   return (
     <div className="bilan-chart">
@@ -64,6 +75,9 @@ function Courbe({
         <line x1="0" y1={y(max)} x2={largeur} y2={y(max)} stroke="#eef2ef" />
         {cible !== undefined && (
           <line x1="0" y1={y(cible)} x2={largeur} y2={y(cible)} stroke="#d9c9a8" strokeDasharray="4 4" />
+        )}
+        {traceMoyenne.length > 0 && (
+          <polyline points={traceMoyenne} fill="none" stroke="#3f7dbf" strokeWidth="2" strokeDasharray="6 4" strokeLinecap="round" />
         )}
         <polyline points={trace} fill="none" stroke="#5f9b3f" strokeWidth="2.5" strokeLinecap="round" />
         {points.map((point, index) => (
@@ -82,6 +96,13 @@ function Courbe({
           </text>
         ))}
       </svg>
+      {traceMoyenne.length > 0 && (
+        <p className="bilan-note bilan-chart-legende">
+          <span className="trait-plein" /> Relevé du samedi
+          <span className="trait-moyenne" /> Moyenne sur {Math.min(4, points.length)} semaines
+        </p>
+      )}
+      {note && <p className="bilan-note">{note}</p>}
     </div>
   );
 }
@@ -140,8 +161,32 @@ export function BilanScreen({ profileId, measurements, current, sessions, onBack
 
   const volumeSemaine = sessions.reduce((total, session) => (session.completedAt ? total + sessionVolume(session) : total), 0);
 
+  /** Poids relevés, du plus ancien au plus récent, sans les valeurs écartées. */
+  const poidsPoints = jusqua
+    .filter((item) => typeof item.weightKg === 'number' && !item.excluded?.includes('weightKg'))
+    .map((item) => ({ label: `S${item.week}`, value: item.weightKg as number }));
+  /**
+   * Moyenne mobile sur quatre semaines : elle lisse le bruit d'hydratation, qui
+   * fait varier le poids d'un jour à l'autre sans rien dire de la tendance.
+   */
+  const moyennePoids = movingAverage(poidsPoints.map((point) => point.value), 4);
+  const lectureMoyenne = (() => {
+    const dernier = poidsPoints.at(-1)?.value;
+    const moyenneActuelle = moyennePoids.at(-1);
+    if (dernier === undefined || moyenneActuelle === undefined || poidsPoints.length < 2) return undefined;
+    const ecart = Math.abs(dernier - moyenneActuelle);
+    // 0,3 % du poids : en dessous, la variation est du bruit d'hydratation.
+    const seuil = Math.max(0.2, Math.abs(dernier) * 0.003);
+    return ecart <= seuil
+      ? 'La moyenne confirme la tendance : l\u2019écart d\u2019une semaine à l\u2019autre reste dans le bruit d\u2019hydratation.'
+      : undefined;
+  })();
+
   /** Séances terminées de la semaine, pour la page « Ressenti ». */
-  const seancesSemaine = sessions.filter((session) => session.completedAt);
+  const seancesSemaine = seancesDeLaSemaine(sessions, {
+    depuis: previous?.measuredOn,
+    jusqua: current.measuredOn,
+  });
   const ressenti = weeklyCheckinSummary(seancesSemaine);
 
   const lecture = buildWeeklyReading({
@@ -323,14 +368,22 @@ export function BilanScreen({ profileId, measurements, current, sessions, onBack
           </tbody>
         </table>
 
+        {rth !== undefined && rth >= 0.6 && (
+          <div className="bilan-read alert">
+            <b>Tour de taille / hauteur : {formatNombre(rth, 2)}.</b> Au-dessus de 0,6, ce ratio est un facteur de
+            risque cardio-métabolique reconnu, et il baisse avec vous : c'est le signe le plus encourageant des trois.
+            Ce suivi sportif ne remplace pas un avis médical.
+          </div>
+        )}
+
         <h3>Évolution du poids</h3>
         <Courbe
           titre="Poids"
           unite="kg"
           cible={body.initialWeightKg}
-          points={jusqua
-            .filter((item) => typeof item.weightKg === 'number' && !item.excluded?.includes('weightKg'))
-            .map((item) => ({ label: `S${item.week}`, value: item.weightKg as number }))}
+          points={poidsPoints}
+          moyenne={moyennePoids}
+          note={lectureMoyenne}
         />
         <p className="bilan-note">
           Repère pointillé : poids de départ ({formatNombre(body.initialWeightKg, 2)} kg). Le rythme se lit sur

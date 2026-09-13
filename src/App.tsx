@@ -18,6 +18,8 @@ import type { WeeklyMeasurement } from './domain/measurements';
 import { FollowupScreen } from './components/screens/FollowupScreen';
 import { BilanScreen } from './components/screens/BilanScreen';
 import { STORAGE_UNAVAILABLE_MESSAGE, withStorageGuard } from './storage/guard';
+import { etatSauvegarde, reporterSauvegarde } from './storage/backupReminder';
+import { telechargerSauvegarde } from './storage/backupFile';
 import MustaphaApp from './mustapha/MustaphaApp';
 
 import { TopBar } from './components/layout/TopBar';
@@ -98,11 +100,44 @@ export default function App() {
   const [restMultiplier, setRestMultiplier] = useState<number>(1.0);
   const [session, setSession] = useState<WorkoutSession | null>(null);
   const [history, setHistory] = useState<WorkoutSession[]>([]);
+
+  /**
+   * Faut-il proposer une sauvegarde ? La décision appartient au module de
+   * rappel : huit séances minimum, une fois par mois, et une semaine de silence
+   * après un « plus tard ».
+   */
+  useEffect(() => {
+    if (!profile) {
+      setRappelSauvegarde({ proposer: false });
+      return;
+    }
+    const terminees = history.filter((item) => item.completedAt).length;
+    setRappelSauvegarde(etatSauvegarde(profile, terminees));
+  }, [profile, history]);
+
+  const exporterSauvegarde = async () => {
+    if (!profile) return;
+    await telechargerSauvegarde(profile);
+    setRappelSauvegarde({ proposer: false });
+    setNotice('Sauvegarde exportée.');
+    window.setTimeout(() => setNotice(''), 3500);
+  };
+
+  const reporterSauvegardePlusTard = () => {
+    if (!profile) return;
+    reporterSauvegarde(profile);
+    setRappelSauvegarde({ proposer: false });
+  };
+
   const [tutorialId, setTutorialId] = useState<string | null>(null);
   const [alternativeId, setAlternativeId] = useState<string | null>(null);
   const [restSeconds, setRestSeconds] = useState(0);
   const [isResting, setIsResting] = useState(false);
   const [notice, setNotice] = useState('');
+  /** Rappel de sauvegarde : proposé seulement quand les données valent la peine. */
+  const [rappelSauvegarde, setRappelSauvegarde] = useState<{ proposer: boolean; joursDepuisExport?: number }>({
+    proposer: false,
+  });
   const [exitPromptOpen, setExitPromptOpen] = useState(false);
 
   const [isOnline, setIsOnline] = useState(() => (typeof navigator === 'undefined' ? true : navigator.onLine));
@@ -707,6 +742,16 @@ export default function App() {
           onStart={handleInitiateStart}
           onResume={resumeWorkout}
           onDiscard={() => setAbandonOpen(true)}
+          sauvegarde={
+            rappelSauvegarde.proposer
+              ? {
+                  sessions: history.filter((item) => item.completedAt).length,
+                  joursDepuisExport: rappelSauvegarde.joursDepuisExport,
+                  onExport: () => void exporterSauvegarde(),
+                  onLater: reporterSauvegardePlusTard,
+                }
+              : undefined
+          }
         />
       )}
 

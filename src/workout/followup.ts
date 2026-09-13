@@ -169,6 +169,31 @@ export function navyBodyFat(options: {
   return arrondi(495 / (1.29579 - 0.35004 * Math.log10(base) + 0.221 * Math.log10(heightCm)) - 450, 1);
 }
 
+/**
+ * Séances réellement comprises dans la semaine d'un point de mesure.
+ *
+ * La fenêtre va du point précédent (exclu) au point courant, avec deux heures de
+ * tolérance : une séance faite juste après la pesée du samedi compte pour la
+ * semaine qui se termine, tandis qu'une séance de l'après-midi appartient déjà à
+ * la semaine suivante. Sans cette borne, une séance compterait deux fois.
+ * Sans date de mesure, on ne devine pas : mieux vaut une page vide qu'une page
+ * qui compte trois semaines de séances dans une seule.
+ */
+export function seancesDeLaSemaine<T extends { completedAt?: string }>(
+  sessions: readonly T[],
+  bornes: { depuis?: string; jusqua?: string },
+): T[] {
+  if (!bornes.jusqua) return [];
+  const fin = new Date(bornes.jusqua).getTime() + 2 * 60 * 60 * 1000;
+  const debut = bornes.depuis ? new Date(bornes.depuis).getTime() : undefined;
+  return sessions.filter((session) => {
+    if (!session.completedAt) return false;
+    const quand = new Date(session.completedAt).getTime();
+    if (Number.isNaN(quand) || quand > fin) return false;
+    return debut === undefined || quand > debut;
+  });
+}
+
 export interface CheckinSummary {
   sessions: number;
   averageRpe?: number;

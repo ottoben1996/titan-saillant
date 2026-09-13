@@ -232,8 +232,11 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
     expect(screen.getByText('Charge (kg)')).toBeInTheDocument();
     const loadInput = screen.getByDisplayValue('110');
     expect(loadInput).toHaveValue('110');
-    fireEvent.click(screen.getByRole('button', { name: '+5' }));
+    // Les boutons de charge portent un libellé explicite pour les lecteurs d'écran,
+    // et leurs paliers suivent le mouvement : 5 et 2,5 kg sur la presse à cuisse.
+    fireEvent.click(screen.getByRole('button', { name: /augmenter la charge de 5 kg/i }));
     expect(screen.getByDisplayValue('115')).toHaveValue('115');
+    expect(screen.getByRole('button', { name: /augmenter la charge de 2,5 kg/i })).toBeInTheDocument();
 
     await validateSet();
     // --- Repos long prescrit (135 s) affiché au chrono.
