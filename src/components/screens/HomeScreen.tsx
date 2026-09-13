@@ -32,6 +32,8 @@ interface HomeScreenProps {
   profile: ProfileId;
   program: ReturnType<typeof getProgram>;
   history: WorkoutSession[];
+  /** Vrai tant que la première lecture du stockage n'est pas revenue. */
+  chargement?: boolean;
   activeSession: WorkoutSession | null;
   onStart: (day: WorkoutDay) => void;
   onResume: () => void;
@@ -52,6 +54,7 @@ export function HomeScreen({
   profile,
   program,
   history,
+  chargement = false,
   activeSession,
   onStart,
   onResume,
@@ -142,7 +145,18 @@ export function HomeScreen({
       )}
 
       {/* Action dominante : la séance du jour, ou l'état « semaine complète ». */}
-      {!view.isResuming && todaySlot && (
+      {/* Première lecture du stockage : une silhouette, pas une page vide.
+          Le lecteur d'écran n'a rien à annoncer d'un dessin. */}
+      {chargement && (
+        <div className="skeleton-card" aria-hidden="true">
+          <span className="skeleton-line short" />
+          <span className="skeleton-line strong" />
+          <span className="skeleton-line" />
+          <span className="skeleton-line half" />
+        </div>
+      )}
+
+      {!chargement && !view.isResuming && todaySlot && (
         <article className="today-card">
           <div className="today-card-head">
             <p className="eyebrow">LA SÉANCE DU JOUR</p>

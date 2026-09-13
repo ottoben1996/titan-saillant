@@ -190,3 +190,34 @@
     padding-top: var(--sp-12);
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Passage d'un écran à l'autre.
+
+   Fondu seulement, jamais de déplacement : un `transform` sur un conteneur
+   d'écran créerait un bloc conteneur pour ses descendants en position fixe,
+   et la barre de validation comme les dialogues se retrouveraient placés
+   n'importe où pendant l'animation.
+
+   180 ms : assez pour que l'œil suive, trop court pour qu'on attende.
+   --------------------------------------------------------------------------- */
+@keyframes apparition-ecran {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.app-shell > section,
+.app-shell > .content {
+  animation: apparition-ecran 180ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-shell > section,
+  .app-shell > .content {
+    animation: none;
+  }
+}

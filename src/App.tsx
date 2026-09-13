@@ -130,6 +130,8 @@ export default function App() {
   const [isResting, setIsResting] = useState(false);
   const [notice, setNotice] = useState('');
   /** Rappel de sauvegarde : proposé seulement quand les données valent la peine. */
+  /** Faux jusqu'à la première lecture de l'historique. */
+  const [historiqueCharge, setHistoriqueCharge] = useState(false);
   const [rappelSauvegarde, setRappelSauvegarde] = useState<{ proposer: boolean; joursDepuisExport?: number }>({
     proposer: false,
   });
@@ -166,11 +168,16 @@ export default function App() {
   const persist = (sessionToSave: WorkoutSession) =>
     void withStorageGuard(saveSession(sessionToSave), onStorageFailure, undefined);
 
-  const refreshHistory = async (id: ProfileId) =>
+  const refreshHistory = async (id: ProfileId) => {
     setHistory(await withStorageGuard(listSessions(id), onStorageFailure, []));
+    // L'écran d'accueil attend cette première lecture : tant qu'elle n'est pas
+    // revenue, il montre une silhouette plutôt qu'une page qui se remplit.
+    setHistoriqueCharge(true);
+  };
 
   useEffect(() => {
     if (!profile) return;
+    setHistoriqueCharge(false);
     void refreshHistory(profile);
     // Reprise de l'historique de la feuille de suivi au premier lancement, puis
     // lecture des points enregistrés (revalider une semaine remplace la valeur).
@@ -762,6 +769,7 @@ export default function App() {
           profile={profile}
           program={program}
           history={history}
+          chargement={!historiqueCharge}
           activeSession={session}
           onStart={handleInitiateStart}
           onResume={resumeWorkout}

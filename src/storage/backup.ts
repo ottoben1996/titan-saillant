@@ -1,4 +1,3 @@
-import { z } from 'zod';
 import type { WeeklyMeasurement } from '../domain/measurements';
 import type { ProfileId, WorkoutSession } from '../domain/types';
 import type { PreferenceRecord } from './db';
@@ -20,75 +19,6 @@ import { listSessions } from './sessionRepository';
  * Les sauvegardes de la version précédente restent lisibles.
  */
 const BACKUP_VERSION = 3;
-
-const profileIdSchema = z.enum(['ottman', 'laura']);
-const isoDate = z.string().refine((valeur) => Number.isFinite(Date.parse(valeur)), 'date invalide');
-const nombreOptionnel = z.number().finite().optional();
-
-const loggedSetSchema = z.object({
-  exerciseId: z.string().min(1),
-  setIndex: z.number().int().min(0),
-  completedAt: isoDate,
-  actualRepetitions: z.number().optional(),
-  actualLoadKg: z.number().optional(),
-});
-
-const sessionSchema = z
-  .object({
-    id: z.string().min(1),
-    profileId: profileIdSchema,
-    dayId: z.enum(['full-body-a', 'full-body-b', 'cardio']),
-    startedAt: isoDate,
-    updatedAt: isoDate,
-    completedAt: isoDate.optional(),
-    currentExerciseIndex: z.number().int().min(0),
-    currentSetIndex: z.number().int().min(0),
-    loggedSets: z.array(loggedSetSchema),
-    perceivedExertion: z.number().min(1).max(10).optional(),
-    energy: z.number().min(1).max(5).optional(),
-    loadConsigne: z.enum(['increase', 'decrease', 'same']).optional(),
-    notes: z.string().optional(),
-    coachNote: z.string().optional(),
-  })
-  .passthrough();
-
-/** Les huit zones mesurées, plus la date et les notes. */
-const measurementSchema = z
-  .object({
-    id: z.string().min(1),
-    profileId: profileIdSchema,
-    cycle: z.number().int().min(1),
-    week: z.number().int().min(1),
-    measuredOn: isoDate.optional(),
-    weightKg: nombreOptionnel,
-    neckCm: nombreOptionnel,
-    waistCm: nombreOptionnel,
-    chestCm: nombreOptionnel,
-    armRightCm: nombreOptionnel,
-    armLeftCm: nombreOptionnel,
-    thighRightCm: nombreOptionnel,
-    thighLeftCm: nombreOptionnel,
-    excluded: z.array(z.string()).optional(),
-    coachNote: z.string().optional(),
-  })
-  .passthrough();
-
-const preferenceSchema = z
-  .object({ profileId: profileIdSchema, key: z.string().min(1), value: z.unknown() })
-  .passthrough();
-
-const payloadSchema = z.object({
-  version: z.number().int().min(1),
-  profileId: profileIdSchema.optional(),
-  exportedAt: isoDate.optional(),
-  sessions: z.array(sessionSchema),
-  // Les préférences se refont en un geste : une entrée abîmée est écartée
-  // plutôt que de faire refuser tout le fichier. Les séances et les mesures,
-  // elles, ne se refont pas — un défaut y bloque la restauration, en le disant.
-  preferences: z.array(z.unknown()).optional(),
-  // Absent des sauvegardes de la version 2 : lisible, simplement vide.
-  measurements: z.array(measurementSchema).optional(),
-});
 
 /**
  * Forme écrite par l'export. Le schéma de lecture décrit les mêmes données,
@@ -121,16 +51,6 @@ export async function exportProfileData(profileId: ProfileId): Promise<string> {
   return JSON.stringify(payload, null, 2);
 }
 
-/** Message d'erreur à partir du premier champ fautif. */
-function messageDeRefus(erreur: z.ZodError): string {
-  const premier = erreur.issues[0];
-  if (!premier) return 'Sauvegarde invalide';
-  const chemin = premier.path.join(' › ');
-  return chemin
-    ? `Sauvegarde invalide : « ${chemin} » (${premier.message})`
-    : `Sauvegarde invalide : ${premier.message}`;
-}
-
 export async function importProfileData(json: string, profileId: ProfileId): Promise<void> {
   let brut: unknown;
   try {
@@ -138,6 +58,10 @@ export async function importProfileData(json: string, profileId: ProfileId): Pro
   } catch {
     throw new Error('Sauvegarde invalide : ce fichier n’est pas lisible');
   }
+
+  // Chargé ici et pas au démarrage : valider un fichier sert une fois par
+  // restauration, alors que ces schémas pèseraient sur chaque ouverture.
+  const { messageDeRefus, payloadSchema, preferenceSchema } = await import('./backupSchema');
 
   const lecture = payloadSchema.safeParse(brut);
   if (!lecture.success) throw new Error(messageDeRefus(lecture.error));

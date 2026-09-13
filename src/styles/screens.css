@@ -1115,3 +1115,61 @@
   color: var(--text-3);
   font-size: var(--fs-1);
 }
+
+/* ---------------------------------------------------------------------------
+   Silhouette de chargement.
+
+   Un dessin qui respire, sans texte : la page se remplit au lieu d'apparaître
+   d'un bloc, et rien n'est annoncé à un lecteur d'écran (aria-hidden).
+   --------------------------------------------------------------------------- */
+.skeleton-card {
+  display: grid;
+  gap: var(--sp-4);
+  padding: var(--sp-8);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface-1);
+}
+
+.skeleton-line {
+  display: block;
+  height: 12px;
+  border-radius: var(--r-sm);
+  background: linear-gradient(
+    90deg,
+    var(--surface-2) 0%,
+    color-mix(in srgb, var(--text-3) 22%, var(--surface-2)) 50%,
+    var(--surface-2) 100%
+  );
+  background-size: 200% 100%;
+  animation: respiration 1.4s ease-in-out infinite;
+}
+
+.skeleton-line.short {
+  width: 35%;
+  height: 10px;
+}
+
+.skeleton-line.strong {
+  width: 62%;
+  height: 20px;
+}
+
+.skeleton-line.half {
+  width: 48%;
+}
+
+@keyframes respiration {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-line {
+    animation: none;
+  }
+}
