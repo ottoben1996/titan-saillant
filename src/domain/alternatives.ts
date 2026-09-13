@@ -36,21 +36,21 @@ export const equipmentAlternatives: Readonly<Record<string, EquipmentAlternative
     name: 'Goblet squat',
     equipment: 'Un haltère tenu contre la poitrine',
     setup: 'Conserve les répétitions et les repos du PDF. Ajuste la charge pour garder 2 à 3 répétitions en réserve.',
-    caution: 'Ne reprends pas les kilogrammes de la presse : la charge n’est pas comparable.',
+    caution: 'Ne reprends pas les kilogrammes de la presse : la charge n’est pas comparable.',
     suggestedLoadKg: (orig) => (orig ? Math.min(32, Math.max(12, Math.round((orig * 0.25) / 2) * 2)) : 20),
   },
   'leg-curl-allonge': {
     name: 'Leg curl assis',
     equipment: 'Machine leg curl assis',
     setup: 'Conserve les répétitions et le repos prescrits.',
-    caution: 'Réajuste la charge : les valeurs des deux machines ne sont pas directement comparables.',
+    caution: 'Réajuste la charge : les valeurs des deux machines ne sont pas directement comparables.',
     suggestedLoadKg: (orig) => (orig ? Math.max(10, Math.round((orig * 0.8) / 2) * 2) : 25),
   },
   'chest-press': {
     name: 'Développé couché avec haltères',
     equipment: 'Banc plat et deux haltères',
     setup: 'Conserve les répétitions et le repos prescrits.',
-    caution: 'Commence léger : la charge de la machine ne se transpose pas aux haltères.',
+    caution: 'Commence léger : la charge de la machine ne se transpose pas aux haltères.',
     suggestedLoadKg: (orig) => (orig ? Math.max(8, Math.round((orig * 0.4) / 2) * 2) : 16),
   },
   'tirage-horizontal': {
@@ -64,7 +64,7 @@ export const equipmentAlternatives: Readonly<Record<string, EquipmentAlternative
     name: 'Goblet squat',
     equipment: 'Un haltère tenu contre la poitrine',
     setup: 'Conserve les répétitions et les repos du PDF.',
-    caution: 'Ne transpose pas la charge de la Smith machine ; commence plus léger.',
+    caution: 'Ne transpose pas la charge de la Smith machine ; commence plus léger.',
     suggestedLoadKg: (orig) => (orig ? Math.min(28, Math.max(10, Math.round((orig * 0.5) / 2) * 2)) : 18),
   },
   'leg-extension': {
@@ -77,7 +77,7 @@ export const equipmentAlternatives: Readonly<Record<string, EquipmentAlternative
     name: 'Développé couché avec haltères',
     equipment: 'Banc plat et deux haltères',
     setup: 'Conserve les répétitions et le repos prescrits.',
-    caution: 'Commence léger : la charge de la machine ne se transpose pas aux haltères.',
+    caution: 'Commence léger : la charge de la machine ne se transpose pas aux haltères.',
     suggestedLoadKg: (orig) => (orig ? Math.max(10, Math.round((orig * 0.35) / 2) * 2) : 18),
   },
   'tirage-vertical': {
@@ -96,7 +96,7 @@ export const equipmentAlternatives: Readonly<Record<string, EquipmentAlternative
     name: 'Développé épaules à la machine',
     equipment: 'Machine à épaules, prise neutre si possible',
     setup: 'Conserve la durée et le repos du circuit.',
-    caution: 'Ajuste la charge : les kilogrammes ne sont pas comparables aux haltères.',
+    caution: 'Ajuste la charge : les kilogrammes ne sont pas comparables aux haltères.',
     suggestedLoadKg: (orig) => (orig ? Math.round(orig * 1.5) : 8),
   },
   'cooldown-full-body-a': {

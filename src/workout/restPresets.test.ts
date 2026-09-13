@@ -10,7 +10,7 @@ import {
 
 const presetById = (id: RestPreset['id']) => {
   const preset = [...REST_PRESETS, REST_SKIP_PRESET].find((item) => item.id === id);
-  if (!preset) throw new Error(`Préréglage introuvable : ${id}`);
+  if (!preset) throw new Error(`Préréglage introuvable : ${id}`);
   return preset;
 };
 

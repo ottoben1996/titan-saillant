@@ -16,7 +16,7 @@ describe('couleurs proposées', () => {
     expect(new Set(accents.map((accent) => accent.accent)).size).toBe(5);
   });
 
-  it('garde le texte lisible sur la couleur : seuil AAA de 7:1 dépassé', () => {
+  it('garde le texte lisible sur la couleur : seuil AAA de 7:1 dépassé', () => {
     for (const accent of accents) {
       // L'encre est posée sur la couleur : c'est le cas des boutons pleins.
       expect(contraste(accent.ink, accent.accent), `${accent.label} encre/couleur`).toBeGreaterThanOrEqual(7);

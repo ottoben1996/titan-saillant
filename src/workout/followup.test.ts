@@ -73,7 +73,7 @@ describe('suivi hebdomadaire', () => {
     expect(navyBodyFat({ sex: 'femme', heightCm: 160, waistCm: 95, neckCm: 34, hipCm: 108 })).toBeGreaterThan(25);
   });
 
-  it('reconnaît une recomposition : taille qui baisse, bras et cuisses qui montent', () => {
+  it('reconnaît une recomposition : taille qui baisse, bras et cuisses qui montent', () => {
     const lecture = buildWeeklyReading({
       current: ottman(2),
       previous: ottman(1),

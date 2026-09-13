@@ -46,7 +46,7 @@ export function AlternativeModal({
           <Warning size={16} /> {alternative.caution}
         </div>
         <p className="alternative-note">
-          Cette alternative ne modifie pas ton programme : elle te permet de continuer la séance quand le matériel
+          Cette alternative ne modifie pas ton programme : elle te permet de continuer la séance quand le matériel
           prescrit est indisponible.
         </p>
         <button

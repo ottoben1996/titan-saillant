@@ -61,10 +61,10 @@ export function PlateBadge({ totalLoadKg, exerciseId, barWeightKg }: PlateBadgeP
   const discSummary = platesPerSide.map((item) => `${item.count} × ${formatKg(item.plateKg)} kg`).join(', ');
 
   const accessibleLabel = [
-    `Chargement par côté : ${formatKg(achievablePerSideKg)} kg par côté`,
+    `Chargement par côté : ${formatKg(achievablePerSideKg)} kg par côté`,
     effectiveBarWeight > 0 ? `barre ${formatKg(effectiveBarWeight)} kg comprise` : 'manchons seuls',
     `total ${formatKg(achievedTotalKg)} kg`,
-    platesPerSide.length > 0 ? `disques : ${discSummary}` : 'aucun disque',
+    platesPerSide.length > 0 ? `disques : ${discSummary}` : 'aucun disque',
     isExact
       ? 'charge exacte'
       : `charge non exacte, il manque ${formatKg(shortfallTotalKg)} kg par rapport à la cible de ${formatKg(totalLoadKg)} kg`,

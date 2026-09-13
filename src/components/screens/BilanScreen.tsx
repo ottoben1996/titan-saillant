@@ -231,7 +231,7 @@ export function BilanScreen({ profileId, measurements, current, sessions, onBack
     // 0,3 % du poids : en dessous, la variation est du bruit d'hydratation.
     const seuil = Math.max(0.2, Math.abs(dernier) * 0.003);
     return ecart <= seuil
-      ? 'La moyenne confirme la tendance : l\u2019écart d\u2019une semaine à l\u2019autre reste dans le bruit d\u2019hydratation.'
+      ? 'La moyenne confirme la tendance : l\u2019écart d\u2019une semaine à l\u2019autre reste dans le bruit d\u2019hydratation.'
       : undefined;
   })();
 
@@ -439,8 +439,8 @@ export function BilanScreen({ profileId, measurements, current, sessions, onBack
 
         {rth !== undefined && rth >= 0.6 && (
           <div className="bilan-read alert">
-            <b>Tour de taille / hauteur : {formatNombre(rth, 2)}.</b> Au-dessus de 0,6, ce ratio est un facteur de
-            risque cardio-métabolique reconnu, et il baisse avec vous : c'est le signe le plus encourageant des trois.
+            <b>Tour de taille / hauteur : {formatNombre(rth, 2)}.</b> Au-dessus de 0,6, ce ratio est un facteur de
+            risque cardio-métabolique reconnu, et il baisse avec vous : c'est le signe le plus encourageant des trois.
             Ce suivi sportif ne remplace pas un avis médical.
           </div>
         )}
@@ -455,7 +455,7 @@ export function BilanScreen({ profileId, measurements, current, sessions, onBack
           note={lectureMoyenne}
         />
         <p className="bilan-note">
-          Repère pointillé : poids de départ ({formatNombre(body.initialWeightKg, 2)} kg). Le rythme se lit sur
+          Repère pointillé : poids de départ ({formatNombre(body.initialWeightKg, 2)} kg). Le rythme se lit sur
           plusieurs semaines : la variation d'une semaine dépend aussi de l'hydratation et du repas de la veille.
         </p>
 
@@ -522,7 +522,7 @@ export function BilanScreen({ profileId, measurements, current, sessions, onBack
             ))}
             <p className="bilan-note">
               Charges les plus lourdes réellement validées, relevées automatiquement dans les séances enregistrées.
-              Volume soulevé sur l'ensemble du suivi : {Math.round(volumeSemaine).toLocaleString('fr-FR')} kg.
+              Volume soulevé sur l'ensemble du suivi : {Math.round(volumeSemaine).toLocaleString('fr-FR')} kg.
             </p>
           </>
         )}
@@ -557,7 +557,7 @@ export function BilanScreen({ profileId, measurements, current, sessions, onBack
             <p className="bilan-note">
               Charge la plus lourde réellement validée à chaque passage, séries d'échauffement exclues.
               {stagnations.length > 0
-                ? ` Sans progression depuis trois passages : ${stagnations.map((item) => item.nom.toLowerCase()).join(', ')}.`
+                ? ` Sans progression depuis trois passages : ${stagnations.map((item) => item.nom.toLowerCase()).join(', ')}.`
                 : ''}
             </p>
           </>
@@ -594,7 +594,7 @@ export function BilanScreen({ profileId, measurements, current, sessions, onBack
             </table>
             <p className="bilan-note">
               {ressenti.averageRpe !== undefined
-                ? `Effort moyen de la semaine : ${formatNombre(ressenti.averageRpe)}/10. `
+                ? `Effort moyen de la semaine : ${formatNombre(ressenti.averageRpe)}/10. `
                 : ''}
               {ressenti.formTrend === 'better'
                 ? 'Forme en hausse sur la semaine.'
@@ -604,7 +604,7 @@ export function BilanScreen({ profileId, measurements, current, sessions, onBack
                     ? 'Forme variable selon les séances.'
                     : ''}
               {ressenti.consignes.length > 0
-                ? ` Consignes données : ${ressenti.consignes
+                ? ` Consignes données : ${ressenti.consignes
                     .map((item) => `${workoutDayLabel(item.dayId).toLowerCase()} — ${libelleConsigne(item.consigne)}`)
                     .join(', ')}.`
                 : ''}

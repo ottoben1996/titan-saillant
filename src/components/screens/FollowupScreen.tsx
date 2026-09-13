@@ -150,7 +150,7 @@ export function FollowupScreen({
       {enPause && (
         <p className="cycle-pause">
           Cycle en pause depuis le {enPause.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })}. Aucun point
-          n’est attendu : les courbes sont gelées, pas faussées, et la numérotation reprendra où elle s’est arrêtée.
+          n’est attendu : les courbes sont gelées, pas faussées, et la numérotation reprendra où elle s’est arrêtée.
         </p>
       )}
       <h1>
@@ -235,7 +235,7 @@ export function FollowupScreen({
           <Warning size={15} />
           <span>
             Écart invraisemblable sur {invraisemblables.length > 1 ? 'ces zones' : 'cette zone'}. La valeur est gardée
-            mais écartée des tendances : vérifie la mesure avant de valider.
+            mais écartée des tendances : vérifie la mesure avant de valider.
           </span>
         </div>
       )}

@@ -25,7 +25,7 @@ export function calculatePlateDelta(fromTotalKg: number, toTotalKg: number): Pla
       differenceKg: 0,
       deltaPerSideKg: 0,
       action: 'keep',
-      summaryLabel: 'Même charge : aucun changement de disques.',
+      summaryLabel: 'Même charge : aucun changement de disques.',
       platesPerSide: [],
     };
   }
@@ -43,8 +43,8 @@ export function calculatePlateDelta(fromTotalKg: number, toTotalKg: number): Pla
 
   const summaryLabel =
     action === 'add'
-      ? `Ajouter ${deltaPerSideKg} kg / côté${platesDesc ? ` : ${platesDesc}` : ''}`
-      : `Retirer ${deltaPerSideKg} kg / côté${platesDesc ? ` : ${platesDesc}` : ''}`;
+      ? `Ajouter ${deltaPerSideKg} kg / côté${platesDesc ? ` : ${platesDesc}` : ''}`
+      : `Retirer ${deltaPerSideKg} kg / côté${platesDesc ? ` : ${platesDesc}` : ''}`;
 
   return {
     fromTotalKg,

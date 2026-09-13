@@ -38,25 +38,25 @@ describe('tutoriels (contenu pédagogique)', () => {
     const missing = prescribedExerciseIds().filter(
       (id) => !TOLERATED_WITHOUT_TUTORIAL.includes(id) && tutorials[id] === undefined,
     );
-    expect(missing, `tutoriels manquants : ${missing.join(', ')}`).toEqual([]);
+    expect(missing, `tutoriels manquants : ${missing.join(', ')}`).toEqual([]);
   });
 
-  it.each(entries)('« %s » : au moins 3 étapes non vides', (_key, tutorial) => {
+  it.each(entries)('« %s » : au moins 3 étapes non vides', (_key, tutorial) => {
     expect(tutorial.steps.length).toBeGreaterThanOrEqual(3);
     for (const step of tutorial.steps) expect(step.trim()).not.toBe('');
   });
 
-  it.each(entries)('« %s » : au moins 2 erreurs fréquentes non vides', (_key, tutorial) => {
+  it.each(entries)('« %s » : au moins 2 erreurs fréquentes non vides', (_key, tutorial) => {
     expect(tutorial.commonMistakes.length).toBeGreaterThanOrEqual(2);
     for (const mistake of tutorial.commonMistakes) expect(mistake.trim()).not.toBe('');
   });
 
-  it.each(entries)('« %s » : au moins 1 consigne de sécurité non vide', (_key, tutorial) => {
+  it.each(entries)('« %s » : au moins 1 consigne de sécurité non vide', (_key, tutorial) => {
     expect(tutorial.safety.length).toBeGreaterThanOrEqual(1);
     for (const rule of tutorial.safety) expect(rule.trim()).not.toBe('');
   });
 
-  it.each(entries)('« %s » : repère clé, position et muscles renseignés', (_key, tutorial) => {
+  it.each(entries)('« %s » : repère clé, position et muscles renseignés', (_key, tutorial) => {
     expect(tutorial.keyCue?.trim(), 'keyCue').toBeTruthy();
     expect(tutorial.position.trim()).not.toBe('');
     expect(tutorial.title.trim()).not.toBe('');
@@ -77,7 +77,7 @@ describe('tutoriels (contenu pédagogique)', () => {
       ].filter((text) => text.trim() !== '');
       for (const text of texts) {
         const owner = seen.get(text);
-        expect(owner, `texte dupliqué entre « ${owner} » et « ${key} » : ${text}`).toBeUndefined();
+        expect(owner, `texte dupliqué entre « ${owner} » et « ${key} » : ${text}`).toBeUndefined();
         seen.set(text, key);
       }
     }

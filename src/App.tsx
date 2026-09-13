@@ -398,7 +398,7 @@ export default function App() {
     setScreen('workout');
 
     if (energy === 'low') {
-      setNotice('Mode Récupération actif : repos allongés (+20%).');
+      setNotice('Mode Récupération actif : repos allongés (+20%).');
       window.setTimeout(() => setNotice(''), 3500);
     }
   };
@@ -499,7 +499,7 @@ export default function App() {
         const published = swSource.match(/assets\/index-[A-Za-z0-9_-]+\.js/)?.[0];
 
         if (published && running && !running.includes(published)) {
-          show('Nouvelle version trouvée : rechargement…');
+          show('Nouvelle version trouvée : rechargement…');
           window.setTimeout(() => window.dispatchEvent(new Event('coach-force-update')), 700);
           return;
         }
@@ -563,7 +563,7 @@ export default function App() {
     setSession(updated);
     persist(updated);
     if (suggestedLoadKg) {
-      setNotice(`Alternative activée (charge suggérée : ${suggestedLoadKg} kg)`);
+      setNotice(`Alternative activée (charge suggérée : ${suggestedLoadKg} kg)`);
       window.setTimeout(() => setNotice(''), 3500);
     }
   };
@@ -878,8 +878,8 @@ export default function App() {
       {abandonOpen && (
         <ConfirmDialog
           eyebrow="SÉANCE EN COURS"
-          title="Annuler cette séance ?"
-          description="Les séries déjà validées seront supprimées : la séance ne figurera ni dans l’historique ni dans ta progression. Pour la reprendre plus tard, choisis plutôt « mettre en pause »."
+          title="Annuler cette séance ?"
+          description="Les séries déjà validées seront supprimées : la séance ne figurera ni dans l’historique ni dans ta progression. Pour la reprendre plus tard, choisis plutôt « mettre en pause »."
           confirmLabel="Annuler la séance"
           cancelLabel="Garder la séance"
           onConfirm={() => void abandonWorkout()}
@@ -890,7 +890,7 @@ export default function App() {
       {sessionToDelete && (
         <ConfirmDialog
           eyebrow="HISTORIQUE"
-          title="Supprimer cette séance ?"
+          title="Supprimer cette séance ?"
           description="Elle disparaîtra de l’historique et de tes statistiques. Les autres séances ne sont pas touchées."
           confirmLabel="Supprimer"
           cancelLabel="Conserver"
@@ -902,8 +902,8 @@ export default function App() {
       {confirmSwitchOpen && (
         <ConfirmDialog
           eyebrow="ESPACE PERSONNEL"
-          title="Changer de profil ?"
-          description="Tes données resteront séparées : chaque profil garde son historique sur cet appareil."
+          title="Changer de profil ?"
+          description="Tes données resteront séparées : chaque profil garde son historique sur cet appareil."
           confirmLabel="Changer de profil"
           cancelLabel="Rester ici"
           onConfirm={() => {

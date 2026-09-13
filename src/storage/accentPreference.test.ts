@@ -17,7 +17,7 @@ describe('couleur choisie', () => {
     expect(lireAccent('laura')).toBe('turquoise');
   });
 
-  it('garde un choix par profil : celui de Laura ne touche pas Ottman', () => {
+  it('garde un choix par profil : celui de Laura ne touche pas Ottman', () => {
     enregistrerAccent('ottman', 'bleu');
     enregistrerAccent('laura', 'ambre');
     expect(lireAccent('ottman')).toBe('bleu');

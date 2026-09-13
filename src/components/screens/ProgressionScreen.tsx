@@ -199,7 +199,7 @@ export function ProgressionScreen({ history, profile, measurements, onBack, onOp
           </strong>
           <small>
             {dernierPoint
-              ? `Dernier relevé : ${
+              ? `Dernier relevé : ${
                   typeof dernierPoint.weightKg === 'number'
                     ? `${formatLoadKg(dernierPoint.weightKg)} kg`
                     : 'poids non renseigné'
@@ -315,7 +315,7 @@ export function ProgressionScreen({ history, profile, measurements, onBack, onOp
               <>
                 {!hasVolume && (
                   <p className="muted-copy">
-                    Aucune charge renseignée pour l’instant : la tendance affiche les séries validées par séance.
+                    Aucune charge renseignée pour l’instant : la tendance affiche les séries validées par séance.
                   </p>
                 )}
                 <VolumeTrendChart points={view.points} dataKey={hasVolume ? 'volume' : 'sets'} />

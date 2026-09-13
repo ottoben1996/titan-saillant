@@ -18,7 +18,7 @@ export function ExitWorkoutDialog({ onCancel, onPause, onAbandon }: ExitWorkoutD
         <p className="eyebrow">SÉANCE EN COURS</p>
         <h2 id="exit-workout-title">Quitter la séance ?</h2>
         <p id="exit-workout-description">
-          En pause, la séance est gardée : tu la reprends depuis l’accueil, au même mouvement. L’annuler supprime les
+          En pause, la séance est gardée : tu la reprends depuis l’accueil, au même mouvement. L’annuler supprime les
           séries déjà validées.
         </p>
         <div className="exit-actions">

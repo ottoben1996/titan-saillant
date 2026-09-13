@@ -372,7 +372,7 @@ export function buildWeeklyReading(options: {
       title: 'Perte de poids trop rapide',
       text: `Le poids baisse de ${formatNombre(Math.abs(velocity.kgPerWeek))} kg par semaine, soit ${Math.abs(
         velocity.percentPerWeek,
-      )} % du poids corporel. Au-delà de 1 % par semaine, une partie de ce qui part est du muscle : mieux vaut ralentir et sécuriser les apports en protéines.`,
+      )} % du poids corporel. Au-delà de 1 % par semaine, une partie de ce qui part est du muscle : mieux vaut ralentir et sécuriser les apports en protéines.`,
       alert: true,
     };
   }
@@ -383,11 +383,11 @@ export function buildWeeklyReading(options: {
     observations.push(
       `Le poids ${typeof poidsSemaine === 'number' && poidsSemaine < 0 ? 'baisse' : 'reste stable'} et le ${zone} diminue de ${formatNombre(
         ecart,
-      )} cm cette semaine, pendant que les bras et les cuisses prennent du volume des deux côtés. C'est une recomposition : tu perds du gras en gardant, voire en gagnant du muscle.`,
+      )} cm cette semaine, pendant que les bras et les cuisses prennent du volume des deux côtés. C'est une recomposition : tu perds du gras en gardant, voire en gagnant du muscle.`,
     );
   } else if (ceintureBaisse && typeof poidsSemaine === 'number' && poidsSemaine > 0) {
     observations.push(
-      'Le tour de taille diminue tandis que le poids augmente légèrement : la silhouette change avant la balance, ce qui est un bon signe.',
+      'Le tour de taille diminue tandis que le poids augmente légèrement : la silhouette change avant la balance, ce qui est un bon signe.',
     );
   } else if (typeof poidsSemaine === 'number' && poidsSemaine < 0) {
     observations.push(`Le poids baisse de ${formatNombre(Math.abs(poidsSemaine))} kg cette semaine.`);
@@ -399,7 +399,7 @@ export function buildWeeklyReading(options: {
 
   if (typeof poidsCycle === 'number' && poidsCycle !== 0) {
     observations.push(
-      `Depuis le début du suivi : ${poidsCycle < 0 ? '−' : '+'}${formatNombre(Math.abs(poidsCycle))} kg sur le poids.`,
+      `Depuis le début du suivi : ${poidsCycle < 0 ? '−' : '+'}${formatNombre(Math.abs(poidsCycle))} kg sur le poids.`,
     );
   }
 
@@ -413,7 +413,7 @@ export function buildWeeklyReading(options: {
 
   if (typeof volumeDeltaPercent === 'number' && Number.isFinite(volumeDeltaPercent)) {
     observations.push(
-      `Volume soulevé ${volumeDeltaPercent >= 0 ? 'en hausse' : 'en baisse'} de ${Math.abs(Math.round(volumeDeltaPercent))} % : la charge de travail suit.`,
+      `Volume soulevé ${volumeDeltaPercent >= 0 ? 'en hausse' : 'en baisse'} de ${Math.abs(Math.round(volumeDeltaPercent))} % : la charge de travail suit.`,
     );
   }
 

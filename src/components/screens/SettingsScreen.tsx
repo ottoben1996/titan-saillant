@@ -105,7 +105,7 @@ export function SettingsScreen({
 
   const ajouterAuCalendrier = () => {
     telechargerCalendrierSuivi(profile);
-    onNotice('Fichier prêt : ouvre-le pour inscrire les huit rendez-vous.');
+    onNotice('Fichier prêt : ouvre-le pour inscrire les huit rendez-vous.');
   };
 
   const importFile = async (file: File) => {
@@ -180,12 +180,12 @@ export function SettingsScreen({
               if (pause) {
                 reprendreCycle(profile);
                 setPause(undefined);
-                onNotice('Cycle repris : le point du samedi est de nouveau attendu.');
+                onNotice('Cycle repris : le point du samedi est de nouveau attendu.');
               } else {
                 const maintenant = new Date();
                 mettreEnPause(profile, maintenant);
                 setPause(maintenant);
-                onNotice('Cycle en pause : les courbes sont gelées, pas faussées.');
+                onNotice('Cycle en pause : les courbes sont gelées, pas faussées.');
               }
             }}
           >
@@ -195,7 +195,7 @@ export function SettingsScreen({
               <small>
                 {pause
                   ? `Depuis le ${pause.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })} · aucun point attendu`
-                  : 'Blessure, vacances, semaine chargée : mets le cycle en pause plutôt que de sauter un point'}
+                  : 'Blessure, vacances, semaine chargée : mets le cycle en pause plutôt que de sauter un point'}
               </small>
             </span>
             <span className={`toggle-pill${pause ? ' on' : ''}`} aria-hidden="true">
@@ -222,7 +222,7 @@ export function SettingsScreen({
           <Timer size={16} /> Ajouter à mon calendrier
         </button>
         <p className="settings-footnote">
-          Aucune notification serveur : le rappel vient du calendrier du téléphone, qui ne rate jamais une alerte, même
+          Aucune notification serveur : le rappel vient du calendrier du téléphone, qui ne rate jamais une alerte, même
           application fermée.
         </p>
       </section>
@@ -324,7 +324,7 @@ export function SettingsScreen({
             </div>
             <p className="danger-lead">
               Cette action supprime le profil de <strong>{profileLabels[profile]}</strong> et{' '}
-              <strong>{describeSessions(counts)}</strong>. Aucune récupération n’est possible : pense à exporter une
+              <strong>{describeSessions(counts)}</strong>. Aucune récupération n’est possible : pense à exporter une
               sauvegarde avant de continuer.
             </p>
             <label className="danger-word">
@@ -404,7 +404,7 @@ export function SettingsScreen({
             </div>
           </div>
 
-          {/* Une mise à jour peut être vérifiée à la demande : plus besoin
+          {/* Une mise à jour peut être vérifiée à la demande : plus besoin
               d'attendre la vérification automatique au retour au premier plan. */}
           <button type="button" className="secondary-button full update-check-btn" onClick={onCheckUpdate}>
             Rechercher une mise à jour
@@ -425,7 +425,7 @@ export function SettingsScreen({
 
       <p className="settings-footnote">Coach hors ligne · tes données restent dans le navigateur de cet appareil.</p>
       <p className="settings-footnote">
-        Illustrations d’exercices :{' '}
+        Illustrations d’exercices :{' '}
         <a href="https://repdb.co" target="_blank" rel="noreferrer">
           Exercise data by RepDB (repdb.co)
         </a>

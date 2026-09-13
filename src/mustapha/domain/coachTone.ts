@@ -7,7 +7,7 @@ const messages: Record<CoachTone, Record<CoachEvent, string>> = {
     welcome: 'On avance avec un plan clair, une séance à la fois.',
     'before-session': 'Prépare ta séance. La régularité fera la différence.',
     'after-session': 'Séance enregistrée. Récupère, puis reviens au prochain rendez-vous.',
-    'rest-day': 'Récupération active : marche légère, hydratation, sommeil régulier.',
+    'rest-day': 'Récupération active : marche légère, hydratation, sommeil régulier.',
   },
   directive: {
     welcome: 'Plan chargé. Tu exécutes la prochaine action, sans négocier avec toi-même.',
@@ -16,7 +16,7 @@ const messages: Record<CoachTone, Record<CoachEvent, string>> = {
     'rest-day': 'Aujourd’hui tu récupères. La discipline inclut aussi le repos.',
   },
   'dictator-rp': {
-    welcome: 'Ordre du jour : tu suis le plan. Le régime est fictif, la séance est réelle.',
+    welcome: 'Ordre du jour : tu suis le plan. Le régime est fictif, la séance est réelle.',
     'before-session': 'Va à la salle, soldat. Échauffe-toi et exécute la première série.',
     'after-session': 'Séance validée par le commandement. Hydrate-toi et récupère.',
     'rest-day': 'Repos obligatoire. Même un dictateur compétent protège ses troupes.',

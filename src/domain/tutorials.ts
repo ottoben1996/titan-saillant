@@ -49,12 +49,12 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
       'Reviens au point de départ sur deux temps, en inspirant, sans laisser l’élastique ramener le bras d’un coup.',
     ],
     [
-      'Le coude se décolle du flanc dès que la résistance augmente : reprends une tension plus légère.',
-      'Le buste tourne pour aider le bras : garde tronc et bassin immobiles, seul l’avant-bras travaille.',
-      'Le mouvement part avec un élan : la coiffe se travaille lentement, jamais lancée.',
+      'Le coude se décolle du flanc dès que la résistance augmente : reprends une tension plus légère.',
+      'Le buste tourne pour aider le bras : garde tronc et bassin immobiles, seul l’avant-bras travaille.',
+      'Le mouvement part avec un élan : la coiffe se travaille lentement, jamais lancée.',
     ],
     [
-      'Choisis une tension légère ; une gêne à l’épaule qui persiste après la série signale une charge à réduire.',
+      'Choisis une tension légère ; une gêne à l’épaule qui persiste après la série signale une charge à réduire.',
       'Arrête la série en cas de douleur vive ou de craquement douloureux à l’épaule.',
     ],
     {
@@ -77,9 +77,9 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
       'Respire normalement, sans bloquer, même quand l’équilibre devient instable.',
     ],
     [
-      'Le regard descend vers les pieds : lève les yeux vers un point fixe pour stabiliser la position.',
-      'Le genou se verrouille pour compenser l’instabilité : garde-le légèrement fléchi.',
-      'La descente se fait d’un coup : pose le pied au sol en contrôlant avant de lâcher l’autre.',
+      'Le regard descend vers les pieds : lève les yeux vers un point fixe pour stabiliser la position.',
+      'Le genou se verrouille pour compenser l’instabilité : garde-le légèrement fléchi.',
+      'La descente se fait d’un coup : pose le pied au sol en contrôlant avant de lâcher l’autre.',
     ],
     [
       'Reste près d’un mur ou d’un montant pour te rattraper si l’équilibre part.',
@@ -98,15 +98,15 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
     ['Rameur'],
     'Assis sur le siège, pieds sanglés sur les cale-pieds, tibias verticaux en position d’attaque. Dos neutre, gainage léger, bras tendus devant toi.',
     [
-      'Attaque : jambes fléchies, buste légèrement penché, bras tendus, épaules relâchées.',
+      'Attaque : jambes fléchies, buste légèrement penché, bras tendus, épaules relâchées.',
       'Pousse fort dans les jambes en gardant le buste penché et les bras tendus.',
       'Jambes presque tendues, ouvre le buste puis ramène la poignée au bas des côtes en soufflant.',
-      'Reviens dans l’ordre inverse : bras, puis buste, puis jambes, en inspirant.',
+      'Reviens dans l’ordre inverse : bras, puis buste, puis jambes, en inspirant.',
     ],
     [
-      'Les bras tirent avant les jambes : la puissance vient des jambes, les bras finissent le geste.',
-      'Le dos s’arrondit en fin de tirage : gaine le tronc et garde la poitrine ouverte.',
-      'Le retour se fait avec un à-coup : enchaîne les mouvements dans l’ordre inverse, sans télégraphier.',
+      'Les bras tirent avant les jambes : la puissance vient des jambes, les bras finissent le geste.',
+      'Le dos s’arrondit en fin de tirage : gaine le tronc et garde la poitrine ouverte.',
+      'Le retour se fait avec un à-coup : enchaîne les mouvements dans l’ordre inverse, sans télégraphier.',
     ],
     [
       'Règle la résistance et serre les sangles avant de commencer pour éviter que les pieds glissent.',
@@ -116,8 +116,8 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
       youtubeShortId: 'soveq2xBNpo',
       primaryMuscles: ['Dos', 'Jambes'],
       secondaryMuscles: ['Bras'],
-      tempoRecommended: 'Cadence régulière : tirage puissant, retour fluide',
-      keyCue: 'Jambes, buste, bras à l’aller ; l’inverse au retour',
+      tempoRecommended: 'Cadence régulière : tirage puissant, retour fluide',
+      keyCue: 'Jambes, buste, bras à l’aller ; l’inverse au retour',
     },
   ),
   velo: tutorial(
@@ -130,12 +130,12 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
       'Règle la selle à hauteur de hanche, puis vérifie que le genou reste légèrement fléchi en bas de course.',
       'Pédale à intensité moyenne, à cadence régulière, sans résistance excessive.',
       'Garde les épaules basses et les mains détendues, le buste accompagne légèrement la cadence.',
-      'Respire régulièrement : tu dois pouvoir dire une courte phrase à cette allure.',
+      'Respire régulièrement : tu dois pouvoir dire une courte phrase à cette allure.',
     ],
     [
-      'Les épaules montent vers les oreilles : relâche le haut du corps, les jambes font le travail.',
-      'La selle est trop basse et le genou plie fortement en haut : remonte la selle d’un cran.',
-      'Le buste reste crispé et figé : laisse une légère oscillation accompagner la cadence.',
+      'Les épaules montent vers les oreilles : relâche le haut du corps, les jambes font le travail.',
+      'La selle est trop basse et le genou plie fortement en haut : remonte la selle d’un cran.',
+      'Le buste reste crispé et figé : laisse une légère oscillation accompagner la cadence.',
     ],
     [
       'Engage les pieds dans les cale-pieds ou les sangles avant d’accélérer.',
@@ -160,12 +160,12 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
       'Garde une seconde en haut avant de redescendre pour enchaîner la série suivante.',
     ],
     [
-      'Le bassin décolle du dossier en fin de descente : réduis l’amplitude et garde le contact.',
-      'Les genoux se verrouillent d’un coup en haut : termine la poussée sans les claquer.',
-      'Les genoux partent vers l’intérieur à la montée : pousse dans les orteils et garde-les dans l’axe.',
+      'Le bassin décolle du dossier en fin de descente : réduis l’amplitude et garde le contact.',
+      'Les genoux se verrouillent d’un coup en haut : termine la poussée sans les claquer.',
+      'Les genoux partent vers l’intérieur à la montée : pousse dans les orteils et garde-les dans l’axe.',
     ],
     [
-      'Réduis l’amplitude dès qu’une tension vive apparaît à l’arrière du genou : ne cherche pas la descente maximale.',
+      'Réduis l’amplitude dès qu’une tension vive apparaît à l’arrière du genou : ne cherche pas la descente maximale.',
       'Vérifie que les sécurités sont en place avant de charger la machine.',
     ],
     {
@@ -189,9 +189,9 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
       'Redescends lentement sur trois temps, jusqu’à presque tendre les jambes, sans lâcher la charge.',
     ],
     [
-      'Le bassin se soulève pour finir la répétition : la charge est trop lourde, réduis-la.',
-      'Le retour se fait en chute libre : la phase négative se contrôle, sinon l’exercice perd son intérêt.',
-      'Le dos se cambre quand la charge résiste : garde le ventre posé et le bassin plaqué.',
+      'Le bassin se soulève pour finir la répétition : la charge est trop lourde, réduis-la.',
+      'Le retour se fait en chute libre : la phase négative se contrôle, sinon l’exercice perd son intérêt.',
+      'Le dos se cambre quand la charge résiste : garde le ventre posé et le bassin plaqué.',
     ],
     [
       'Arrête en cas de crampe ou de pointe vive à l’arrière de la cuisse, et réduis la charge au besoin.',
@@ -217,12 +217,12 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
       'Enchaîne la répétition suivante sans relâcher complètement la tension en bas de course.',
     ],
     [
-      'Les épaules montent vers les oreilles pendant la poussée : garde les omoplates basses et serrées de bout en bout.',
-      'Les coudes se verrouillent violemment : termine bras presque tendus, sans claquer l’articulation.',
-      'Le dos se décolle du dossier pour pousser plus fort : la charge est trop lourde, réduis-la.',
+      'Les épaules montent vers les oreilles pendant la poussée : garde les omoplates basses et serrées de bout en bout.',
+      'Les coudes se verrouillent violemment : termine bras presque tendus, sans claquer l’articulation.',
+      'Le dos se décolle du dossier pour pousser plus fort : la charge est trop lourde, réduis-la.',
     ],
     [
-      'Choisis une charge qui te laisse contrôler la phase de retour : ne force jamais sur l’articulation de l’épaule.',
+      'Choisis une charge qui te laisse contrôler la phase de retour : ne force jamais sur l’articulation de l’épaule.',
       'Arrête en cas de douleur vive à l’épaule ou à la poitrine.',
     ],
     {
@@ -246,12 +246,12 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
       'Reviens lentement bras tendus, en laissant les omoplates s’ouvrir sous contrôle.',
     ],
     [
-      'Le buste se balance en arrière pour tirer plus lourd : reste droit et laisse les coudes faire le travail.',
-      'Les épaules montent vers les oreilles : garde-les basses, c’est le dos qui travaille.',
-      'Le retour se fait en lâchant la résistance : accompagne la poignée jusqu’au bout des bras.',
+      'Le buste se balance en arrière pour tirer plus lourd : reste droit et laisse les coudes faire le travail.',
+      'Les épaules montent vers les oreilles : garde-les basses, c’est le dos qui travaille.',
+      'Le retour se fait en lâchant la résistance : accompagne la poignée jusqu’au bout des bras.',
     ],
     [
-      'Ne tire jamais la poignée derrière la nuque ni vers le haut du torse : reste au niveau du ventre.',
+      'Ne tire jamais la poignée derrière la nuque ni vers le haut du torse : reste au niveau du ventre.',
       'Réduis la charge si les lombaires se chargent en fin de série.',
     ],
     {
@@ -275,9 +275,9 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
       'Enchaîne au rythme d’une respiration fluide, sans t’arrêter entre les répétitions.',
     ],
     [
-      'La réception se fait jambes tendues et talons qui claquent : fléchis les genoux à chaque retour.',
-      'La respiration est bloquée pendant l’effort : souffle à chaque ouverture.',
-      'Les appuis restent sur la pointe sans contrôle : reste réactif mais pose le pied à plat.',
+      'La réception se fait jambes tendues et talons qui claquent : fléchis les genoux à chaque retour.',
+      'La respiration est bloquée pendant l’effort : souffle à chaque ouverture.',
+      'Les appuis restent sur la pointe sans contrôle : reste réactif mais pose le pied à plat.',
     ],
     [
       'Réduis l’amplitude et le rythme si le souffle se saccade ou si les appuis deviennent douloureux.',
@@ -302,12 +302,12 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
       'Maintiens la position jusqu’à la fin du chrono, sans creuser ni monter les hanches.',
     ],
     [
-      'Les hanches s’affaissent progressivement : rattrape en serrant fessiers et abdos, ou raccourcis la série.',
-      'Les fesses montent pour soulager le ventre : reviens à l’alignement, quitte à tenir moins longtemps.',
-      'La respiration est bloquée : garde un souffle régulier, signe d’un gainage tenu et non crispé.',
+      'Les hanches s’affaissent progressivement : rattrape en serrant fessiers et abdos, ou raccourcis la série.',
+      'Les fesses montent pour soulager le ventre : reviens à l’alignement, quitte à tenir moins longtemps.',
+      'La respiration est bloquée : garde un souffle régulier, signe d’un gainage tenu et non crispé.',
     ],
     [
-      'Arrête la position si le bas du dos pique : repose les genoux et reprends avec un appui plus haut.',
+      'Arrête la position si le bas du dos pique : repose les genoux et reprends avec un appui plus haut.',
       'Préfère une série plus courte bien alignée à une série longue avec le dos creusé.',
     ],
     {
@@ -330,9 +330,9 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
       'Termine debout genoux souples, sans les claquer, puis enchaîne la répétition suivante.',
     ],
     [
-      'Les genoux rentrent vers l’intérieur à la remontée : pousse-les vers l’extérieur, dans l’axe des orteils.',
-      'Le bas du dos s’arrondit en fin de descente : remonte, c’est la limite d’amplitude du jour.',
-      'Les talons se décollent : répartis le poids sur tout le pied et recule un peu les appuis si besoin.',
+      'Les genoux rentrent vers l’intérieur à la remontée : pousse-les vers l’extérieur, dans l’axe des orteils.',
+      'Le bas du dos s’arrondit en fin de descente : remonte, c’est la limite d’amplitude du jour.',
+      'Les talons se décollent : répartis le poids sur tout le pied et recule un peu les appuis si besoin.',
     ],
     [
       'Sécurise les crochets de la Smith avant la série et tourne les mains d’un cran pour verrouiller la barre.',
@@ -359,9 +359,9 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
       'Redescends en contrôlant sur deux temps, sans laisser la charge retomber.',
     ],
     [
-      'La charge est balancée avec élan : la phase de retour doit être aussi contrôlée que la montée.',
-      'Les genoux se verrouillent d’un coup en haut : tends les jambes sans claquer l’articulation.',
-      'Le bassin se décolle du siège : baisse la charge pour rester assis stable.',
+      'La charge est balancée avec élan : la phase de retour doit être aussi contrôlée que la montée.',
+      'Les genoux se verrouillent d’un coup en haut : tends les jambes sans claquer l’articulation.',
+      'Le bassin se décolle du siège : baisse la charge pour rester assis stable.',
     ],
     [
       'Réduis l’amplitude si le genou craque de façon douloureuse et reste dans le secteur indolore.',
@@ -387,12 +387,12 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
       'Reviens lentement jusqu’à l’étirement des pectoraux, omoplates toujours stables.',
     ],
     [
-      'Le dos se cambre et décolle du dossier : la charge est trop lourde, garde le contact.',
-      'Les poignées descendent trop bas et tirent sur l’épaule : limite l’amplitude au secteur confortable.',
-      'Les épaules montent vers les oreilles pendant la poussée : garde-les basses et serrées.',
+      'Le dos se cambre et décolle du dossier : la charge est trop lourde, garde le contact.',
+      'Les poignées descendent trop bas et tirent sur l’épaule : limite l’amplitude au secteur confortable.',
+      'Les épaules montent vers les oreilles pendant la poussée : garde-les basses et serrées.',
     ],
     [
-      'Arrête la série en cas de douleur vive à l’épaule : ne descends pas plus bas que le confortable.',
+      'Arrête la série en cas de douleur vive à l’épaule : ne descends pas plus bas que le confortable.',
       'Vérifie le réglage du siège avant de charger pour éviter une amplitude d’épaule excessive.',
     ],
     {
@@ -416,9 +416,9 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
       'Remonte la barre lentement bras tendus, en laissant les omoplates s’ouvrir en fin de course.',
     ],
     [
-      'La barre est tirée derrière la nuque : tire toujours devant, vers le haut du torse.',
-      'Le buste se balance en arrière pour finir la répétition : reste droit, c’est le dos qui tire.',
-      'Les épaules restent hautes et les bras travaillent seuls : abaisse les omoplates avant de fléchir les coudes.',
+      'La barre est tirée derrière la nuque : tire toujours devant, vers le haut du torse.',
+      'Le buste se balance en arrière pour finir la répétition : reste droit, c’est le dos qui tire.',
+      'Les épaules restent hautes et les bras travaillent seuls : abaisse les omoplates avant de fléchir les coudes.',
     ],
     [
       'Réduis la charge si les épaules ou les coudes tirent en fin de série.',
@@ -445,9 +445,9 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
       'Remonte les mains au-dessus de la tête en inspirant, puis enchaîne en mouvement continu.',
     ],
     [
-      'Seuls les bras tirent : ajoute le buste et les jambes, la chaîne complète fait l’efficacité.',
-      'Le dos s’arrondit fortement en bas du mouvement : garde la poitrine ouverte et les omoplates contrôlées.',
-      'Le mouvement est haché : garde une cadence régulière et une respiration fluide.',
+      'Seuls les bras tirent : ajoute le buste et les jambes, la chaîne complète fait l’efficacité.',
+      'Le dos s’arrondit fortement en bas du mouvement : garde la poitrine ouverte et les omoplates contrôlées.',
+      'Le mouvement est haché : garde une cadence régulière et une respiration fluide.',
     ],
     [
       'Ajuste la résistance avant de commencer et garde les pieds stables pour éviter la glissade.',
@@ -473,12 +473,12 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
       'Maintiens la position jusqu’à la fin du chrono en respirant régulièrement, sans creuser le dos.',
     ],
     [
-      'Le bas du dos se creuse et se décolle : réduis l’amplitude en repliant un peu les jambes ou en gardant les bras au sol.',
-      'La respiration est bloquée : garde un souffle court mais continu.',
-      'La tête est trop décollée : l’enroulement reste léger, c’est le ventre qui tient la position.',
+      'Le bas du dos se creuse et se décolle : réduis l’amplitude en repliant un peu les jambes ou en gardant les bras au sol.',
+      'La respiration est bloquée : garde un souffle court mais continu.',
+      'La tête est trop décollée : l’enroulement reste léger, c’est le ventre qui tient la position.',
     ],
     [
-      'Dès que le bas du dos se décolle, arrête la série ou réduis l’amplitude : ne force pas sur les lombaires.',
+      'Dès que le bas du dos se décolle, arrête la série ou réduis l’amplitude : ne force pas sur les lombaires.',
       'Préfère une position plus facile tenue proprement à une position avancée avec le dos creusé.',
     ],
     {
@@ -500,9 +500,9 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
       'Garde les épaules au-dessus des mains et une respiration continue.',
     ],
     [
-      'Les fesses montent pendant l’alternance : garde le bassin bas et le corps aligné.',
-      'Les mains se décalent vers l’avant : replace-les régulièrement sous les épaules.',
-      'L’alternance devient précipitée : un rythme régulier vaut mieux qu’une course désordonnée.',
+      'Les fesses montent pendant l’alternance : garde le bassin bas et le corps aligné.',
+      'Les mains se décalent vers l’avant : replace-les régulièrement sous les épaules.',
+      'L’alternance devient précipitée : un rythme régulier vaut mieux qu’une course désordonnée.',
     ],
     [
       'Repose les genoux si les poignets ou les lombaires se chargent, puis reprends plus lentement.',
@@ -527,13 +527,13 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
       'Redescends lentement en contrôlant, jusqu’à frôler l’assise avant de te rasseoir.',
     ],
     [
-      'Tu te laisses tomber sur la chaise : contrôle la descente, c’est la partie qui travaille.',
-      'Tu pousses avec les mains sur les genoux : garde les bras libres et pousse dans les pieds.',
-      'Les genoux partent vers l’intérieur à la levée : mets-les dans l’axe des orteils.',
+      'Tu te laisses tomber sur la chaise : contrôle la descente, c’est la partie qui travaille.',
+      'Tu pousses avec les mains sur les genoux : garde les bras libres et pousse dans les pieds.',
+      'Les genoux partent vers l’intérieur à la levée : mets-les dans l’axe des orteils.',
     ],
     [
       'Utilise un banc stable, ni trop haut ni roulant, pour éviter de te rattraper en déséquilibre.',
-      'Garde une assise à hauteur confortable : si les genoux tirent, remonte le siège.',
+      'Garde une assise à hauteur confortable : si les genoux tirent, remonte le siège.',
     ],
     {
       youtubeShortId: '8gkfe4aTE-0',
@@ -554,9 +554,9 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
       'Redescends lentement jusqu’à effleurer le sol, puis enchaîne.',
     ],
     [
-      'La nuque est tirée par les mains : les mains reposent à peine, c’est le ventre qui enroule le buste.',
-      'Le bas du dos décolle et le mouvement devient un sit-up complet : reste sur un enroulement court.',
-      'La montée se fait avec élan : descente lente, sans rebond.',
+      'La nuque est tirée par les mains : les mains reposent à peine, c’est le ventre qui enroule le buste.',
+      'Le bas du dos décolle et le mouvement devient un sit-up complet : reste sur un enroulement court.',
+      'La montée se fait avec élan : descente lente, sans rebond.',
     ],
     [
       'Arrête si la nuque ou le bas du dos tire et corrige d’abord la position des mains et l’enroulement.',
@@ -582,12 +582,12 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
       'Redescends lentement jusqu’à hauteur d’épaules, sous contrôle, sans laisser tomber les bras.',
     ],
     [
-      'Le dos se cambre et le bassin avance : garde le tronc gainé et la cage thoracique basse.',
-      'Les haltères se cognent en haut : laisse un écart stable entre les mains.',
-      'Les coudes s’ouvrent à 90° du buste : garde-les à environ 45°, plus confortables pour l’épaule.',
+      'Le dos se cambre et le bassin avance : garde le tronc gainé et la cage thoracique basse.',
+      'Les haltères se cognent en haut : laisse un écart stable entre les mains.',
+      'Les coudes s’ouvrent à 90° du buste : garde-les à environ 45°, plus confortables pour l’épaule.',
     ],
     [
-      'Reste sur des charges légères : avec des haltères en mouvement libre, mieux vaut contrôler que forcer.',
+      'Reste sur des charges légères : avec des haltères en mouvement libre, mieux vaut contrôler que forcer.',
       'Arrête si l’épaule tire en haut de la poussée et réduis l’amplitude.',
     ],
     {
@@ -611,9 +611,9 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
       'À la fin des 5 minutes, décélère progressivement au lieu de t’arrêter net.',
     ],
     [
-      'Le buste s’affaisse sur le guidon : reste droit, la marche est un décrassage, pas un appui.',
-      'La vitesse est changée brutalement en cours de route : garde une allure constante sur toute la durée.',
-      'L’arrêt se fait d’un coup en fin de séance : réduis la vitesse pour redescendre en douceur.',
+      'Le buste s’affaisse sur le guidon : reste droit, la marche est un décrassage, pas un appui.',
+      'La vitesse est changée brutalement en cours de route : garde une allure constante sur toute la durée.',
+      'L’arrêt se fait d’un coup en fin de séance : réduis la vitesse pour redescendre en douceur.',
     ],
     [
       'Attache le dispositif d’arrêt d’urgence avant de démarrer le tapis.',
@@ -637,9 +637,9 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
       'Réduis la vitesse sur la dernière minute pour finir en marche lente avant de descendre.',
     ],
     [
-      'La marche rapide se transforme en course : reste sur un pas rapide, l’objectif est la récupération.',
-      'Les bras restent figés le long du corps : laisse-les accompagner naturellement le mouvement.',
-      'Le buste penche en avant en fin de séance : redresse-le et redescends en intensité si nécessaire.',
+      'La marche rapide se transforme en course : reste sur un pas rapide, l’objectif est la récupération.',
+      'Les bras restent figés le long du corps : laisse-les accompagner naturellement le mouvement.',
+      'Le buste penche en avant en fin de séance : redresse-le et redescends en intensité si nécessaire.',
     ],
     [
       'Vérifie la sécurité d’arrêt au début et garde la main libre pour l’actionner en cas de besoin.',
@@ -658,17 +658,17 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
     'Sur le tapis, marche rapide, épaules relâchées, respiration ample pour redescendre après le circuit. Sécurité d’arrêt activée.',
     [
       'Monte sur le tapis, active la sécurité d’arrêt et démarre tranquillement après le circuit cardio.',
-      'Trouve une marche rapide mais confortable : le souffle doit revenir progressivement.',
+      'Trouve une marche rapide mais confortable : le souffle doit revenir progressivement.',
       'Garde un buste droit et des épaules basses pendant les 5 minutes.',
       'Baisse l’allure sur la fin et quitte le tapis une fois l’essoufflement retombé.',
     ],
     [
-      'On reprend un rythme trop élevé : cette marche sert à redescendre, pas à prolonger le circuit.',
-      'La respiration reste courte et haute : ralentis pour retrouver un souffle ample et calme.',
-      'L’arrêt se fait en sautant du tapis : décélère d’abord, puis descends à l’arrêt.',
+      'On reprend un rythme trop élevé : cette marche sert à redescendre, pas à prolonger le circuit.',
+      'La respiration reste courte et haute : ralentis pour retrouver un souffle ample et calme.',
+      'L’arrêt se fait en sautant du tapis : décélère d’abord, puis descends à l’arrêt.',
     ],
     [
-      'Garde le dispositif d’arrêt attaché : la fatigue du circuit rend les appuis moins sûrs.',
+      'Garde le dispositif d’arrêt attaché : la fatigue du circuit rend les appuis moins sûrs.',
       'Si un vertige survient en fin de circuit, ralentis immédiatement et descends sans te précipiter.',
     ],
     {

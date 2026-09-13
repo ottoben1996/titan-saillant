@@ -85,7 +85,7 @@ export function TutorialModal({ tutorial, onClose }: TutorialModalProps) {
                 <div className="tutorial-short-wrapper">
                   <iframe
                     src={`https://www.youtube-nocookie.com/embed/${tutorial.youtubeShortId}?autoplay=1&mute=1&loop=1&playlist=${tutorial.youtubeShortId}&playsinline=1&controls=1&rel=0&modestbranding=1`}
-                    title={`Short Démonstration : ${tutorial.title}`}
+                    title={`Short Démonstration : ${tutorial.title}`}
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     allowFullScreen
                     className="tutorial-short-iframe"
@@ -154,9 +154,9 @@ export function TutorialModal({ tutorial, onClose }: TutorialModalProps) {
                   height: '100%',
                 }}
               >
-                <img src={media.start} alt={`Départ : ${tutorial.title}`} style={frameStyle} />
+                <img src={media.start} alt={`Départ : ${tutorial.title}`} style={frameStyle} />
                 <ArrowRight size={20} className="tutorial-arrow" />
-                <img src={media.peak ?? media.main ?? media.start} alt={`Fin : ${tutorial.title}`} style={frameStyle} />
+                <img src={media.peak ?? media.main ?? media.start} alt={`Fin : ${tutorial.title}`} style={frameStyle} />
               </div>
             ) : media?.main ? (
               <img
@@ -196,7 +196,7 @@ export function TutorialModal({ tutorial, onClose }: TutorialModalProps) {
               margin: '.6rem 0',
             }}
           >
-            <Bolt size={14} /> Repère clé du coach : {tutorial.keyCue}
+            <Bolt size={14} /> Repère clé du coach : {tutorial.keyCue}
           </div>
         )}
 

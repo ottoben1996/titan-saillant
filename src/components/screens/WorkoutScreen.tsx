@@ -360,7 +360,7 @@ export function WorkoutScreen({
           <h1>{activeAlternative ? activeAlternative.name : exercise?.name}</h1>
           {activeAlternative && (
             <div className="alternative-active-badge">
-              <span>Alternative active (original : {exercise?.name})</span>
+              <span>Alternative active (original : {exercise?.name})</span>
               {onRevertAlternative && (
                 <button type="button" className="revert-alt-btn" onClick={() => onRevertAlternative(exercise!.id)}>
                   <Undo size={13} /> Revenir à la machine
@@ -416,20 +416,20 @@ export function WorkoutScreen({
                     <img
                       className="movement-frame frame-start"
                       src={movementMedia.start}
-                      alt={`Position de départ : ${exercise.name}`}
+                      alt={`Position de départ : ${exercise.name}`}
                       decoding="async"
                     />
                     <img
                       className="movement-frame frame-peak"
                       src={movementMedia.peak ?? movementMedia.start}
-                      alt={`Position finale : ${exercise.name}`}
+                      alt={`Position finale : ${exercise.name}`}
                       decoding="async"
                     />
                   </>
                 ) : (
                   <img
                     src={movementMedia.main ?? movementMedia.start ?? ''}
-                    alt={`Illustration : ${exercise.name}`}
+                    alt={`Illustration : ${exercise.name}`}
                     decoding="async"
                   />
                 )}
@@ -479,12 +479,12 @@ export function WorkoutScreen({
                 <span>
                   {progression.source === 'demande' ? (
                     <>
-                      Tu avais demandé à charger plus : <strong>{progression.suggestedLoadKg} kg</strong> (+
+                      Tu avais demandé à charger plus : <strong>{progression.suggestedLoadKg} kg</strong> (+
                       {progression.incrementKg} kg)
                     </>
                   ) : (
                     <>
-                      Objectif suggéré : <strong>{progression.suggestedLoadKg} kg</strong> (+{progression.incrementKg}{' '}
+                      Objectif suggéré : <strong>{progression.suggestedLoadKg} kg</strong> (+{progression.incrementKg}{' '}
                       kg)
                     </>
                   )}
@@ -502,7 +502,7 @@ export function WorkoutScreen({
             {/* Demande d'allègement : la charge prescrite ne bouge pas, mais on le dit */}
             {allegementDemande && prescription.phase !== 'warmup' && (
               <p className="progression-allgement">
-                Tu as demandé d’alléger la dernière fois. La charge reste celle du coach : soigne la technique et arrête
+                Tu as demandé d’alléger la dernière fois. La charge reste celle du coach : soigne la technique et arrête
                 la série dès que l’effort dépasse 8 sur 10.
               </p>
             )}
@@ -596,7 +596,7 @@ export function WorkoutScreen({
                   {prescription.loadKg !== undefined && (
                     <div className="rest-next-prep">
                       <span className="rest-next-load">
-                        Charge prévue : <strong>{formatLoadKg(prescription.loadKg)} kg</strong>
+                        Charge prévue : <strong>{formatLoadKg(prescription.loadKg)} kg</strong>
                       </span>
                       {prescription.loadKg >= 20 && (
                         <PlateBadge totalLoadKg={prescription.loadKg} exerciseId={exercise.id} />
@@ -640,7 +640,7 @@ export function WorkoutScreen({
                 <div className="ghost-perf-strip">
                   <Repeat size={14} className="ghost-icon" />
                   <span className="ghost-perf-text">
-                    Dernière fois : <strong>{ghostSummary}</strong>
+                    Dernière fois : <strong>{ghostSummary}</strong>
                   </span>
                   {ghostDelta && (
                     <span className={`ghost-delta${ghostDelta.atParity ? ' at-parity' : ''}`}>{ghostDelta.label}</span>

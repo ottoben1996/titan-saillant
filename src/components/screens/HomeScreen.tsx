@@ -141,7 +141,7 @@ export function HomeScreen({
         </aside>
       )}
 
-      {/* Action dominante : la séance du jour, ou l'état « semaine complète ». */}
+      {/* Action dominante : la séance du jour, ou l'état « semaine complète ». */}
       {!view.isResuming && todaySlot && (
         <article className="today-card">
           <div className="today-card-head">

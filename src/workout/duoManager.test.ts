@@ -16,7 +16,7 @@ describe('duoManager', () => {
     expect(delta.differenceKg).toBe(40);
     expect(delta.deltaPerSideKg).toBe(20);
     expect(delta.platesPerSide).toEqual([{ plateKg: 20, count: 1 }]);
-    expect(delta.summaryLabel).toContain('Ajouter 20 kg / côté : 20kg');
+    expect(delta.summaryLabel).toContain('Ajouter 20 kg / côté : 20kg');
   });
 
   it('calculates plates to remove when moving from Ottman (110kg) to Laura (70kg)', () => {
@@ -25,7 +25,7 @@ describe('duoManager', () => {
     expect(delta.differenceKg).toBe(-40);
     expect(delta.deltaPerSideKg).toBe(20);
     expect(delta.platesPerSide).toEqual([{ plateKg: 20, count: 1 }]);
-    expect(delta.summaryLabel).toContain('Retirer 20 kg / côté : 20kg');
+    expect(delta.summaryLabel).toContain('Retirer 20 kg / côté : 20kg');
   });
 
   it('calculates multiple plates (e.g. 50kg to 125kg: diff 75kg -> 37.5kg/side)', () => {

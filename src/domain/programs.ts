@@ -17,7 +17,7 @@ const warmup: readonly ExercisePrescription[] = Object.freeze([
     name: 'Équilibre sur bosu',
     kind: 'warmup',
     sets: Array.from({ length: 3 }, () => ({ durationSeconds: 40, loadLabel: 'PDC' })),
-    notes: '40 secondes par série : 20 secondes par jambe, changer de jambe à mi-série',
+    notes: '40 secondes par série : 20 secondes par jambe, changer de jambe à mi-série',
   }),
   exercise({
     id: 'rameur',

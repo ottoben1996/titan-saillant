@@ -12,20 +12,20 @@
 .followup {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  padding-top: 8px;
+  gap: var(--sp-7);
+  padding-top: var(--sp-4);
 }
 
 .back-link {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--sp-3);
   align-self: flex-start;
-  padding: 8px 10px;
-  border-radius: 10px;
+  padding: var(--sp-4) var(--sp-5);
+  border-radius: var(--r-md);
   background: rgba(255, 255, 255, 0.05);
   color: var(--text-2);
-  font-size: 12px;
+  font-size: var(--fs-2);
   font-weight: 700;
 }
 
@@ -44,13 +44,13 @@
 /* Rail du cycle : on voit d'un coup d'œil où on en est sur les huit semaines. */
 .cycle-track {
   display: flex;
-  gap: 5px;
+  gap: var(--sp-2);
 }
 
 .cycle-track i {
   flex: 1;
   height: 4px;
-  border-radius: 99px;
+  border-radius: var(--r-full);
   background: rgba(255, 255, 255, 0.12);
 }
 
@@ -67,15 +67,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: var(--sp-4);
   min-height: 48px;
-  padding: 12px;
-  border-radius: 14px;
+  padding: var(--sp-6);
+  border-radius: var(--r-lg);
   border: 1px solid rgb(var(--accent-rgb) / 0.35);
   background: rgb(var(--accent-rgb) / 0.12);
   color: var(--accent);
   font-weight: 700;
-  font-size: 13px;
+  font-size: var(--fs-3);
 }
 
 .report-button:disabled {
@@ -86,16 +86,16 @@
   display: flex;
   flex-direction: column;
   border: 1px solid var(--line);
-  border-radius: 16px;
+  border-radius: var(--r-lg);
   background: var(--surface-1);
-  padding: 4px 14px;
+  padding: var(--sp-2) var(--sp-7);
 }
 
 .followup-field {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 11px 0;
+  gap: var(--sp-5);
+  padding: var(--sp-5) 0;
   border-bottom: 1px solid var(--line);
 }
 
@@ -114,14 +114,14 @@
 
 .followup-label b {
   display: block;
-  font-size: 13px;
+  font-size: var(--fs-3);
   font-weight: 600;
 }
 
 .followup-label small {
   display: block;
   color: var(--text-3);
-  font-size: 11px;
+  font-size: var(--fs-1);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -130,7 +130,7 @@
 .followup-stepper {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--sp-3);
 }
 
 .followup-stepper button {
@@ -139,7 +139,7 @@
   /* 44 px : la cible tactile recommandée pour un pouce, mesurée par audit. */
   width: 44px;
   height: 44px;
-  border-radius: 11px;
+  border-radius: var(--r-md);
   background: var(--surface-2);
   color: var(--text-2);
 }
@@ -147,12 +147,12 @@
 .followup-stepper input {
   width: 64px;
   height: 44px;
-  padding: 9px 6px;
+  padding: var(--sp-4) var(--sp-3);
   border: 1px solid var(--line);
-  border-radius: 11px;
+  border-radius: var(--r-md);
   background: var(--surface-0);
   color: var(--text-1);
-  font-size: 17px;
+  font-size: var(--fs-6);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   text-align: center;
@@ -166,7 +166,7 @@
 .followup-delta {
   min-width: 46px;
   text-align: right;
-  font-size: 12px;
+  font-size: var(--fs-2);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   color: var(--text-3);
@@ -182,22 +182,22 @@
 
 .followup-warning {
   display: flex;
-  gap: 9px;
-  padding: 11px 12px;
-  border-radius: 13px;
+  gap: var(--sp-4);
+  padding: var(--sp-5) var(--sp-6);
+  border-radius: var(--r-lg);
   border: 1px solid rgb(243 189 107 / 0.32);
   background: rgb(243 189 107 / 0.1);
   color: #f0d6a8;
-  font-size: 12px;
+  font-size: var(--fs-2);
   line-height: 1.45;
 }
 
 .followup-summary {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px 14px;
+  gap: var(--sp-3) var(--sp-7);
   color: var(--text-3);
-  font-size: 11.5px;
+  font-size: var(--fs-1);
 }
 
 .followup-summary b {
@@ -207,22 +207,22 @@
 .followup-saved {
   margin: 0;
   color: var(--accent);
-  font-size: 12.5px;
+  font-size: var(--fs-2);
   font-weight: 700;
 }
 
 .bilan-button {
-  margin-top: 2px;
+  margin-top: var(--sp-1);
 }
 
 .followup-next {
   align-self: center;
-  padding: 10px 4px;
+  padding: var(--sp-5) var(--sp-2);
 }
 
 .followup-history-title {
-  margin: 10px 0 0;
-  font-size: 13px;
+  margin: var(--sp-5) 0 0;
+  font-size: var(--fs-3);
   text-transform: uppercase;
   letter-spacing: 0.12em;
   color: var(--text-3);
@@ -231,15 +231,15 @@
 .followup-history {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--sp-4);
 }
 
 .followup-row {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 11px 13px;
-  border-radius: 13px;
+  gap: var(--sp-6);
+  padding: var(--sp-5) var(--sp-6);
+  border-radius: var(--r-lg);
   background: var(--surface-1);
   border: 1px solid var(--line);
 }
@@ -247,7 +247,7 @@
 .followup-week {
   min-width: 58px;
   color: var(--accent);
-  font-size: 12px;
+  font-size: var(--fs-2);
   font-weight: 800;
   font-variant-numeric: tabular-nums;
 }
@@ -255,27 +255,27 @@
 .followup-row-values {
   display: grid;
   flex: 1;
-  gap: 2px;
+  gap: var(--sp-1);
 }
 
 .followup-row-values b {
-  font-size: 15px;
+  font-size: var(--fs-5);
 }
 
 .followup-row-values small {
   color: var(--text-3);
-  font-size: 11.5px;
+  font-size: var(--fs-1);
 }
 
 /* Entrée depuis l'écran Progression. */
 .followup-cta {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--sp-6);
   width: 100%;
-  margin: 18px 0 6px;
-  padding: 14px;
-  border-radius: 16px;
+  margin: var(--sp-9) 0 var(--sp-3);
+  padding: var(--sp-7);
+  border-radius: var(--r-lg);
   border: 1px solid rgb(var(--accent-rgb) / 0.28);
   background: rgb(var(--accent-rgb) / 0.08);
   text-align: left;
@@ -286,7 +286,7 @@
   place-items: center;
   width: 40px;
   height: 40px;
-  border-radius: 12px;
+  border-radius: var(--r-md);
   background: var(--accent);
   color: var(--accent-ink);
 }
@@ -294,16 +294,16 @@
 .followup-cta-text {
   display: grid;
   flex: 1;
-  gap: 2px;
+  gap: var(--sp-1);
 }
 
 .followup-cta-text strong {
-  font-size: 14px;
+  font-size: var(--fs-4);
 }
 
 .followup-cta-text small {
   color: var(--text-3);
-  font-size: 11.5px;
+  font-size: var(--fs-1);
 }
 
 .followup-cta > svg {
@@ -313,7 +313,7 @@
 /* ------------------------------------------------------------------ Bilan --- */
 
 .bilan {
-  padding: 10px 0 40px;
+  padding: var(--sp-5) 0 var(--sp-13);
 }
 
 .bilan-bar {
@@ -323,25 +323,25 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 14px;
-  padding: 10px 12px;
-  border-radius: 14px;
+  gap: var(--sp-5);
+  margin-bottom: var(--sp-7);
+  padding: var(--sp-5) var(--sp-6);
+  border-radius: var(--r-lg);
   border: 1px solid var(--line);
   background: rgb(16 22 21 / 0.92);
   backdrop-filter: blur(14px);
 }
 
 .bilan-bar .primary-button {
-  padding: 11px 14px;
-  font-size: 13px;
+  padding: var(--sp-5) var(--sp-7);
+  font-size: var(--fs-3);
 }
 
 .bilan-doc {
   width: min(100%, 820px);
   margin: 0 auto;
-  padding: 26px 24px 30px;
-  border-radius: 14px;
+  padding: var(--sp-11) var(--sp-11) var(--sp-12);
+  border-radius: var(--r-lg);
   background: #ffffff;
   color: #16211c;
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
@@ -351,20 +351,20 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 14px;
-  padding-bottom: 12px;
+  gap: var(--sp-7);
+  padding-bottom: var(--sp-6);
   border-bottom: 2px solid #16211c;
 }
 
 .bilan-head h2 {
   margin: 0;
-  font-size: 21px;
+  font-size: var(--fs-8);
   letter-spacing: -0.03em;
 }
 
 .bilan-head p {
-  margin: 4px 0 0;
-  font-size: 11px;
+  margin: var(--sp-2) 0 0;
+  font-size: var(--fs-1);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: #55655c;
@@ -372,13 +372,13 @@
 
 .bilan-tag {
   text-align: right;
-  font-size: 11px;
+  font-size: var(--fs-1);
   color: #55655c;
 }
 
 .bilan-tag b {
   display: block;
-  font-size: 15px;
+  font-size: var(--fs-5);
   color: #16211c;
   letter-spacing: -0.02em;
 }
@@ -386,19 +386,19 @@
 .bilan-kpis {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 9px;
-  margin: 16px 0 6px;
+  gap: var(--sp-4);
+  margin: var(--sp-8) 0 var(--sp-3);
 }
 
 .bilan-kpis > div {
   border: 1px solid #d8e0db;
-  border-radius: 9px;
-  padding: 9px 11px;
+  border-radius: var(--r-md);
+  padding: var(--sp-4) var(--sp-5);
 }
 
 .bilan-kpis span {
   display: block;
-  font-size: 10px;
+  font-size: var(--fs-1);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: #55655c;
@@ -406,47 +406,47 @@
 
 .bilan-kpis b {
   display: block;
-  margin-top: 4px;
-  font-size: 18px;
+  margin-top: var(--sp-2);
+  font-size: var(--fs-7);
   letter-spacing: -0.03em;
   font-variant-numeric: tabular-nums;
 }
 
 .bilan-kpis small {
   display: block;
-  font-size: 10.5px;
+  font-size: var(--fs-1);
   color: #55655c;
 }
 
 .bilan-doc h3 {
-  margin: 20px 0 8px;
-  font-size: 12px;
+  margin: var(--sp-10) 0 var(--sp-4);
+  font-size: var(--fs-2);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: #55655c;
 }
 
 .bilan-doc h4 {
-  margin: 14px 0 6px;
-  font-size: 13px;
+  margin: var(--sp-7) 0 var(--sp-3);
+  font-size: var(--fs-3);
 }
 
 .bilan-charges h4 {
   display: flex;
-  gap: 6px;
+  gap: var(--sp-3);
   align-items: baseline;
 }
 
 .bilan-doc table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 12.5px;
+  font-size: var(--fs-2);
 }
 
 .bilan-doc th {
-  padding: 6px 0 6px 0;
+  padding: var(--sp-3) 0 var(--sp-3) 0;
   border-bottom: 1px solid #d8e0db;
-  font-size: 10px;
+  font-size: var(--fs-1);
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -455,7 +455,7 @@
 }
 
 .bilan-doc td {
-  padding: 7px 0;
+  padding: var(--sp-3) 0;
   border-bottom: 1px solid #eef2ef;
   font-variant-numeric: tabular-nums;
 }
@@ -464,14 +464,14 @@
 .bilan-doc th.num {
   text-align: right;
   white-space: nowrap;
-  padding-left: 16px;
+  padding-left: var(--sp-8);
 }
 
 .bilan-doc td.note,
 .bilan-doc th.note {
   text-align: left;
-  padding-left: 20px;
-  font-size: 11px;
+  padding-left: var(--sp-10);
+  font-size: var(--fs-1);
   color: #55655c;
 }
 
@@ -486,17 +486,17 @@
 }
 
 .bilan-coach {
-  margin: 0 0 16px;
-  padding: 11px 13px;
+  margin: 0 0 var(--sp-8);
+  padding: var(--sp-5) var(--sp-6);
   border-left: 3px solid #b98cc9;
-  border-radius: 0 10px 10px 0;
+  border-radius: 0 var(--r-md) var(--r-md) 0;
   background: #f6eefa;
 }
 
 .bilan-coach b {
   display: block;
-  margin-bottom: 4px;
-  font-size: 11px;
+  margin-bottom: var(--sp-2);
+  font-size: var(--fs-1);
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: #6b4a78;
@@ -504,7 +504,7 @@
 
 .bilan-coach p {
   margin: 0;
-  font-size: 13.5px;
+  font-size: var(--fs-3);
   font-style: italic;
 }
 
@@ -513,47 +513,47 @@
   /* 40 px : c'est un raccourci, pas l'action principale, mais il doit rester
      attrapable au pouce. Mesuré par audit, comme le reste. */
   min-height: 40px;
-  padding: 8px 10px;
+  padding: var(--sp-4) var(--sp-5);
   border: 1px dashed var(--line);
-  border-radius: 8px;
+  border-radius: var(--r-sm);
   background: transparent;
   color: var(--text-3);
-  font-size: 11.5px;
+  font-size: var(--fs-1);
   font-weight: 600;
 }
 
 .cycle-pause {
   margin: 0;
-  padding: 10px 12px;
+  padding: var(--sp-5) var(--sp-6);
   border-left: 3px solid var(--rest);
-  border-radius: 0 10px 10px 0;
+  border-radius: 0 var(--r-md) var(--r-md) 0;
   background: var(--surface-2);
   color: var(--text-2);
-  font-size: 12.5px;
+  font-size: var(--fs-2);
 }
 
 .followup-coach {
   display: grid;
-  gap: 6px;
+  gap: var(--sp-3);
 }
 
 .followup-coach > span {
-  font-size: 13px;
+  font-size: var(--fs-3);
   font-weight: 600;
 }
 
 .followup-coach small {
   display: block;
   color: var(--text-3);
-  font-size: 11.5px;
+  font-size: var(--fs-1);
   font-weight: 500;
 }
 
 .followup-coach textarea {
   width: 100%;
-  padding: 12px;
+  padding: var(--sp-6);
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: var(--r-md);
   background: var(--surface-1);
   color: var(--text-1);
   font: inherit;
@@ -562,18 +562,18 @@
 
 .progression-allgement {
   margin: 0;
-  padding: 10px 12px;
+  padding: var(--sp-5) var(--sp-6);
   border-left: 3px solid var(--rest);
-  border-radius: 0 10px 10px 0;
+  border-radius: 0 var(--r-md) var(--r-md) 0;
   background: var(--surface-2);
   color: var(--text-2);
-  font-size: 12.5px;
+  font-size: var(--fs-2);
 }
 
 .bilan-chart-legende {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--sp-4);
 }
 
 .bilan-chart-legende span {
@@ -594,19 +594,19 @@
 }
 
 .bilan-chart {
-  margin: 4px 0 10px;
+  margin: var(--sp-2) 0 var(--sp-5);
 }
 
 .bilan-chart h4 {
   display: flex;
-  gap: 8px;
+  gap: var(--sp-4);
   align-items: baseline;
-  margin: 0 0 2px;
-  font-size: 12px;
+  margin: 0 0 var(--sp-1);
+  font-size: var(--fs-2);
 }
 
 .bilan-chart h4 span {
-  font-size: 10px;
+  font-size: var(--fs-1);
   color: #55655c;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -619,8 +619,8 @@
 }
 
 .bilan-note {
-  margin: 4px 0 0;
-  font-size: 10.5px;
+  margin: var(--sp-2) 0 0;
+  font-size: var(--fs-1);
   line-height: 1.5;
   color: #55655c;
 }
@@ -628,8 +628,8 @@
 .bilan-read {
   border-left: 3px solid var(--accent);
   background: #f4fbf0;
-  padding: 11px 13px;
-  font-size: 12.5px;
+  padding: var(--sp-5) var(--sp-6);
+  font-size: var(--fs-2);
   line-height: 1.55;
 }
 
@@ -641,11 +641,11 @@
 .bilan-foot {
   display: flex;
   justify-content: space-between;
-  gap: 10px;
-  margin-top: 22px;
-  padding-top: 10px;
+  gap: var(--sp-5);
+  margin-top: var(--sp-10);
+  padding-top: var(--sp-5);
   border-top: 1px solid #d8e0db;
-  font-size: 10px;
+  font-size: var(--fs-1);
   color: #55655c;
 }
 
@@ -685,7 +685,7 @@
     margin: 0;
     /* Un filet de marge intérieure : sans lui, le tableau de largeur 100 %
        dépasse d'un cheveu le fond blanc du document. */
-    padding: 0 4px;
+    padding: 0 var(--sp-2);
     border-radius: 0;
     box-shadow: none;
   }
@@ -703,13 +703,13 @@
   .bilan-doc table {
     table-layout: fixed;
     width: 100%;
-    font-size: 12px;
+    font-size: var(--fs-2);
   }
 
   .bilan-doc th {
     white-space: normal;
-    font-size: 9.5px;
-    padding-left: 8px;
+    font-size: var(--fs-1);
+    padding-left: var(--sp-4);
   }
 
   .bilan-doc td:first-child,
@@ -720,13 +720,13 @@
 
   .bilan-doc td.num,
   .bilan-doc th.num {
-    padding-left: 8px;
+    padding-left: var(--sp-4);
   }
 
   /* Un filet de sécurité : aucun glyphe ne doit toucher le bord du cadre. */
   .bilan-doc td:last-child,
   .bilan-doc th:last-child {
-    padding-right: 6px;
+    padding-right: var(--sp-3);
   }
 
   .bilan-tag {
@@ -734,7 +734,7 @@
   }
 
   .bilan-doc h3 {
-    font-size: 15px;
+    font-size: var(--fs-5);
     break-after: avoid;
   }
 }
@@ -754,8 +754,8 @@
   .text-button,
   .back-link {
     min-height: 44px;
-    padding-top: 10px;
-    padding-bottom: 10px;
+    padding-top: var(--sp-5);
+    padding-bottom: var(--sp-5);
   }
 }
 
@@ -763,22 +763,22 @@
    en-têtes compacts, marges resserrées. La version imprimée garde sa respiration. */
 @media (max-width: 480px) {
   .bilan-doc {
-    padding: 18px 14px 22px;
+    padding: var(--sp-9) var(--sp-7) var(--sp-10);
   }
 
   .bilan-doc table {
-    font-size: 11.5px;
+    font-size: var(--fs-1);
     table-layout: fixed;
   }
 
   .bilan-doc th {
-    font-size: 9.5px;
+    font-size: var(--fs-1);
     letter-spacing: 0.04em;
   }
 
   .bilan-doc td.num,
   .bilan-doc th.num {
-    padding-left: 6px;
+    padding-left: var(--sp-3);
   }
 
   .bilan-doc td:first-child,
@@ -788,11 +788,11 @@
   }
 
   .bilan-kpis b {
-    font-size: 16px;
+    font-size: var(--fs-6);
   }
 
   .bilan-head h2 {
-    font-size: 18px;
+    font-size: var(--fs-7);
   }
 }
 
@@ -807,6 +807,6 @@
   }
 
   .bilan-doc {
-    padding: 20px 16px 24px;
+    padding: var(--sp-10) var(--sp-8) var(--sp-11);
   }
 }

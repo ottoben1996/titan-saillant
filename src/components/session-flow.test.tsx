@@ -123,7 +123,7 @@ async function completeRemainingSets(maxActions = 80) {
 /** Contenu d'une cellule du bilan (durée, séries, volume, meilleure charge). */
 function bilanCell(label: RegExp): HTMLElement {
   const cell = screen.getByText(label).closest('.bilan-cell');
-  if (!cell) throw new Error(`Cellule de bilan introuvable : ${label}`);
+  if (!cell) throw new Error(`Cellule de bilan introuvable : ${label}`);
   return cell as HTMLElement;
 }
 
@@ -136,7 +136,7 @@ function quizGroup(label: RegExp): HTMLElement {
 function completedSession(profileId: 'ottman' | 'laura', dayId: string): WorkoutSession {
   const program = getProgram(profileId);
   const day = program.days.find((item) => item.id === dayId);
-  if (!day) throw new Error(`Jour introuvable : ${dayId}`);
+  if (!day) throw new Error(`Jour introuvable : ${dayId}`);
   let session = createRunner(day, profileId);
   let guard = 0;
   while (!session.completedAt && guard < 80) {
@@ -177,7 +177,7 @@ afterEach(async () => {
 /* ------------------------------------------------------------------- tests -- */
 
 describe('Parcours complet d’une séance (intégration, interface pilotée)', () => {
-  it('[1] parcours nominal : profil → accueil → énergie → échauffement → travail + charge → repos → fin de séance', async () => {
+  it('[1] parcours nominal : profil → accueil → énergie → échauffement → travail + charge → repos → fin de séance', async () => {
     await openAsOttman();
     expect(screen.getByRole('heading', { name: /bonjour ottman/i })).toBeInTheDocument();
 
@@ -257,7 +257,7 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
     expect(bilanCell(/volume/i).textContent).toMatch(/kg·rép\./);
   });
 
-  it('[2] reprise : la séance en cours est restaurée au bon endroit après remontage de l’application', async () => {
+  it('[2] reprise : la séance en cours est restaurée au bon endroit après remontage de l’application', async () => {
     const { unmount } = render(<App />);
     fireEvent.click(screen.getByRole('button', { name: /ottman/i }));
     await flush();
@@ -286,7 +286,7 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
     expect(restored[0].completedAt).toBeUndefined();
   });
 
-  it('[3] pause et reprise : continuer ou mettre en pause, puis reprise au bon exercice', async () => {
+  it('[3] pause et reprise : continuer ou mettre en pause, puis reprise au bon exercice', async () => {
     await openAsOttman();
     await startDayFromHome('Full Body A');
     await validateSet(); // 1 série validée → exercice suivant, série 1
@@ -329,7 +329,7 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
     expect(screen.getByText(`2 / ${FULL_BODY_A_STEPS}`)).toBeInTheDocument();
   });
 
-  it('[4] isolation des profils : la séance validée par Ottman n’apparaît pas dans l’historique de Laura', async () => {
+  it('[4] isolation des profils : la séance validée par Ottman n’apparaît pas dans l’historique de Laura', async () => {
     // Une séance réellement terminée par Ottman (moteur de séance + dépôt réel).
     const ottmanSession = completedSession('ottman', 'full-body-a');
     expect(ottmanSession.completedAt).toBeTruthy();
@@ -373,7 +373,7 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
     expect(await listSessions('laura')).toHaveLength(0);
   });
 
-  it('[5] séance terminée : bilan factuel (durée, séries, volume) puis enregistrement dans l’historique', async () => {
+  it('[5] séance terminée : bilan factuel (durée, séries, volume) puis enregistrement dans l’historique', async () => {
     await openAsOttman();
     await startDayFromHome('Full Body A');
     await completeRemainingSets();
@@ -424,7 +424,7 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
    |  signalera qu'il faut le repasser en `it`.                                  |
    \* ------------------------------------------------------------------------- */
 
-  it('[6] démarrer une 2e séance clôture la précédente : une seule séance reste en cours (orpheline corrigée)', async () => {
+  it('[6] démarrer une 2e séance clôture la précédente : une seule séance reste en cours (orpheline corrigée)', async () => {
     await openAsOttman();
     await startDayFromHome('Full Body A');
     await validateSet(); // une série validée → la séance A existe en base
@@ -469,7 +469,7 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
   /*  Annulation et suppression de séance, liste des exercices          */
   /* ------------------------------------------------------------------ */
 
-  it('[7] annuler une séance en cours : le dialogue de sortie propose l’annulation, puis rien n’est conservé', async () => {
+  it('[7] annuler une séance en cours : le dialogue de sortie propose l’annulation, puis rien n’est conservé', async () => {
     await openAsOttman();
     await startDayFromHome('Full Body A');
     await validateSet();
@@ -520,7 +520,7 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
     expect(screen.queryByText(/séance en cours/i)).toBeNull();
   });
 
-  it('[9] liste des exercices : consultable à tout moment, dans l’ordre de la séance', async () => {
+  it('[9] liste des exercices : consultable à tout moment, dans l’ordre de la séance', async () => {
     await openAsOttman();
     await startDayFromHome('Full Body A');
 

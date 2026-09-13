@@ -17,14 +17,14 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.35rem 0.5rem;
-  margin: 0 0 0.45rem;
-  padding: 0.35rem 0.55rem;
+  gap: var(--sp-3) var(--sp-4);
+  margin: 0 0 var(--sp-4);
+  padding: var(--sp-3) var(--sp-4);
   border: 1px dashed var(--line-strong);
   border-radius: var(--r-md);
   background: var(--surface-1);
   color: var(--text-2);
-  font-size: 0.75rem;
+  font-size: var(--fs-2);
   line-height: 1.3;
 }
 
@@ -47,12 +47,12 @@
 .workout-content .ghost-perf-strip .ghost-delta {
   flex: none;
   margin-left: auto;
-  padding: 0.15rem 0.45rem;
+  padding: var(--sp-1) var(--sp-4);
   border: 1px solid rgb(var(--accent-rgb) / 0.32);
   border-radius: var(--r-sm);
   background: rgb(var(--accent-rgb) / 0.12);
   color: var(--accent);
-  font-size: 0.75rem;
+  font-size: var(--fs-2);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -68,18 +68,18 @@
 .rest-presets {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.4rem;
-  margin-top: 0.5rem;
+  gap: var(--sp-3);
+  margin-top: var(--sp-4);
 }
 
 .rest-presets .rest-preset-btn {
   min-height: 44px;
-  padding: 0.5rem 0.25rem;
+  padding: var(--sp-4) var(--sp-2);
   border: 1px solid rgb(var(--accent-rgb) / 0.3);
   border-radius: var(--r-md);
   background: rgb(var(--accent-rgb) / 0.1);
   color: var(--accent);
-  font-size: 0.8125rem;
+  font-size: var(--fs-3);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   transition:
@@ -93,7 +93,7 @@
 
 /* --- [3] Carte de repos utile : exercice suivant, séries, charge ----------- */
 .workout-content .rest-cockpit-container {
-  gap: 0.55rem;
+  gap: var(--sp-4);
 }
 
 .workout-content .rest-orbit-svg-container {
@@ -102,16 +102,16 @@
 }
 
 .workout-content .rest-card {
-  padding: 0.6rem 0.8rem;
+  padding: var(--sp-5) var(--sp-6);
 }
 
 .workout-content .rest-actions {
-  margin-top: 0.35rem;
+  margin-top: var(--sp-3);
 }
 
 .rest-next-preview-card {
-  padding: 0.6rem 0.75rem;
-  gap: 0.3rem;
+  padding: var(--sp-5) var(--sp-6);
+  gap: var(--sp-2);
   border-radius: var(--r-md);
 }
 
@@ -119,8 +119,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.5rem;
-  font-size: 0.75rem;
+  gap: var(--sp-4);
+  font-size: var(--fs-2);
 }
 
 .rest-next-remaining {
@@ -134,22 +134,22 @@
 }
 
 .workout-content .rest-next-preview-card .plate-badge-container {
-  margin: 0.3rem 0 0;
-  padding: 0.35rem 0.5rem;
+  margin: var(--sp-2) 0 0;
+  padding: var(--sp-3) var(--sp-4);
 }
 
 /* --- [4] Densité : la colonne de séance tient dans 100dvh ------------------ */
 .workout-content {
-  gap: 0.4rem;
-  padding-top: 0.2rem;
+  gap: var(--sp-3);
+  padding-top: var(--sp-2);
   /* La barre d'accueil est déjà réservée par .workout-shell
      (padding-bottom: env(safe-area-inset-bottom)) ; on garde une respiration
      minimale sans la compter deux fois. */
-  padding-bottom: 0.5rem;
+  padding-bottom: var(--sp-4);
 }
 
 .workout-content .duo-wrapper {
-  gap: 0.3rem;
+  gap: var(--sp-2);
   margin-bottom: 0;
 }
 
@@ -166,22 +166,22 @@
 }
 
 .workout-content .workout-actions {
-  gap: 0.35rem;
+  gap: var(--sp-3);
 }
 
 .workout-content .prescription-card.compact {
-  padding: 0.6rem 0.8rem;
-  gap: 0.3rem;
+  padding: var(--sp-5) var(--sp-6);
+  gap: var(--sp-2);
   overflow: hidden;
 }
 
 .workout-content .prescription-card.compact .prescription-main {
-  margin: 0.25rem 0;
+  margin: var(--sp-2) 0;
 }
 
 .workout-content .exercise-illustration {
   min-height: 5rem;
-  margin: 0.2rem 0 0.35rem;
+  margin: var(--sp-2) 0 var(--sp-3);
 }
 
 .workout-content .exercise-illustration img {
@@ -190,30 +190,30 @@
 }
 
 .workout-content .log-card.compact {
-  padding: 0.6rem 0.75rem;
+  padding: var(--sp-5) var(--sp-6);
 }
 
 .workout-content .log-card.compact .log-card-heading {
-  margin-bottom: 0.35rem;
+  margin-bottom: var(--sp-3);
 }
 
 .workout-content .log-card.compact .input-row-modern {
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
+  gap: var(--sp-4);
+  margin-bottom: var(--sp-4);
 }
 
 .workout-content .log-card.compact .stepper-group {
-  gap: 0.25rem;
+  gap: var(--sp-2);
 }
 
 .workout-content .log-card.compact .primary-button {
   min-height: 44px;
-  padding: 0.6rem 0.9rem;
+  padding: var(--sp-5) var(--sp-7);
 }
 
 .workout-content .exercise-timer {
-  margin-bottom: 0.5rem;
-  padding: 0.5rem 0.7rem;
+  margin-bottom: var(--sp-4);
+  padding: var(--sp-4) var(--sp-6);
 }
 
 .workout-content .next-hint {
@@ -231,17 +231,17 @@
    mouvement n'en a pas : sans lui, la carte étirée laissait une zone vide. */
 .workout-content .key-cue-strip {
   display: grid;
-  gap: 0.2rem;
-  margin: 0.15rem 0 0.25rem;
-  padding: 0.4rem 0.6rem;
+  gap: var(--sp-2);
+  margin: var(--sp-1) 0 var(--sp-2);
+  padding: var(--sp-3) var(--sp-5);
   border-left: 2px solid var(--accent);
-  border-radius: 6px;
+  border-radius: var(--r-sm);
   background: var(--surface-2);
 }
 
 .workout-content .key-cue-strip span:last-child {
   color: var(--text-1);
-  font-size: 0.84rem;
+  font-size: var(--fs-3);
   line-height: 1.35;
 }
 
@@ -354,14 +354,14 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   align-items: stretch;
-  gap: 0.5rem;
+  gap: var(--sp-4);
 }
 
 .workout-content .exercise-timer > div:first-of-type {
   display: flex;
   align-items: baseline;
   flex-wrap: wrap;
-  gap: 0.1rem 0.55rem;
+  gap: var(--sp-1) var(--sp-4);
   min-width: 0;
 }
 
@@ -378,7 +378,7 @@
 .workout-content .timer-actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.35rem;
+  gap: var(--sp-3);
   justify-content: stretch;
 }
 
@@ -418,7 +418,7 @@
 @media (max-height: 700px) {
   .workout-content .exercise-illustration {
     min-height: 3.5rem;
-    margin: 0.15rem 0 0.25rem;
+    margin: var(--sp-1) 0 var(--sp-2);
   }
 
   .workout-content .exercise-illustration img {

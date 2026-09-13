@@ -170,7 +170,7 @@ export function CompletionFeedback({ session, onFinish }: CompletionFeedbackProp
               className="quiz-input"
               value={painLocation}
               onChange={(event) => setPainLocation(event.target.value)}
-              placeholder="Où ? Ex. épaule droite, genou gauche…"
+              placeholder="Où ? Ex. épaule droite, genou gauche…"
               aria-label="Où se situe la gêne"
             />
           )}

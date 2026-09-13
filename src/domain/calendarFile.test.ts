@@ -32,7 +32,7 @@ describe('fichier calendrier du point du samedi', () => {
     expect(fichier).toContain('SUMMARY:Point du samedi — Laura');
   });
 
-  it('reste lisible par un calendrier : retour chariot et lignes courtes', () => {
+  it('reste lisible par un calendrier : retour chariot et lignes courtes', () => {
     const fichier = fichierCalendrierSuivi({ profileId: 'ottman', depuis: new Date(2026, 8, 12) });
     const lignes = fichier.split('\r\n').filter((ligne) => ligne.length > 0);
 

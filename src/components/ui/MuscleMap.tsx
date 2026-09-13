@@ -91,8 +91,8 @@ export function MuscleMap({ primaryMuscles = [], secondaryMuscles = [], size = '
     primaryIds.length === 0 && secondaryIds.length === 0
       ? 'Aucun muscle renseigné pour cet exercice.'
       : [
-          primaryIds.length > 0 ? `Muscles principaux : ${primaryText}.` : null,
-          secondaryIds.length > 0 ? `Muscles synergistes : ${secondaryText}.` : null,
+          primaryIds.length > 0 ? `Muscles principaux : ${primaryText}.` : null,
+          secondaryIds.length > 0 ? `Muscles synergistes : ${secondaryText}.` : null,
         ]
           .filter(Boolean)
           .join(' ');

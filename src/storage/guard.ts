@@ -23,4 +23,4 @@ export async function withStorageGuard<T>(
 }
 
 export const STORAGE_UNAVAILABLE_MESSAGE =
-  'Stockage local indisponible : tes séries ne sont pas enregistrées. Autorise le stockage du site ou quitte la navigation privée.';
+  'Stockage local indisponible : tes séries ne sont pas enregistrées. Autorise le stockage du site ou quitte la navigation privée.';

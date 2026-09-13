@@ -107,7 +107,7 @@
 .app-shell select,
 .app-shell textarea,
 .input-row input {
-  font-size: 16px;
+  font-size: var(--fs-6);
 }
 
 /* --- défilement ---------------------------------------------------------- */
@@ -124,16 +124,16 @@
      identifiable en salle, et l'accessibilité repose sur le texte. */
   .bottom-nav {
     justify-content: space-around;
-    padding: 0.35rem 0.4rem;
+    padding: var(--sp-3) var(--sp-3);
   }
 
   .bottom-nav button {
     flex: 1;
     flex-direction: column;
-    gap: 2px;
+    gap: var(--sp-1);
     min-height: 56px;
-    padding: 0.45rem 0.25rem;
-    font-size: 0.75rem;
+    padding: var(--sp-4) var(--sp-2);
+    font-size: var(--fs-2);
     line-height: 1.1;
   }
 
@@ -148,7 +148,7 @@
 
   /* La zone de séance garde ses marges internes cohérentes. */
   .workout-content {
-    padding-top: 0.25rem;
+    padding-top: var(--sp-2);
   }
 
   /* Sélecteur de profil en séance et accès secondaires : cibles de 44 px.
@@ -156,12 +156,12 @@
   .workout-actions .tutorial-link,
   .workout-actions .alternative-link {
     min-height: 44px;
-    padding: 0.6rem 0.8rem;
+    padding: var(--sp-5) var(--sp-6);
   }
 
   .duo-pill-btn {
     min-height: 44px;
-    padding: 0.55rem 0.8rem;
+    padding: var(--sp-4) var(--sp-6);
   }
 
   .duo-switcher-bar {
@@ -171,7 +171,7 @@
   /* Lien d'attribution : lien de texte en ligne, simple confort de tap. */
   .asset-credits a,
   .settings-footnote a {
-    padding: 0.4rem 0;
+    padding: var(--sp-3) 0;
   }
 
   /* Modales en feuille basse : elles respectent la zone sûre inférieure. */
@@ -187,6 +187,6 @@
   }
 
   .content {
-    padding-top: 2rem;
+    padding-top: var(--sp-12);
   }
 }

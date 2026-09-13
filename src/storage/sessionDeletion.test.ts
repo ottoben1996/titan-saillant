@@ -30,7 +30,7 @@ describe('suppression d’une séance', () => {
     expect(restantes.map((item) => item.id)).toEqual(['b']);
   });
 
-  it('libère la reprise : la séance supprimée n’est plus la séance en cours', async () => {
+  it('libère la reprise : la séance supprimée n’est plus la séance en cours', async () => {
     await saveSession(makeSession({ id: 'en-cours' }));
     expect((await getActiveSession('ottman'))?.id).toBe('en-cours');
 

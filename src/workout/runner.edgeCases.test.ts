@@ -134,7 +134,7 @@ describe('workout runner — cas limites', () => {
     expect(getNextStep(next, day)).toMatchObject(steps[target + 1]);
   });
 
-  it('dernier exercice du dernier bloc : la planche précède le retour au calme', () => {
+  it('dernier exercice du dernier bloc : la planche précède le retour au calme', () => {
     const day = getProgram('ottman').days[0];
     const exercises = getWorkoutExercises(day, createRunner(day, 'ottman'));
     const steps = getWorkoutSteps(day, createRunner(day, 'ottman'));

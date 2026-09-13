@@ -7,7 +7,7 @@ describe('dialogue de confirmation dans l’application', () => {
     render(
       <ConfirmDialog
         eyebrow="ESPACE PERSONNEL"
-        title="Changer de profil ?"
+        title="Changer de profil ?"
         description="Tes données resteront séparées."
         confirmLabel="Changer de profil"
         cancelLabel="Rester ici"
@@ -18,7 +18,7 @@ describe('dialogue de confirmation dans l’application', () => {
 
     const dialog = screen.getByRole('alertdialog');
     expect(dialog.getAttribute('aria-modal')).toBe('true');
-    expect(screen.getByRole('heading', { name: 'Changer de profil ?' })).toBeTruthy();
+    expect(screen.getByRole('heading', { name: 'Changer de profil ?' })).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Changer de profil' })).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Rester ici' })).toBeTruthy();
   });

@@ -181,7 +181,7 @@ describe('sauvegardes de profil — cas limites', () => {
     expect(preferences[0]).toMatchObject({ profileId: 'ottman', key: 'gardee', value: 1 });
   });
 
-  it('est idempotent : réimporter la même sauvegarde ne duplique rien', async () => {
+  it('est idempotent : réimporter la même sauvegarde ne duplique rien', async () => {
     const backup = validBackup('ottman', [sessionOf('o-1', 'ottman')], [{ profileId: 'ottman', key: 'k', value: 1 }]);
     await importProfileData(backup, 'ottman');
     await importProfileData(backup, 'ottman');

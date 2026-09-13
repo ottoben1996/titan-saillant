@@ -829,7 +829,7 @@ function TrainScreen({
           )}
           <div className="mustapha-exercise-visual">
             {currentExercise && getExerciseAsset(currentExercise.id) ? (
-              <img src={getExerciseAsset(currentExercise.id)} alt={`Démonstration : ${currentExercise.name}`} />
+              <img src={getExerciseAsset(currentExercise.id)} alt={`Démonstration : ${currentExercise.name}`} />
             ) : (
               <span aria-hidden="true">◉</span>
             )}
@@ -1167,7 +1167,7 @@ function ShoppingScreen({
   };
   const clear = async () => {
     if (!shopping.items.length) return;
-    if (!window.confirm('Vider toute la liste de courses ?')) return;
+    if (!window.confirm('Vider toute la liste de courses ?')) return;
     await update([]);
     setNotice('Liste vidée.');
   };
@@ -1461,7 +1461,7 @@ function Settings({
               · images et métadonnées CC0-1.0.
             </p>
             <p>
-              Photo repas : Openverse, source CC0. Les images servent à illustrer et ne remplacent pas les consignes ou
+              Photo repas : Openverse, source CC0. Les images servent à illustrer et ne remplacent pas les consignes ou
               avis professionnels.
             </p>
           </section>
@@ -1469,7 +1469,7 @@ function Settings({
         <button
           className="danger-button full"
           onClick={() => {
-            if (window.confirm('Supprimer toutes les données MUSTAPHA COACH ?')) void onReset();
+            if (window.confirm('Supprimer toutes les données MUSTAPHA COACH ?')) void onReset();
           }}
           type="button"
         >
