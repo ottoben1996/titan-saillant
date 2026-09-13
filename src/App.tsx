@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { Suspense, lazy, useEffect, useState } from 'react';
 import type { ProfileId, SessionTimerState, WorkoutDay, WorkoutSession } from './domain/types';
 import { getProgram } from './domain/programs';
 import type { AccentId } from './domain/palettes';
@@ -21,7 +21,13 @@ import { BilanScreen } from './components/screens/BilanScreen';
 import { STORAGE_UNAVAILABLE_MESSAGE, withStorageGuard } from './storage/guard';
 import { etatSauvegarde, reporterSauvegarde } from './storage/backupReminder';
 import { telechargerSauvegarde } from './storage/backupFile';
-import MustaphaApp from './mustapha/MustaphaApp';
+/**
+ * L'espace MUSTAPHA n'est chargé que si on l'ouvre.
+ *
+ * Il était importé en dur : son code partait dans le paquet initial de
+ * l'application Ottman, pour toutes les personnes, à chaque ouverture.
+ */
+const MustaphaApp = lazy(() => import('./mustapha/MustaphaApp'));
 
 import { TopBar } from './components/layout/TopBar';
 import { BottomNav, type Screen } from './components/layout/BottomNav';
@@ -46,7 +52,11 @@ type BeforeInstallPromptEvent = Event & {
 
 export default function App() {
   if (window.location.pathname === '/mustapha' || window.location.pathname.startsWith('/mustapha/')) {
-    return <MustaphaApp />;
+    return (
+      <Suspense fallback={<div className="app-shell" aria-busy="true" />}>
+        <MustaphaApp />
+      </Suspense>
+    );
   }
 
   const [profile, setProfile] = useState<ProfileId | null>(() => {
