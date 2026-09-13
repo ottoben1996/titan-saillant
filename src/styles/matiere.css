@@ -1,0 +1,238 @@
+/* ============================================================================
+   Matière et mouvement — la couche « iOS ».
+
+   Chargée en dernier : à spécificité égale, c'est elle qui décide.
+
+   Ce que fait cette feuille, et rien d'autre :
+
+     1. la barre du haut devient une matière : elle se pose au défilement, le
+        contenu passe dessous, le fond se floute et se sature légèrement ;
+     2. la barre du bas reçoit la même matière, tirée des jetons au lieu d'un
+        gris écrit en dur ;
+     3. un bouton s'enfonce sous le doigt et revient avec un léger dépassement ;
+     4. le grand titre de l'écran s'efface pendant que le titre de la barre
+        apparaît — la paire signature d'iOS.
+
+   Aucune de ces règles n'anime un flou : seule l'opacité et la transformation
+   bougent, le reste est posé. Un `backdrop-filter` animé coûte une repainte par
+   image et fait chauffer un téléphone qui passe une heure en salle.
+
+   Chaque animation a son repli : `prefers-reduced-motion` les coupe toutes, et
+   un navigateur sans `backdrop-filter` reçoit un fond opaque lisible.
+   ========================================================================== */
+
+/* ---------------------------------------------------------- barre du haut -- */
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 6;
+}
+
+/*
+ * La matière est un pseudo-élément, pas le fond de la barre : elle doit couvrir
+ * toute la largeur de l'écran, alors que la barre vit dans la gouttière de
+ * l'application. `pointer-events: none` est indispensable — sans lui, la barre
+ * avalerait les appuis destinés au contenu qui défile dessous.
+ */
+.topbar::before {
+  content: "";
+  position: absolute;
+  top: calc(-1 * (1.25rem + env(safe-area-inset-top)));
+  bottom: calc(-1 * var(--sp-10));
+  left: calc(-1 * max(1rem, env(safe-area-inset-left)));
+  right: calc(-1 * max(1rem, env(safe-area-inset-right)));
+  background: color-mix(in srgb, var(--surface-0) 72%, transparent);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+  box-shadow: inset 0 -1px 0 var(--line);
+  opacity: 0;
+  transition: opacity var(--duree-matiere) var(--ressort);
+  pointer-events: none;
+}
+
+/* La barre ne se pose qu'une fois le contenu passé dessous. */
+html[data-replie="true"] .topbar::before {
+  opacity: 1;
+}
+
+/*
+ * Le voile est un élément positionné : sans cela, il peint PAR-DESSUS les
+ * boutons de la barre, qui restent cliquables mais deviennent illisibles. Les
+ * enfants passent donc devant, chacun dans son propre contexte d'empilement.
+ */
+.topbar > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Le titre de l'écran prend la place de la marque, comme dans une barre iOS. */
+.topbar-titre {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: var(--fs-3);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text-1);
+  opacity: 0;
+  transition: opacity var(--duree-matiere) var(--ressort);
+  pointer-events: none;
+}
+
+html[data-replie="true"] .topbar-titre {
+  opacity: 1;
+}
+
+html[data-replie="true"] .topbar-brand {
+  opacity: 0;
+}
+
+.topbar-brand {
+  transition: opacity var(--duree-matiere) var(--ressort);
+}
+
+/* ----------------------------------------------------- titre qui s'efface -- */
+
+/*
+ * Le grand titre ne rétrécit pas : animer une taille de police déclenche une
+ * remise en page à chaque image, et ça se voit sur un téléphone. Il s'efface et
+ * remonte de quelques pixels — même effet perçu, coût nul.
+ */
+.home-head h1,
+.page-heading h1,
+.workout-heading h1 {
+  transition:
+    opacity var(--duree-matiere) var(--ressort),
+    transform var(--duree-matiere) var(--ressort);
+}
+
+html[data-replie="true"] .home-head h1,
+html[data-replie="true"] .page-heading h1,
+html[data-replie="true"] .workout-heading h1 {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
+/* ---------------------------------------------------------- barre du bas --- */
+
+.bottom-nav {
+  background: color-mix(in srgb, var(--surface-0) 76%, transparent);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+}
+
+/* Sans flou disponible, la barre doit rester lisible : fond plein. */
+@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .bottom-nav {
+    background: var(--surface-1);
+  }
+}
+
+/* ---------------------------------------------------------- sous le doigt -- */
+
+/*
+ * L'enfoncement : presque instantané à l'appui, ressort au relâchement. C'est
+ * la différence entre un bouton qui « répond » et un bouton qui change juste de
+ * couleur. Le facteur reste discret : 2,8 % d'écart, invisible à l'arrêt.
+ */
+.app-shell button,
+.app-shell a,
+.bottom-nav button,
+.icon-button,
+.round-action {
+  transition: transform var(--duree-enfonce) ease-out;
+}
+
+.app-shell button:active,
+.app-shell a:active,
+.bottom-nav button:active,
+.icon-button:active,
+.round-action:active {
+  transform: scale(0.972);
+}
+
+/*
+ * Ressort au relâchement, avec un léger dépassement. Le repli par défaut est un
+ * cubic-bezier : `linear()` n'existe pas partout, et une fonction inconnue
+ * invalide la déclaration entière — donc la transition aussi.
+ */
+@supports (transition-timing-function: linear(0, 1)) {
+  .app-shell button,
+  .app-shell a,
+  .bottom-nav button,
+  .icon-button,
+  .round-action {
+    transition: transform 340ms var(--ressort-vif);
+  }
+
+  .app-shell button:active,
+  .app-shell a:active,
+  .bottom-nav button:active,
+  .icon-button:active,
+  .round-action:active {
+    transition-duration: var(--duree-enfonce);
+    transition-timing-function: ease-out;
+  }
+}
+
+/* Les pastilles de navigation : le mouvement suit la sélection. */
+.bottom-nav button {
+  transition:
+    transform 340ms var(--ressort-vif),
+    background-color var(--duree-matiere) ease-out,
+    color var(--duree-matiere) ease-out;
+}
+
+/* ------------------------------------------------------------- les feuilles - */
+
+@supports (transition-timing-function: linear(0, 1)) {
+  .sheet-content {
+    transition:
+      transform 420ms var(--ressort),
+      opacity var(--duree-matiere) ease-out;
+  }
+
+  .sheet-overlay {
+    transition: opacity var(--duree-matiere) ease-out;
+  }
+}
+
+/* -------------------------------------------------------------- mouvement --- */
+
+/*
+ * Rien de tout cela ne doit bouger pour qui a demandé à réduire les animations.
+ * Les états finaux restent appliqués : la matière apparaît, simplement sans
+ * fondu ; l'enfoncement disparaît, la couleur pressée reste.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .topbar::before,
+  .topbar-titre,
+  .topbar-brand,
+  .home-head h1,
+  .page-heading h1,
+  .workout-heading h1,
+  .app-shell button,
+  .app-shell a,
+  .bottom-nav button,
+  .icon-button,
+  .round-action,
+  .sheet-content,
+  .sheet-overlay {
+    transition: none;
+  }
+
+  .app-shell button:active,
+  .app-shell a:active,
+  .bottom-nav button:active,
+  .icon-button:active,
+  .round-action:active {
+    transform: none;
+  }
+
+  .home-head h1,
+  .page-heading h1,
+  .workout-heading h1 {
+    transform: none;
+  }
+}

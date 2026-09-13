@@ -35,6 +35,7 @@ import { SettingsScreen } from './components/screens/SettingsScreen';
 import { WorkoutScreen } from './components/screens/WorkoutScreen';
 import { ConfirmDialog } from './components/ui/ConfirmDialog';
 import { Check } from './components/ui/Icons';
+import { useEnTeteReplie } from './components/ui/useEnTeteReplie';
 
 const profileKey = 'coach-active-profile';
 type BeforeInstallPromptEvent = Event & {
@@ -152,6 +153,10 @@ export default function App() {
   const [sessionToDelete, setSessionToDelete] = useState<string | null>(null);
 
   const onStorageFailure = () => setStorageMessage(STORAGE_UNAVAILABLE_MESSAGE);
+
+  // La barre du haut se pose et le grand titre s'efface : tout est du CSS,
+  // piloté par un attribut sur la racine.
+  useEnTeteReplie();
 
   /** Ce qu'un lecteur d'écran annonce quand on change d'écran. */
   const libellesEcran: Record<Screen, string> = {
@@ -740,6 +745,7 @@ export default function App() {
         onBack={handleTopbarBack}
         backLabel={topbarLabel}
         isOnline={isOnline}
+        titre={libellesEcran[screen]}
         onOpenSettings={() => setScreen('settings')}
       />
 

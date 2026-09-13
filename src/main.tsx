@@ -10,6 +10,8 @@ import './styles/workout.css';
 import './styles/screens.css';
 import './styles/ui.css';
 import './styles/followup.css';
+// En dernier : la couche matière et mouvement décide à spécificité égale.
+import './styles/matiere.css';
 
 registerSW({
   immediate: true,

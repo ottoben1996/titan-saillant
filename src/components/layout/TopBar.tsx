@@ -5,14 +5,17 @@ interface TopBarProps {
   backLabel: string;
   isOnline: boolean;
   onOpenSettings: () => void;
+  /** Titre de l'écran courant : il prend la place de la marque au défilement. */
+  titre?: string;
 }
 
-export function TopBar({ onBack, backLabel, isOnline, onOpenSettings }: TopBarProps) {
+export function TopBar({ onBack, backLabel, isOnline, onOpenSettings, titre }: TopBarProps) {
   return (
     <header className="topbar">
       <button className="icon-button" type="button" onClick={onBack} aria-label={backLabel}>
         <ArrowLeft size={21} />
       </button>
+      {titre && <span className="topbar-titre">{titre}</span>}
       <div className="topbar-brand">
         <span className="brand-mark small">
           <Barbell size={18} weight="duotone" />
