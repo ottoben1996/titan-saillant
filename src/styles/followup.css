@@ -136,15 +136,17 @@
 .followup-stepper button {
   display: grid;
   place-items: center;
-  width: 36px;
-  height: 40px;
+  /* 44 px : la cible tactile recommandée pour un pouce, mesurée par audit. */
+  width: 44px;
+  height: 44px;
   border-radius: 11px;
   background: var(--surface-2);
   color: var(--text-2);
 }
 
 .followup-stepper input {
-  width: 68px;
+  width: 64px;
+  height: 44px;
   padding: 9px 6px;
   border: 1px solid var(--line);
   border-radius: 11px;
@@ -508,7 +510,10 @@
 
 /* Reprendre la valeur précédente d'un appui : cible large, texte discret. */
 .followup-reuse {
-  padding: 4px 6px;
+  /* 40 px : c'est un raccourci, pas l'action principale, mais il doit rester
+     attrapable au pouce. Mesuré par audit, comme le reste. */
+  min-height: 40px;
+  padding: 8px 10px;
   border: 1px dashed var(--line);
   border-radius: 8px;
   background: transparent;
@@ -741,6 +746,17 @@
 @page {
   size: A4 portrait;
   margin: 12mm;
+}
+
+/* Sur un téléphone, un bouton de texte reste une cible : il doit atteindre
+   44 px de haut, même s'il ressemble à un simple lien. */
+@media (max-width: 480px) {
+  .text-button,
+  .back-link {
+    min-height: 44px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
 }
 
 /* Sur un téléphone, le document ne doit jamais être tronqué ni défiler de côté :
