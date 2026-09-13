@@ -5,6 +5,7 @@ import { telechargerCalendrierSuivi, telechargerSauvegarde } from '../../storage
 import { deleteProfileData, listSessions } from '../../storage/sessionRepository';
 import { ArrowLeft, ArrowRight, DownloadSimple, Timer, Trash, Warning } from '../ui/Icons';
 import { isSoundEnabled, playTimerChime, setSoundEnabled } from '../../workout/alerts';
+import { debutDePause, mettreEnPause, reprendreCycle } from '../../storage/cyclePause';
 import { accents, type AccentId } from '../../domain/palettes';
 import { profileLabels } from './HomeScreen';
 
@@ -75,6 +76,8 @@ export function SettingsScreen({
 }: SettingsScreenProps) {
   const fileInput = useRef<HTMLInputElement>(null);
   const [soundOn, setSoundOn] = useState(() => isSoundEnabled());
+  /** Cycle en pause : la date de mise en pause, ou rien. */
+  const [pause, setPause] = useState<Date | undefined>(() => debutDePause(profile));
   const [counts, setCounts] = useState<SessionCounts | null>(null);
   const [eraseConfirming, setEraseConfirming] = useState(false);
   const [eraseWord, setEraseWord] = useState('');
@@ -164,6 +167,43 @@ export function SettingsScreen({
           Changer
         </button>
       </div>
+
+      {/* -------------------------------------------------- cycle en pause --- */}
+      <section className="settings-section">
+        <h2 className="settings-title">Mon cycle</h2>
+        <div className="settings-list">
+          <button
+            type="button"
+            className="toggle-row"
+            aria-pressed={pause !== undefined}
+            onClick={() => {
+              if (pause) {
+                reprendreCycle(profile);
+                setPause(undefined);
+                onNotice('Cycle repris : le point du samedi est de nouveau attendu.');
+              } else {
+                const maintenant = new Date();
+                mettreEnPause(profile, maintenant);
+                setPause(maintenant);
+                onNotice('Cycle en pause : les courbes sont gelées, pas faussées.');
+              }
+            }}
+          >
+            <Timer size={21} />
+            <span>
+              <strong>{pause ? 'Cycle en pause' : 'Cycle en cours'}</strong>
+              <small>
+                {pause
+                  ? `Depuis le ${pause.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })} · aucun point attendu`
+                  : 'Blessure, vacances, semaine chargée : mets le cycle en pause plutôt que de sauter un point'}
+              </small>
+            </span>
+            <span className={`toggle-pill${pause ? ' on' : ''}`} aria-hidden="true">
+              <i />
+            </span>
+          </button>
+        </div>
+      </section>
 
       {/* ----------------------------------------------------- rappels ------- */}
       <section className="settings-section">

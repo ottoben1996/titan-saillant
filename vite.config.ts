@@ -41,5 +41,21 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: './src/test/setup.ts',
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json-summary'],
+      reportsDirectory: 'coverage',
+      // Le plancher est posé juste sous le niveau réellement atteint : il ne
+      // bloque rien aujourd'hui, mais toute baisse silencieuse devient visible.
+      thresholds: {
+        statements: 62,
+        branches: 56,
+        functions: 54,
+        lines: 68,
+      },
+      // L'espace MUSTAPHA est un second produit, mesuré à part ; les fichiers de
+      // test, les styles et les déclarations de types ne se mesurent pas.
+      exclude: ['src/**/*.test.*', 'src/mustapha/**', 'src/styles/**', 'src/vite-env.d.ts', 'src/test/**'],
+    },
   },
 });

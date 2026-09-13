@@ -8,6 +8,7 @@ import {
   type WeeklyMeasurement,
 } from '../../domain/measurements';
 import type { ProfileId } from '../../domain/types';
+import { debutDePause } from '../../storage/cyclePause';
 import { implausibleZones, nextTargetWeek, previousMeasurement, zoneDelta } from '../../workout/followup';
 import { Check, Plus, Minus, Repeat, ArrowLeft, ChartLine, Warning } from '../ui/Icons';
 
@@ -72,6 +73,8 @@ export function FollowupScreen({
   const [enregistre, setEnregistre] = useState(false);
   /** Réponse du coach, collée à la main après son retour. */
   const [retourCoach, setRetourCoach] = useState(() => existing?.coachNote ?? '');
+  /** Cycle mis en pause depuis les réglages : on n'attend plus de point. */
+  const [enPause] = useState(() => debutDePause(profileId));
 
   const setValue = (zone: MeasurementZone, raw: string) => {
     setDraft((current) => ({ ...current, [zone]: raw.replace(/[^0-9,.]/g, '') }));
@@ -147,6 +150,12 @@ export function FollowupScreen({
       </button>
 
       <p className="eyebrow">POINT DU SAMEDI</p>
+      {enPause && (
+        <p className="cycle-pause">
+          Cycle en pause depuis le {enPause.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })}. Aucun point
+          n’est attendu : les courbes sont gelées, pas faussées, et la numérotation reprendra où elle s’est arrêtée.
+        </p>
+      )}
       <h1>
         Semaine {target.week} <em>du cycle {target.cycle}</em>
       </h1>
