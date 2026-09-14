@@ -313,8 +313,8 @@
      la séance défile derrière. Un bouton seul collé par-dessus masquait la
      rangée de saisie. */
   .workout-content .log-card.compact {
-    position: sticky;
-    bottom: 0;
+    position: static;
+
     z-index: 3;
     background: var(--surface-1);
     box-shadow: 0 -14px 28px rgba(0, 0, 0, 0.5);
@@ -446,4 +446,126 @@
  */
 .warmup-ramp-toggle {
   min-height: 44px;
+}
+
+/* ================================================== le bandeau du tempo == */
+
+/*
+ * FIGÉ EN HAUT. Un seul élément collé en haut, un seul collé en bas (la barre de
+ * validation) : la consigne de Laura était « fige tout ou rien ». Entre les
+ * deux, le contenu défile.
+ *
+ * La cause des cinq chevauchements de la soirée du 14/09 n'était pas ici : les
+ * animations d'écran en `animation-fill-mode: both` laissaient une MATRICE
+ * IDENTITÉ posée à demeure sur le conteneur de défilement, donc un bloc
+ * conteneur et un contexte d'empilement permanents. Corrigé dans matiere.css.
+ */
+.tempo-band {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  margin-bottom: var(--sp-5);
+  padding: var(--sp-3) var(--sp-5) var(--sp-4);
+  border-radius: var(--r-lg);
+  background: var(--surface-1);
+  box-shadow: inset 0 -1px 0 var(--line);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .tempo-band {
+    background: var(--surface-0);
+  }
+}
+
+.workout-content .tempo-band .exercise-timer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--sp-3);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+/*
+ * LE CORRECTIF MESURÉ PAR L'AUDIT : le conteneur du chiffre est en
+ * `flex-direction: column; flex-wrap: wrap`. Avec le retour à la ligne actif, le
+ * chiffre basculait dans une SECONDE COLONNE, à 150,19 px plus à droite — soit
+ * exactement la largeur de l'intitulé (146,19) plus l'écart (4). Le chiffre
+ * finissait à 444 px pour un écran de 390.
+ */
+.workout-content .tempo-band .exercise-timer > div:first-of-type {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: var(--sp-2);
+  min-width: 0;
+  text-align: center;
+}
+
+/* L'intitulé partageait la ligne du chiffre : le bandeau EST le compteur. */
+.workout-content .tempo-band .eyebrow {
+  display: none;
+}
+
+.workout-content .tempo-band .exercise-timer strong {
+  width: 100%;
+  max-width: 100%;
+  text-align: center;
+  font-size: var(--fs-tempo);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 1.04;
+  font-variant-numeric: tabular-nums;
+}
+
+.tempo-unite {
+  font-size: var(--fs-tempo-unite);
+  font-weight: 460;
+  letter-spacing: 0;
+  color: var(--text-2);
+}
+
+.workout-content .tempo-band .timer-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-3);
+}
+
+.workout-content .tempo-band .timer-actions button:last-child {
+  display: none;
+}
+
+.workout-content .tempo-band .timer-actions button:first-child {
+  grid-column: 1 / -1;
+}
+
+.warmup-ramp-toggle {
+  min-height: 44px;
+}
+
+/* ============================================ équilibre des deux figeages == */
+
+/*
+ * Constat de Laura : « le compteur tempo et Performance sont figés, ça
+ * chevauche ». La carte de saisie portait une règle de l'application écrite bien
+ * avant ce soir — `.workout-content .log-card.compact { position: static;
+ * bottom: 0 }` — qui l'épinglait en bas de l'écran et la faisait passer
+ * par-dessus ce qui suivait.
+ *
+ * Règle retenue, la sienne : DEUX figés, un en haut, un en bas, et rien entre
+ * les deux. Le bandeau du tempo en haut, la barre de validation en bas ; la
+ * carte de saisie et la consigne défilent normalement.
+ */
+.workout-content .log-card.compact {
+  position: static;
+}
+
+/* La barre de validation reste au fond de l'écran : on réserve sa place dans le
+   contenu, sinon elle recouvre le bas du formulaire. */
+.workout-content {
+  padding-bottom: calc(var(--sp-11) + var(--sp-7));
 }

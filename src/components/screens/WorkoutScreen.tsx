@@ -391,6 +391,28 @@ export function WorkoutScreen({
 
       {exercise && prescription && (
         <>
+          {/* FIGÉ EN HAUT : le temps est ce qu'on lit de loin, téléphone au sol.
+              Deux éléments figés seulement dans cet écran, celui-ci et la barre
+              de validation en bas ; tout le reste défile entre les deux. */}
+          {prescription.durationSeconds && !resting ? (
+            <div className="tempo-band">
+              <ExerciseTimer
+                key={`${exercise.id}-${step.setIndex}`}
+                exerciseId={exercise.id}
+                setIndex={step.setIndex!}
+                durationSeconds={prescription.durationSeconds}
+                initialState={matchingTimer?.kind === 'tempo' ? matchingTimer : undefined}
+                suspended={timerSuspended}
+                onStateChange={onTimerStateChange}
+                onDone={() => {
+                  setTempoSkipped(true);
+                  onTimerDone('tempo');
+                }}
+                onSkip={() => setTempoSkipped(true)}
+              />
+            </div>
+          ) : null}
+
           {(tutorials[exercise.id] || (equipmentAlternatives[exercise.id] && !activeAlternative)) && (
             <div className="workout-actions">
               {tutorials[exercise.id] && (
@@ -608,23 +630,6 @@ export function WorkoutScreen({
             </div>
           ) : (
             <div className="log-card compact">
-              {prescription.durationSeconds && (
-                <ExerciseTimer
-                  key={`${exercise.id}-${step.setIndex}`}
-                  exerciseId={exercise.id}
-                  setIndex={step.setIndex!}
-                  durationSeconds={prescription.durationSeconds}
-                  initialState={matchingTimer?.kind === 'tempo' ? matchingTimer : undefined}
-                  suspended={timerSuspended}
-                  onStateChange={onTimerStateChange}
-                  onDone={() => {
-                    setTempoSkipped(true);
-                    onTimerDone('tempo');
-                  }}
-                  onSkip={() => setTempoSkipped(true)}
-                />
-              )}
-
               <div className="log-card-heading">
                 <span>Ta performance</span>
                 <small>

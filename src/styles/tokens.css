@@ -789,6 +789,13 @@ body {
   --fs-11: 2rem;
   --fs-12: 2.5rem;
 
+  /* Le chiffre du compteur tempo, figé en haut de la séance. Mesuré à 390 px :
+     à 148 px, « 40s » faisait 331 px de large dans une zone de 331 et sortait de
+     140 px. 24 vw donnent 94 px ici : « 40s » tient en 210 px, et le pire cas
+     « 12:00 » en 300 — sous les 327 disponibles. */
+  --fs-tempo: clamp(4.5rem, 24vw, 7rem);
+  --fs-tempo-unite: 0.42em;
+
   /* Rayons : prolonge les trois qui existaient déjà. */
   --r-xs: 4px;
   --r-xl: 20px;
