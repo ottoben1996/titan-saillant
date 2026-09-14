@@ -1,4 +1,4 @@
-import { ArrowLeft, Barbell, Gear } from '../ui/Icons';
+import { ArrowLeft, Gear } from '../ui/Icons';
 
 interface TopBarProps {
   onBack: () => void;
@@ -18,7 +18,10 @@ export function TopBar({ onBack, backLabel, isOnline, onOpenSettings, titre }: T
       {titre && <span className="topbar-titre">{titre}</span>}
       <div className="topbar-brand">
         <span className="brand-mark small">
-          <Barbell size={18} weight="duotone" />
+          {/* La marque de l'application : l'anneau et le carre arrondi qui se
+              chevauchent. Détourée depuis l'image source (lime sur fond noir),
+              elle flotte sur le fond de l'en-tête sans raccord visible. */}
+          <img src="/icons/logo-mark.png" alt="" width={20} height={20} />
         </span>
         <span>COACH</span>
       </div>

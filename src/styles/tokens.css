@@ -347,7 +347,11 @@ body {
 .primary-button:hover {
   transform: none;
   box-shadow: none;
-  background: #c4f884;
+  /* Était un vert lime écrit en dur (#c4f884) : quand on changeait la couleur,
+     le bouton restait vert. Sur téléphone l'état :hover colle après l'appui, donc
+     il restait vert jusqu'au geste suivant — signalé par Laura. On éclaircit
+     l'accent courant, quelle que soit la couleur choisie. */
+  background: color-mix(in srgb, var(--accent) 86%, white);
 }
 
 .round-action:hover {
