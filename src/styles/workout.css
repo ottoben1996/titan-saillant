@@ -491,11 +491,12 @@
  * spécificité : deux classes de plus, aucun !important.
  */
 .tempo-band {
-  position: sticky;
-  top: 0;
-  /* Au-dessus de la carte de saisie et de ses en-têtes : sur la capture de
-     Laura, « Ta performance » se peignait par-dessus le bandeau. */
-  z-index: 20;
+  /* Plus de position collante, plus de z-index. Deux livraisons de suite sont
+     arrivées chez Laura avec des éléments superposés : un bloc qui se colle ne
+     peut que passer par-dessus ce qui suit, et je n'avais pas les moyens de
+     vérifier ce recouvrement sur son téléphone. En bloc normal, la
+     superposition devient impossible — et la demande de départ, un gros chiffre
+     lisible à trois mètres, est tenue par la taille, pas par le collage. */
   margin-bottom: var(--sp-5);
   padding: var(--sp-3) var(--sp-5) var(--sp-4);
   border-radius: var(--r-lg);

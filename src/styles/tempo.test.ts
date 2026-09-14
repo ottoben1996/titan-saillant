@@ -19,24 +19,33 @@ const ecran = readFileSync('src/components/screens/WorkoutScreen.tsx', 'utf8');
 
 /** Le corps d'un bloc `sélecteur { … }`, sans descendre dans les imbrications. */
 function corps(source: string, selecteur: string): string {
-  // Plusieurs blocs peuvent viser le même sélecteur (un repli dans @supports,
-  // par exemple) : on les réunit, c'est l'ensemble des règles qui s'appliquent.
-  return (
-    [...source.matchAll(/([^{}]+)\{([^{}]*)\}/g)]
-      // Le sélecteur capturé avale le commentaire qui le précède : on l'enlève
-      // avant de comparer, sinon aucun sélecteur commenté ne correspond.
-      .filter((bloc) => bloc[1].replace(/\/\*[\s\S]*?\*\//g, '').trim() === selecteur)
-      .map((bloc) => bloc[2])
-      .join('\n')
-  );
+  // Les commentaires partent d'abord : sans ça, un commentaire qui parle de
+  // « z-index » fait échouer le test qui interdit le z-index.
+  const propre = source.replace(/\/\*[\s\S]*?\*\//g, '');
+  // Plusieurs blocs peuvent viser le même sélecteur (un repli dans @supports) :
+  // on les réunit, c'est l'ensemble des règles qui s'appliquent.
+  return [...propre.matchAll(/([^{}]+)\{([^{}]*)\}/g)]
+    .filter((bloc) => bloc[1].trim() === selecteur)
+    .map((bloc) => bloc[2])
+    .join('\n');
 }
 
 describe('bandeau du tempo', () => {
-  it('colle en haut de l’écran', () => {
+  it('ne peut pas recouvrir ce qui suit : aucun positionnement, aucun z-index', () => {
     const bloc = corps(feuille, '.tempo-band');
     expect(bloc, 'le sélecteur .tempo-band doit exister').not.toBe('');
-    expect(bloc).toMatch(/position:\s*sticky/);
-    expect(bloc).toMatch(/top:\s*0/);
+    // Une vérification à l'aveugle sur un téléphone ne se rattrape pas :
+    // on interdit la cause entière du recouvrement plutôt que de la corriger.
+    expect(bloc).not.toMatch(/position:\s*(sticky|fixed|absolute)/);
+    expect(bloc).not.toMatch(/z-index/);
+  });
+
+  it('ouvre l’écran, avant la carte de prescription', () => {
+    const bande = ecran.indexOf('className="tempo-band"');
+    const carte = ecran.indexOf('prescription-card');
+    expect(bande).toBeGreaterThan(-1);
+    expect(carte).toBeGreaterThan(-1);
+    expect(bande).toBeLessThan(carte);
   });
 
   it('n’a pas de fond transparent : le contenu défile dessous', () => {
