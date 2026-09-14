@@ -794,7 +794,11 @@ body {
      de haut, soit une lecture confortable vers 3,4 m. En rem, donc il suit la
      taille de police système — et borné, pour ne pas dévorer l'écran sur un
      très grand réglage d'accessibilité. */
-  --fs-tempo: clamp(7rem, 40vw, 9.5rem);
+  --fs-tempo: clamp(6rem, 38vw, 10rem);
+
+  /* Le « s » des secondes : discret à côté du chiffre, mais assez grand pour
+     rester lisible quand on est à trois mètres. */
+  --fs-tempo-unite: 0.42em;
 
   /* Rayons : prolonge les trois qui existaient déjà. */
   --r-xs: 4px;

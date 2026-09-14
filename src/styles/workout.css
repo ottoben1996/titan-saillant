@@ -493,7 +493,9 @@
 .tempo-band {
   position: sticky;
   top: 0;
-  z-index: 5;
+  /* Au-dessus de la carte de saisie et de ses en-têtes : sur la capture de
+     Laura, « Ta performance » se peignait par-dessus le bandeau. */
+  z-index: 20;
   margin-bottom: var(--sp-5);
   padding: var(--sp-3) var(--sp-5) var(--sp-4);
   border-radius: var(--r-lg);
@@ -541,6 +543,25 @@
    hauteur au chiffre. */
 .workout-content .tempo-band .timer-actions {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--sp-3);
+}
+
+/* « Recommencer » quitte le bandeau : la maquette validée n'en garde que deux,
+   et trois commandes ne tenaient pas sur une ligne de téléphone. L'action reste
+   disponible par la fiche de séance. */
+.workout-content .tempo-band .timer-actions button:last-child {
+  display: none;
+}
+
+.workout-content .tempo-band .timer-actions button:first-child {
+  grid-column: 1 / -1;
+}
+
+/* L'unité est discrète : c'est le chiffre qu'on lit de loin. */
+.tempo-unite {
+  font-size: var(--fs-tempo-unite);
+  font-weight: 460;
+  letter-spacing: 0;
+  color: var(--text-2);
 }
