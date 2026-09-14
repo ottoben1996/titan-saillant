@@ -1,0 +1,272 @@
+/**
+ * Recouvrement sur l'écran de séance.
+ *
+ * Deux livraisons de suite sont arrivées chez Laura avec des éléments posés les
+ * uns sur les autres : le bandeau du temps, puis la barre « Valider la série ».
+ * Les gardes existantes lisaient le TEXTE d'une seule feuille (`workout.css`,
+ * via le défunt `tempo.test.ts`) : une règle ajoutée dans `matiere.css`, dans
+ * `screens.css` ou dans un attribut `style` passait donc entre les mailles.
+ *
+ * Ces tests-ci MESURENT le rendu : le composant est monté pour de vrai par
+ * `@testing-library`, les huit feuilles réellement servies (`main.tsx`) sont
+ * injectées, jsdom applique la cascade, et l'on interroge le style RÉSOLU des
+ * éléments réellement rendus — plus les déclarations servies pour ce que jsdom
+ * n'applique pas (les blocs `@media`).
+ *
+ * jsdom ne calcule aucune mise en page : `getBoundingClientRect` y renvoie des
+ * zéros, et un test de recouvrement qui s'appuierait dessus ne mesurerait rien.
+ * Les rectangles sont donc posés ici — mais à partir des POSITIONS RÉSOLUES, pas
+ * de chiffres choisis d'avance : chaque enfant de la colonne tient une bande,
+ * empilées dans l'ordre du document, et un enfant épinglé en bas se pose sur la
+ * DERNIÈRE bande, donc sur ce qui le suit.
+ *
+ * Ce fichier ne modifie rien : il constate.
+ */
+import { readFileSync } from 'node:fs';
+import { render } from '@testing-library/react';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { getProgram } from '../../domain/programs';
+import { completeSet, createRunner, getNextStep, getWorkoutExercises } from '../../workout/runner';
+import { WorkoutScreen } from './WorkoutScreen';
+
+/* ------------------------------------------------------------- les feuilles -- */
+
+/** Les feuilles et leur ordre : ceux de `src/main.tsx`, donc ceux de la cascade servie. */
+const FEUILLES = [
+  'src/styles.css',
+  'src/styles/tokens.css',
+  'src/styles/mobile.css',
+  'src/styles/workout.css',
+  'src/styles/screens.css',
+  'src/styles/ui.css',
+  'src/styles/followup.css',
+  'src/styles/matiere.css',
+];
+
+/** Chaque feuille servie, commentaires retirés. */
+const SOURCES: readonly string[] = FEUILLES.map((chemin) =>
+  readFileSync(chemin, 'utf8').replace(/\/\*[\s\S]*?\*\//g, ''),
+);
+
+beforeAll(() => {
+  // jsdom n'implémente pas `window.matchMedia` : les blocs `@media` sont donc
+  // ignorés à la résolution. On injecte quand même les feuilles — tout ce qui
+  // vit hors `@media` est appliqué pour de bon.
+  for (const css of SOURCES) {
+    const style = document.createElement('style');
+    style.textContent = css;
+    document.head.appendChild(style);
+  }
+});
+
+afterAll(() => {
+  for (const style of document.querySelectorAll('head style')) style.remove();
+});
+
+/* ------------------------------------------------------------------- outils -- */
+
+/** L'élément, ou une erreur nommée : le rendu est le sujet du test, pas le doute. */
+function exiger<T extends Element>(element: T | null, message: string): T {
+  if (element === null) throw new Error(message);
+  return element;
+}
+
+/**
+ * Les blocs servis dont le sélecteur vise `classe`, repli `@media` compris.
+ *
+ * On filtre sur la PREMIÈRE classe de l'élément — la classe qui porte le sens
+ * (`.log-card`, `.action-bar`, `.next-hint`) et jamais une classe d'état
+ * partagée (`.compact`), qui ferait attribuer à un élément les règles d'un
+ * autre. Le découpage en blocs est le même que dans `src/styles/tempo.test.ts`.
+ */
+function declarationsPour(classe: string): string[] {
+  const motif = new RegExp(`\\.${classe}(?![\\w-])`);
+  const trouves: string[] = [];
+  for (const css of SOURCES) {
+    for (const bloc of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+      if (motif.test(bloc[1])) trouves.push(bloc[2]);
+    }
+  }
+  return trouves;
+}
+
+/** Un élément posé au bas de son conteneur de défilement, donc par-dessus ce qui le suit. */
+function epingleEnBas(element: HTMLElement): boolean {
+  const resolu = getComputedStyle(element);
+  if (/sticky|fixed/.test(resolu.position) && /^0(px)?$/.test(resolu.bottom)) return true;
+
+  const classe = [...element.classList][0];
+  if (classe === undefined) return false;
+  return declarationsPour(classe).some(
+    (corps) => /position:\s*(sticky|fixed)/.test(corps) && /bottom:\s*0/.test(corps),
+  );
+}
+
+/** Un rectangle, posé à la main : jsdom n'en calcule aucun. */
+function rectangle(y: number, hauteur: number, largeur = 390): DOMRect {
+  return {
+    x: 0,
+    y,
+    top: y,
+    bottom: y + hauteur,
+    left: 0,
+    right: largeur,
+    width: largeur,
+    height: hauteur,
+    toJSON: () => ({}),
+  } as DOMRect;
+}
+
+/** La hauteur d'une bande : assez grande pour que deux bandes voisines soient distinctes. */
+const BANDE = 120;
+
+/** L'aire commune à deux rectangles — 0 quand ils ne se touchent pas. */
+function aire(a: DOMRect, b: DOMRect): number {
+  const largeur = Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left));
+  const hauteur = Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top));
+  return largeur * hauteur;
+}
+
+/** Les enfants directs de la colonne de séance, dans l'ordre du document. */
+function colonne(conteneur: HTMLElement): HTMLElement[] {
+  const section = exiger(
+    conteneur.querySelector('.workout-content'),
+    'colonne de séance (.workout-content) introuvable',
+  );
+  return [...section.children] as HTMLElement[];
+}
+
+/** Une bande par enfant, empilées ; l'épinglé en bas prend la dernière bande. */
+function bandes(enfants: HTMLElement[]): DOMRect[] {
+  return enfants.map((enfant, index) => {
+    const epingle = index < enfants.length - 1 && epingleEnBas(enfant);
+    return rectangle((epingle ? enfants.length - 1 : index) * BANDE, BANDE);
+  });
+}
+
+/** Un nom lisible pour un élément, dans un message d'échec. */
+function nommer(element: HTMLElement): string {
+  return element.className === ''
+    ? element.tagName.toLowerCase()
+    : `${element.tagName.toLowerCase()}.${element.className}`;
+}
+
+/* -------------------------------------------------------- le rendu de séance -- */
+
+/** « Full Body A » d'Ottman, avancée jusqu'à la première série chronométrée. */
+function jourEtSession() {
+  const day = getProgram('ottman').days.find((item) => item.id === 'full-body-a');
+  if (!day) throw new Error('Séance « Full Body A » introuvable');
+  let session = createRunner(day, 'ottman');
+  for (let pas = 0; pas < 6; pas += 1) {
+    const step = getNextStep(session, day);
+    const exercise = getWorkoutExercises(day, session)[step.exerciseIndex ?? 0];
+    const prescription = exercise.sets[step.setIndex ?? 0];
+    if (prescription?.durationSeconds) break;
+    session = completeSet(session, day, {
+      exerciseId: exercise.id,
+      setIndex: step.setIndex ?? 0,
+      actualRepetitions: prescription?.repetitions,
+      actualDurationSeconds: prescription?.durationSeconds,
+      actualLoadKg: prescription?.loadKg,
+    });
+  }
+  return { day, session };
+}
+
+function rendreLaSeance() {
+  const { day, session } = jourEtSession();
+  return render(
+    <WorkoutScreen
+      profile="ottman"
+      day={day}
+      session={session}
+      resting={false}
+      restSeconds={30}
+      timerSuspended={false}
+      onTimerStateChange={() => undefined}
+      onTimerDone={() => undefined}
+      onCompleteSet={async () => undefined}
+      onTutorial={() => undefined}
+      onAlternative={() => undefined}
+      onFinish={async () => undefined}
+    />,
+  );
+}
+
+/* ------------------------------------------------------------------- tests -- */
+
+describe('recouvrement de l’écran de séance', () => {
+  it('aucun élément de l’écran de séance n’est en position fixe', () => {
+    const { container } = rendreLaSeance();
+    const colonneSeance = exiger(container.querySelector('.workout-content'), 'colonne de séance introuvable');
+
+    // La transition d'écran pose un `transform` sur le conteneur : un élément
+    // `fixed` à l'intérieur s'ancre alors sur LUI au lieu de la fenêtre et saute
+    // au milieu de l'écran. C'est le défaut vu sur le téléphone de Laura.
+    const fautifs = [...colonneSeance.querySelectorAll('*')]
+      .filter((element) => getComputedStyle(element).position === 'fixed')
+      .map((element) => nommer(element as HTMLElement));
+
+    expect(fautifs, `éléments fixes à l’intérieur de l’écran : ${fautifs.join(', ')}`).toEqual([]);
+  });
+
+  it('aucun enfant de la colonne n’est épinglé en bas alors qu’un autre le suit', () => {
+    const { container } = rendreLaSeance();
+    const enfants = colonne(container);
+
+    const fautifs = enfants
+      .filter((enfant, index) => index < enfants.length - 1 && epingleEnBas(enfant))
+      .map((enfant) => nommer(enfant));
+
+    expect(fautifs, `enfants épinglés en bas qui recouvrent la suite : ${fautifs.join(', ')}`).toEqual([]);
+  });
+
+  it('le recouvrement mesuré entre les enfants de la colonne est nul', () => {
+    const { container } = rendreLaSeance();
+    const enfants = colonne(container);
+    const posees = bandes(enfants);
+
+    const recouvrements: string[] = [];
+    for (let avant = 0; avant < enfants.length; avant += 1) {
+      for (let apres = avant + 1; apres < enfants.length; apres += 1) {
+        const aireCommune = aire(posees[avant], posees[apres]);
+        if (aireCommune > 0) {
+          recouvrements.push(`${nommer(enfants[avant])} sur ${nommer(enfants[apres])} (${aireCommune} px²)`);
+        }
+      }
+    }
+
+    expect(recouvrements, `recouvrements mesurés : ${recouvrements.join(' | ')}`).toEqual([]);
+  });
+
+  it('le compteur tempo ne vit pas dans la carte de saisie', () => {
+    const { container } = rendreLaSeance();
+    const compteur = exiger(
+      container.querySelector('.exercise-timer'),
+      'le compteur tempo doit être rendu sur une série chronométrée',
+    );
+
+    // Le compteur était redescendu sous la rangée de saisie : on le lisait après
+    // coup, hors de l'écran, pendant que le mouvement tournait. Le remettre dans
+    // la carte de saisie, c'est replacer la superposition qu'on a corrigée.
+    expect(compteur.closest('.log-card'), 'le compteur tempo est redescendu dans la carte de saisie').toBeNull();
+  });
+
+  it('la lecture du tempo et ses commandes sont empilées, jamais côte à côte', () => {
+    const { container } = rendreLaSeance();
+    const compteur = exiger(container.querySelector('.exercise-timer'), 'le compteur tempo doit être rendu');
+
+    // Une seule piste de grille : le chiffre et les commandes ne peuvent pas se
+    // disputer la largeur, donc pas se chevaucher. Le défaut mesuré était de
+    // 20 px de chevauchement entre le chiffre et l'état à 390 px.
+    expect(getComputedStyle(compteur).gridTemplateColumns).toBe('minmax(0, 1fr)');
+
+    const lecture = exiger(compteur.querySelector('div'), 'le bloc de lecture doit exister');
+    const commandes = exiger(compteur.querySelector('.timer-actions'), 'les commandes doivent exister');
+
+    // Les commandes viennent APRÈS la lecture dans le document : elles ne
+    // peuvent pas être posées à côté d'elle, quoi qu'en fasse la grille.
+    expect(lecture.compareDocumentPosition(commandes) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+});

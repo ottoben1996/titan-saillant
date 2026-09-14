@@ -249,14 +249,9 @@ html[data-replie="true"] .workout-heading h1 {
  * la continuité sans garder deux écrans vivants — et sans rejouer leurs
  * requêtes de stockage.
  *
- * On n'anime que l'opacité et la transformation.
- *
- * ATTENTION : la transformation du conteneur crée un bloc conteneur pour tout
- * `position: fixed` placé à l'intérieur. Une barre fixe s'ancre alors sur le
- * conteneur au lieu de la fenêtre — « Valider la série » flottait au milieu de
- * l'écran sur le téléphone de Laura. La phrase « aucun écran ne contient
- * d'élément fixe (vérifié) » a été écrite ici avant que j'en ajoute une.
- * Les barres qui doivent rester en place sont donc COLLANTES, jamais fixes.
+ * On n'anime que l'opacité et la transformation. Aucun écran ne contient
+ * d'élément fixe (vérifié) : une transformation sur le conteneur ne peut donc
+ * pas déplacer une barre censée rester en place.
  */
 @keyframes pousse {
   from {
@@ -291,17 +286,17 @@ html[data-replie="true"] .workout-heading h1 {
 
 .app-shell[data-sens="pousse"] > section,
 .app-shell[data-sens="pousse"] > .content {
-  animation: pousse 460ms var(--ressort) both;
+  animation: pousse 460ms var(--ressort);
 }
 
 .app-shell[data-sens="revient"] > section,
 .app-shell[data-sens="revient"] > .content {
-  animation: revient 420ms var(--ressort) both;
+  animation: revient 420ms var(--ressort);
 }
 
 .app-shell[data-sens="onglet"] > section,
 .app-shell[data-sens="onglet"] > .content {
-  animation: commute 200ms ease-out both;
+  animation: commute 200ms ease-out;
 }
 
 /* Pendant un glissement de retour, la page suit le doigt sans transition. */
@@ -316,7 +311,7 @@ html[data-replie="true"] .workout-heading h1 {
   .app-shell[data-sens="revient"] > .content,
   .app-shell[data-sens="onglet"] > section,
   .app-shell[data-sens="onglet"] > .content {
-    animation: commute 120ms ease-out both;
+    animation: commute 120ms ease-out;
   }
 }
 
@@ -335,11 +330,10 @@ html[data-replie="true"] .workout-heading h1 {
  * La barre résiste à l'encoche : elle remonte de la zone sûre.
  */
 .action-bar {
-  position: sticky;
+  position: fixed;
   left: max(0.75rem, env(safe-area-inset-left));
   right: max(0.75rem, env(safe-area-inset-right));
-  bottom: 0;
-  padding-bottom: calc(var(--sp-3) + env(safe-area-inset-bottom));
+  bottom: calc(var(--sp-3) + env(safe-area-inset-bottom));
   z-index: 12;
   min-height: 52px;
   background: var(--accent);

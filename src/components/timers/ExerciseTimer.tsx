@@ -168,19 +168,7 @@ export function ExerciseTimer({
       </span>
       <div>
         <span className="eyebrow">COMPTEUR TEMPO</span>
-        {/* Sous la minute, les secondes seules : « 40 » et un petit « s » tiennent
-            en grand. « 00:40 » prend cinq signes et ne rentre pas dans la largeur
-            d'un téléphone sans qu'on rapetisse tout. Au-delà, format minutes. */}
-        <strong>
-          {remaining < 60 ? (
-            <>
-              {remaining}
-              <span className="tempo-unite">s</span>
-            </>
-          ) : (
-            formatDuration(remaining)
-          )}
-        </strong>
+        <strong>{formatDuration(remaining)}</strong>
         <small>
           {remaining === 0
             ? 'Temps terminé'

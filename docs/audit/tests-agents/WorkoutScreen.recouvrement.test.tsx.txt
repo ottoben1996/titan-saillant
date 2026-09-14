@@ -1,0 +1,285 @@
+/**
+ * Recouvrement sur l'écran de séance.
+ *
+ * Deux livraisons de suite sont arrivées chez Laura avec des éléments posés les
+ * uns sur les autres : le bandeau du temps, puis la barre « Valider la série ».
+ * Les tests existants lisaient le TEXTE du CSS — et ne regardaient qu'une seule
+ * feuille (`workout.css`). Une règle ajoutée dans `matiere.css` ou dans un style
+ * en ligne passait donc entre les mailles.
+ *
+ * Ces tests-ci MESURENT le rendu : le composant est monté pour de vrai avec
+ * `@testing-library`, les feuilles réellement servies sont injectées, et jsdom
+ * applique la cascade. On interroge ensuite le style RÉSOLU de l'élément
+ * réellement rendu, et l'on pose les rectangles pour compter les recouvrements.
+ *
+ * jsdom ne calcule aucune mise en page : `getBoundingClientRect` y renvoie des
+ * zéros, et un test de recouvrement qui s'appuierait dessus ne mesurerait rien.
+ * Les rectangles sont donc posés ici — mais à partir des POSITIONS RÉSOLUES, pas
+ * de chiffres choisis d'avance : chaque enfant de la colonne tient une bande,
+ * empilées dans l'ordre du document, et un enfant épinglé en bas se pose sur la
+ * DERNIÈRE bande, donc sur ce qui le suit. Remettre un `position` sur le bandeau
+ * du tempo fait replacer son rectangle sur la carte de prescription et le test
+ * échoue.
+ */
+import { readFileSync } from 'node:fs';
+import { render } from '@testing-library/react';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { getProgram } from '../../domain/programs';
+import { completeSet, createRunner, getNextStep, getWorkoutExercises } from '../../workout/runner';
+import { WorkoutScreen } from './WorkoutScreen';
+
+/* ------------------------------------------------------------- les feuilles -- */
+
+/**
+ * L'ordre et les chemins sont ceux de `src/main.tsx` : c'est l'ordre de la
+ * cascade réellement servie.
+ */
+const FEUILLES = [
+  'src/styles.css',
+  'src/styles/tokens.css',
+  'src/styles/mobile.css',
+  'src/styles/workout.css',
+  'src/styles/screens.css',
+  'src/styles/ui.css',
+  'src/styles/followup.css',
+  'src/styles/matiere.css',
+];
+
+/** Le texte servi de chaque feuille, commentaires retirés. */
+const SOURCES: readonly string[] = FEUILLES.map((chemin) =>
+  readFileSync(chemin, 'utf8').replace(/\/\*[\s\S]*?\*\//g, ''),
+);
+
+beforeAll(() => {
+  // jsdom n'implémente pas `window.matchMedia` : les blocs `@media` sont donc
+  // ignorés à la résolution. On injecte quand même les feuilles — tout ce qui
+  // vit hors `@media` est appliqué pour de bon.
+  for (const css of SOURCES) {
+    const style = document.createElement('style');
+    style.textContent = css;
+    document.head.appendChild(style);
+  }
+});
+
+afterAll(() => {
+  for (const style of document.querySelectorAll('head style')) style.remove();
+});
+
+/* ------------------------------------------------------------------- outils -- */
+
+/**
+ * Le corps de tous les blocs dont le sélecteur SE TERMINE par `suffixe`.
+ *
+ * Le découpage est le même que dans `src/styles/tempo.test.ts` : un repli
+ * `@media` s'écrit `.parent .enfant { … }`, la fin du sélecteur suffit donc à le
+ * retrouver, et le filtre attrape aussi bien la règle de base que son repli.
+ */
+function declarations(suffixe: string): string[] {
+  const trouves: string[] = [];
+  for (const css of SOURCES) {
+    for (const bloc of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+      if (bloc[1].trim().endsWith(suffixe)) trouves.push(bloc[2]);
+    }
+  }
+  return trouves;
+}
+
+/** Le style réellement appliqué à un élément du rendu. */
+function style(element: Element): CSSStyleDeclaration {
+  return getComputedStyle(element);
+}
+
+/** Un rectangle, posé à la main : jsdom n'en calcule aucun. */
+function rectangle(y: number, hauteur: number, largeur = 390): DOMRect {
+  return {
+    x: 0,
+    y,
+    top: y,
+    bottom: y + hauteur,
+    left: 0,
+    right: largeur,
+    width: largeur,
+    height: hauteur,
+    toJSON: () => ({}),
+  } as DOMRect;
+}
+
+/** La hauteur d'une bande : assez grande pour que deux bandes voisines soient distinctes. */
+const BANDE = 120;
+
+/** L'aire commune à deux rectangles — 0 quand ils ne se touchent pas. */
+function aire(a: DOMRect, b: DOMRect): number {
+  const largeur = Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left));
+  const hauteur = Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top));
+  return largeur * hauteur;
+}
+
+/**
+ * Un élément « épinglé en bas » : une fois la page défilée, le navigateur le
+ * pose au bas du conteneur de défilement — donc par-dessus ce qui le suit.
+ *
+ * Deux façons de l'être, et il faut les deux : par le style RÉSOLU (jsdom l'a
+ * appliqué), ou par une déclaration dans un bloc `@media` que jsdom ignore mais
+ * que le navigateur du téléphone applique — c'est exactement le cas de la carte
+ * de saisie sous 780 px de haut.
+ */
+function epingleEnBas(element: Element): boolean {
+  const resolu = style(element);
+  if (/sticky|fixed/.test(resolu.position) && /^0(px)?$/.test(resolu.bottom)) return true;
+
+  const classes = [...element.classList].join('.');
+  if (classes === '') return false;
+  return declarations(`.${classes}`).some(
+    (corps) => /position:\s*(sticky|fixed)/.test(corps) && /bottom:\s*0/.test(corps),
+  );
+}
+
+/** Les enfants directs de la colonne de séance, dans l'ordre du document. */
+function colonne(conteneur: HTMLElement): HTMLElement[] {
+  const section = conteneur.querySelector('.workout-content');
+  if (!section) throw new Error('La colonne de séance (.workout-content) est introuvable');
+  return [...section.children] as HTMLElement[];
+}
+
+/** Une bande par enfant, empilées ; l'épinglé en bas prend la dernière bande. */
+function bandes(enfants: HTMLElement[]): Map<HTMLElement, DOMRect> {
+  const posees = new Map<HTMLElement, DOMRect>();
+  enfants.forEach((enfant, index) => {
+    const epingle = index < enfants.length - 1 && epingleEnBas(enfant);
+    posees.set(enfant, rectangle((epingle ? enfants.length - 1 : index) * BANDE, BANDE));
+  });
+  return posees;
+}
+
+/* -------------------------------------------------------- le rendu de séance -- */
+
+/** « Full Body A » d'Ottman, avancée jusqu'à la première série chronométrée. */
+function jourEtSession() {
+  const day = getProgram('ottman').days.find((item) => item.id === 'full-body-a');
+  if (!day) throw new Error('Séance « Full Body A » introuvable');
+  let session = createRunner(day, 'ottman');
+  for (let pas = 0; pas < 6; pas += 1) {
+    const step = getNextStep(session, day);
+    const exercise = getWorkoutExercises(day, session)[step.exerciseIndex ?? 0];
+    const prescription = exercise.sets[step.setIndex ?? 0];
+    if (prescription?.durationSeconds) break;
+    session = completeSet(session, day, {
+      exerciseId: exercise.id,
+      setIndex: step.setIndex ?? 0,
+      actualRepetitions: prescription?.repetitions,
+      actualDurationSeconds: prescription?.durationSeconds,
+      actualLoadKg: prescription?.loadKg,
+    });
+  }
+  return { day, session };
+}
+
+function rendreLaSeance() {
+  const { day, session } = jourEtSession();
+  return render(
+    <WorkoutScreen
+      profile="ottman"
+      day={day}
+      session={session}
+      resting={false}
+      restSeconds={30}
+      timerSuspended={false}
+      onTimerStateChange={() => undefined}
+      onTimerDone={() => undefined}
+      onCompleteSet={async () => undefined}
+      onTutorial={() => undefined}
+      onAlternative={() => undefined}
+      onFinish={async () => undefined}
+    />,
+  );
+}
+
+/* ------------------------------------------------------------------- tests -- */
+
+describe('recouvrement de l’écran de séance', () => {
+  it('le bandeau du tempo est en flux normal : aucun positionnement, aucun z-index, où que ce soit dans la cascade', () => {
+    const { container } = rendreLaSeance();
+    const bande = container.querySelector('.tempo-band');
+    expect(bande, 'le bandeau du tempo doit être rendu').not.toBeNull();
+
+    // Le style RÉSOLU, pas le texte d'une feuille : une règle ajoutée dans
+    // matiere.css, dans screens.css ou dans un attribut `style` est vue ici,
+    // là où `tempo.test.ts` ne lit que workout.css.
+    const resolu = style(bande!);
+    expect(resolu.position).toBe('static');
+    expect(resolu.zIndex).toBe('auto');
+    expect(epingleEnBas(bande!)).toBe(false);
+  });
+
+  it('le bandeau du tempo ne recouvre jamais ce qui le suit', () => {
+    const { container } = rendreLaSeance();
+    const enfants = colonne(container);
+    const posees = bandes(enfants);
+    const rang = enfants.findIndex((enfant) => enfant.classList.contains('tempo-band'));
+    expect(rang, 'le bandeau doit être un enfant direct de la colonne').toBeGreaterThan(-1);
+
+    const bande = posees.get(enfants[rang])!;
+    for (const suite of enfants.slice(rang + 1)) {
+      expect(aire(bande, posees.get(suite)!), `le bandeau du tempo recouvre ${suite.className || suite.tagName}`).toBe(
+        0,
+      );
+    }
+  });
+
+  it('la barre « Valider la série » n’est jamais fixe : sous un ancêtre transformé, elle flotterait au milieu', () => {
+    const { container } = rendreLaSeance();
+    const barre = container.querySelector('.action-bar');
+    expect(barre, 'la barre de validation doit être rendue').not.toBeNull();
+
+    // La transition d'écran pose un `transform` sur le conteneur : un
+    // `position: fixed` à l'intérieur s'ancre alors sur lui et saute au milieu
+    // de l'écran. C'est exactement le défaut vu sur le téléphone.
+    const resolu = style(barre!);
+    expect(resolu.position).not.toBe('fixed');
+    expect(resolu.position).toBe('sticky');
+  });
+
+  it('la lecture du tempo garde toute la largeur : une seule colonne, les commandes dessous', () => {
+    const { container } = rendreLaSeance();
+    const lecture = container.querySelector('.tempo-band .exercise-timer');
+    expect(lecture, 'le compteur doit vivre dans le bandeau').not.toBeNull();
+
+    // Une seule piste de grille : le chiffre et l'état ne peuvent pas se
+    // disputer la largeur, donc pas se chevaucher. C'était le défaut mesuré
+    // (chiffre et état superposés de 20 px à 390 px).
+    expect(style(lecture!).gridTemplateColumns).toBe('minmax(0, 1fr)');
+
+    const bloc = lecture!.querySelector('div');
+    const commandes = lecture!.querySelector('.timer-actions');
+    expect(bloc, 'le bloc de lecture doit exister').not.toBeNull();
+    expect(commandes, 'les commandes doivent exister').not.toBeNull();
+
+    // Les commandes viennent APRÈS le bloc de lecture dans le document : elles
+    // ne peuvent pas être posées à côté de lui, quoi qu'en fasse la grille.
+    expect(bloc!.compareDocumentPosition(commandes!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  /*
+   * DÉFAUT DOCUMENTÉ — le test reste en `it.fails` tant que le défaut existe.
+   * Le jour où la carte de saisie cesse d'être épinglée en bas sous 780 px, ce
+   * test passera : vitest le signalera comme une réussite inattendue, et il
+   * faudra le repasser en `it`.
+   */
+  it.fails('DÉFAUT — la carte de saisie épinglée en bas ne recouvre pas l’indication de suite', () => {
+    const { container } = rendreLaSeance();
+    const enfants = colonne(container);
+    const posees = bandes(enfants);
+    const rang = enfants.findIndex((enfant) => enfant.classList.contains('log-card'));
+    expect(rang, 'la carte de saisie doit être un enfant direct de la colonne').toBeGreaterThan(-1);
+
+    const carte = enfants[rang];
+    expect(epingleEnBas(carte), 'la carte est épinglée en bas sous 780 px').toBe(true);
+
+    const suite = enfants[rang + 1];
+    expect(suite?.classList.contains('next-hint'), 'l’indication de suite suit la carte').toBe(true);
+    expect(
+      aire(posees.get(carte)!, posees.get(suite)!),
+      'la carte de saisie recouvre l’indication « Ensuite : … »',
+    ).toBe(0);
+  });
+});

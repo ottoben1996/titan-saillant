@@ -21,10 +21,7 @@ describe('ExerciseTimer (Compteur Tempo)', () => {
     );
 
     expect(screen.getByText('COMPTEUR TEMPO')).toBeInTheDocument();
-    // Sous la minute, le bandeau n'affiche que les secondes : « 00:40 » prend
-    // cinq signes et ne peut pas grossir assez pour se lire à trois mètres.
-    expect(screen.getByText('40')).toBeInTheDocument();
-    expect(screen.getByText('s')).toBeInTheDocument();
+    expect(screen.getByText('00:40')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /passer/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /démarrer/i })).toBeInTheDocument();
   });
