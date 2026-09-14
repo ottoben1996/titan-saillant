@@ -1,0 +1,453 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Séance minimaliste, cinq propositions — Coach Ottman &amp; Laura</title>
+<style>
+  /* Palette réelle de l'application (src/styles/tokens.css), pas une palette inventée. */
+  :root {
+    --surface-0: #0b0f0e;
+    --surface-1: #121715;
+    --surface-2: #18201d;
+    --line: rgba(255, 255, 255, 0.09);
+    --line-strong: rgba(255, 255, 255, 0.16);
+    --text-1: #f1f5f2;
+    --text-2: #a9b7ae;
+    --text-3: #78877e;
+    --accent: #b8f36b;
+    --accent-ink: #0e1710;
+    --accent-2: #5fbf97;
+    --rest: #f3bd6b;
+    --r-md: 10px;
+    --r-lg: 14px;
+    --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+    --cadre: 390px;
+  }
+
+  * { box-sizing: border-box; }
+
+  /* Les boutons gardent leur fond clair par défaut du navigateur dès qu'ils
+     sortent du groupe .actions : quatre « Démarrer » sur cinq s'affichaient
+     comme des rectangles blancs. Trouvé à l'œil sur la capture, pas à la mesure. */
+  button { background: transparent; color: inherit; font: inherit; }
+
+  body {
+    margin: 0;
+    padding: 40px 20px 80px;
+    background: #07090a;
+    color: var(--text-1);
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .entete { max-width: 1100px; margin: 0 auto 40px; }
+  .entete h1 { font-size: 30px; letter-spacing: -0.02em; margin: 0 0 10px; }
+  .entete p { color: var(--text-2); max-width: 62ch; line-height: 1.6; margin: 0 0 8px; }
+  .entete .constat {
+    margin-top: 22px; padding: 16px 18px; border: 1px solid var(--line);
+    border-left: 3px solid var(--accent); border-radius: var(--r-md);
+    background: var(--surface-1); color: var(--text-2); line-height: 1.6;
+  }
+  .entete .constat b { color: var(--text-1); font-weight: 560; }
+
+  .galerie {
+    display: grid; gap: 34px; max-width: 1100px; margin: 0 auto;
+    grid-template-columns: repeat(auto-fit, minmax(432px, 1fr));
+  }
+
+  .item {
+    display: flex; flex-direction: column; gap: 14px;
+    padding: 20px; border: 1px solid var(--line); border-radius: 16px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+  }
+  .item > header { display: flex; gap: 12px; align-items: flex-start; }
+  .numero {
+    flex: 0 0 auto; width: 30px; height: 30px; border-radius: 50%;
+    display: grid; place-items: center; background: var(--accent); color: var(--accent-ink);
+    font-weight: 620; font-size: 14px;
+  }
+  .item h2 { font-size: 17px; margin: 0 0 3px; letter-spacing: -0.01em; font-weight: 580; }
+  .item h3 { font-size: 12px; margin: 0; color: var(--text-3); font-weight: 460; letter-spacing: 0.02em; }
+  .note { color: var(--text-2); font-size: 13px; line-height: 1.55; margin: 0; }
+  .note b { color: var(--text-1); font-weight: 560; }
+  .cout { color: var(--text-3); font-size: 12px; margin: 0; }
+
+  /* ---------------------------------------------------------------- le cadre */
+  .ecran {
+    /* Un cadre de téléphone ne se comprime pas : écrasé à 302 px, la maquette
+       ne démontre plus rien (mesuré, corrigé). max-width passe après le 390 px
+       pour les petits écrans seulement. */
+    width: var(--cadre); min-width: var(--cadre); height: 700px; margin: 0 auto;
+    background: var(--surface-0); border: 1px solid var(--line-strong);
+    border-radius: 26px; overflow: hidden; position: relative;
+    display: flex; flex-direction: column;
+  }
+  .barre {
+    display: flex; align-items: center; gap: 8px; padding: 10px 14px;
+    border-bottom: 1px solid var(--line); flex: 0 0 auto;
+  }
+  .marque { font-size: 11px; letter-spacing: 0.16em; color: var(--text-3); font-weight: 560; }
+  .barre .droite { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+  .chrono-total { font-size: 12px; color: var(--text-3); font-variant-numeric: tabular-nums; }
+  .pastille {
+    font-size: 12px; padding: 4px 9px; border-radius: 999px;
+    border: 1px solid var(--line); color: var(--text-2);
+  }
+  .fil { height: 3px; background: var(--surface-2); flex: 0 0 auto; }
+  .fil i { display: block; height: 100%; width: 11%; background: var(--accent); }
+
+  .corps { flex: 1 1 auto; overflow: hidden; display: flex; flex-direction: column; }
+  .corps.libre { overflow-y: auto; }
+
+  .oeil { font-size: 10px; letter-spacing: 0.22em; color: var(--text-3); font-weight: 560; }
+
+  /* L'illustration est marquée comme illustrative : la maquette n'embarque pas
+     les vrais détourages, qui vivent dans src/assets. */
+  .illu {
+    position: relative; border-radius: var(--r-md); border: 1px dashed var(--line-strong);
+    background: var(--surface-1); display: grid; place-items: center; color: var(--text-3);
+    font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+  }
+  .illu.moyen { height: 118px; }
+  .illu.petit { height: 74px; }
+  .illu.grand { height: 150px; }
+
+  /* --------------------------------------------------------------- le compteur */
+  .tempo { font-variant-numeric: tabular-nums; font-weight: 500; letter-spacing: -0.04em; line-height: 0.9; }
+  .secondes { font-size: 0.44em; font-weight: 460; letter-spacing: 0; color: var(--text-2); margin-left: 0.1em; }
+
+  .actions { display: flex; gap: 8px; }
+  .actions button, .bouton {
+    font: inherit; cursor: pointer; border-radius: var(--r-md);
+    border: 1px solid var(--line-strong); background: transparent; color: var(--text-1);
+    min-height: 44px; padding: 0 14px; font-size: 13px;
+  }
+  .primaire { background: var(--accent); color: var(--accent-ink); border-color: transparent; font-weight: 560; }
+  .discret { color: var(--text-2); border-color: var(--line); }
+
+  /* Proposition 1 : le temps plein écran */
+  .p1 { align-items: center; justify-content: center; gap: 26px; padding: 22px; text-align: center; flex: 1 1 auto; display: flex; flex-direction: column; }
+  .p1 .nom { font-size: 15px; color: var(--text-2); }
+  .p1 .tempo { font-size: 160px; }
+  .p1 .suite { font-size: 13px; color: var(--text-3); }
+  .p1 .actions { flex-direction: column; width: 100%; }
+  .p1 .actions button { width: 100%; }
+
+  /* Proposition 2 : deux zones, rien ne défile */
+  .p2 { display: flex; flex-direction: column; height: 100%; }
+  .p2 .zone { flex: 0 0 42%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; border-bottom: 1px solid var(--line); }
+  .p2 .tempo { font-size: 140px; }
+  .p2 .bas { flex: 1 1 auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+  .p2 .titre { font-size: 15px; font-weight: 560; }
+  .p2 .grille { display: flex; gap: 16px; }
+  .p2 .grille div { font-size: 12px; color: var(--text-3); }
+  .p2 .grille b { display: block; font-size: 19px; color: var(--text-1); font-variant-numeric: tabular-nums; font-weight: 540; }
+
+  /* Proposition 3 : le rétrécissement */
+  .p3 { padding: 14px; display: flex; flex-direction: column; gap: 12px; height: 100%; }
+  .p3 .haut { transition: flex-basis 420ms var(--ease), opacity 220ms var(--ease); }
+  .p3[data-phase="pret"] .tempo-bloc { flex: 0 0 auto; }
+  .p3[data-phase="pret"] .illu { height: 168px; }
+  .p3[data-phase="en-cours"] .illu { height: 62px; }
+  .p3 .tempo-bloc { flex: 1 1 auto; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
+  .p3 .tempo { font-size: 150px; }
+  .p3 .bas { display: flex; flex-direction: column; gap: 10px; }
+
+  /* Proposition 4 : le chiffre seul */
+  .p4 { display: flex; flex-direction: column; height: 100%; }
+  .p4 .centre { flex: 1 1 auto; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; }
+  .p4 .tempo { font-size: 150px; font-weight: 460; }
+  .p4 .pied { padding: 14px; border-top: 1px solid var(--line); display: flex; align-items: center; gap: 10px; }
+  .p4 .pied .txt { font-size: 13px; color: var(--text-2); }
+  .p4 .tire { width: 44px; height: 4px; border-radius: 999px; background: var(--line-strong); margin: 0 auto 8px; }
+
+  /* Proposition 5 : le temps qui ne bouge jamais */
+  .p5 { display: flex; flex-direction: column; height: 100%; }
+  .p5 .bande {
+    flex: 0 0 auto; display: flex; align-items: baseline; justify-content: center; gap: 10px;
+    padding: 10px 14px; border-bottom: 1px solid var(--line); background: var(--surface-1);
+  }
+  .p5 .bande .tempo { font-size: 118px; }
+  .p5 .bande .etiquette { font-size: 11px; color: var(--text-3); letter-spacing: 0.14em; }
+  .p5 .defilable { flex: 1 1 auto; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+  .p5 .defilable .astuce { font-size: 11px; color: var(--text-3); text-align: center; }
+
+  .pied-cadre { padding: 12px 14px; border-top: 1px solid var(--line); display: flex; gap: 8px; }
+  .pied-cadre button { flex: 1 1 auto; }
+
+  .avis { max-width: 1100px; margin: 44px auto 0; padding: 20px; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--surface-1); }
+  .avis h2 { font-size: 18px; margin: 0 0 10px; }
+  .avis p, .avis li { color: var(--text-2); font-size: 14px; line-height: 1.65; }
+  .avis b { color: var(--text-1); }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<header class="entete">
+  <h1>Séance minimaliste, cinq propositions</h1>
+  <p>Laura ne retrouvait plus le mouvement pendant la séance, et le compteur tempo prenait tout l'écran. <b>Ce n'est pas un problème de goût, c'est un problème de place.</b></p>
+  <p class="constat">
+    <b>Le constat, mesuré dans le code :</b> la carte de prescription tient <b>dans un seul bloc</b>
+    l'illustration du mouvement, le repère de série, les répétitions, la charge, le compteur et ses trois
+    boutons. Le compteur grossit, les boutons s'ajoutent, et c'est l'illustration — ce que Laura lit pour
+    savoir quoi faire — qui sort de l'écran la première.
+    <br /><br />
+    Les cinq propositions ci-dessous répondent aux mêmes deux contraintes : <b>la consigne doit rester
+    visible</b>, et <b>le temps doit se lire à trois mètres</b>, téléphone posé au sol. Toutes utilisent la
+    palette réelle du produit. Le compteur décompte pour de vrai — appuyez sur Démarrer.
+  </p>
+</header>
+
+<div class="galerie">
+
+  <!-- 1 --------------------------------------------------------------------- -->
+  <article class="item" id="m1">
+    <header>
+      <div class="numero">1</div>
+      <div>
+        <h2>Le temps plein écran</h2>
+        <h3>Pendant la séance · lecture à distance maximale</h3>
+      </div>
+    </header>
+    <div class="ecran">
+      <div class="barre">
+        <span class="marque">COACH</span>
+        <div class="droite"><span class="chrono-total">Total 12:40</span><span class="pastille">3 / 26</span></div>
+      </div>
+      <div class="fil"><i></i></div>
+      <div class="p1">
+        <span class="oeil">PRESSE À CUISSE INCLINÉE · SÉRIE 1</span>
+        <span class="nom">Temps de maintien</span>
+        <div class="tempo" data-tempo="45">45<span class="secondes">s</span></div>
+        <span class="suite">Ensuite : 12 répétitions · 110 kg</span>
+        <div class="actions">
+          <button class="discret" data-toggle="m1">Démarrer</button>
+          <button class="primaire" data-skip="m1">Passer le tempo</button>
+        </div>
+      </div>
+    </div>
+    <p class="note">Rien d'autre à l'écran que ce qu'on vient chercher quand on est sous la barre. <b>Le mouvement disparaît pendant le tempo</b> — acceptable si le tempo précède la série.</p>
+    <p class="cout">Effort : faible. C'est un réagencement de la carte existante.</p>
+  </article>
+
+  <!-- 2 --------------------------------------------------------------------- -->
+  <article class="item" id="m2">
+    <header>
+      <div class="numero">2</div>
+      <div>
+        <h2>Deux zones, rien ne défile</h2>
+        <h3>Pendant la séance · la consigne ne sort jamais</h3>
+      </div>
+    </header>
+    <div class="ecran">
+      <div class="barre">
+        <span class="marque">COACH</span>
+        <div class="droite"><span class="chrono-total">Total 12:40</span><span class="pastille">3 / 26</span></div>
+      </div>
+      <div class="fil"><i></i></div>
+      <div class="p2">
+        <div class="zone">
+          <span class="oeil">COMPTEUR TEMPO</span>
+          <div class="tempo" data-tempo="45">45<span class="secondes">s</span></div>
+          <button class="discret" data-toggle="m2" style="min-height:44px">Démarrer</button>
+        </div>
+        <div class="bas">
+          <span class="oeil">PRESSE À CUISSE INCLINÉE · SÉRIE 1</span>
+          <div class="grille">
+            <div>Répétitions<b>12</b></div>
+            <div>Charge<b>110 kg</b></div>
+            <div>Repos après<b>75 s</b></div>
+          </div>
+          <div class="illu moyen">Illustration du mouvement</div>
+        </div>
+      </div>
+      <div class="pied-cadre"><button class="primaire">Valider la série</button></div>
+    </div>
+    <p class="note">Le temps occupe le <b>haut de l'écran, en dur</b> ; le mouvement et les chiffres vivent dessous, dans une zone qui ne défile pas. Laura ne perd plus jamais le geste.</p>
+    <p class="cout">Effort : faible. Deux blocs dans la carte actuelle, aucune donnée nouvelle.</p>
+  </article>
+
+  <!-- 3 --------------------------------------------------------------------- -->
+  <article class="item" id="m3">
+    <header>
+      <div class="numero">3</div>
+      <div>
+        <h2>Le rétrécissement</h2>
+        <h3>Pendant la séance · le geste d'abord, le chrono ensuite</h3>
+      </div>
+    </header>
+    <div class="ecran">
+      <div class="barre">
+        <span class="marque">COACH</span>
+        <div class="droite"><span class="chrono-total">Total 12:40</span><span class="pastille">3 / 26</span></div>
+      </div>
+      <div class="fil"><i></i></div>
+      <div class="p3" data-phase="pret" id="p3">
+        <div class="haut">
+          <span class="oeil">PRESSE À CUISSE INCLINÉE · SÉRIE 1</span>
+          <div class="illu" id="p3-illu">Illustration du mouvement</div>
+        </div>
+        <div class="tempo-bloc">
+          <div class="tempo" data-tempo="45">45<span class="secondes">s</span></div>
+          <span class="suite" style="font-size:12px;color:var(--text-3)">Prêt à démarrer</span>
+        </div>
+        <div class="bas">
+          <div class="grille" style="display:flex;gap:16px">
+            <div style="font-size:12px;color:var(--text-3)">Répétitions<b style="display:block;font-size:19px;color:var(--text-1)">12</b></div>
+            <div style="font-size:12px;color:var(--text-3)">Charge<b style="display:block;font-size:19px;color:var(--text-1)">110 kg</b></div>
+          </div>
+          <div class="actions">
+            <button class="primaire" data-toggle="m3" id="p3-go" style="flex:1 1 auto">Démarrer le tempo</button>
+            <button class="discret" data-skip="m3">Passer</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="note">Tant qu'on n'a pas lancé le chrono, <b>le mouvement occupe la moitié de l'écran</b>. Au démarrage, l'illustration se replie et le temps prend la place. C'est le geste d'Apple : un seul objet à la fois.</p>
+    <p class="cout">Effort : moyen. Un état de plus dans la carte, une transition à calculer.</p>
+  </article>
+
+  <!-- 4 --------------------------------------------------------------------- -->
+  <article class="item" id="m4">
+    <header>
+      <div class="numero">4</div>
+      <div>
+        <h2>Le chiffre seul</h2>
+        <h3>Pendant la séance · la version radicale</h3>
+      </div>
+    </header>
+    <div class="ecran">
+      <div class="barre">
+        <span class="marque">COACH</span>
+        <div class="droite"><span class="pastille">3 / 26</span></div>
+      </div>
+      <div class="p4">
+        <div class="centre">
+          <div class="tempo" data-tempo="45">45<span class="secondes">s</span></div>
+          <span style="font-size:13px;color:var(--text-3)">Presse à cuisse inclinée</span>
+        </div>
+        <div class="pied">
+          <div class="txt" style="flex:1 1 auto">12 répétitions · 110 kg</div>
+          <button class="discret" data-toggle="m4">Démarrer</button>
+        </div>
+        <div class="pied" style="border-top:none;padding-top:0">
+          <div class="tire"></div>
+        </div>
+      </div>
+    </div>
+    <p class="note">Un seul chiffre, plus rien autour. <b>Le mouvement remonte par un geste</b> : on tire la feuille vers le haut, elle contient l'illustration et le détail. À trancher : est-ce trop peu en salle ?</p>
+    <p class="cout">Effort : moyen. Réutilise la feuille du plan de séance déjà en place.</p>
+  </article>
+
+  <!-- 5 --------------------------------------------------------------------- -->
+  <article class="item" id="m5">
+    <header>
+      <div class="numero">5</div>
+      <div>
+        <h2>Le temps qui ne bouge jamais</h2>
+        <h3>Pendant la séance · téléphone au sol</h3>
+      </div>
+    </header>
+    <div class="ecran">
+      <div class="barre">
+        <span class="marque">COACH</span>
+        <div class="droite"><span class="chrono-total">Total 12:40</span><span class="pastille">3 / 26</span></div>
+      </div>
+      <div class="p5">
+        <div class="bande">
+          <span class="etiquette">TEMPO</span>
+          <div class="tempo" data-tempo="45">45<span class="secondes">s</span></div>
+          <button class="discret" data-toggle="m5" style="min-height:44px">Démarrer</button>
+        </div>
+        <div class="defilable">
+          <span class="oeil">PRESSE À CUISSE INCLINÉE · SÉRIE 1</span>
+          <div class="illu grand">Illustration du mouvement</div>
+          <div style="display:flex;gap:16px">
+            <div style="font-size:12px;color:var(--text-3)">Répétitions<b style="display:block;font-size:19px;color:var(--text-1)">12</b></div>
+            <div style="font-size:12px;color:var(--text-3)">Charge<b style="display:block;font-size:19px;color:var(--text-1)">110 kg</b></div>
+            <div style="font-size:12px;color:var(--text-3)">Repos<b style="display:block;font-size:19px;color:var(--text-1)">75 s</b></div>
+          </div>
+          <p style="font-size:13px;color:var(--text-2);line-height:1.55;margin:0">
+            Nuque longue, dos plaqué contre le dossier, pieds à largeur de bassin. Descente lente, poussée
+            franche sans verrouiller les genoux.
+          </p>
+        </div>
+        <div class="pied-cadre"><button class="primaire">Valider la série</button></div>
+      </div>
+    </div>
+    <p class="note">La bande du temps <b>ne défile pas</b> : elle reste en haut quoi qu'on fasse. Le mouvement et la consigne défilent dessous, en grand, lisibles une fois le téléphone reposé.</p>
+    <p class="cout">Effort : faible. Un bloc collant de plus, celui du bouton de validation existe déjà.</p>
+  </article>
+
+</div>
+
+<section class="avis">
+  <h2>Ce que je recommande, et pourquoi</h2>
+  <p><b>La 5, avec la taille de la 2.</b> Elle répond aux deux contraintes sans rien retirer : le temps ne
+  bouge jamais, donc il se lit toujours ; la consigne et le mouvement gardent leur place et leur taille. La 1
+  est la plus lisible mais perd le geste, la 3 est la plus élégante mais ajoute un état à comprendre — et
+  Laura était justement perdue, ce n'est pas le moment d'ajouter une mécanique. La 4 est un pari : à
+  essayer sur un seul écran avant d'y aller.</p>
+  <p>Ce qui me ferait changer d'avis : si tu me dis que le tempo se lance surtout <b>avant</b> de prendre la
+  position, la 1 redevient la meilleure — on n'a plus besoin du mouvement pendant qu'il tourne.</p>
+</section>
+
+<script>
+  // Un compte à rebours par proposition : une maquette de mouvement doit bouger,
+  // sinon elle ne démontre rien.
+  const etats = new Map();
+  for (const el of document.querySelectorAll('[data-tempo]')) {
+    const carte = el.closest('.item');
+    etats.set(carte.id, { valeur: Number(el.dataset.tempo), base: Number(el.dataset.tempo), actif: false, el });
+  }
+
+  const rendre = (id) => {
+    const e = etats.get(id);
+    if (!e) return;
+    e.el.innerHTML = `${e.valeur}<span class="secondes">s</span>`;
+  };
+
+  setInterval(() => {
+    for (const [id, e] of etats) {
+      if (!e.actif || e.valeur <= 0) continue;
+      e.valeur -= 1;
+      rendre(id);
+    }
+  }, 1000);
+
+  for (const bouton of document.querySelectorAll('[data-toggle]')) {
+    bouton.addEventListener('click', () => {
+      const id = bouton.dataset.toggle;
+      const e = etats.get(id);
+      if (!e) return;
+      if (e.valeur <= 0) {
+        e.valeur = e.base;
+        rendre(id);
+      }
+      e.actif = !e.actif;
+      bouton.textContent = e.actif ? 'Pause' : e.valeur === e.base ? 'Démarrer' : 'Reprendre';
+      // Proposition 3 : le geste se replie quand le chrono part.
+      if (id === 'm3') {
+        const p3 = document.getElementById('p3');
+        p3.dataset.phase = e.actif ? 'en-cours' : 'pret';
+        document.getElementById('p3-go').textContent = e.actif ? 'Pause' : 'Démarrer le tempo';
+      }
+    });
+  }
+
+  for (const bouton of document.querySelectorAll('[data-skip]')) {
+    bouton.addEventListener('click', () => {
+      const id = bouton.dataset.skip;
+      const e = etats.get(id);
+      if (!e) return;
+      e.actif = false;
+      e.valeur = 0;
+      rendre(id);
+      bouton.textContent = 'Temps terminé';
+    });
+  }
+</script>
+</body>
+</html>

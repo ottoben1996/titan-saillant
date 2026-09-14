@@ -789,6 +789,13 @@ body {
   --fs-11: 2rem;
   --fs-12: 2.5rem;
 
+  /* Le chiffre du compteur tempo. Il se lit à trois mètres, téléphone posé au
+     sol : 9,5 rem sur un écran de 390 px donnent des chiffres d'environ 17 mm
+     de haut, soit une lecture confortable vers 3,4 m. En rem, donc il suit la
+     taille de police système — et borné, pour ne pas dévorer l'écran sur un
+     très grand réglage d'accessibilité. */
+  --fs-tempo: clamp(7rem, 40vw, 9.5rem);
+
   /* Rayons : prolonge les trois qui existaient déjà. */
   --r-xs: 4px;
   --r-xl: 20px;

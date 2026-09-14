@@ -474,3 +474,73 @@
     transform: none;
   }
 }
+
+/* ------------------------------------------------- le bandeau du tempo -- */
+
+/*
+ * Le temps ne bouge plus. Il se colle en haut de l'écran de séance et y reste
+ * pendant qu'on fait défiler pour relire le mouvement — c'est une séance dont
+ * on pose le téléphone au sol, à trois mètres de soi.
+ *
+ * Le chiffre passe de 40 px (--fs-12) à --fs-tempo, soit environ 17 mm de haut
+ * sur un écran de 390 px : lisible vers 3,4 m. Décision prise sur maquette
+ * comparée (docs/ux-ui/maquette-seance-minimal.html, proposition 5 avec la
+ * taille de la 2, le chiffre un cran au-dessus).
+ *
+ * Ces règles arrivent après celles de la carte et les emportent par
+ * spécificité : deux classes de plus, aucun !important.
+ */
+.tempo-band {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  margin-bottom: var(--sp-5);
+  padding: var(--sp-3) var(--sp-5) var(--sp-4);
+  border-radius: var(--r-lg);
+  background: var(--surface-1);
+  box-shadow: inset 0 -1px 0 var(--line);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+}
+
+/* Un navigateur sans flou reçoit un fond opaque : le chiffre reste lisible. */
+@supports not (backdrop-filter: blur(1px)) {
+  .tempo-band {
+    background: var(--surface-0);
+  }
+}
+
+.workout-content .tempo-band .exercise-timer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--sp-3);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+/* Le chiffre occupe sa ligne, seul et centré : c'est lui qu'on lit de loin. */
+.workout-content .tempo-band .exercise-timer > div:first-of-type {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+  text-align: center;
+}
+
+.workout-content .tempo-band .exercise-timer strong {
+  font-size: var(--fs-tempo);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 0.92;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Les trois commandes tiennent sur une ligne : elles ne disputent plus la
+   hauteur au chiffre. */
+.workout-content .tempo-band .timer-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--sp-3);
+}
