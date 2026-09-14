@@ -652,7 +652,7 @@ export default function App() {
       try {
         new Notification(kind === 'tempo' ? 'Coach · tempo terminé' : 'Coach · repos terminé', {
           body: message,
-          icon: '/icons/logo-mark.png',
+          icon: `${import.meta.env.BASE_URL}icons/logo-mark.png`,
           tag: 'coach-timer',
         });
       } catch {

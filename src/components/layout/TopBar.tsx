@@ -21,7 +21,10 @@ export function TopBar({ onBack, backLabel, isOnline, onOpenSettings, titre }: T
           {/* La marque de l'application : l'anneau et le carre arrondi qui se
               chevauchent. Détourée depuis l'image source (lime sur fond noir),
               elle flotte sur le fond de l'en-tête sans raccord visible. */}
-          <img src="/icons/logo-mark.png" alt="" width={20} height={20} />
+          {/* Chemin construit sur la base de déploiement : l'application est
+              servie sous /titan-saillant/, un chemin absolu pointerait vers la
+              racine du domaine et l'image serait cassée. C'est arrivé. */}
+          <img src={`${import.meta.env.BASE_URL}icons/logo-mark.png`} alt="" width={20} height={20} />
         </span>
         <span>COACH</span>
       </div>
