@@ -533,6 +533,9 @@
 }
 
 .workout-content .tempo-band .exercise-timer strong {
+  width: 100%;
+  justify-content: center;
+  text-align: center;
   font-size: var(--fs-tempo);
   font-weight: 500;
   letter-spacing: -0.04em;

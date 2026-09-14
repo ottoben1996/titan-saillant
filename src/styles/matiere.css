@@ -249,9 +249,14 @@ html[data-replie="true"] .workout-heading h1 {
  * la continuité sans garder deux écrans vivants — et sans rejouer leurs
  * requêtes de stockage.
  *
- * On n'anime que l'opacité et la transformation. Aucun écran ne contient
- * d'élément fixe (vérifié) : une transformation sur le conteneur ne peut donc
- * pas déplacer une barre censée rester en place.
+ * On n'anime que l'opacité et la transformation.
+ *
+ * ATTENTION : la transformation du conteneur crée un bloc conteneur pour tout
+ * `position: fixed` placé à l'intérieur. Une barre fixe s'ancre alors sur le
+ * conteneur au lieu de la fenêtre — « Valider la série » flottait au milieu de
+ * l'écran sur le téléphone de Laura. La phrase « aucun écran ne contient
+ * d'élément fixe (vérifié) » a été écrite ici avant que j'en ajoute une.
+ * Les barres qui doivent rester en place sont donc COLLANTES, jamais fixes.
  */
 @keyframes pousse {
   from {
@@ -330,10 +335,11 @@ html[data-replie="true"] .workout-heading h1 {
  * La barre résiste à l'encoche : elle remonte de la zone sûre.
  */
 .action-bar {
-  position: fixed;
+  position: sticky;
   left: max(0.75rem, env(safe-area-inset-left));
   right: max(0.75rem, env(safe-area-inset-right));
-  bottom: calc(var(--sp-3) + env(safe-area-inset-bottom));
+  bottom: 0;
+  padding-bottom: calc(var(--sp-3) + env(safe-area-inset-bottom));
   z-index: 12;
   min-height: 52px;
   background: var(--accent);
