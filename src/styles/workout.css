@@ -566,6 +566,3 @@
 
 /* La barre de validation reste au fond de l'écran : on réserve sa place dans le
    contenu, sinon elle recouvre le bas du formulaire. */
-.workout-content {
-  padding-bottom: calc(var(--sp-11) + var(--sp-7));
-}

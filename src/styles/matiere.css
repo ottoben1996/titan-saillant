@@ -367,3 +367,13 @@ html[data-replie="true"] .workout-heading h1 {
     transition: none;
   }
 }
+
+/*
+ * ATTENTION : `.action-bar` est portée par DEUX éléments — la barre du haut de
+ * l'écran de séance (avec la flèche de retour) et le bouton « Valider la série ».
+ * Dépingler la classe entière emportait la flèche de retour hors de l'écran au
+ * défilement. On ne dépingle donc que le bouton, par sa classe complète.
+ */
+.primary-button.full.action-bar {
+  position: static;
+}
