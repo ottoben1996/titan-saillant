@@ -172,7 +172,7 @@ export function HomeScreen({
               <Clock size={16} /> ≈ {estimatedMinutes(todaySlot.day)} min
             </span>
             <button className="primary-button today-cta" onClick={() => onStart(todaySlot.day)} type="button">
-              <Play size={18} weight="fill" /> Démarrer
+              <Play size={18} weight="fill" /> Démarrer {todaySlot.day.name} · {estimatedMinutes(todaySlot.day)} min
             </button>
           </div>
         </article>

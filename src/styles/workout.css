@@ -102,10 +102,19 @@
 }
 
 .workout-content .rest-card {
-  padding: var(--sp-5) var(--sp-6);
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: var(--sp-6);
+  align-items: center;
+  padding: var(--sp-6);
+  border-color: color-mix(in srgb, var(--rest) 38%, var(--line));
+  background: linear-gradient(135deg, color-mix(in srgb, var(--rest) 11%, var(--surface-1)), var(--surface-1) 42%);
 }
 
 .workout-content .rest-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-3);
   margin-top: var(--sp-3);
 }
 
@@ -113,6 +122,25 @@
   padding: var(--sp-5) var(--sp-6);
   gap: var(--sp-2);
   border-radius: var(--r-md);
+}
+
+.workout-content .rest-card > .sr-only,
+.workout-content .rest-card > p {
+  display: none;
+}
+
+.workout-content .rest-card .rest-actions,
+.workout-content .rest-card .rest-presets {
+  grid-column: 1 / -1;
+}
+
+.workout-content .rest-card .rest-actions button {
+  min-height: 44px;
+}
+
+.workout-content .rest-card .rest-skip-button {
+  background: var(--accent);
+  color: var(--accent-ink);
 }
 
 .rest-next-meta {

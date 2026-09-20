@@ -232,8 +232,8 @@ export function RestTimer({
       </div>
       <p>Récupère vraiment. La prochaine série sera plus solide.</p>
       <div className="rest-actions">
-        <button type="button" onClick={handleSkip} aria-label="Passer le temps de repos">
-          <X size={18} /> Passer
+        <button type="button" className="rest-skip-button" onClick={handleSkip}>
+          <X size={18} /> Passer le repos
         </button>
         <button type="button" onClick={toggle} disabled={suspended} aria-label={paused ? 'Reprendre' : 'Pause'}>
           <Play size={16} /> {paused ? 'Reprendre' : 'Pause'}

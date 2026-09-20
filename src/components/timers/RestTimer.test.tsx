@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { RestTimer } from './RestTimer';
 
 describe('RestTimer', () => {
-  it('renders countdown, Passer, Pause and +30s buttons', () => {
+  it('renders countdown, clear skip action, Pause and +30s buttons', () => {
     const onStateChange = vi.fn();
     const onDone = vi.fn();
 
@@ -19,7 +19,7 @@ describe('RestTimer', () => {
     );
 
     expect(screen.getByText('01:30')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /passer/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Passer le repos' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /pause/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /30 secondes/i })).toBeInTheDocument();
   });

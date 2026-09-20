@@ -441,8 +441,8 @@ input:focus-visible {
   font-size: var(--fs-2);
 }
 .bottom-nav button.active {
-  background: var(--accent);
-  color: var(--accent-ink);
+  background: rgb(var(--accent-rgb) / 0.14);
+  color: var(--accent);
   font-weight: 800;
 }
 .workout-heading {
@@ -3463,11 +3463,12 @@ input:focus-visible {
   display: flex;
   align-items: center;
   gap: var(--sp-3);
+  min-inline-size: 0;
   background: #00000050;
   padding: var(--sp-2);
   border-radius: var(--r-full);
   border: 1px solid #ffffff12;
-  margin-bottom: var(--sp-7);
+  margin: 0;
 }
 .duo-pill-btn {
   flex: 1;
@@ -3500,7 +3501,8 @@ input:focus-visible {
   display: flex;
   flex-direction: column;
   gap: var(--sp-3);
-  margin-bottom: var(--sp-4);
+  align-items: flex-start;
+  margin: 0;
 }
 .duo-delta-banner {
   background: rgb(var(--accent-rgb) / 0.08);
@@ -3533,6 +3535,11 @@ input:focus-visible {
   display: flex;
   flex-direction: column;
   gap: var(--sp-8);
+}
+
+.rest-actions .rest-skip-button {
+  background: var(--accent);
+  color: var(--accent-ink);
 }
 .rest-next-preview-card {
   background: rgb(var(--accent-rgb) / 0.05);

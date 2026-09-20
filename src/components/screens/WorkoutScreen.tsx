@@ -14,7 +14,7 @@ import { generateWarmupRamp } from '../../workout/warmupRamp';
 import { SessionPlanSheet } from '../modals/SessionPlanSheet';
 import { ExerciseTimer } from '../timers/ExerciseTimer';
 import { formatDuration, RestTimer } from '../timers/RestTimer';
-import { ArrowRight, Barbell, Bolt, Check, Clock, List, Person, Repeat, Undo, Video } from '../ui/Icons';
+import { ArrowRight, Barbell, Bolt, Check, Clock, List, Repeat, Undo, Video } from '../ui/Icons';
 import { PlateBadge } from '../ui/PlateBadge';
 import { CompletionFeedback } from './CompletionFeedback';
 
@@ -318,40 +318,6 @@ export function WorkoutScreen({
 
   return (
     <section className="content workout-content">
-      {onSwitchDuoProfile && (
-        <div className="duo-wrapper">
-          <div className="duo-switcher-bar">
-            <button
-              type="button"
-              className={`duo-pill-btn ${profile === 'ottman' ? 'active' : ''}`}
-              onClick={() => onSwitchDuoProfile('ottman')}
-            >
-              <span>
-                <Bolt size={15} /> Ottman
-              </span>
-              {profile === 'ottman' && <span className="duo-pill-badge">en cours</span>}
-            </button>
-            <button
-              type="button"
-              className={`duo-pill-btn ${profile === 'laura' ? 'active' : ''}`}
-              onClick={() => onSwitchDuoProfile('laura')}
-            >
-              <span>
-                <Person size={15} /> Laura
-              </span>
-              {profile === 'laura' && <span className="duo-pill-badge">en cours</span>}
-            </button>
-          </div>
-          {partnerDelta && partnerDelta.action !== 'keep' && (
-            <div className="duo-delta-banner">
-              <span>
-                Vers <strong>{partnerProfile === 'ottman' ? 'Ottman' : 'Laura'}</strong> : {partnerDelta.summaryLabel}
-              </span>
-            </div>
-          )}
-        </div>
-      )}
-
       <div className="workout-heading">
         <div>
           <p className="eyebrow">
@@ -384,6 +350,37 @@ export function WorkoutScreen({
           </button>
         </div>
       </div>
+
+      {onSwitchDuoProfile && (
+        <div className="duo-wrapper">
+          <fieldset className="duo-switcher-bar">
+            <legend className="sr-only">Profil de séance</legend>
+            <button
+              type="button"
+              className={`duo-pill-btn ${profile === 'ottman' ? 'active' : ''}`}
+              onClick={() => onSwitchDuoProfile('ottman')}
+              aria-pressed={profile === 'ottman'}
+            >
+              Ottman
+            </button>
+            <button
+              type="button"
+              className={`duo-pill-btn ${profile === 'laura' ? 'active' : ''}`}
+              onClick={() => onSwitchDuoProfile('laura')}
+              aria-pressed={profile === 'laura'}
+            >
+              Laura
+            </button>
+          </fieldset>
+          {partnerDelta && partnerDelta.action !== 'keep' && (
+            <div className="duo-delta-banner">
+              <span>
+                Vers <strong>{partnerProfile === 'ottman' ? 'Ottman' : 'Laura'}</strong> : {partnerDelta.summaryLabel}
+              </span>
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="progress-track large">
         <i style={{ width: `${progress}%` }} />

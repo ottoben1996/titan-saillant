@@ -170,16 +170,19 @@ export function ProgressionScreen({ history, profile, measurements, onBack, onOp
   );
 
   return (
-    <section className="content progression-content">
+    <section className={`content progression-content progression-profile-${profile}`}>
       <div className="page-heading">
         <div>
-          <p className="eyebrow">TON PARCOURS · {profileLabels[profile].toUpperCase()}</p>
-          <h1>Progression</h1>
+          <p className="eyebrow">PROGRESSION · TENDANCE</p>
+          <h1>{profileLabels[profile]}</h1>
         </div>
-        <button className="text-button" onClick={onBack} type="button">
-          <ArrowLeft size={16} /> Accueil
-        </button>
+        <div className={`avatar avatar-${profile}`} aria-hidden="true">
+          {profileLabels[profile][0]}
+        </div>
       </div>
+      <button className="text-button progression-back" onClick={onBack} type="button">
+        <ArrowLeft size={16} /> Accueil
+      </button>
       <p className="intro progression-intro">
         Un aperçu de tes séances enregistrées sur cet appareil. Les données restent privées et séparées de l’autre
         profil.

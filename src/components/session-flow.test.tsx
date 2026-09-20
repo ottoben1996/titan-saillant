@@ -70,9 +70,9 @@ async function advance(ms: number) {
   await flush(3);
 }
 
-/** Le bloc de repos est-il affiché ? (bouton « Passer le temps de repos » du RestTimer). */
+/** Le bloc de repos est-il affiché ? (bouton explicite « Passer le repos »). */
 function restBlockVisible() {
-  return Boolean(screen.queryByRole('button', { name: /passer le temps de repos/i }));
+  return Boolean(screen.queryByRole('button', { name: /passer le repos/i }));
 }
 
 /** Ouverture de l'application puis sélection du profil Ottman (parcours réel). */
@@ -84,9 +84,11 @@ async function openAsOttman() {
 
 /** Depuis l'accueil : bouton « Démarrer » puis validation du check-in d'énergie. */
 async function startDayFromHome(dayName: string) {
-  fireEvent.click(screen.getByRole('button', { name: /^démarrer$/i }));
+  fireEvent.click(screen.getByRole('button', { name: /^démarrer .+ · \d+ min$/i }));
   await flush();
-  fireEvent.click(screen.getByRole('button', { name: new RegExp(`démarrer ${dayName}`, 'i') }));
+  fireEvent.click(
+    within(screen.getByRole('dialog')).getByRole('button', { name: new RegExp(`^démarrer ${dayName}$`, 'i') }),
+  );
   await flush();
 }
 
@@ -99,7 +101,7 @@ async function validateSet() {
 
 /** Passe le temps de repos en cours. */
 async function skipRest() {
-  fireEvent.click(screen.getByRole('button', { name: /passer le temps de repos/i }));
+  fireEvent.click(screen.getByRole('button', { name: /passer le repos/i }));
   await advance(50);
 }
 

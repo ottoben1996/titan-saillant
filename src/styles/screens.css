@@ -442,10 +442,15 @@
   gap: var(--sp-2);
   align-content: start;
   min-width: 0;
-  padding: var(--sp-6) var(--sp-6);
-  border: 1px solid var(--line);
-  border-radius: var(--r-md);
-  background: var(--surface-1);
+  padding: var(--sp-4) var(--sp-5);
+  border: 0;
+  border-left: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent;
+}
+
+.metric-cell:first-child {
+  border-left: 0;
 }
 
 .metric-cell > span {
@@ -470,7 +475,7 @@
 }
 
 .metric-cell.accent {
-  border-color: rgb(var(--accent-rgb) / 0.28);
+  border-color: var(--line);
 }
 
 .metric-cell.accent strong {

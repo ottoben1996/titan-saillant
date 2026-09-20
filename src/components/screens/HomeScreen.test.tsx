@@ -48,4 +48,10 @@ describe('accueil pendant la première lecture', () => {
     expect(container.querySelector('.skeleton-card')).toBeNull();
     expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument();
   });
+
+  it('nomme l’action principale avec la séance et sa durée estimée', () => {
+    rendre(false);
+
+    expect(screen.getByRole('button', { name: /démarrer .+ · \d+ min/i })).toBeInTheDocument();
+  });
 });
