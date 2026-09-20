@@ -2,10 +2,11 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import { defineConfig } from 'vitest/config';
 
-export default defineConfig({
-  // GitHub Pages sert le site sous /<depot>/ : le chemin est injecté au moment du
-  // déploiement (VITE_BASE), et reste la racine en développement.
-  base: process.env.VITE_BASE ?? '/',
+export default defineConfig(({ command }) => ({
+  // GitHub Pages sert le site sous /<depot>/. Le build doit donc produire ces
+  // chemins par défaut ; le serveur local reste, lui, servi depuis la racine.
+  // VITE_BASE garde la possibilité de cibler explicitement un autre hébergement.
+  base: process.env.VITE_BASE ?? (command === 'build' ? '/titan-saillant/' : '/'),
   // Version injectée au build : affichée dans Réglages pour vérifier d'un coup
   // d'œil quelle version tourne réellement sur l'appareil.
   define: { __BUILD_DATE__: JSON.stringify(new Date().toISOString()) },
@@ -61,4 +62,4 @@ export default defineConfig({
       exclude: ['src/**/*.test.*', 'src/mustapha/**', 'src/styles/**', 'src/vite-env.d.ts', 'src/test/**'],
     },
   },
-});
+}));
