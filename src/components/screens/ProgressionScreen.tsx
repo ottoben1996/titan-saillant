@@ -133,9 +133,17 @@ interface ProgressionScreenProps {
   measurements: readonly WeeklyMeasurement[];
   onBack: () => void;
   onOpenFollowup: () => void;
+  onSwitchDuoProfile?: (profile: ProfileId) => void;
 }
 
-export function ProgressionScreen({ history, profile, measurements, onBack, onOpenFollowup }: ProgressionScreenProps) {
+export function ProgressionScreen({
+  history,
+  profile,
+  measurements,
+  onBack,
+  onOpenFollowup,
+  onSwitchDuoProfile,
+}: ProgressionScreenProps) {
   const view = useMemo(() => {
     const now = new Date();
     const completed = history.filter((item) => item.completedAt);
@@ -180,6 +188,27 @@ export function ProgressionScreen({ history, profile, measurements, onBack, onOp
           {profileLabels[profile][0]}
         </div>
       </div>
+      {onSwitchDuoProfile && (
+        <fieldset className="progression-duo-switcher" aria-label="Profil de progression">
+          <legend className="sr-only">Profil de progression</legend>
+          <button
+            type="button"
+            className={`duo-pill-btn ${profile === 'ottman' ? 'active' : ''}`}
+            aria-pressed={profile === 'ottman'}
+            onClick={() => onSwitchDuoProfile('ottman')}
+          >
+            Ottman
+          </button>
+          <button
+            type="button"
+            className={`duo-pill-btn ${profile === 'laura' ? 'active' : ''}`}
+            aria-pressed={profile === 'laura'}
+            onClick={() => onSwitchDuoProfile('laura')}
+          >
+            Laura
+          </button>
+        </fieldset>
+      )}
       <button className="text-button progression-back" onClick={onBack} type="button">
         <ArrowLeft size={16} /> Accueil
       </button>

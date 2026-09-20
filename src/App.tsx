@@ -848,6 +848,7 @@ export default function App() {
           measurements={measurements}
           onBack={() => setScreen('home')}
           onOpenFollowup={() => setScreen('followup')}
+          onSwitchDuoProfile={switchDuoProfile}
         />
       )}
       {screen === 'followup' && profile && (

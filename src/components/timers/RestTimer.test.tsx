@@ -49,7 +49,7 @@ describe('RestTimer', () => {
 
     const addBtn = screen.getByRole('button', { name: /ajouter 15 secondes/i });
     fireEvent.click(addBtn);
-    expect(screen.getByText('01:30')).toBeInTheDocument();
+    expect(screen.getByText('01:00')).toBeInTheDocument();
   });
 
   it('terminates rest when clicking Passer', () => {

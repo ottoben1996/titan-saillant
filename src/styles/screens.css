@@ -429,6 +429,23 @@
 
 /* ============================================================ PROGRESSION == */
 
+.progression-duo-switcher {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  width: min(100%, 20rem);
+  margin: 0 0 var(--sp-6);
+  padding: var(--sp-2);
+  border: 1px solid #ffffff12;
+  border-radius: var(--r-full);
+  background: #00000050;
+}
+
+.progression-duo-switcher .duo-pill-btn {
+  min-height: 32px;
+  padding: var(--sp-2) var(--sp-5);
+}
+
 /* Rangée d'indicateurs compacts : une ligne dense, quatre valeurs. */
 .metric-strip {
   display: grid;

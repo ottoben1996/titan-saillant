@@ -171,6 +171,44 @@ export function RestTimer({
     }
   };
 
+  const handleAdjustSeconds = (delta: number) => {
+    triggerHaptic(25);
+    const wasPaused = paused;
+    const nextRemaining = Math.max(0, remaining + delta);
+    const nextTotal = Math.max(totalDuration, nextRemaining);
+    controller.current?.cancel();
+    setRemaining(nextRemaining);
+    setTotalDuration(nextTotal);
+    setPaused(false);
+    if (nextRemaining === 0) {
+      onStateChangeRef.current(null);
+      onDone();
+      return;
+    }
+    const timer = createCountdown(
+      nextRemaining,
+      (value) => {
+        setRemaining(value);
+        if (value === 0 || value <= 5 || value % 15 === 0) {
+          publish(value, false);
+        }
+      },
+      () => {
+        setRemaining(0);
+        setPaused(false);
+        onStateChangeRef.current(null);
+        onDone();
+      },
+    );
+    controller.current = timer;
+    if (wasPaused) {
+      timer.pause();
+      publish(nextRemaining, true);
+    } else {
+      publish(nextRemaining, false);
+    }
+  };
+
   const handleSkip = () => {
     triggerHaptic(30);
     const next = applyRestPreset({ remainingSeconds: remaining, totalSeconds: totalDuration }, REST_SKIP_PRESET);
@@ -239,18 +277,26 @@ export function RestTimer({
           <Play size={16} /> {paused ? 'Reprendre' : 'Pause'}
         </button>
       </div>
-      <div className="rest-presets" role="group" aria-label="Ajouter du temps de repos">
-        {REST_PRESETS.map((preset) => (
-          <button
-            key={preset.id}
-            type="button"
-            className="rest-preset-btn"
-            onClick={() => handleAddPreset(preset)}
-            aria-label={preset.ariaLabel}
-          >
-            {preset.label}
-          </button>
-        ))}
+      <div className="rest-presets" role="group" aria-label="Ajuster le repos">
+        <button
+          type="button"
+          className="rest-preset-btn"
+          onClick={() => handleAdjustSeconds(-15)}
+          aria-label="Retirer 15 secondes de repos"
+        >
+          −15 s
+        </button>
+        <button
+          type="button"
+          className="rest-preset-btn"
+          onClick={() => handleAddPreset(REST_PRESETS[0])}
+          aria-label="Ajouter 15 secondes de repos"
+        >
+          +15 s
+        </button>
+        <button type="button" className="rest-preset-btn" onClick={handleSkip}>
+          Marquer la série
+        </button>
       </div>
     </div>
   );
