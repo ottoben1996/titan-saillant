@@ -348,7 +348,7 @@ export default function App() {
     setHistory([]);
   };
 
-  const switchDuoProfile = async (target: ProfileId) => {
+  const switchDuoProfile = async (target: ProfileId, fallbackScreen: Screen = 'home') => {
     if (target === profile) return;
     if (session) {
       await withStorageGuard(
@@ -382,7 +382,7 @@ export default function App() {
     } else {
       setSession(null);
       setSelectedDay(null);
-      setScreen('home');
+      setScreen(fallbackScreen);
       setNotice(`Session ${target === 'ottman' ? 'Ottman' : 'Laura'} : choisis ta séance.`);
       window.setTimeout(() => setNotice(''), 3000);
     }
@@ -812,7 +812,7 @@ export default function App() {
       {screen === 'workout' && selectedDay && session && (
         <WorkoutScreen
           profile={profile}
-          onSwitchDuoProfile={switchDuoProfile}
+          onSwitchDuoProfile={(target) => switchDuoProfile(target)}
           day={selectedDay}
           session={session}
           history={history}
@@ -848,7 +848,7 @@ export default function App() {
           measurements={measurements}
           onBack={() => setScreen('home')}
           onOpenFollowup={() => setScreen('followup')}
-          onSwitchDuoProfile={switchDuoProfile}
+          onSwitchDuoProfile={(target) => switchDuoProfile(target, 'progression')}
         />
       )}
       {screen === 'followup' && profile && (

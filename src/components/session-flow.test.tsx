@@ -375,6 +375,19 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
     expect(await listSessions('laura')).toHaveLength(0);
   });
 
+  it('[4b] le sélecteur duo de Progression conserve l’écran de progression', async () => {
+    await openAsOttman();
+    fireEvent.click(screen.getByRole('button', { name: 'Progression' }));
+    await flush();
+
+    expect(screen.getByRole('heading', { level: 1, name: 'Ottman' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Laura' }));
+    await flush();
+
+    expect(screen.getByRole('heading', { level: 1, name: 'Laura' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Progression' })).toHaveAttribute('aria-current', 'page');
+  });
+
   it('[5] séance terminée : bilan factuel (durée, séries, volume) puis enregistrement dans l’historique', async () => {
     await openAsOttman();
     await startDayFromHome('Full Body A');
