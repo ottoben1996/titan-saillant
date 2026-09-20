@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { RestTimer } from './RestTimer';
 
 describe('RestTimer', () => {
-  it('renders countdown, clear skip action, Pause and +30s buttons', () => {
+  it('renders countdown, skip action, Pause and the mockup rest actions', () => {
     const onStateChange = vi.fn();
     const onDone = vi.fn();
 
@@ -21,10 +21,12 @@ describe('RestTimer', () => {
     expect(screen.getByText('01:30')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Passer le repos' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /pause/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /30 secondes/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /retirer 15 secondes/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /ajouter 15 secondes/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /marquer la série/i })).toBeInTheDocument();
   });
 
-  it('increments remaining time when clicking +30s', () => {
+  it('adjusts remaining time by 15 seconds in either direction', () => {
     const onStateChange = vi.fn();
     const onDone = vi.fn();
 
@@ -41,9 +43,12 @@ describe('RestTimer', () => {
 
     expect(screen.getByText('01:00')).toBeInTheDocument();
 
-    const addBtn = screen.getByRole('button', { name: /30 secondes/i });
-    fireEvent.click(addBtn);
+    const removeBtn = screen.getByRole('button', { name: /retirer 15 secondes/i });
+    fireEvent.click(removeBtn);
+    expect(screen.getByText('00:45')).toBeInTheDocument();
 
+    const addBtn = screen.getByRole('button', { name: /ajouter 15 secondes/i });
+    fireEvent.click(addBtn);
     expect(screen.getByText('01:30')).toBeInTheDocument();
   });
 
