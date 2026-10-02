@@ -8,7 +8,8 @@ export type RunnerStep = {
 };
 
 const cooldownExercise = (day: WorkoutDay): ExercisePrescription => ({
-  id: `cooldown-${day.id}`,
+  // La séance cardio supplémentaire reprend le retour au calme cardio déjà documenté.
+  id: day.id === 'cardio-4' ? 'cooldown-cardio' : `cooldown-${day.id}`,
   name: day.cooldown.name,
   kind: 'cooldown',
   sets: [

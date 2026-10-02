@@ -255,8 +255,8 @@ function plan(profileId: ProfileId, week = 1, manualLoads?: ManualLoadOverrides)
   });
   const c: WorkoutDay = Object.freeze({
     id: 'cardio',
-    name: 'Cardio',
-    subtitle: 'Circuit cardio, rameur et marche',
+    name: 'Cardio circuit',
+    subtitle: 'Circuit cardio et renforcement',
     exercises: Object.freeze([
       timed('jumping-jack', 'Jumping Jack', laura ? 40 : 30, 3, undefined, 'circuit-1'),
       timed('mountain-climber', 'Mountain Climber', 30, 3, 60, 'circuit-1'),
@@ -264,8 +264,6 @@ function plan(profileId: ProfileId, week = 1, manualLoads?: ManualLoadOverrides)
       timed('crunches', 'Crunches', 30, 3, 60, 'circuit-2'),
       timed('skierg', 'SKIERG', 30, 3, undefined, 'circuit-3'),
       timed('rameur', 'Rameur', laura ? 40 : 30, 3, 60, 'circuit-3'),
-      timed('rameur-15-min', 'Rameur — 15 minutes', 15 * 60, 1, 60),
-      timed('marche-cardio', 'Marche sur tapis', 25 * 60, 1, 0),
       exercise({
         id: 'developpe-clavicule',
         name: 'Développé clavicule prise neutre',
@@ -282,12 +280,23 @@ function plan(profileId: ProfileId, week = 1, manualLoads?: ManualLoadOverrides)
     warmup: cardioWarmup,
     cooldown: cooldownFastWalk,
   });
+  const d: WorkoutDay = Object.freeze({
+    id: 'cardio-4',
+    name: 'Rameur + marche',
+    subtitle: '4ᵉ séance de la semaine · cardio continu',
+    exercises: Object.freeze([
+      timed('rameur-15-min', 'Rameur — 15 minutes', 15 * 60, 1, 60),
+      timed('marche-cardio', 'Marche sur tapis — 25 minutes', 25 * 60, 1, 0),
+    ]),
+    warmup: cardioWarmup,
+    cooldown: cooldownFastWalk,
+  });
   return Object.freeze({
     profileId,
     displayName: profileId === 'ottman' ? 'Ottman' : 'Laura',
     coach: 'SELVA Adrien',
     warmup,
-    days: Object.freeze([a, b, c]),
+    days: Object.freeze([a, b, c, d]),
   });
 }
 

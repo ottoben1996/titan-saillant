@@ -5,7 +5,7 @@ import { serieAssiduite } from './assiduite';
 
 const JOUR = 86_400_000;
 const maintenant = new Date(2026, 8, 12, 9, 0, 0); // samedi 12 septembre 2026
-const programme = getProgram('ottman'); // trois jours : Full Body A, B et Cardio
+const programme = getProgram('ottman'); // quatre jours : Full Body A, B, Cardio et Rameur + marche
 
 /** Séance terminée à tant de jours en arrière. */
 const seance = (jours: number, id: string): WorkoutSession =>
@@ -22,11 +22,12 @@ const seance = (jours: number, id: string): WorkoutSession =>
     loggedSets: [],
   }) as WorkoutSession;
 
-/** Trois séances dans la semaine qui commence à `jours` en arrière. */
+/** Quatre séances dans la semaine qui commence à `jours` en arrière. */
 const semaineComplete = (jours: number, marque: string) => [
   seance(jours, `${marque}-1`),
   seance(jours + 2, `${marque}-2`),
   seance(jours + 4, `${marque}-3`),
+  seance(jours + 5, `${marque}-4`),
 ];
 
 describe('série d’assiduité', () => {
@@ -39,7 +40,7 @@ describe('série d’assiduité', () => {
     const serie = serieAssiduite(historique, programme, maintenant);
 
     expect(serie.semainesConsecutives).toBe(3);
-    expect(serie.seancesFaites).toBe(9);
+    expect(serie.seancesFaites).toBe(12);
     expect(serie.semaines).toHaveLength(8);
   });
 
@@ -64,7 +65,7 @@ describe('série d’assiduité', () => {
     const historique = [...semaineComplete(1, 'cette'), ...semaineComplete(70, 'trop-vieux')];
     const serie = serieAssiduite(historique, programme, maintenant);
 
-    expect(serie.seancesFaites).toBe(3);
+    expect(serie.seancesFaites).toBe(4);
   });
 
   it('ignore les séances abandonnées', () => {

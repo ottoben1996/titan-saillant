@@ -22,8 +22,8 @@ const SLOT_STATES: Record<WeekSlotState, string> = {
   upcoming: 'À venir',
 };
 
-/** Le volume hebdomadaire cible : chaque profil a 3 créneaux prescrits. */
-const WEEKLY_TARGET = 3;
+/** Le volume hebdomadaire cible : chaque profil a 4 créneaux prescrits. */
+const WEEKLY_TARGET = 4;
 
 function estimatedMinutes(day: WorkoutDay) {
   return Math.round(getWorkoutSteps(day).length * 2 + 12);

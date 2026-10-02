@@ -31,6 +31,7 @@ import { ExitWorkoutDialog } from './components/modals/ExitWorkoutDialog';
 import { TutorialModal } from './components/modals/TutorialModal';
 import { HistoryScreen } from './components/screens/HistoryScreen';
 import { HomeScreen } from './components/screens/HomeScreen';
+import { LoadsScreen } from './components/screens/LoadsScreen';
 import { ProfileChooser } from './components/screens/ProfileChooser';
 import { ProgressionScreen } from './components/screens/ProgressionScreen';
 import { SettingsScreen } from './components/screens/SettingsScreen';
@@ -176,6 +177,7 @@ export default function App() {
     followup: 'Point du samedi',
     bilan: 'Bilan de la semaine',
     settings: 'Réglages',
+    loads: 'Mes charges',
   };
   const libelleEcran = `${profile === 'laura' ? 'Espace de Laura' : profile === 'ottman' ? 'Espace d\u2019Ottman' : 'Choix du profil'}, ${libellesEcran[screen] ?? ''}`;
 
@@ -933,8 +935,6 @@ export default function App() {
           onSwitch={leaveProfile}
           onNotice={setNotice}
           onImported={() => void refreshHistory(profile)}
-          manualLoads={manualLoadsProfile === profile ? manualLoads : {}}
-          onManualLoadsSave={saveManualLoads}
           isOnline={isOnline}
           offlineReady={offlineReady}
           serviceWorkerReady={serviceWorkerReady}
@@ -943,6 +943,15 @@ export default function App() {
           notificationPermission={notificationPermission}
           onEnableNotifications={() => void enableNotifications()}
           onCheckUpdate={checkForUpdate}
+        />
+      )}
+      {screen === 'loads' && profile && (
+        <LoadsScreen
+          profile={profile}
+          manualLoads={manualLoadsProfile === profile ? manualLoads : {}}
+          onBack={() => setScreen('home')}
+          onNotice={setNotice}
+          onSave={saveManualLoads}
         />
       )}
 

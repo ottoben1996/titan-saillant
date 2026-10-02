@@ -1,6 +1,6 @@
 export type ProfileId = 'ottman' | 'laura';
 
-export type WorkoutDayId = 'full-body-a' | 'full-body-b' | 'cardio';
+export type WorkoutDayId = 'full-body-a' | 'full-body-b' | 'cardio' | 'cardio-4';
 export type ExerciseKind = 'strength' | 'timed' | 'cardio' | 'warmup' | 'cooldown';
 
 /** Charges saisies manuellement, indexées par exercice puis par semaine S1 → S5. */

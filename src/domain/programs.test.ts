@@ -3,8 +3,8 @@ import { getProgram } from './programs';
 import { tutorials } from './tutorials';
 
 describe('seed programs from PDFs', () => {
-  it.each(['ottman', 'laura'] as const)('exposes the three sessions for %s', (profile) => {
-    expect(getProgram(profile).days.map((day) => day.id)).toEqual(['full-body-a', 'full-body-b', 'cardio']);
+  it.each(['ottman', 'laura'] as const)('exposes the four sessions for %s', (profile) => {
+    expect(getProgram(profile).days.map((day) => day.id)).toEqual(['full-body-a', 'full-body-b', 'cardio', 'cardio-4']);
   });
 
   it('preserves representative load and circuit differences', () => {
@@ -93,9 +93,10 @@ describe('seed programs from PDFs', () => {
   it('conserve le circuit cardio et ajoute le rameur de 15 minutes et la marche de 25 minutes', () => {
     for (const profile of ['ottman', 'laura'] as const) {
       const cardio = getProgram(profile).days[2];
+      const cardio4 = getProgram(profile).days[3];
       const oldRower = cardio.exercises.find((item) => item.id === 'rameur');
-      const addedRower = cardio.exercises.find((item) => item.id === 'rameur-15-min');
-      const walk = cardio.exercises.find((item) => item.id === 'marche-cardio');
+      const addedRower = cardio4.exercises.find((item) => item.id === 'rameur-15-min');
+      const walk = cardio4.exercises.find((item) => item.id === 'marche-cardio');
 
       expect(oldRower?.circuitId).toBe('circuit-3');
       expect(oldRower?.sets).toHaveLength(3);

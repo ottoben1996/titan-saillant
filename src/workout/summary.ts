@@ -13,6 +13,7 @@ const DAY_LABELS: Record<WorkoutDayId, string> = {
   'full-body-a': 'Full Body A',
   'full-body-b': 'Full Body B',
   cardio: 'Cardio',
+  'cardio-4': 'Rameur + marche',
 };
 
 /** Libellé français d'un créneau, sans dépendre du programme chargé. */

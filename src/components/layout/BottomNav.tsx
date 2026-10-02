@@ -1,4 +1,4 @@
-import { Barbell, ChartLine, Repeat, UserCircle } from '../ui/Icons';
+import { Barbell, ChartLine, Gear, Repeat, UserCircle } from '../ui/Icons';
 
 export type Screen =
   | 'home'
@@ -6,6 +6,7 @@ export type Screen =
   | 'history'
   | 'progression'
   | 'settings'
+  | 'loads'
   /** Suivi hebdomadaire : saisie du samedi et historique des semaines. */
   | 'followup'
   /** Bilan imprimable d'une semaine, destiné au coach. */
@@ -19,6 +20,16 @@ interface BottomNavProps {
 export function BottomNav({ currentScreen, onNavigate }: BottomNavProps) {
   return (
     <nav className="bottom-nav" aria-label="Navigation principale">
+      <button
+        type="button"
+        aria-label="Charges"
+        aria-current={currentScreen === 'loads' ? 'page' : undefined}
+        className={currentScreen === 'loads' ? 'active' : ''}
+        onClick={() => onNavigate('loads')}
+      >
+        <Gear size={21} />
+        <span>Charges</span>
+      </button>
       <button
         type="button"
         aria-label="Séances"

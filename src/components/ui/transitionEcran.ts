@@ -24,6 +24,7 @@ const PROFONDEUR: Record<Screen, number> = {
   history: 0,
   progression: 0,
   settings: 0,
+  loads: 0,
   workout: 1,
   followup: 1,
   bilan: 2,

@@ -1,14 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { type AccentId, accents } from '../../domain/palettes';
-import { getProgram } from '../../domain/programs';
-import type { ManualLoadOverrides, ProfileId } from '../../domain/types';
+import type { ProfileId } from '../../domain/types';
 import { importProfileData } from '../../storage/backup';
 import { telechargerCalendrierSuivi, telechargerSauvegarde } from '../../storage/backupFile';
 import { debutDePause, mettreEnPause, reprendreCycle } from '../../storage/cyclePause';
 import { journalEnTexte, lireErreurs, viderErreurs } from '../../storage/journalErreurs';
 import { deleteProfileData, listSessions } from '../../storage/sessionRepository';
 import { isSoundEnabled, playTimerChime, setSoundEnabled } from '../../workout/alerts';
-import { formatLoadKg } from '../../workout/summary';
 import { ArrowLeft, ArrowRight, DownloadSimple, Timer, Trash, Warning } from '../ui/Icons';
 import { profileLabels } from './HomeScreen';
 
@@ -37,9 +35,6 @@ interface SettingsScreenProps {
   onEnableNotifications: () => void;
   /** Force la vérification d'une nouvelle version (service worker). */
   onCheckUpdate: () => void;
-  /** Charges saisies pour les prochaines séances, sans modifier l'historique. */
-  manualLoads?: ManualLoadOverrides;
-  onManualLoadsSave?: (loads: ManualLoadOverrides) => Promise<void> | void;
 }
 
 /** Version réellement embarquée dans cette copie de l'application. */
@@ -79,8 +74,6 @@ export function SettingsScreen({
   notificationPermission,
   onEnableNotifications,
   onCheckUpdate,
-  manualLoads = {},
-  onManualLoadsSave = () => undefined,
 }: SettingsScreenProps) {
   const fileInput = useRef<HTMLInputElement>(null);
   const [soundOn, setSoundOn] = useState(() => isSoundEnabled());
@@ -103,46 +96,6 @@ export function SettingsScreen({
   const [eraseConfirming, setEraseConfirming] = useState(false);
   const [eraseWord, setEraseWord] = useState('');
   const [erasing, setErasing] = useState(false);
-  const [draftManualLoads, setDraftManualLoads] = useState<ManualLoadOverrides>(manualLoads);
-  const weeks = [1, 2, 3, 4, 5] as const;
-
-  useEffect(() => {
-    setDraftManualLoads(manualLoads);
-  }, [manualLoads]);
-
-  const strengthExercises = getProgram(profile)
-    .days.filter((day) => day.id === 'full-body-a' || day.id === 'full-body-b')
-    .flatMap((day) => day.exercises.filter((exercise) => exercise.kind === 'strength'));
-
-  const updateManualLoad = (exerciseId: string, weekIndex: number, rawValue: string) => {
-    const nextValue = rawValue.trim() === '' ? null : Number(rawValue.replace(',', '.'));
-    setDraftManualLoads((current) => {
-      const weeks = [...(current[exerciseId] ?? Array.from({ length: 5 }, () => null))];
-      weeks[weekIndex] = Number.isFinite(nextValue) && nextValue !== null && nextValue >= 0 ? nextValue : null;
-      const next = { ...current, [exerciseId]: weeks };
-      if (weeks.every((value) => value === null)) delete next[exerciseId];
-      return next;
-    });
-  };
-
-  const resetManualLoad = (exerciseId: string) => {
-    setDraftManualLoads((current) => {
-      const next = { ...current };
-      delete next[exerciseId];
-      return next;
-    });
-  };
-
-  const prescribedLabel = (exercise: (typeof strengthExercises)[number], weekIndex: number) => {
-    const sets = exercise.weeklySetLoadsKg?.[weekIndex];
-    if (sets) {
-      const unique = [...new Set(sets)];
-      if (unique.length === 1) return `${formatLoadKg(unique[0])} kg`;
-      return `${formatLoadKg(exercise.weeklyLoadKg?.[weekIndex] ?? Math.max(...sets))} kg + 1×${formatLoadKg(Math.max(...sets))} kg`;
-    }
-    const load = exercise.weeklyLoadKg?.[weekIndex];
-    return load === undefined ? '—' : `${formatLoadKg(load)} kg`;
-  };
 
   useEffect(() => {
     let cancelled = false;
@@ -264,62 +217,6 @@ export function SettingsScreen({
             </span>
           </button>
         </div>
-      </section>
-
-      {/* --------------------------------------------- charges personnalisées --- */}
-      <section className="settings-section" aria-labelledby="manual-loads-title">
-        <div>
-          <h2 className="settings-title" id="manual-loads-title">
-            Charges personnalisées
-          </h2>
-          <p className="settings-section-intro">
-            Ajuste les charges des prochaines séances. Les champs vides reprennent la prescription et aucun historique
-            déjà enregistré ne change.
-          </p>
-        </div>
-        <div className="manual-loads-list">
-          {strengthExercises.map((exercise) => {
-            const overrides = draftManualLoads[exercise.id] ?? [];
-            return (
-              <article className="manual-load-card" key={exercise.id}>
-                <div className="manual-load-card-head">
-                  <div>
-                    <strong>{exercise.name}</strong>
-                    <small>Prescription affichée sous chaque semaine</small>
-                  </div>
-                  <button
-                    className="text-button"
-                    type="button"
-                    onClick={() => resetManualLoad(exercise.id)}
-                    disabled={!draftManualLoads[exercise.id]}
-                  >
-                    Réinitialiser
-                  </button>
-                </div>
-                <div className="manual-load-grid">
-                  {weeks.map((weekNumber, weekIndex) => (
-                    <label key={`${exercise.id}-week-${weekNumber}`}>
-                      <span>S{weekNumber}</span>
-                      <input
-                        type="number"
-                        min="0"
-                        step="0.5"
-                        inputMode="decimal"
-                        value={overrides[weekIndex] ?? ''}
-                        placeholder={prescribedLabel(exercise, weekIndex)}
-                        aria-label={`${exercise.name} semaine ${weekNumber}`}
-                        onChange={(event) => updateManualLoad(exercise.id, weekIndex, event.target.value)}
-                      />
-                    </label>
-                  ))}
-                </div>
-              </article>
-            );
-          })}
-        </div>
-        <button className="primary-button full" type="button" onClick={() => void onManualLoadsSave(draftManualLoads)}>
-          Enregistrer mes charges
-        </button>
       </section>
 
       {/* ----------------------------------------------------- rappels ------- */}
