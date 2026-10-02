@@ -32,6 +32,8 @@ function estimatedMinutes(day: WorkoutDay) {
 interface HomeScreenProps {
   profile: ProfileId;
   program: ReturnType<typeof getProgram>;
+  /** Programme d'origine affiché dans la feuille des charges prescrites. */
+  prescribedProgram?: ReturnType<typeof getProgram>;
   history: WorkoutSession[];
   /** Vrai tant que la première lecture du stockage n'est pas revenue. */
   chargement?: boolean;
@@ -56,6 +58,7 @@ interface HomeScreenProps {
 export function HomeScreen({
   profile,
   program,
+  prescribedProgram = program,
   history,
   chargement = false,
   activeSession,
@@ -193,7 +196,7 @@ export function HomeScreen({
         </article>
       )}
 
-      <ProgramLoadCard program={program} week={programWeek} onWeekChange={onProgramWeekChange} />
+      <ProgramLoadCard program={prescribedProgram} week={programWeek} onWeekChange={onProgramWeekChange} />
 
       {/* Série de semaines complètes : un repère de régularité, jamais un score. */}
       {serie && serie.seancesFaites > 0 && (

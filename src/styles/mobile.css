@@ -120,16 +120,22 @@
 
 /* --- téléphones --------------------------------------------------------- */
 @media (max-width: 700px) {
-  .program-load-head {
+  .program-load-sheet .program-load-head {
     display: grid;
   }
 
-  .program-week-select {
+  .program-load-sheet .program-week-select {
     justify-self: stretch;
   }
 
-  .program-week-select select {
+  .program-load-sheet .program-week-select select {
     width: 100%;
+  }
+
+  .manual-load-grid {
+    grid-template-columns: repeat(5, minmax(4rem, 1fr));
+    overflow-x: auto;
+    padding-bottom: var(--sp-2);
   }
 
   /* Libellés de navigation toujours visibles : une icône seule n'est pas

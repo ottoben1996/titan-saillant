@@ -105,6 +105,23 @@ describe('seed programs from PDFs', () => {
     }
   });
 
+  it('applique une charge manuelle aux prochaines séances sans modifier la prescription par défaut', () => {
+    const custom = getProgram('ottman', 5, {
+      'chest-press': [null, null, null, null, 62.5],
+      'developpe-couche-machine': [null, null, null, null, 92.5],
+    });
+    const chest = custom.days[0].exercises.find((item) => item.id === 'chest-press');
+    const convergente = custom.days[1].exercises.find((item) => item.id === 'developpe-couche-machine');
+
+    expect(chest?.sets.slice(-3).map((item) => item.loadKg)).toEqual([62.5, 62.5, 62.5]);
+    expect(convergente?.sets.slice(-3).map((item) => item.loadKg)).toEqual([92.5, 92.5, 92.5]);
+    expect(
+      getProgram('ottman', 5)
+        .days[1].exercises.find((item) => item.id === 'developpe-couche-machine')
+        ?.sets.map((item) => item.loadKg),
+    ).toEqual([80, 80, 100]);
+  });
+
   it('provides an offline French tutorial for every seeded exercise', () => {
     const ids = new Set(getProgram('ottman').days.flatMap((d) => d.exercises.map((e) => e.id)));
     for (const id of ids) expect(tutorials[id]).toBeDefined();

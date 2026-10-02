@@ -3,6 +3,9 @@ export type ProfileId = 'ottman' | 'laura';
 export type WorkoutDayId = 'full-body-a' | 'full-body-b' | 'cardio';
 export type ExerciseKind = 'strength' | 'timed' | 'cardio' | 'warmup' | 'cooldown';
 
+/** Charges saisies manuellement, indexées par exercice puis par semaine S1 → S5. */
+export type ManualLoadOverrides = Readonly<Record<string, readonly (number | null)[]>>;
+
 export interface SetPrescription {
   readonly repetitions?: number;
   readonly durationSeconds?: number;

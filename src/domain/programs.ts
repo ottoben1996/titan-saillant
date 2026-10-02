@@ -1,4 +1,11 @@
-import type { ExercisePrescription, ProfileId, SetPrescription, WorkoutDay, WorkoutPlan } from './types';
+import type {
+  ExercisePrescription,
+  ManualLoadOverrides,
+  ProfileId,
+  SetPrescription,
+  WorkoutDay,
+  WorkoutPlan,
+} from './types';
 
 export const PROGRAM_WEEKS = 5;
 
@@ -58,28 +65,42 @@ const strength = (
   weeklyLoadKg?: readonly number[],
   weeklySetLoadsKg?: readonly (readonly number[])[],
   week = 1,
+  manualLoads?: ManualLoadOverrides,
 ) =>
-  exercise({
-    id,
-    name,
-    kind: 'strength',
-    weeklyLoadKg: weeklyLoadKg ? Object.freeze([...weeklyLoadKg]) : undefined,
-    weeklySetLoadsKg: weeklySetLoadsKg
-      ? Object.freeze(weeklySetLoadsKg.map((loads) => Object.freeze([...loads])))
-      : undefined,
-    sets: [
-      ...(warmupSets ?? []),
-      ...Array.from({ length: workSets }, (_, index) => ({
-        ...work,
-        ...(weeklySetLoadsKg?.[week - 1]?.[index] !== undefined
-          ? { loadKg: weeklySetLoadsKg[week - 1][index] }
-          : weeklyLoadKg?.[week - 1] !== undefined
-            ? { loadKg: weeklyLoadKg[week - 1] }
-            : {}),
-      })),
-    ],
-    restAfterSeconds: restSeconds,
-  });
+  (() => {
+    const overrides = manualLoads?.[id] ?? [];
+    const overrideAt = (index: number) => {
+      const value = overrides[index];
+      return typeof value === 'number' && Number.isFinite(value) && value >= 0 ? value : undefined;
+    };
+    const resolvedWeeklyLoadKg = weeklyLoadKg?.map((load, index) => overrideAt(index) ?? load);
+    const resolvedWeeklySetLoadsKg = weeklySetLoadsKg?.map((loads, index) => {
+      const override = overrideAt(index);
+      return override === undefined ? [...loads] : loads.map(() => override);
+    });
+
+    return exercise({
+      id,
+      name,
+      kind: 'strength',
+      weeklyLoadKg: resolvedWeeklyLoadKg ? Object.freeze([...resolvedWeeklyLoadKg]) : undefined,
+      weeklySetLoadsKg: resolvedWeeklySetLoadsKg
+        ? Object.freeze(resolvedWeeklySetLoadsKg.map((loads) => Object.freeze([...loads])))
+        : undefined,
+      sets: [
+        ...(warmupSets ?? []),
+        ...Array.from({ length: workSets }, (_, index) => ({
+          ...work,
+          ...(resolvedWeeklySetLoadsKg?.[week - 1]?.[index] !== undefined
+            ? { loadKg: resolvedWeeklySetLoadsKg[week - 1][index] }
+            : resolvedWeeklyLoadKg?.[week - 1] !== undefined
+              ? { loadKg: resolvedWeeklyLoadKg[week - 1] }
+              : {}),
+        })),
+      ],
+      restAfterSeconds: restSeconds,
+    });
+  })();
 const timed = (
   id: string,
   name: string,
@@ -97,7 +118,7 @@ const timed = (
     circuitId,
   });
 
-function plan(profileId: ProfileId, week = 1): WorkoutPlan {
+function plan(profileId: ProfileId, week = 1, manualLoads?: ManualLoadOverrides): WorkoutPlan {
   const laura = profileId === 'laura';
   const activeWeek = Math.min(PROGRAM_WEEKS, Math.max(1, Math.round(week)));
   const a: WorkoutDay = Object.freeze({
@@ -118,6 +139,7 @@ function plan(profileId: ProfileId, week = 1): WorkoutPlan {
         laura ? [70, 70, 70, 70, 80] : [110, 110, 130, 110, 160],
         undefined,
         activeWeek,
+        manualLoads,
       ),
       strength(
         'leg-curl-allonge',
@@ -129,6 +151,7 @@ function plan(profileId: ProfileId, week = 1): WorkoutPlan {
         laura ? [23, 23, 27, 27, 27] : [50, 50, 55, 50, 50],
         undefined,
         activeWeek,
+        manualLoads,
       ),
       strength(
         'chest-press',
@@ -140,6 +163,7 @@ function plan(profileId: ProfileId, week = 1): WorkoutPlan {
         laura ? [18, 18, 20, 20, 20] : [45, 45, 52, 45, 59],
         undefined,
         activeWeek,
+        manualLoads,
       ),
       strength(
         'tirage-horizontal',
@@ -151,6 +175,7 @@ function plan(profileId: ProfileId, week = 1): WorkoutPlan {
         laura ? [18, 18, 25, 25, 25] : [45, 45, 52, 45, 45],
         undefined,
         activeWeek,
+        manualLoads,
       ),
       timed('jumping-jack', 'Jumping Jack', laura ? 35 : 25, 3, undefined, 'finisher-a'),
       timed('gainage-planche', 'Gainage planche', laura ? 35 : 25, 3, laura ? 25 : 30, 'finisher-a'),
@@ -176,6 +201,7 @@ function plan(profileId: ProfileId, week = 1): WorkoutPlan {
         laura ? [27, 27, 30, 30, 30] : [30, 30, 40, 40, 80],
         undefined,
         activeWeek,
+        manualLoads,
       ),
       strength(
         'leg-extension',
@@ -187,6 +213,7 @@ function plan(profileId: ProfileId, week = 1): WorkoutPlan {
         laura ? [22.5, 22.5, 25, 25, 27] : [45, 45, 45, 45, 45],
         undefined,
         activeWeek,
+        manualLoads,
       ),
       strength(
         'developpe-couche-machine',
@@ -206,6 +233,7 @@ function plan(profileId: ProfileId, week = 1): WorkoutPlan {
               [80, 80, 100],
             ],
         activeWeek,
+        manualLoads,
       ),
       strength(
         'tirage-vertical',
@@ -217,6 +245,7 @@ function plan(profileId: ProfileId, week = 1): WorkoutPlan {
         laura ? [25, 25, 25, 25, 27] : [45, 45, 45, 45, 52],
         undefined,
         activeWeek,
+        manualLoads,
       ),
       timed('skierg', 'SKIERG', laura ? 40 : 30, 3, undefined, 'finisher-b'),
       timed('hollow-hold', 'Hollow Hold', 25, 3, laura ? 25 : 30, 'finisher-b'),
@@ -268,6 +297,6 @@ export const programs: Readonly<Record<ProfileId, WorkoutPlan>> = Object.freeze(
   ottman: ottmanProgram,
   laura: lauraProgram,
 });
-export function getProgram(profileId: ProfileId, week = 1): WorkoutPlan {
-  return week === 1 ? programs[profileId] : plan(profileId, week);
+export function getProgram(profileId: ProfileId, week = 1, manualLoads?: ManualLoadOverrides): WorkoutPlan {
+  return week === 1 && !manualLoads ? programs[profileId] : plan(profileId, week, manualLoads);
 }

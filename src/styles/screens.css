@@ -194,8 +194,69 @@
   padding: var(--sp-6) var(--sp-9);
 }
 
-/* Tableau de charges : toute la progression reste visible sans modifier
-   l'historique local des séances. */
+/* Le tableau complet vit dans une feuille : l'accueil garde seulement son
+   action compacte, sans perdre l'accès aux charges prescrites. */
+.program-load-trigger {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-5);
+  width: 100%;
+  padding: var(--sp-6) var(--sp-7);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface-1);
+  color: var(--text-1);
+  text-align: left;
+}
+
+.program-load-trigger:hover {
+  border-color: rgb(var(--accent-rgb) / 0.45);
+  background: var(--surface-2);
+}
+
+.program-load-trigger-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--r-md);
+  background: rgb(var(--accent-rgb) / 0.13);
+  color: var(--accent);
+}
+
+.program-load-trigger > span:nth-child(2) {
+  display: grid;
+  flex: 1;
+  gap: var(--sp-1);
+}
+
+.program-load-trigger small {
+  color: var(--text-3);
+  font-size: var(--fs-2);
+}
+
+.program-load-trigger > svg {
+  color: var(--text-3);
+}
+
+.program-load-sheet {
+  display: grid;
+  gap: var(--sp-6);
+}
+
+.program-load-sheet .program-load-head {
+  margin-top: var(--sp-2);
+}
+
+.program-load-sheet .program-load-table-wrap {
+  max-height: 48dvh;
+}
+
+.program-load-sheet .program-load-note {
+  margin-top: calc(var(--sp-2) * -1);
+}
+
 .program-load-card {
   display: grid;
   gap: var(--sp-5);
@@ -888,6 +949,79 @@
 
 .settings-section .settings-list {
   margin-top: 0;
+}
+
+.settings-section-intro {
+  max-width: 42rem;
+  margin: var(--sp-3) 0 0;
+  color: var(--text-2);
+  font-size: var(--fs-3);
+  line-height: 1.45;
+}
+
+.manual-loads-list {
+  display: grid;
+  gap: var(--sp-4);
+}
+
+.manual-load-card {
+  display: grid;
+  gap: var(--sp-5);
+  padding: var(--sp-6);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface-1);
+}
+
+.manual-load-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sp-4);
+}
+
+.manual-load-card-head > div {
+  display: grid;
+  gap: var(--sp-1);
+}
+
+.manual-load-card-head small {
+  color: var(--text-3);
+  font-size: var(--fs-2);
+}
+
+.manual-load-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--sp-3);
+}
+
+.manual-load-grid label {
+  display: grid;
+  gap: var(--sp-2);
+  color: var(--text-3);
+  font-size: var(--fs-2);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.manual-load-grid input {
+  width: 100%;
+  min-width: 0;
+  min-height: 42px;
+  padding: 0 var(--sp-3);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-md);
+  background: var(--surface-0);
+  color: var(--text-1);
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+}
+
+.manual-load-grid input:focus {
+  border-color: var(--accent);
+  outline: 2px solid rgb(var(--accent-rgb) / 0.22);
+  outline-offset: 1px;
 }
 
 .device-diagnostic .card-heading h3 {

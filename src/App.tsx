@@ -6,11 +6,12 @@ import type { WeeklyMeasurement } from './domain/measurements';
 import type { AccentId } from './domain/palettes';
 import { getProgram } from './domain/programs';
 import { tutorials } from './domain/tutorials';
-import type { ProfileId, SessionTimerState, WorkoutDay, WorkoutSession } from './domain/types';
+import type { ManualLoadOverrides, ProfileId, SessionTimerState, WorkoutDay, WorkoutSession } from './domain/types';
 import { enregistrerAccent, lireAccent } from './storage/accentPreference';
 import { telechargerSauvegarde } from './storage/backupFile';
 import { etatSauvegarde, reporterSauvegarde } from './storage/backupReminder';
 import { STORAGE_UNAVAILABLE_MESSAGE, withStorageGuard } from './storage/guard';
+import { enregistrerChargesPersonnalisees, lireChargesPersonnalisees } from './storage/manualLoads';
 import { listMeasurements, saveMeasurement, seedMeasurementsIfEmpty } from './storage/measurementRepository';
 import { enregistrerSemaineProgramme, lireSemaineProgramme } from './storage/programWeek';
 import { deleteSession, getActiveSession, listSessions, saveSession } from './storage/sessionRepository';
@@ -101,6 +102,9 @@ export default function App() {
   const [history, setHistory] = useState<WorkoutSession[]>([]);
   /** Semaine de charges choisie pour les prochaines séances du profil. */
   const [programWeek, setProgramWeek] = useState(1);
+  /** Surcharges de charges du profil actif, séparées des séances enregistrées. */
+  const [manualLoads, setManualLoads] = useState<ManualLoadOverrides>({});
+  const [manualLoadsProfile, setManualLoadsProfile] = useState<ProfileId | null>(null);
 
   /**
    * Faut-il proposer une sauvegarde ? La décision appartient au module de
@@ -186,10 +190,22 @@ export default function App() {
   };
 
   useEffect(() => {
-    if (!profile) return;
+    if (!profile) {
+      setManualLoads({});
+      setManualLoadsProfile(null);
+      return;
+    }
+    setManualLoads({});
+    setManualLoadsProfile(null);
     setProgramWeek(lireSemaineProgramme(profile));
     setHistoriqueCharge(false);
     void refreshHistory(profile);
+    void lireChargesPersonnalisees(profile)
+      .then((loads) => {
+        setManualLoads(loads);
+        setManualLoadsProfile(profile);
+      })
+      .catch(onStorageFailure);
     // Reprise de l'historique de la feuille de suivi au premier lancement, puis
     // lecture des points enregistrés (revalider une semaine remplace la valeur).
     void withStorageGuard(seedMeasurementsIfEmpty(profile), onStorageFailure, 0).then(() =>
@@ -402,7 +418,8 @@ export default function App() {
 
   if (!profile) return <ProfileChooser onChoose={chooseProfile} />;
 
-  const program = getProgram(profile, programWeek);
+  const effectiveManualLoads = manualLoadsProfile === profile ? manualLoads : undefined;
+  const program = getProgram(profile, programWeek, effectiveManualLoads);
 
   const changeProgramWeek = (week: number) => {
     if (session && !session.completedAt) {
@@ -416,6 +433,19 @@ export default function App() {
 
   const handleInitiateStart = (day: WorkoutDay) => {
     setPendingDay(day);
+  };
+
+  const saveManualLoads = async (loads: ManualLoadOverrides) => {
+    if (!profile) return;
+    setManualLoads(loads);
+    setManualLoadsProfile(profile);
+    try {
+      await enregistrerChargesPersonnalisees(profile, loads);
+      setNotice('Charges personnalisées enregistrées. L’historique reste inchangé.');
+      window.setTimeout(() => setNotice(''), 4000);
+    } catch {
+      onStorageFailure();
+    }
   };
 
   const confirmWorkoutStart = (energy: EnergyLevel, multiplier: number) => {
@@ -453,7 +483,7 @@ export default function App() {
 
   const resumeWorkout = () => {
     if (!session) return;
-    const sessionProgram = getProgram(profile, session.programWeek ?? programWeek);
+    const sessionProgram = getProgram(profile, session.programWeek ?? programWeek, effectiveManualLoads);
     const day = sessionProgram.days.find((item) => item.id === session.dayId);
     if (!day) return;
     const restoredTimer = session.activeTimer
@@ -806,6 +836,7 @@ export default function App() {
         <HomeScreen
           profile={profile}
           program={program}
+          prescribedProgram={getProgram(profile, programWeek)}
           history={history}
           chargement={!historiqueCharge}
           activeSession={session}
@@ -902,6 +933,8 @@ export default function App() {
           onSwitch={leaveProfile}
           onNotice={setNotice}
           onImported={() => void refreshHistory(profile)}
+          manualLoads={manualLoadsProfile === profile ? manualLoads : {}}
+          onManualLoadsSave={saveManualLoads}
           isOnline={isOnline}
           offlineReady={offlineReady}
           serviceWorkerReady={serviceWorkerReady}

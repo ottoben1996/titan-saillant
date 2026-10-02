@@ -1,5 +1,8 @@
+import { useState } from 'react';
 import type { WorkoutPlan } from '../domain/types';
 import { formatLoadKg } from '../workout/summary';
+import { ArrowRight, Barbell } from './ui/Icons';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from './ui/Sheet';
 
 interface ProgramLoadCardProps {
   program: WorkoutPlan;
@@ -22,67 +25,89 @@ function formatWeekLoad(exercise: WorkoutPlan['days'][number]['exercises'][numbe
 export function ProgramLoadCard({ program, week, onWeekChange }: ProgramLoadCardProps) {
   const strengthDays = program.days.filter((day) => day.id === 'full-body-a' || day.id === 'full-body-b');
   const weeks = [1, 2, 3, 4, 5] as const;
+  const [open, setOpen] = useState(false);
 
   return (
-    <section className="program-load-card" aria-labelledby="program-load-title">
-      <div className="program-load-head">
-        <div>
-          <p className="eyebrow">CHARGES PRESCRITES</p>
-          <h2 id="program-load-title">Semaine {week}</h2>
-          <p>Les historiques restent inchangés. Seule la prescription des prochaines séances évolue.</p>
-        </div>
-        <label className="program-week-select">
-          <span>Semaine active</span>
-          <select value={week} onChange={(event) => onWeekChange(Number(event.target.value))}>
-            {Array.from({ length: 5 }, (_, index) => index + 1).map((item) => (
-              <option key={item} value={item}>
-                Semaine {item}
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
+    <>
+      <button className="program-load-trigger" type="button" onClick={() => setOpen(true)}>
+        <span className="program-load-trigger-icon" aria-hidden="true">
+          <Barbell size={20} />
+        </span>
+        <span>
+          <strong>Voir les charges prescrites</strong>
+          <small>Semaine active : S{week} · tableau complet des exercices</small>
+        </span>
+        <ArrowRight size={19} aria-hidden="true" />
+      </button>
 
-      <div className="program-load-table-wrap">
-        <table className="program-load-table">
-          <thead>
-            <tr>
-              <th scope="col">Exercice</th>
-              {weeks.map((weekNumber) => (
-                <th key={`week-${weekNumber}`} scope="col" className={week === weekNumber ? 'active' : undefined}>
-                  S{weekNumber}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {strengthDays.map((day) => (
-              <tr className="program-load-day" key={day.id}>
-                <th colSpan={6} scope="rowgroup">
-                  {day.name}
-                </th>
-              </tr>
-            ))}
-            {strengthDays.flatMap((day) =>
-              day.exercises
-                .filter((exercise) => exercise.weeklyLoadKg)
-                .map((exercise) => (
-                  <tr key={`${day.id}-${exercise.id}`}>
-                    <th scope="row">{exercise.name}</th>
-                    {weeks.map((weekNumber) => (
-                      <td key={`week-${weekNumber}`} className={week === weekNumber ? 'active' : undefined}>
-                        {formatWeekLoad(exercise, weekNumber)}
-                      </td>
-                    ))}
+      <Sheet open={open} onOpenChange={setOpen}>
+        <SheetContent className="program-load-sheet" aria-describedby="program-load-description">
+          <SheetHeader>
+            <SheetTitle id="program-load-title">Charges prescrites</SheetTitle>
+            <SheetDescription id="program-load-description">
+              Les valeurs prévues par le programme. Les charges personnalisées se règlent dans Réglages.
+            </SheetDescription>
+          </SheetHeader>
+
+          <div className="program-load-head">
+            <div>
+              <p className="eyebrow">PROGRAMME {program.displayName.toUpperCase()}</p>
+              <h2>Semaine {week}</h2>
+            </div>
+            <label className="program-week-select">
+              <span>Semaine active</span>
+              <select value={week} onChange={(event) => onWeekChange(Number(event.target.value))}>
+                {Array.from({ length: 5 }, (_, index) => index + 1).map((item) => (
+                  <option key={item} value={item}>
+                    Semaine {item}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+
+          <div className="program-load-table-wrap">
+            <table className="program-load-table">
+              <thead>
+                <tr>
+                  <th scope="col">Exercice</th>
+                  {weeks.map((weekNumber) => (
+                    <th key={`week-${weekNumber}`} scope="col" className={week === weekNumber ? 'active' : undefined}>
+                      S{weekNumber}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {strengthDays.map((day) => (
+                  <tr className="program-load-day" key={day.id}>
+                    <th colSpan={6} scope="rowgroup">
+                      {day.name}
+                    </th>
                   </tr>
-                )),
-            )}
-          </tbody>
-        </table>
-      </div>
-      <small className="program-load-note">
-        Les semaines 6 à 8 restent à renseigner ; elles ne remplacent aucune donnée existante.
-      </small>
-    </section>
+                ))}
+                {strengthDays.flatMap((day) =>
+                  day.exercises
+                    .filter((exercise) => exercise.weeklyLoadKg)
+                    .map((exercise) => (
+                      <tr key={`${day.id}-${exercise.id}`}>
+                        <th scope="row">{exercise.name}</th>
+                        {weeks.map((weekNumber) => (
+                          <td key={`week-${weekNumber}`} className={week === weekNumber ? 'active' : undefined}>
+                            {formatWeekLoad(exercise, weekNumber)}
+                          </td>
+                        ))}
+                      </tr>
+                    )),
+                )}
+              </tbody>
+            </table>
+          </div>
+          <small className="program-load-note">
+            Les semaines 6 à 8 restent à renseigner ; elles ne remplacent aucune donnée existante.
+          </small>
+        </SheetContent>
+      </Sheet>
+    </>
   );
 }
