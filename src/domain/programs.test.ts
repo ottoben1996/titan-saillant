@@ -123,6 +123,19 @@ describe('seed programs from PDFs', () => {
     ).toEqual([80, 80, 100]);
   });
 
+  it('accepte des charges et durées personnalisées jusqu’à S8', () => {
+    const custom = getProgram(
+      'ottman',
+      8,
+      { 'chest-press': [null, null, null, null, null, null, null, 75] },
+      { 'rameur-15-min': [null, null, null, null, null, null, null, 1200] },
+    );
+    const chest = custom.days[0].exercises.find((item) => item.id === 'chest-press');
+    const rower = custom.days[3].exercises.find((item) => item.id === 'rameur-15-min');
+    expect(chest?.sets.slice(-3).map((item) => item.loadKg)).toEqual([75, 75, 75]);
+    expect(rower?.sets[0].durationSeconds).toBe(1200);
+  });
+
   it('provides an offline French tutorial for every seeded exercise', () => {
     const ids = new Set(getProgram('ottman').days.flatMap((d) => d.exercises.map((e) => e.id)));
     for (const id of ids) expect(tutorials[id]).toBeDefined();

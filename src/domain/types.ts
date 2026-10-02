@@ -3,8 +3,10 @@ export type ProfileId = 'ottman' | 'laura';
 export type WorkoutDayId = 'full-body-a' | 'full-body-b' | 'cardio' | 'cardio-4';
 export type ExerciseKind = 'strength' | 'timed' | 'cardio' | 'warmup' | 'cooldown';
 
-/** Charges saisies manuellement, indexées par exercice puis par semaine S1 → S5. */
+/** Charges saisies manuellement, indexées par exercice puis par semaine S1 → S8. */
 export type ManualLoadOverrides = Readonly<Record<string, readonly (number | null)[]>>;
+/** Durées saisies manuellement, en secondes, indexées par exercice puis S1 → S8. */
+export type ManualDurationOverrides = Readonly<Record<string, readonly (number | null)[]>>;
 
 export interface SetPrescription {
   readonly repetitions?: number;
@@ -20,7 +22,7 @@ export interface ExercisePrescription {
   readonly name: string;
   readonly kind: ExerciseKind;
   readonly sets: readonly SetPrescription[];
-  /** Charges de travail prévues par semaine (S1 → S5 pour le cycle actuel). */
+  /** Charges de travail prévues par semaine (S1 → S8). */
   readonly weeklyLoadKg?: readonly number[];
   /** Exception quand une semaine comporte plusieurs charges dans le même exercice. */
   readonly weeklySetLoadsKg?: readonly (readonly number[])[];

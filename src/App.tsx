@@ -6,11 +6,19 @@ import type { WeeklyMeasurement } from './domain/measurements';
 import type { AccentId } from './domain/palettes';
 import { getProgram } from './domain/programs';
 import { tutorials } from './domain/tutorials';
-import type { ManualLoadOverrides, ProfileId, SessionTimerState, WorkoutDay, WorkoutSession } from './domain/types';
+import type {
+  ManualDurationOverrides,
+  ManualLoadOverrides,
+  ProfileId,
+  SessionTimerState,
+  WorkoutDay,
+  WorkoutSession,
+} from './domain/types';
 import { enregistrerAccent, lireAccent } from './storage/accentPreference';
 import { telechargerSauvegarde } from './storage/backupFile';
 import { etatSauvegarde, reporterSauvegarde } from './storage/backupReminder';
 import { STORAGE_UNAVAILABLE_MESSAGE, withStorageGuard } from './storage/guard';
+import { enregistrerDureesPersonnalisees, lireDureesPersonnalisees } from './storage/manualDurations';
 import { enregistrerChargesPersonnalisees, lireChargesPersonnalisees } from './storage/manualLoads';
 import { listMeasurements, saveMeasurement, seedMeasurementsIfEmpty } from './storage/measurementRepository';
 import { enregistrerSemaineProgramme, lireSemaineProgramme } from './storage/programWeek';
@@ -105,6 +113,7 @@ export default function App() {
   const [programWeek, setProgramWeek] = useState(1);
   /** Surcharges de charges du profil actif, séparées des séances enregistrées. */
   const [manualLoads, setManualLoads] = useState<ManualLoadOverrides>({});
+  const [manualDurations, setManualDurations] = useState<ManualDurationOverrides>({});
   const [manualLoadsProfile, setManualLoadsProfile] = useState<ProfileId | null>(null);
 
   /**
@@ -194,10 +203,12 @@ export default function App() {
   useEffect(() => {
     if (!profile) {
       setManualLoads({});
+      setManualDurations({});
       setManualLoadsProfile(null);
       return;
     }
     setManualLoads({});
+    setManualDurations({});
     setManualLoadsProfile(null);
     setProgramWeek(lireSemaineProgramme(profile));
     setHistoriqueCharge(false);
@@ -208,6 +219,7 @@ export default function App() {
         setManualLoadsProfile(profile);
       })
       .catch(onStorageFailure);
+    void lireDureesPersonnalisees(profile).then(setManualDurations).catch(onStorageFailure);
     // Reprise de l'historique de la feuille de suivi au premier lancement, puis
     // lecture des points enregistrés (revalider une semaine remplace la valeur).
     void withStorageGuard(seedMeasurementsIfEmpty(profile), onStorageFailure, 0).then(() =>
@@ -421,7 +433,7 @@ export default function App() {
   if (!profile) return <ProfileChooser onChoose={chooseProfile} />;
 
   const effectiveManualLoads = manualLoadsProfile === profile ? manualLoads : undefined;
-  const program = getProgram(profile, programWeek, effectiveManualLoads);
+  const program = getProgram(profile, programWeek, effectiveManualLoads, manualDurations);
 
   const changeProgramWeek = (week: number) => {
     if (session && !session.completedAt) {
@@ -444,6 +456,18 @@ export default function App() {
     try {
       await enregistrerChargesPersonnalisees(profile, loads);
       setNotice('Charges personnalisées enregistrées. L’historique reste inchangé.');
+      window.setTimeout(() => setNotice(''), 4000);
+    } catch {
+      onStorageFailure();
+    }
+  };
+
+  const saveManualDurations = async (durations: ManualDurationOverrides) => {
+    if (!profile) return;
+    setManualDurations(durations);
+    try {
+      await enregistrerDureesPersonnalisees(profile, durations);
+      setNotice('Durées personnalisées enregistrées. L’historique reste inchangé.');
       window.setTimeout(() => setNotice(''), 4000);
     } catch {
       onStorageFailure();
@@ -949,9 +973,11 @@ export default function App() {
         <LoadsScreen
           profile={profile}
           manualLoads={manualLoadsProfile === profile ? manualLoads : {}}
+          manualDurations={manualDurations}
           onBack={() => setScreen('home')}
           onNotice={setNotice}
           onSave={saveManualLoads}
+          onSaveDurations={saveManualDurations}
         />
       )}
 

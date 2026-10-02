@@ -1,5 +1,6 @@
 import type {
   ExercisePrescription,
+  ManualDurationOverrides,
   ManualLoadOverrides,
   ProfileId,
   SetPrescription,
@@ -7,7 +8,7 @@ import type {
   WorkoutPlan,
 } from './types';
 
-export const PROGRAM_WEEKS = 5;
+export const PROGRAM_WEEKS = 8;
 
 const set = (values: SetPrescription): SetPrescription => Object.freeze({ ...values });
 const exercise = (values: Omit<ExercisePrescription, 'sets'> & { sets: SetPrescription[] }): ExercisePrescription =>
@@ -73,7 +74,9 @@ const strength = (
       const value = overrides[index];
       return typeof value === 'number' && Number.isFinite(value) && value >= 0 ? value : undefined;
     };
-    const resolvedWeeklyLoadKg = weeklyLoadKg?.map((load, index) => overrideAt(index) ?? load);
+    const resolvedWeeklyLoadKg = weeklyLoadKg
+      ? (Array.from({ length: PROGRAM_WEEKS }, (_, index) => overrideAt(index) ?? weeklyLoadKg[index]) as number[])
+      : undefined;
     const resolvedWeeklySetLoadsKg = weeklySetLoadsKg?.map((loads, index) => {
       const override = overrideAt(index);
       return override === undefined ? [...loads] : loads.map(() => override);
@@ -108,17 +111,27 @@ const timed = (
   setsCount: number,
   restAfterSeconds?: number,
   circuitId?: string,
+  manualDurations?: ManualDurationOverrides,
+  week = 1,
 ) =>
   exercise({
     id,
     name,
     kind: 'timed',
-    sets: Array.from({ length: setsCount }, () => ({ durationSeconds, loadLabel: 'PDC' })),
+    sets: Array.from({ length: setsCount }, () => ({
+      durationSeconds: manualDurations?.[id]?.[week - 1] ?? durationSeconds,
+      loadLabel: 'PDC',
+    })),
     restAfterSeconds,
     circuitId,
   });
 
-function plan(profileId: ProfileId, week = 1, manualLoads?: ManualLoadOverrides): WorkoutPlan {
+function plan(
+  profileId: ProfileId,
+  week = 1,
+  manualLoads?: ManualLoadOverrides,
+  manualDurations?: ManualDurationOverrides,
+): WorkoutPlan {
   const laura = profileId === 'laura';
   const activeWeek = Math.min(PROGRAM_WEEKS, Math.max(1, Math.round(week)));
   const a: WorkoutDay = Object.freeze({
@@ -177,8 +190,17 @@ function plan(profileId: ProfileId, week = 1, manualLoads?: ManualLoadOverrides)
         activeWeek,
         manualLoads,
       ),
-      timed('jumping-jack', 'Jumping Jack', laura ? 35 : 25, 3, undefined, 'finisher-a'),
-      timed('gainage-planche', 'Gainage planche', laura ? 35 : 25, 3, laura ? 25 : 30, 'finisher-a'),
+      timed('jumping-jack', 'Jumping Jack', laura ? 35 : 25, 3, undefined, 'finisher-a', manualDurations, activeWeek),
+      timed(
+        'gainage-planche',
+        'Gainage planche',
+        laura ? 35 : 25,
+        3,
+        laura ? 25 : 30,
+        'finisher-a',
+        manualDurations,
+        activeWeek,
+      ),
     ]),
     warmup,
     cooldown: cooldownAt5Kmh,
@@ -247,8 +269,8 @@ function plan(profileId: ProfileId, week = 1, manualLoads?: ManualLoadOverrides)
         activeWeek,
         manualLoads,
       ),
-      timed('skierg', 'SKIERG', laura ? 40 : 30, 3, undefined, 'finisher-b'),
-      timed('hollow-hold', 'Hollow Hold', 25, 3, laura ? 25 : 30, 'finisher-b'),
+      timed('skierg', 'SKIERG', laura ? 40 : 30, 3, undefined, 'finisher-b', manualDurations, activeWeek),
+      timed('hollow-hold', 'Hollow Hold', 25, 3, laura ? 25 : 30, 'finisher-b', manualDurations, activeWeek),
     ]),
     warmup,
     cooldown: cooldownFastWalk,
@@ -258,12 +280,12 @@ function plan(profileId: ProfileId, week = 1, manualLoads?: ManualLoadOverrides)
     name: 'Cardio circuit',
     subtitle: 'Circuit cardio et renforcement',
     exercises: Object.freeze([
-      timed('jumping-jack', 'Jumping Jack', laura ? 40 : 30, 3, undefined, 'circuit-1'),
-      timed('mountain-climber', 'Mountain Climber', 30, 3, 60, 'circuit-1'),
-      timed('sit-to-stand', 'Sit to Stand', laura ? 40 : 30, 3, undefined, 'circuit-2'),
-      timed('crunches', 'Crunches', 30, 3, 60, 'circuit-2'),
-      timed('skierg', 'SKIERG', 30, 3, undefined, 'circuit-3'),
-      timed('rameur', 'Rameur', laura ? 40 : 30, 3, 60, 'circuit-3'),
+      timed('jumping-jack', 'Jumping Jack', laura ? 40 : 30, 3, undefined, 'circuit-1', manualDurations, activeWeek),
+      timed('mountain-climber', 'Mountain Climber', 30, 3, 60, 'circuit-1', manualDurations, activeWeek),
+      timed('sit-to-stand', 'Sit to Stand', laura ? 40 : 30, 3, undefined, 'circuit-2', manualDurations, activeWeek),
+      timed('crunches', 'Crunches', 30, 3, 60, 'circuit-2', manualDurations, activeWeek),
+      timed('skierg', 'SKIERG', 30, 3, undefined, 'circuit-3', manualDurations, activeWeek),
+      timed('rameur', 'Rameur', laura ? 40 : 30, 3, 60, 'circuit-3', manualDurations, activeWeek),
       exercise({
         id: 'developpe-clavicule',
         name: 'Développé clavicule prise neutre',
@@ -275,7 +297,7 @@ function plan(profileId: ProfileId, week = 1, manualLoads?: ManualLoadOverrides)
         })),
         circuitId: 'circuit-4',
       }),
-      timed('hollow-hold', 'Hollow Hold', 30, 3, 60, 'circuit-4'),
+      timed('hollow-hold', 'Hollow Hold', 30, 3, 60, 'circuit-4', manualDurations, activeWeek),
     ]),
     warmup: cardioWarmup,
     cooldown: cooldownFastWalk,
@@ -285,8 +307,8 @@ function plan(profileId: ProfileId, week = 1, manualLoads?: ManualLoadOverrides)
     name: 'Rameur + marche',
     subtitle: '4ᵉ séance de la semaine · cardio continu',
     exercises: Object.freeze([
-      timed('rameur-15-min', 'Rameur — 15 minutes', 15 * 60, 1, 60),
-      timed('marche-cardio', 'Marche sur tapis — 25 minutes', 25 * 60, 1, 0),
+      timed('rameur-15-min', 'Rameur — 15 minutes', 15 * 60, 1, 60, undefined, manualDurations, activeWeek),
+      timed('marche-cardio', 'Marche sur tapis — 25 minutes', 25 * 60, 1, 0, undefined, manualDurations, activeWeek),
     ]),
     warmup: cardioWarmup,
     cooldown: cooldownFastWalk,
@@ -306,6 +328,13 @@ export const programs: Readonly<Record<ProfileId, WorkoutPlan>> = Object.freeze(
   ottman: ottmanProgram,
   laura: lauraProgram,
 });
-export function getProgram(profileId: ProfileId, week = 1, manualLoads?: ManualLoadOverrides): WorkoutPlan {
-  return week === 1 && !manualLoads ? programs[profileId] : plan(profileId, week, manualLoads);
+export function getProgram(
+  profileId: ProfileId,
+  week = 1,
+  manualLoads?: ManualLoadOverrides,
+  manualDurations?: ManualDurationOverrides,
+): WorkoutPlan {
+  return week === 1 && !manualLoads && !manualDurations
+    ? programs[profileId]
+    : plan(profileId, week, manualLoads, manualDurations);
 }
