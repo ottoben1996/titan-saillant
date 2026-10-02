@@ -25,6 +25,8 @@ export function LoadsScreen({
 }: LoadsScreenProps) {
   const [draft, setDraft] = useState<ManualLoadOverrides>(manualLoads);
   const [durationDraft, setDurationDraft] = useState<ManualDurationOverrides>(manualDurations);
+  const [copyFrom, setCopyFrom] = useState(5);
+  const [copyTo, setCopyTo] = useState(6);
   const weeks = [1, 2, 3, 4, 5, 6, 7, 8] as const;
   const allExercises = getProgram(profile).days.flatMap((day) => day.exercises);
   const exercises = [
@@ -94,6 +96,25 @@ export function LoadsScreen({
     onNotice('Charges et durées personnalisées enregistrées. L’historique reste inchangé.');
   };
 
+  const copyWeek = () => {
+    if (copyFrom === copyTo) return;
+    const from = copyFrom - 1;
+    const to = copyTo - 1;
+    const copyValues = (source: ManualLoadOverrides) => {
+      const next = { ...source };
+      for (const [exerciseId, values] of Object.entries(source)) {
+        const updated = Array.from({ length: 8 }, (_, index) => values[index] ?? null);
+        updated[to] = values[from] ?? null;
+        if (updated.every((value) => value === null)) delete next[exerciseId];
+        else next[exerciseId] = updated;
+      }
+      return next;
+    };
+    setDraft(copyValues);
+    setDurationDraft(copyValues);
+    onNotice(`S${copyFrom} copiée vers S${copyTo}. Enregistre pour conserver la modification.`);
+  };
+
   const prescribedDuration = (exercise: ExercisePrescription) =>
     Math.round((exercise.sets[0]?.durationSeconds ?? 0) / 60);
 
@@ -112,6 +133,40 @@ export function LoadsScreen({
         Modifie ici les charges et les durées de chaque exercice, y compris les semaines S6 à S8. Les prescriptions
         originales et ton historique restent conservés.
       </p>
+      <div className="manual-load-card week-copy-card">
+        <div className="manual-load-card-head">
+          <div>
+            <strong>Préparer une semaine</strong>
+            <small>Copie les charges et durées personnalisées vers une autre semaine.</small>
+          </div>
+          <button className="secondary-button" type="button" onClick={copyWeek} disabled={copyFrom === copyTo}>
+            Copier
+          </button>
+        </div>
+        <div className="week-copy-controls">
+          <label>
+            <span>Depuis</span>
+            <select value={copyFrom} onChange={(event) => setCopyFrom(Number(event.target.value))}>
+              {weeks.map((week) => (
+                <option key={`from-${week}`} value={week}>
+                  S{week}
+                </option>
+              ))}
+            </select>
+          </label>
+          <span aria-hidden="true">→</span>
+          <label>
+            <span>Vers</span>
+            <select value={copyTo} onChange={(event) => setCopyTo(Number(event.target.value))}>
+              {weeks.map((week) => (
+                <option key={`to-${week}`} value={week}>
+                  S{week}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+      </div>
       <div className="manual-loads-list">
         {exercises.map((exercise) => {
           const overrides = draft[exercise.id] ?? [];

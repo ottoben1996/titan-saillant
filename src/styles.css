@@ -2571,6 +2571,32 @@ input:focus-visible {
 .secondary-button:hover {
   background: #ffffff14;
 }
+
+.week-copy-card {
+  margin-bottom: var(--sp-4);
+}
+
+.week-copy-controls {
+  display: flex;
+  align-items: end;
+  gap: var(--sp-3);
+  margin-top: var(--sp-4);
+}
+
+.week-copy-controls label {
+  display: grid;
+  gap: var(--sp-2);
+  min-width: 7rem;
+}
+
+.week-copy-controls select {
+  min-height: 2.5rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 0 var(--sp-3);
+  background: var(--surface);
+  color: var(--text);
+}
 .device-diagnostic {
   display: grid;
   gap: var(--sp-7);
