@@ -120,6 +120,18 @@
 
 /* --- téléphones --------------------------------------------------------- */
 @media (max-width: 700px) {
+  .program-load-head {
+    display: grid;
+  }
+
+  .program-week-select {
+    justify-self: stretch;
+  }
+
+  .program-week-select select {
+    width: 100%;
+  }
+
   /* Libellés de navigation toujours visibles : une icône seule n'est pas
      identifiable en salle, et l'accessibilité repose sur le texte. */
   .bottom-nav {

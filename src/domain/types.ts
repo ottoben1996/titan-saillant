@@ -17,6 +17,10 @@ export interface ExercisePrescription {
   readonly name: string;
   readonly kind: ExerciseKind;
   readonly sets: readonly SetPrescription[];
+  /** Charges de travail prévues par semaine (S1 → S5 pour le cycle actuel). */
+  readonly weeklyLoadKg?: readonly number[];
+  /** Exception quand une semaine comporte plusieurs charges dans le même exercice. */
+  readonly weeklySetLoadsKg?: readonly (readonly number[])[];
   readonly notes?: string;
   readonly circuitId?: string;
   readonly restAfterSeconds?: number;
@@ -87,6 +91,8 @@ export interface WorkoutSession {
   id: string;
   profileId: ProfileId;
   dayId: WorkoutDayId;
+  /** Semaine de prescription utilisée pour cette séance, absent dans les anciennes sauvegardes. */
+  programWeek?: number;
   sequenceVersion?: 2;
   currentStepIndex?: number;
   startedAt: string;

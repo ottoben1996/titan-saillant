@@ -40,30 +40,69 @@ describe('seed programs from PDFs', () => {
     }
   });
 
-  it('matches every PDF-specific difference between Ottman and Laura', () => {
-    const ottman = getProgram('ottman');
-    const laura = getProgram('laura');
-    const values = (profile: typeof ottman, dayIndex: number, exerciseId: string) =>
-      profile.days[dayIndex].exercises.find((exercise) => exercise.id === exerciseId)?.sets;
+  it('expose toutes les charges Ottman et Laura des semaines 1 à 5', () => {
+    const expected = {
+      ottman: {
+        'presse-cuisses-inclinee': [110, 110, 130, 110, 160],
+        'leg-curl-allonge': [50, 50, 55, 50, 50],
+        'chest-press': [45, 45, 52, 45, 59],
+        'tirage-horizontal': [45, 45, 52, 45, 45],
+        'squat-smith': [30, 30, 40, 40, 80],
+        'leg-extension': [45, 45, 45, 45, 45],
+        'developpe-couche-machine': [60, 60, 80, 70, 80],
+        'tirage-vertical': [45, 45, 45, 45, 52],
+      },
+      laura: {
+        'presse-cuisses-inclinee': [70, 70, 70, 70, 80],
+        'leg-curl-allonge': [23, 23, 27, 27, 27],
+        'chest-press': [18, 18, 20, 20, 20],
+        'tirage-horizontal': [18, 18, 25, 25, 25],
+        'squat-smith': [27, 27, 30, 30, 30],
+        'leg-extension': [22.5, 22.5, 25, 25, 27],
+        'developpe-couche-machine': [20, 20, 20, 20, 20],
+        'tirage-vertical': [25, 25, 25, 25, 27],
+      },
+    } as const;
 
-    expect(values(ottman, 0, 'presse-cuisses-inclinee')?.map((set) => set.loadKg)).toEqual([50, 80, 110, 110, 110]);
-    expect(values(laura, 0, 'presse-cuisses-inclinee')?.map((set) => set.loadKg)).toEqual([40, 50, 70, 70, 70]);
-    expect(values(ottman, 0, 'leg-curl-allonge')?.[0].loadKg).toBe(50);
-    expect(values(laura, 0, 'leg-curl-allonge')?.[0].loadKg).toBe(23);
-    expect(values(ottman, 0, 'tirage-horizontal')?.[0].loadKg).toBe(45);
-    expect(values(laura, 0, 'tirage-horizontal')?.[0].loadKg).toBe(18);
-    expect(values(ottman, 1, 'squat-smith')?.map((set) => set.repetitions)).toEqual([12, 10, 10, 10, 10]);
-    expect(values(laura, 1, 'squat-smith')?.map((set) => set.repetitions)).toEqual([15, 12, 10, 10, 10]);
-    expect(values(ottman, 1, 'leg-extension')?.[0].loadKg).toBe(35);
-    expect(values(laura, 1, 'leg-extension')?.[0].loadKg).toBe(22);
-    expect(values(ottman, 2, 'jumping-jack')?.[0].durationSeconds).toBe(30);
-    expect(values(laura, 2, 'jumping-jack')?.[0].durationSeconds).toBe(40);
-    expect(values(ottman, 2, 'sit-to-stand')?.[0].durationSeconds).toBe(30);
-    expect(values(laura, 2, 'sit-to-stand')?.[0].durationSeconds).toBe(40);
-    expect(values(ottman, 2, 'rameur')?.[0].durationSeconds).toBe(30);
-    expect(values(laura, 2, 'rameur')?.[0].durationSeconds).toBe(40);
-    expect(values(ottman, 2, 'developpe-clavicule')?.[0].loadKg).toBe(6);
-    expect(values(laura, 2, 'developpe-clavicule')?.[0].loadKg).toBe(4);
+    for (const profile of ['ottman', 'laura'] as const) {
+      for (const [exerciseId, weeklyLoads] of Object.entries(expected[profile])) {
+        for (const [weekIndex, load] of weeklyLoads.entries()) {
+          const exercise = getProgram(profile, weekIndex + 1)
+            .days.flatMap((day) => day.exercises)
+            .find((item) => item.id === exerciseId);
+          const exceptionalSets = exercise?.weeklySetLoadsKg?.[weekIndex];
+          if (exceptionalSets) {
+            expect(
+              exercise?.sets.slice(-exceptionalSets.length).map((item) => item.loadKg),
+              `${profile} ${exerciseId} S${weekIndex + 1}`,
+            ).toEqual(exceptionalSets);
+          } else {
+            expect(exercise?.sets.at(-1)?.loadKg, `${profile} ${exerciseId} S${weekIndex + 1}`).toBe(load);
+          }
+          expect(exercise?.weeklyLoadKg?.[weekIndex], `${profile} ${exerciseId} table S${weekIndex + 1}`).toBe(load);
+        }
+      }
+    }
+
+    const ottmanWeek5 = getProgram('ottman', 5).days[1].exercises.find(
+      (item) => item.id === 'developpe-couche-machine',
+    );
+    expect(ottmanWeek5?.sets.map((item) => item.loadKg)).toEqual([80, 80, 100]);
+  });
+
+  it('conserve le circuit cardio et ajoute le rameur de 15 minutes et la marche de 25 minutes', () => {
+    for (const profile of ['ottman', 'laura'] as const) {
+      const cardio = getProgram(profile).days[2];
+      const oldRower = cardio.exercises.find((item) => item.id === 'rameur');
+      const addedRower = cardio.exercises.find((item) => item.id === 'rameur-15-min');
+      const walk = cardio.exercises.find((item) => item.id === 'marche-cardio');
+
+      expect(oldRower?.circuitId).toBe('circuit-3');
+      expect(oldRower?.sets).toHaveLength(3);
+      expect(oldRower?.sets[0].durationSeconds).toBe(profile === 'laura' ? 40 : 30);
+      expect(addedRower?.sets).toEqual([{ durationSeconds: 900, loadLabel: 'PDC' }]);
+      expect(walk?.sets).toEqual([{ durationSeconds: 1500, loadLabel: 'PDC' }]);
+    }
   });
 
   it('provides an offline French tutorial for every seeded exercise', () => {

@@ -59,12 +59,13 @@ export function getWorkoutSteps(day: WorkoutDay, session?: WorkoutSession): read
   return steps;
 }
 
-export function createRunner(day: WorkoutDay, profileId: ProfileId): WorkoutSession {
+export function createRunner(day: WorkoutDay, profileId: ProfileId, programWeek?: number): WorkoutSession {
   const id = globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`;
   return {
     id,
     profileId,
     dayId: day.id,
+    programWeek,
     sequenceVersion: 2,
     currentStepIndex: 0,
     startedAt: new Date().toISOString(),

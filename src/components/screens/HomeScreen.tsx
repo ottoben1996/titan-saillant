@@ -11,6 +11,7 @@ import {
   weeklyComparison,
   weekSlots,
 } from '../../workout/summary';
+import { ProgramLoadCard } from '../ProgramLoadCard';
 import { ArrowRight, Bolt, Check, Clock, DownloadSimple, Play, Trash } from '../ui/Icons';
 
 export const profileLabels: Record<ProfileId, string> = { ottman: 'Ottman', laura: 'Laura' };
@@ -41,6 +42,8 @@ interface HomeScreenProps {
   onDiscard: () => void;
   /** Série de semaines complètes, calculée par l'application. */
   serie?: SerieAssiduite;
+  programWeek?: number;
+  onProgramWeekChange?: (week: number) => void;
   /** Présent seulement quand les données méritent d'être mises à l'abri. */
   sauvegarde?: {
     sessions: number;
@@ -61,6 +64,8 @@ export function HomeScreen({
   onDiscard,
   sauvegarde,
   serie,
+  programWeek = 1,
+  onProgramWeekChange = () => undefined,
 }: HomeScreenProps) {
   const view = useMemo(() => {
     const now = new Date();
@@ -187,6 +192,8 @@ export function HomeScreen({
           </p>
         </article>
       )}
+
+      <ProgramLoadCard program={program} week={programWeek} onWeekChange={onProgramWeekChange} />
 
       {/* Série de semaines complètes : un repère de régularité, jamais un score. */}
       {serie && serie.seancesFaites > 0 && (

@@ -120,6 +120,57 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
       keyCue: 'Jambes, buste, bras à l’aller ; l’inverse au retour',
     },
   ),
+  'rameur-15-min': tutorial(
+    'rameur-15-min',
+    'Rameur — 15 minutes',
+    ['Cardio', 'dos', 'jambes'],
+    ['Rameur'],
+    'Assis sur le siège, pieds sanglés, dos neutre et poignée tenue sans crispation.',
+    [
+      'Commence à allure facile pendant la première minute.',
+      'Pousse avec les jambes, ouvre le buste puis termine avec les bras.',
+      'Reviens dans l’ordre inverse et garde une cadence régulière pendant 15 minutes.',
+    ],
+    [
+      'Tirer avec les bras avant de pousser dans les jambes.',
+      'Arrondir le dos ou accélérer au point de perdre le contrôle.',
+    ],
+    [
+      'Réduis immédiatement l’intensité si le bas du dos devient douloureux.',
+      'Arrête la séance en cas de vertige ou d’essoufflement inhabituel.',
+    ],
+    {
+      primaryMuscles: ['Cardio', 'Jambes'],
+      secondaryMuscles: ['Dos', 'Bras'],
+      keyCue: 'Cadence régulière et mouvement jambes-buste-bras',
+    },
+  ),
+  'marche-cardio': tutorial(
+    'marche-cardio',
+    'Marche sur tapis — 25 minutes',
+    ['Cardio', 'jambes'],
+    ['Tapis de course'],
+    'Debout au centre du tapis, buste droit, regard devant et bras libres le long du corps.',
+    [
+      'Attache la sécurité d’arrêt avant de lancer le tapis et commence à allure confortable.',
+      'Augmente progressivement jusqu’à une marche soutenue, sans courir ni t’accrocher aux poignées.',
+      'Garde une foulée régulière et laisse les bras accompagner naturellement le rythme.',
+      'Ralentis pendant la dernière minute avant de descendre du tapis à l’arrêt complet.',
+    ],
+    [
+      'Se tenir aux poignées en permanence : baisse l’allure plutôt que de te suspendre.',
+      'Partir trop vite : la marche doit rester durable pendant les 25 minutes.',
+      'Descendre du tapis en mouvement : décélère puis attends l’arrêt complet.',
+    ],
+    [
+      'Garde la sécurité d’arrêt attachée pendant toute la marche.',
+      'Arrête-toi si un vertige, une douleur inhabituelle ou un essoufflement anormal apparaît.',
+    ],
+    {
+      primaryMuscles: ['Cardio'],
+      keyCue: 'Marche soutenue, buste droit, sans courir',
+    },
+  ),
   velo: tutorial(
     'velo',
     'Vélo',

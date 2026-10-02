@@ -194,6 +194,111 @@
   padding: var(--sp-6) var(--sp-9);
 }
 
+/* Tableau de charges : toute la progression reste visible sans modifier
+   l'historique local des séances. */
+.program-load-card {
+  display: grid;
+  gap: var(--sp-5);
+  padding: var(--sp-7);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface-1);
+}
+
+.program-load-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sp-6);
+}
+
+.program-load-head h2 {
+  margin: var(--sp-2) 0 0;
+  font-size: var(--fs-6);
+}
+
+.program-load-head p:not(.eyebrow) {
+  max-width: 42rem;
+  margin: var(--sp-2) 0 0;
+  color: var(--text-2);
+  font-size: var(--fs-2);
+  line-height: 1.4;
+}
+
+.program-week-select {
+  display: grid;
+  flex: none;
+  gap: var(--sp-2);
+  color: var(--text-3);
+  font-size: var(--fs-2);
+}
+
+.program-week-select select {
+  min-height: 40px;
+  padding: 0 var(--sp-4);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-md);
+  background: var(--surface-0);
+  color: var(--text-1);
+  font: inherit;
+}
+
+.program-load-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+}
+
+.program-load-table {
+  width: 100%;
+  min-width: 680px;
+  border-collapse: collapse;
+  font-size: var(--fs-2);
+}
+
+.program-load-table th,
+.program-load-table td {
+  padding: var(--sp-3) var(--sp-4);
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.program-load-table thead th {
+  color: var(--text-3);
+  font-size: var(--fs-2);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.program-load-table thead th:not(:first-child),
+.program-load-table td:not(:first-child) {
+  text-align: center;
+}
+
+.program-load-table tbody tr:last-child th,
+.program-load-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.program-load-table .active {
+  background: rgb(var(--accent-rgb) / 0.09);
+  color: var(--accent);
+}
+
+.program-load-table .program-load-day th {
+  padding-top: var(--sp-5);
+  color: var(--text-2);
+  font-size: var(--fs-2);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.program-load-note {
+  color: var(--text-3);
+  font-size: var(--fs-2);
+}
+
 /* Rail de la semaine : 3 créneaux, état explicite. */
 .week-rail {
   display: grid;

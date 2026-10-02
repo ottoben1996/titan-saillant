@@ -12,6 +12,7 @@ import { telechargerSauvegarde } from './storage/backupFile';
 import { etatSauvegarde, reporterSauvegarde } from './storage/backupReminder';
 import { STORAGE_UNAVAILABLE_MESSAGE, withStorageGuard } from './storage/guard';
 import { listMeasurements, saveMeasurement, seedMeasurementsIfEmpty } from './storage/measurementRepository';
+import { enregistrerSemaineProgramme, lireSemaineProgramme } from './storage/programWeek';
 import { deleteSession, getActiveSession, listSessions, saveSession } from './storage/sessionRepository';
 import { playTimerChime, timerTitle, vibrateTimer } from './workout/alerts';
 import { serieAssiduite } from './workout/assiduite';
@@ -98,6 +99,8 @@ export default function App() {
   const [restMultiplier, setRestMultiplier] = useState<number>(1.0);
   const [session, setSession] = useState<WorkoutSession | null>(null);
   const [history, setHistory] = useState<WorkoutSession[]>([]);
+  /** Semaine de charges choisie pour les prochaines séances du profil. */
+  const [programWeek, setProgramWeek] = useState(1);
 
   /**
    * Faut-il proposer une sauvegarde ? La décision appartient au module de
@@ -184,6 +187,7 @@ export default function App() {
 
   useEffect(() => {
     if (!profile) return;
+    setProgramWeek(lireSemaineProgramme(profile));
     setHistoriqueCharge(false);
     void refreshHistory(profile);
     // Reprise de l'historique de la feuille de suivi au premier lancement, puis
@@ -201,7 +205,7 @@ export default function App() {
 
       // Reprise directe anti-crash : restauration immédiate sur la séance en cours
       if (!active.completedAt) {
-        const prog = getProgram(profile);
+        const prog = getProgram(profile, active.programWeek ?? lireSemaineProgramme(profile));
         const day = prog.days.find((d) => d.id === active.dayId);
         if (day) {
           setSelectedDay(day);
@@ -359,10 +363,12 @@ export default function App() {
     }
     localStorage.setItem(profileKey, target);
     setProfile(target);
+    const targetWeek = lireSemaineProgramme(target);
+    setProgramWeek(targetWeek);
     const targetHistory = await listSessions(target);
     setHistory(targetHistory);
     const active = await getActiveSession(target);
-    const targetProgram = getProgram(target);
+    const targetProgram = getProgram(target, targetWeek);
     if (active) {
       const restoredTimer = active.activeTimer
         ? { ...active.activeTimer, remainingSeconds: restoreRemainingSeconds(active.activeTimer) }
@@ -396,7 +402,17 @@ export default function App() {
 
   if (!profile) return <ProfileChooser onChoose={chooseProfile} />;
 
-  const program = getProgram(profile);
+  const program = getProgram(profile, programWeek);
+
+  const changeProgramWeek = (week: number) => {
+    if (session && !session.completedAt) {
+      setNotice('Termine ou mets en pause la séance avant de changer de semaine.');
+      window.setTimeout(() => setNotice(''), 3500);
+      return;
+    }
+    setProgramWeek(week);
+    enregistrerSemaineProgramme(profile, week);
+  };
 
   const handleInitiateStart = (day: WorkoutDay) => {
     setPendingDay(day);
@@ -421,7 +437,7 @@ export default function App() {
       window.setTimeout(() => setNotice(''), 4000);
     }
 
-    const fresh = createRunner(pendingDay, profile);
+    const fresh = createRunner(pendingDay, profile, programWeek);
     setSelectedDay(pendingDay);
     setRestMultiplier(multiplier);
     setSession(fresh);
@@ -437,7 +453,8 @@ export default function App() {
 
   const resumeWorkout = () => {
     if (!session) return;
-    const day = program.days.find((item) => item.id === session.dayId);
+    const sessionProgram = getProgram(profile, session.programWeek ?? programWeek);
+    const day = sessionProgram.days.find((item) => item.id === session.dayId);
     if (!day) return;
     const restoredTimer = session.activeTimer
       ? { ...session.activeTimer, remainingSeconds: restoreRemainingSeconds(session.activeTimer) }
@@ -796,6 +813,8 @@ export default function App() {
           onResume={resumeWorkout}
           onDiscard={() => setAbandonOpen(true)}
           serie={serieAssiduite(history, program, new Date())}
+          programWeek={programWeek}
+          onProgramWeekChange={changeProgramWeek}
           sauvegarde={
             rappelSauvegarde.proposer
               ? {
