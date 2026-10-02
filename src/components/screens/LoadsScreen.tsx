@@ -69,7 +69,7 @@ export function LoadsScreen({
     const value = raw.trim() === '' ? null : Number(raw.replace(',', '.'));
     setDurationDraft((current) => {
       const values = [...(current[exerciseId] ?? Array.from({ length: 8 }, () => null))];
-      values[index] = Number.isFinite(value) && value !== null && value >= 0 ? Math.round(value * 60) : null;
+      values[index] = Number.isFinite(value) && value !== null && value >= 0 ? Math.round(value) : null;
       const next = { ...current, [exerciseId]: values };
       if (values.every((item) => item === null)) delete next[exerciseId];
       return next;
@@ -115,8 +115,7 @@ export function LoadsScreen({
     onNotice(`S${copyFrom} copiée vers S${copyTo}. Enregistre pour conserver la modification.`);
   };
 
-  const prescribedDuration = (exercise: ExercisePrescription) =>
-    Math.round((exercise.sets[0]?.durationSeconds ?? 0) / 60);
+  const prescribedDuration = (exercise: ExercisePrescription) => exercise.sets[0]?.durationSeconds ?? 0;
 
   return (
     <section className="content">
@@ -215,7 +214,7 @@ export function LoadsScreen({
               <div className="manual-load-card-head">
                 <div>
                   <strong>{exercise.name}</strong>
-                  <small>Durée en minutes</small>
+                  <small>Durée en secondes</small>
                 </div>
                 <button
                   className="text-button"
@@ -235,9 +234,9 @@ export function LoadsScreen({
                       min="0"
                       step="0.5"
                       inputMode="decimal"
-                      value={overrides[index] === null || overrides[index] === undefined ? '' : overrides[index] / 60}
+                      value={overrides[index] === null || overrides[index] === undefined ? '' : overrides[index]}
                       placeholder={String(prescribedDuration(exercise))}
-                      aria-label={`${exercise.name} durée semaine ${week} en minutes`}
+                      aria-label={`${exercise.name} durée semaine ${week} en secondes`}
                       onChange={(event) => updateDuration(exercise.id, index, event.target.value)}
                     />
                   </label>

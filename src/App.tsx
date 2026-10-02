@@ -170,6 +170,7 @@ export default function App() {
   const [confirmSwitchOpen, setConfirmSwitchOpen] = useState(false);
   const [abandonOpen, setAbandonOpen] = useState(false);
   const [sessionToDelete, setSessionToDelete] = useState<string | null>(null);
+  const [deletedSession, setDeletedSession] = useState<WorkoutSession | null>(null);
 
   const onStorageFailure = () => setStorageMessage(STORAGE_UNAVAILABLE_MESSAGE);
 
@@ -564,14 +565,25 @@ export default function App() {
   /** Retire une séance de l'historique (lancée par erreur, doublon, séance abandonnée). */
   const removeSession = async (sessionId: string) => {
     setSessionToDelete(null);
+    const removed = history.find((item) => item.id === sessionId) ?? null;
     await withStorageGuard(deleteSession(sessionId), onStorageFailure, undefined);
+    setDeletedSession(removed);
     if (session?.id === sessionId) {
       setSession(null);
       setSelectedDay(null);
       setScreen('home');
     }
     if (profile) await refreshHistory(profile);
-    setNotice('Séance supprimée.');
+    setNotice(removed ? 'Séance supprimée. Annuler ?' : 'Séance supprimée.');
+    window.setTimeout(() => setNotice(''), 3500);
+  };
+
+  const restoreDeletedSession = async () => {
+    if (!deletedSession) return;
+    await withStorageGuard(saveSession(deletedSession), onStorageFailure, undefined);
+    if (profile) await refreshHistory(profile);
+    setDeletedSession(null);
+    setNotice('Séance restaurée dans l’historique.');
     window.setTimeout(() => setNotice(''), 3500);
   };
 
@@ -855,6 +867,11 @@ export default function App() {
       {notice && (
         <div className="toast" role="status">
           <Check size={18} /> {notice}
+          {deletedSession && notice.startsWith('Séance supprimée') && (
+            <button type="button" className="text-button" onClick={() => void restoreDeletedSession()}>
+              Annuler
+            </button>
+          )}
         </div>
       )}
 
