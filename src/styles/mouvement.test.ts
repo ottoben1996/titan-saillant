@@ -15,6 +15,7 @@ import { describe, expect, it } from 'vitest';
 
 const tokens = readFileSync('src/styles/tokens.css', 'utf8');
 const matiere = readFileSync('src/styles/matiere.css', 'utf8');
+const ecrans = readFileSync('src/styles/screens.css', 'utf8');
 
 /** Dernière valeur d'une courbe `linear()`. */
 function arrivee(courbe: string): number {
@@ -95,5 +96,43 @@ describe('couche matière et mouvement', () => {
       const nom = jeton.slice(4, -1);
       expect(jetons.has(nom), nom).toBe(true);
     }
+  });
+});
+
+/**
+ * Le repli « appareil bridé ».
+ *
+ * La sonde de fluidité (`src/perf/fluidite.ts`) mesure la cadence d'images au
+ * démarrage et pose `data-perf="bas"` quand l'appareil est bridé — le cas d'un
+ * iPhone en mode économie d'énergie, où iOS plafonne les animations à 30 images
+ * par seconde. Ce qui doit rester vrai, c'est que le repli existe **et** qu'il
+ * coupe réellement la dépense : un repli écrit mais inopérant ne se verrait qu'en
+ * salle, sur le téléphone de quelqu'un d'autre.
+ */
+describe('repli sur un appareil bridé', () => {
+  it('coupe le flou des deux barres, seul poste qui repaint à chaque image', () => {
+    const repli = matiere.slice(matiere.indexOf('html[data-perf="bas"]'));
+
+    expect(repli).not.toBe('');
+    expect(repli).toContain('.topbar::before');
+    expect(repli).toContain('.bottom-nav');
+    expect(repli).toContain('backdrop-filter: none');
+    // Le fond opaque vient d'un jeton, comme le repli `@supports` : pas de gris écrit à la main.
+    expect(repli).toContain('background: var(--surface-1)');
+  });
+
+  it('ne laisse pas de fondu de flou derrière elle', () => {
+    // Animée, l'opacité d'un `backdrop-filter` re-floute le fond à chaque image.
+    const repli = matiere.slice(matiere.indexOf('html[data-perf="bas"]'));
+    const fondus = repli.slice(repli.indexOf('.topbar::before {'));
+
+    expect(fondus).toContain('transition: none');
+  });
+
+  it('coupe la respiration du squelette, qui anime une propriété non composée', () => {
+    const repli = ecrans.slice(ecrans.indexOf('html[data-perf="bas"] .skeleton-line'));
+
+    expect(repli).not.toBe('');
+    expect(repli).toContain('animation: none');
   });
 });

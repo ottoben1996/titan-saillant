@@ -1438,3 +1438,14 @@
     animation: none;
   }
 }
+
+/*
+ * Appareil bridé : la respiration du squelette est coupée elle aussi. Elle anime
+ * `background-position`, qui n'est pas composée par le GPU — une repainte par
+ * image pendant tout le chargement de l'historique, c'est-à-dire au pire moment.
+ * Un squelette immobile vaut mieux qu'un historique qui met trois secondes à
+ * apparaître. Verdict posé par src/perf/fluidite.ts.
+ */
+html[data-perf="bas"] .skeleton-line {
+  animation: none;
+}

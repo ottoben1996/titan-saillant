@@ -3,6 +3,7 @@ import { lazy, StrictMode, Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
 import { AppErrorBoundary } from './components/layout/ErrorBoundary';
+import { surveillerLaFluidite } from './perf/fluidite';
 import './styles.css';
 import './styles/tokens.css';
 import './styles/mobile.css';
@@ -32,6 +33,14 @@ registerSW({
   },
   onOfflineReady: () => window.dispatchEvent(new Event('coach-offline-ready')),
 });
+
+/**
+ * La couche « matière » (flou des barres, respiration du squelette) coûte une
+ * repainte par image. On l'adapte à ce que l'appareil peut réellement peindre au
+ * lieu de le supposer : la décision est mesurée au démarrage, et refaite au
+ * retour au premier plan. Voir src/perf/fluidite.ts.
+ */
+surveillerLaFluidite();
 
 if ('serviceWorker' in navigator) {
   let refreshing = false;

@@ -73,7 +73,12 @@ export function ExerciseTimer({
       start,
       (value) => {
         onTickRef.current(value);
-        publish(value, false);
+        // Le chiffre affiché est local (onTickRef) : la publication à
+        // l'application ne sert qu'à retrouver le bon restant après un arrêt
+        // forcé. Or l'état publié est horodaté — publier toutes les 5 s ne coûte
+        // donc aucune exactitude, alors que publier chaque seconde re-rendait
+        // tout l'arbre de l'application pendant toute la série.
+        if (value === 0 || value <= 5 || value % 5 === 0) publish(value, false);
       },
       () => {
         setRunning(false);

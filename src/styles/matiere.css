@@ -129,6 +129,32 @@ html[data-replie="true"] .workout-heading h1 {
   }
 }
 
+/* -------------------------------------------------------- appareil bridé --- */
+
+/*
+ * Le mode économie d'énergie d'iOS n'est exposé au web par aucune API : rien
+ * dans la page ne dit « je suis bridé ». La sonde de fluidité le déduit d'une
+ * cadence d'images mesurée basse au démarrage et pose `data-perf="bas"` sur la
+ * racine (voir src/perf/fluidite.ts).
+ *
+ * Bridé, iOS plafonne les animations à ~30 images par seconde, et un
+ * `backdrop-filter` posé sur une barre plein écran demande une repainte du fond
+ * à chaque fois que le contenu dessous change — le premier poste de dépense
+ * d'une heure de salle. Le flou est donc coupé, exactement comme dans le repli
+ * `@supports` ci-dessus : on perd une translucidité, on garde la séance.
+ */
+html[data-perf="bas"] .topbar::before,
+html[data-perf="bas"] .bottom-nav {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  background: var(--surface-1);
+}
+
+/* Sans flou à recalculer, le fondu de la barre n'a plus d'objet : posé, pas animé. */
+html[data-perf="bas"] .topbar::before {
+  transition: none;
+}
+
 /* ---------------------------------------------------------- sous le doigt -- */
 
 /*
