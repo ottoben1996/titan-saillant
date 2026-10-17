@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import type { WeeklyMeasurement } from '../../domain/measurements';
 import type { getProgram } from '../../domain/programs';
 import type { ProfileId, WorkoutDay, WorkoutSession } from '../../domain/types';
 import type { SerieAssiduite } from '../../workout/assiduite';
@@ -30,6 +31,44 @@ const FORFAIT_ETAPE_SECONDES = 120;
 /** Marge hors séance : installation, transitions, réglage des machines. */
 const MARGE_HORS_SEANCE_MINUTES = 12;
 
+export type NextBestAction =
+  | { kind: 'resume'; label: string; description: string }
+  | { kind: 'workout'; label: string; description: string; day: WorkoutDay }
+  | { kind: 'measurement'; label: string; description: string }
+  | { kind: 'recovery'; label: string; description: string };
+
+export function getNextBestAction(options: {
+  program: ReturnType<typeof getProgram>;
+  history: readonly WorkoutSession[];
+  activeSession: WorkoutSession | null;
+  measurements: readonly WeeklyMeasurement[];
+  now?: Date;
+}): NextBestAction {
+  const { program, history, activeSession, measurements, now = new Date() } = options;
+  if (activeSession && !activeSession.completedAt) {
+    return { kind: 'resume', label: 'Reprendre la séance', description: 'Continue là où tu t’es arrêté.' };
+  }
+  const latestMeasurement = [...measurements]
+    .filter((item) => item.measuredOn)
+    .sort((a, b) => Date.parse(b.measuredOn ?? '') - Date.parse(a.measuredOn ?? ''))[0];
+  if (latestMeasurement && now.getTime() - Date.parse(latestMeasurement.measuredOn ?? '') >= 7 * 86_400_000) {
+    return {
+      kind: 'measurement',
+      label: 'Faire ton point hebdomadaire',
+      description: 'Mets à jour tes mesures pour suivre ta progression.',
+    };
+  }
+  const today = weekSlots(program.days, history, now).find((slot) => slot.state === 'today');
+  if (today) {
+    return { kind: 'workout', label: `Démarrer ${today.day.name}`, description: today.day.subtitle, day: today.day };
+  }
+  return {
+    kind: 'recovery',
+    label: 'Prendre un jour de récupération',
+    description: 'Les créneaux sont validés. Marche, hydrate-toi et récupère.',
+  };
+}
+
 /**
  * Durée annoncée d'une séance.
  *
@@ -59,6 +98,9 @@ interface HomeScreenProps {
   /** Programme d'origine affiché dans la feuille des charges prescrites. */
   prescribedProgram?: ReturnType<typeof getProgram>;
   history: WorkoutSession[];
+  measurements?: WeeklyMeasurement[];
+  onOpenFollowup?: () => void;
+  onOpenProgression?: () => void;
   /** Vrai tant que la première lecture du stockage n'est pas revenue. */
   chargement?: boolean;
   activeSession: WorkoutSession | null;
@@ -84,6 +126,9 @@ export function HomeScreen({
   program,
   prescribedProgram = program,
   history,
+  measurements = [],
+  onOpenFollowup = () => undefined,
+  onOpenProgression = () => undefined,
   chargement = false,
   activeSession,
   onStart,
@@ -114,6 +159,10 @@ export function HomeScreen({
 
   const weekProgress = Math.min(100, (view.weekSessions / WEEKLY_TARGET) * 100);
   const todaySlot = view.todaySlot;
+  const nextAction = useMemo(
+    () => getNextBestAction({ program, history, activeSession, measurements }),
+    [program, history, activeSession, measurements],
+  );
   const weekStartLabel = view.weekStart.toLocaleDateString('fr-FR', {
     day: 'numeric',
     month: 'long',
@@ -150,6 +199,34 @@ export function HomeScreen({
             <Trash size={17} />
           </button>
         </div>
+      )}
+
+      {!chargement && !view.isResuming && nextAction.kind !== 'workout' && (
+        <article className="next-action-card" aria-labelledby="next-action-title">
+          <p className="eyebrow">À FAIRE MAINTENANT</p>
+          <h2 id="next-action-title">{nextAction.label}</h2>
+          <p>{nextAction.description}</p>
+          {nextAction.kind === 'measurement' && (
+            <button
+              className="primary-button"
+              type="button"
+              onClick={onOpenFollowup}
+              aria-label="Ouvrir le suivi hebdomadaire"
+            >
+              Faire le point
+            </button>
+          )}
+          {nextAction.kind === 'recovery' && (
+            <button
+              className="primary-button"
+              type="button"
+              onClick={onOpenProgression}
+              aria-label="Voir ma progression"
+            >
+              Voir ma progression
+            </button>
+          )}
+        </article>
       )}
 
       {/* Le suivi ne vit que dans ce téléphone : on propose de le mettre à l'abri. */}

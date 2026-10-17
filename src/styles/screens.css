@@ -9,6 +9,34 @@
 
 /* ============================================================== ACCUEIL === */
 
+/* Carte unique qui répond à « que faire maintenant ? » sans dupliquer le
+   bouton de la séance du jour. */
+.next-action-card {
+  display: grid;
+  gap: var(--sp-3);
+  padding: var(--sp-5);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-lg);
+  background: var(--surface-1);
+}
+
+.next-action-card h2,
+.next-action-card p {
+  margin: 0;
+}
+
+.next-action-card h2 {
+  font-size: var(--text-xl);
+}
+
+.next-action-card p:not(.eyebrow) {
+  color: var(--text-2);
+}
+
+.next-action-card .primary-button {
+  justify-self: start;
+}
+
 /* Séance en cours : reprendre (action principale) ou supprimer (action
    distincte, jamais imbriquée dans le bouton de reprise). */
 .resume-banner-wrap {

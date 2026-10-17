@@ -8,13 +8,50 @@
  */
 import { describe, expect, it } from 'vitest';
 import { getProgram } from '../../domain/programs';
-import { estimatedMinutes } from './HomeScreen';
+import { estimatedMinutes, getNextBestAction } from './HomeScreen';
 
 const jour = (id: string) => {
   const trouve = getProgram('ottman').days.find((item) => item.id === id);
   if (!trouve) throw new Error(`Créneau introuvable : ${id}`);
   return trouve;
 };
+
+describe('next best action', () => {
+  const program = getProgram('ottman');
+  it('prioritizes resuming an unfinished session', () => {
+    const day = program.days[0];
+    const action = getNextBestAction({
+      program,
+      history: [],
+      activeSession: {
+        id: 'active',
+        profileId: 'ottman',
+        dayId: day.id,
+        startedAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        currentExerciseIndex: 0,
+        currentSetIndex: 0,
+        loggedSets: [],
+      },
+      measurements: [],
+      now: new Date('2026-10-17T10:00:00'),
+    });
+    expect(action.kind).toBe('resume');
+    expect(action.label).toContain('Reprendre');
+  });
+
+  it('offers the next session when no session is active', () => {
+    const action = getNextBestAction({
+      program,
+      history: [],
+      activeSession: null,
+      measurements: [],
+      now: new Date('2026-10-17T10:00:00'),
+    });
+    expect(action.kind).toBe('workout');
+    if (action.kind === 'workout') expect(action.day).toBeDefined();
+  });
+});
 
 describe('durée annoncée', () => {
   it('annonce la vraie durée de la séance cardio, pas la moitié', () => {

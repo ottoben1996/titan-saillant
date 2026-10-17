@@ -1030,6 +1030,9 @@ export default function App() {
           program={program}
           prescribedProgram={getProgram(profile, programWeek)}
           history={history}
+          measurements={measurements}
+          onOpenFollowup={() => setScreen('followup')}
+          onOpenProgression={() => setScreen('progression')}
           chargement={!historiqueCharge}
           activeSession={session}
           onStart={handleInitiateStart}
