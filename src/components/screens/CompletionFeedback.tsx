@@ -1,10 +1,14 @@
 import { useMemo, useState } from 'react';
+import { getProgram } from '../../domain/programs';
 import type { LoadConsigne, WorkoutSession } from '../../domain/types';
 import { formatLoadKg, formatMinutes, formatVolume, summarizeSession, workoutDayLabel } from '../../workout/summary';
+import { SetCorrectionTimeline } from '../SetCorrectionTimeline';
 import { ArrowRight, Check, Clock } from '../ui/Icons';
 
 interface CompletionFeedbackProps {
   session: WorkoutSession;
+  profileId?: import('../../domain/types').ProfileId;
+  onSessionChange?: (session: WorkoutSession) => void;
   onFinish: (
     feedback?: Pick<
       WorkoutSession,
@@ -34,7 +38,7 @@ const consignes: readonly { label: string; value: LoadConsigne }[] = Object.free
  * geste — mais chaque réponse alimente le bilan du samedi et le coaching de la
  * prochaine séance.
  */
-export function CompletionFeedback({ session, onFinish }: CompletionFeedbackProps) {
+export function CompletionFeedback({ session, profileId, onSessionChange, onFinish }: CompletionFeedbackProps) {
   const [rpe, setRpe] = useState(() => session.perceivedExertion?.toString() ?? '');
   const [energy, setEnergy] = useState(() => session.energy ?? 0);
   const [pain, setPain] = useState(() => session.pain ?? 'Aucune');
@@ -42,6 +46,13 @@ export function CompletionFeedback({ session, onFinish }: CompletionFeedbackProp
   const [loadConsigne, setLoadConsigne] = useState<LoadConsigne | ''>(() => session.loadConsigne ?? '');
   const [notes, setNotes] = useState(() => session.notes ?? '');
   const [saving, setSaving] = useState(false);
+
+  const exercises = useMemo(() => {
+    if (!profileId) return [];
+    const program = getProgram(profileId);
+    const day = program.days.find((item) => item.id === session.dayId);
+    return day?.exercises ?? [];
+  }, [session.dayId, profileId]);
 
   const summary = useMemo(() => summarizeSession(session), [session]);
 
@@ -108,6 +119,13 @@ export function CompletionFeedback({ session, onFinish }: CompletionFeedbackProp
         Séries et volume comptent l’échauffement et le retour au calme : c’est le travail réellement effectué, pas
         seulement les séries de travail.
       </p>
+      {onSessionChange && (
+        <SetCorrectionTimeline
+          sets={session.loggedSets}
+          exercises={exercises}
+          onChange={(loggedSets) => onSessionChange({ ...session, loggedSets, updatedAt: new Date().toISOString() })}
+        />
+      )}
       <div className="feedback-card">
         <div className="feedback-heading">
           <p className="eyebrow">TON RESSENTI</p>

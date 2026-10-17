@@ -907,6 +907,12 @@ export default function App() {
     window.setTimeout(() => setNotice(''), 3500);
   };
 
+  const correctCompletedSession = async (updated: WorkoutSession) => {
+    setSession(updated);
+    await withStorageGuard(saveSession(updated), onStorageFailure, undefined);
+    if (profile) await refreshHistory(profile);
+  };
+
   const finishWorkout = async (
     feedback?: Pick<
       WorkoutSession,
@@ -1076,6 +1082,7 @@ export default function App() {
           onDeferExercise={() => void reporterExercice()}
           onJumpToExercise={(identifiant) => void allerAExercice(identifiant)}
           onUndoSet={() => void annulerDerniereSerie()}
+          onSessionChange={(updated) => void correctCompletedSession(updated)}
           onRevertAlternative={revertAlternative}
           quickLogMode={quickLogMode}
           onQuickLogModeChange={(enabled) => {

@@ -119,7 +119,11 @@ export function completeSet(
     return session;
   }
   const next = structuredClone(session) as WorkoutSession;
-  next.loggedSets.push({ ...actual, completedAt: new Date().toISOString() });
+  next.loggedSets.push({
+    ...actual,
+    setId: globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    completedAt: new Date().toISOString(),
+  });
   next.activeTimer = undefined;
   if (next.sequenceVersion === 2) {
     const steps = getWorkoutSteps(day, next);

@@ -122,6 +122,7 @@ interface WorkoutScreenProps {
   onDeferExercise: () => void;
   /** Va directement à un exercice choisi dans la liste — le retour sur un reporté. */
   onJumpToExercise: (exerciseId: string) => void;
+  onSessionChange?: (session: WorkoutSession) => void;
   onRevertAlternative?: (id: string) => void;
   quickLogMode?: boolean;
   onQuickLogModeChange?: (enabled: boolean) => void;
@@ -151,6 +152,7 @@ export function WorkoutScreen({
   onUndoSet,
   onDeferExercise,
   onJumpToExercise,
+  onSessionChange,
   onRevertAlternative,
   quickLogMode = false,
   onQuickLogModeChange,
@@ -375,7 +377,10 @@ export function WorkoutScreen({
   // Retour anticipé placé APRÈS tous les hooks : un retour avant un hook faisait
   // varier le nombre de hooks appelés en fin de séance (React : « Rendered fewer
   // hooks than expected »), ce qui cassait l'écran de bilan.
-  if (isComplete) return <CompletionFeedback session={session} onFinish={onFinish} />;
+  if (isComplete)
+    return (
+      <CompletionFeedback session={session} profileId={profile} onSessionChange={onSessionChange} onFinish={onFinish} />
+    );
 
   return (
     <section className="content workout-content">
@@ -897,6 +902,9 @@ export function WorkoutScreen({
           onJumpToExercise(identifiant);
           setPlanOpen(false);
         }}
+        onSessionChange={(loggedSets) =>
+          onSessionChange?.({ ...session, loggedSets, updatedAt: new Date().toISOString() })
+        }
       />
     </section>
   );

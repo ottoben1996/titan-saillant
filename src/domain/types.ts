@@ -82,6 +82,8 @@ export interface Tutorial {
 export type LoadConsigne = 'increase' | 'same' | 'decrease';
 
 export interface LoggedSet {
+  /** Stable identity for corrections. Optional for imports created before correction timeline. */
+  setId?: string;
   exerciseId: string;
   setIndex: number;
   actualRepetitions?: number;

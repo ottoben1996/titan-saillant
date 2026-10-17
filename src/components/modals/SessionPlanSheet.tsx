@@ -1,5 +1,6 @@
 import type { ExercisePrescription, LoggedSet } from '../../domain/types';
 import { formatLoadKg } from '../../workout/summary';
+import { SetCorrectionTimeline } from '../SetCorrectionTimeline';
 import { Check } from '../ui/Icons';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '../ui/Sheet';
 
@@ -26,6 +27,7 @@ interface SessionPlanSheetProps {
    * mis de côté, depuis la liste, à n'importe quel moment.
    */
   onJumpToExercise?: (exerciseId: string) => void;
+  onSessionChange?: (loggedSets: LoggedSet[]) => void;
 }
 
 function phaseLabelFor(exercise: ExercisePrescription): string {
@@ -54,6 +56,7 @@ export function SessionPlanSheet({
   currentExerciseIndex,
   deferredIds,
   onJumpToExercise,
+  onSessionChange,
 }: SessionPlanSheetProps) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -112,6 +115,9 @@ export function SessionPlanSheet({
             );
           })}
         </ol>
+        {onSessionChange && (
+          <SetCorrectionTimeline sets={loggedSets} exercises={exercises} onChange={onSessionChange} />
+        )}
       </SheetContent>
     </Sheet>
   );

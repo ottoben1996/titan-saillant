@@ -38,6 +38,8 @@ describe('workout runner', () => {
     }
 
     expect(session.completedAt).toBeDefined();
+    expect(session.loggedSets.every((set) => typeof set.setId === 'string' && set.setId.length > 0)).toBe(true);
+    expect(new Set(session.loggedSets.map((set) => set.setId)).size).toBe(session.loggedSets.length);
     expect(getNextStep(session, day)).toEqual({ kind: 'complete' });
   });
 
