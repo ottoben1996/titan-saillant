@@ -5,7 +5,6 @@ import type {
   ProfileId,
   SetPrescription,
   WorkoutDay,
-  WorkoutDayId,
   WorkoutPlan,
 } from './types';
 
@@ -47,13 +46,28 @@ const cardioWarmup = Object.freeze([
   }),
 ]);
 
-const cooldownFastWalk: WorkoutPlan['days'][number]['cooldown'] = Object.freeze({
+const cooldownAt5Kmh = Object.freeze({
+  name: 'Tapis de course',
+  durationSeconds: 300,
+  loadLabel: '5 minutes à 5 km/h',
+});
+const cooldownFastWalk = Object.freeze({
   name: 'Tapis de course',
   durationSeconds: 300,
   loadLabel: '5 minutes en marche rapide',
 });
-/* Legacy helper retained for source compatibility. */
-const strength = (id: string, name: string, work: SetPrescription, workSets: number, restSeconds: number, warmupSets?: SetPrescription[], weeklyLoadKg?: readonly number[], weeklySetLoadsKg?: readonly (readonly number[])[], week = 1, manualLoads?: ManualLoadOverrides) =>
+const strength = (
+  id: string,
+  name: string,
+  work: SetPrescription,
+  workSets: number,
+  restSeconds: number,
+  warmupSets?: SetPrescription[],
+  weeklyLoadKg?: readonly number[],
+  weeklySetLoadsKg?: readonly (readonly number[])[],
+  week = 1,
+  manualLoads?: ManualLoadOverrides,
+) =>
   (() => {
     const overrides = manualLoads?.[id] ?? [];
     const overrideAt = (index: number) => {
@@ -90,7 +104,6 @@ const strength = (id: string, name: string, work: SetPrescription, workSets: num
       restAfterSeconds: restSeconds,
     });
   })();
-void strength;
 const timed = (
   id: string,
   name: string,
@@ -113,90 +126,200 @@ const timed = (
     circuitId,
   });
 
-function plan(profileId: ProfileId, week = 1, manualLoads?: ManualLoadOverrides, manualDurations?: ManualDurationOverrides): WorkoutPlan {
+function plan(
+  profileId: ProfileId,
+  week = 1,
+  manualLoads?: ManualLoadOverrides,
+  manualDurations?: ManualDurationOverrides,
+): WorkoutPlan {
   const laura = profileId === 'laura';
   const activeWeek = Math.min(PROGRAM_WEEKS, Math.max(1, Math.round(week)));
-
-  const pdfStrength = (id: string, name: string, repetitions: number, loads: readonly (number | undefined)[], restAfterSeconds: number): ExercisePrescription => {
-    const manual = manualLoads?.[id]?.[activeWeek - 1];
-    const sets = loads.map((loadKg) => ({ repetitions, ...(loadKg === undefined ? { loadLabel: 'PDC' } : { loadKg }), phase: 'working' as const }));
-    const withManual = manual === null || manual === undefined ? sets : sets.map((item) => ({ ...item, loadKg: manual, loadLabel: undefined }));
-    return exercise({
-      id,
-      name,
-      kind: 'strength',
-      weeklyLoadKg: Object.freeze(Array.from({ length: PROGRAM_WEEKS }, () => (manual ?? loads.at(-1) ?? 0))),
-      sets: withManual,
-      restAfterSeconds,
-    });
-  };
-  const pdfTimed = (id: string, name: string, durationSeconds: number, count: number, restAfterSeconds: number, circuitId?: string): ExercisePrescription => timed(id, name, durationSeconds, count, restAfterSeconds, circuitId, manualDurations, activeWeek);
-  const day = (id: WorkoutDayId, name: string, subtitle: string, exercises: ExercisePrescription[], cooldown = cooldownFastWalk): WorkoutDay => Object.freeze({ id, name, subtitle, exercises: Object.freeze(exercises), warmup: id === 'cardio' || id === 'cardio-4' ? cardioWarmup : warmup, cooldown });
-
-  const session1 = laura
-    ? day('full-body-a', 'Full body - Special cuisses', 'Programme 2 PDF - special cuisses', [
-        pdfStrength('leg-press-pdf', 'Leg Press inclinee', 12, [40, 60, 85], 120),
-        pdfStrength('leg-curl-pdf', 'Leg Curl', 12, [27, 27, 27], 90),
-        pdfStrength('row-pdf', 'Tirage horizontal machine', 12, [25, 25, 25], 105),
-        pdfStrength('chest-press-pdf', 'Chest Press', 12, [25, 25, 25], 105),
-        pdfTimed('rameur-pdf', 'Rameur', 600, 1, 60),
-      ])
-    : day('full-body-a', 'Full body - Special upper', 'Programme 2 PDF - special haut du corps', [
-        pdfStrength('rdl-pdf', 'Souleve de terre roumain', 12, [undefined, 40, 40, 40], 105),
-        pdfStrength('bench-pdf', 'Developpe couche barre', 12, [65, 65, 65], 105),
-        pdfStrength('row-pdf', 'Tirage horizontal machine', 12, [50, 50, 50], 105),
-        pdfStrength('shoulder-press-pdf', 'Developpe epaule machine', 12, [40, 40, 40], 105),
-        pdfTimed('rameur-pdf', 'Rameur', 600, 1, 60),
-      ]);
-
-  const session2 = day('full-body-b', 'Cardio / renfo', 'Circuit PDF - renforcement et cardio', laura
-    ? [
-        pdfStrength('air-squat-pdf', 'Air Squat', 10, [undefined, undefined, undefined], 0),
-        pdfStrength('bridge-pdf', 'Gainage pont', 15, [undefined, undefined, undefined], 30),
-        pdfTimed('plank-pdf', 'Gainage planche', 40, 3, 20, 'abdo-posture'),
-        pdfTimed('sit-up-pdf', 'Sit up', 40, 3, 20, 'abdo-posture'),
-        pdfStrength('push-up-pdf', 'Pompes', 2, [undefined, undefined, undefined], 30),
-        pdfStrength('kettlebell-pdf', 'Kettlebell swing', 40, [8, 8, 8], 20),
-        pdfTimed('cross-crunch-pdf', 'Abdos croises', 40, 3, 20, 'abdo-cardio'),
-        pdfTimed('mountain-climber-pdf', 'Mountain climber', 40, 3, 20, 'abdo-cardio'),
-      ]
-    : [
-        pdfStrength('air-squat-pdf', 'Air Squat', 10, [undefined, undefined, undefined], 0),
-        pdfStrength('bridge-pdf', 'Gainage pont', 15, [undefined, undefined, undefined], 30),
-        pdfTimed('plank-pdf', 'Gainage planche', 35, 3, 25, 'abdo-posture'),
-        pdfTimed('sit-up-pdf', 'Sit up', 35, 3, 25, 'abdo-posture'),
-        pdfStrength('push-up-pdf', 'Pompes', 5, [undefined, undefined, undefined], 25),
-        pdfStrength('kettlebell-pdf', 'Kettlebell swing', 35, [8, 8, 8], 25),
-        pdfTimed('cross-crunch-pdf', 'Abdos croises', 35, 3, 25, 'abdo-cardio'),
-        pdfTimed('mountain-climber-pdf', 'Mountain climber', 35, 3, 25, 'abdo-cardio'),
-      ]);
-
-  const session3 = day('cardio', laura ? 'Full body - Special fessier' : 'Full body - Special lower', 'Programme 2 PDF - seance complete', laura
-    ? [
-        pdfStrength('hip-thrust-pdf', 'Hip Thrust machine', 12, [15, 25, 40], 105),
-        pdfStrength('kickback-pdf', 'Kick back unilateral poulie', 12, [7.5, 7.5, 7.5], 60),
-        pdfStrength('pec-fly-pdf', 'Pec Fly', 12, [25, 25, 25], 105),
-        pdfStrength('lat-pulldown-pdf', 'Tirage vertical prise large', 12, [25, 25, 25], 105),
-        pdfTimed('plank-s3-pdf', 'Gainage planche', 40, 3, 20, 's3-core'),
-        pdfTimed('mountain-s3-pdf', 'Mountain Climber', 40, 3, 20, 's3-core'),
-      ]
-    : [
-        pdfStrength('hip-thrust-pdf', 'Hip Trust machine', 15, [15, 25, 40], 90),
-        pdfTimed('leg-extension-iso-pdf', 'Leg extension isometrie unilateral', 20, 2, 0),
-        pdfTimed('leg-curl-iso-pdf', 'Leg curl isometrie', 30, 2, 90),
-        pdfStrength('pec-fly-pdf', 'Pec Fly', 12, [52, 52, 52], 105),
-        pdfStrength('lat-pulldown-pdf', 'Tirage vertical prise large', 12, [52, 52, 52], 105),
-        pdfTimed('plank-s3-pdf', 'Gainage planche', 35, 3, 25, 's3-core'),
-        pdfTimed('mountain-s3-pdf', 'Mountain Climber', 35, 3, 25, 's3-core'),
-      ]);
-
-  const session4 = day('cardio-4', 'Endurance fondamentale', 'Vélo elliptique, marche inclinee et tapis', [
-    pdfTimed('bike-elliptique-pdf', 'Vélo elliptique', 900, 1, 120),
-    pdfTimed('marche-inclinee-pdf', 'Marche tapis incline', 1200, 1, 0),
-    pdfTimed('marche-inclinee-longue-pdf', 'Marche tapis incline', 600, 1, 120),
-  ], Object.freeze({ name: 'Tapis de course', durationSeconds: 300, loadLabel: '5 minutes marche a 3 km/h' as string }));
-
-  return Object.freeze({ profileId, displayName: profileId === 'ottman' ? 'Ottman' : 'Laura', coach: 'SELVA Adrien', warmup, days: Object.freeze([session1, session2, session3, session4]) });
+  const a: WorkoutDay = Object.freeze({
+    id: 'full-body-a',
+    name: 'Full Body A',
+    subtitle: 'Polyarticulaire et finisher cardio',
+    exercises: Object.freeze([
+      strength(
+        'presse-cuisses-inclinee',
+        'Presse à cuisse inclinée',
+        { repetitions: 10, loadKg: laura ? 70 : 110, phase: 'working' },
+        3,
+        135,
+        [
+          { repetitions: 10, loadKg: laura ? 40 : 50, phase: 'warmup', restSeconds: 75 },
+          { repetitions: 10, loadKg: laura ? 50 : 80, phase: 'warmup', restSeconds: 75 },
+        ],
+        laura ? [70, 70, 70, 70, 80] : [110, 110, 130, 110, 160],
+        undefined,
+        activeWeek,
+        manualLoads,
+      ),
+      strength(
+        'leg-curl-allonge',
+        'Leg curl allongé',
+        { repetitions: 12, loadKg: laura ? 23 : 50 },
+        3,
+        105,
+        undefined,
+        laura ? [23, 23, 27, 27, 27] : [50, 50, 55, 50, 50],
+        undefined,
+        activeWeek,
+        manualLoads,
+      ),
+      strength(
+        'chest-press',
+        'Chest Press Machine',
+        { repetitions: 12, loadKg: laura ? 18 : 45 },
+        3,
+        120,
+        undefined,
+        laura ? [18, 18, 20, 20, 20] : [45, 45, 52, 45, 59],
+        undefined,
+        activeWeek,
+        manualLoads,
+      ),
+      strength(
+        'tirage-horizontal',
+        'Tirage horizontal prise serrée',
+        { repetitions: 12, loadKg: laura ? 18 : 45 },
+        3,
+        120,
+        undefined,
+        laura ? [18, 18, 25, 25, 25] : [45, 45, 52, 45, 45],
+        undefined,
+        activeWeek,
+        manualLoads,
+      ),
+      timed('jumping-jack', 'Jumping Jack', laura ? 35 : 25, 3, undefined, 'finisher-a', manualDurations, activeWeek),
+      timed(
+        'gainage-planche',
+        'Gainage planche',
+        laura ? 35 : 25,
+        3,
+        laura ? 25 : 30,
+        'finisher-a',
+        manualDurations,
+        activeWeek,
+      ),
+    ]),
+    warmup,
+    cooldown: cooldownAt5Kmh,
+  });
+  const b: WorkoutDay = Object.freeze({
+    id: 'full-body-b',
+    name: 'Full Body B',
+    subtitle: 'Polyarticulaire renforcé',
+    exercises: Object.freeze([
+      strength(
+        'squat-smith',
+        'Squat smith machine',
+        { repetitions: 10, loadKg: laura ? 30 : 40, phase: 'working' },
+        3,
+        135,
+        [
+          { repetitions: laura ? 15 : 12, loadLabel: 'à vide', phase: 'warmup', restSeconds: 75 },
+          { repetitions: laura ? 12 : 10, loadKg: laura ? 20 : 30, phase: 'warmup', restSeconds: 75 },
+        ],
+        laura ? [27, 27, 30, 30, 30] : [30, 30, 40, 40, 80],
+        undefined,
+        activeWeek,
+        manualLoads,
+      ),
+      strength(
+        'leg-extension',
+        'Leg extension',
+        { repetitions: 15, loadKg: laura ? 22.5 : 45 },
+        2,
+        105,
+        undefined,
+        laura ? [22.5, 22.5, 25, 25, 27] : [45, 45, 45, 45, 45],
+        undefined,
+        activeWeek,
+        manualLoads,
+      ),
+      strength(
+        'developpe-couche-machine',
+        'Développé couché machine convergente',
+        { repetitions: 12, loadKg: laura ? 20 : 60 },
+        3,
+        120,
+        undefined,
+        laura ? [20, 20, 20, 20, 20] : [60, 60, 80, 70, 80],
+        laura
+          ? undefined
+          : [
+              [60, 60, 60],
+              [60, 60, 60],
+              [80, 80, 80],
+              [70, 70, 70],
+              [80, 80, 100],
+            ],
+        activeWeek,
+        manualLoads,
+      ),
+      strength(
+        'tirage-vertical',
+        'Tirage vertical prise neutre',
+        { repetitions: 12, loadKg: laura ? 25 : 45 },
+        3,
+        120,
+        undefined,
+        laura ? [25, 25, 25, 25, 27] : [45, 45, 45, 45, 52],
+        undefined,
+        activeWeek,
+        manualLoads,
+      ),
+      timed('skierg', 'SKIERG', laura ? 40 : 30, 3, undefined, 'finisher-b', manualDurations, activeWeek),
+      timed('hollow-hold', 'Hollow Hold', 25, 3, laura ? 25 : 30, 'finisher-b', manualDurations, activeWeek),
+    ]),
+    warmup,
+    cooldown: cooldownFastWalk,
+  });
+  const c: WorkoutDay = Object.freeze({
+    id: 'cardio',
+    name: 'Cardio circuit',
+    subtitle: 'Circuit cardio et renforcement',
+    exercises: Object.freeze([
+      timed('jumping-jack', 'Jumping Jack', laura ? 40 : 30, 3, undefined, 'circuit-1', manualDurations, activeWeek),
+      timed('mountain-climber', 'Mountain Climber', 30, 3, 60, 'circuit-1', manualDurations, activeWeek),
+      timed('sit-to-stand', 'Sit to Stand', laura ? 40 : 30, 3, undefined, 'circuit-2', manualDurations, activeWeek),
+      timed('crunches', 'Crunches', 30, 3, 60, 'circuit-2', manualDurations, activeWeek),
+      timed('skierg', 'SKIERG', 30, 3, undefined, 'circuit-3', manualDurations, activeWeek),
+      timed('rameur', 'Rameur', laura ? 40 : 30, 3, 60, 'circuit-3', manualDurations, activeWeek),
+      exercise({
+        id: 'developpe-clavicule',
+        name: 'Développé clavicule prise neutre',
+        kind: 'timed',
+        sets: Array.from({ length: 3 }, () => ({
+          durationSeconds: 30,
+          loadKg: laura ? 4 : 6,
+          loadLabel: `${laura ? 4 : 6} kg par mains`,
+        })),
+        circuitId: 'circuit-4',
+      }),
+      timed('hollow-hold', 'Hollow Hold', 30, 3, 60, 'circuit-4', manualDurations, activeWeek),
+    ]),
+    warmup: cardioWarmup,
+    cooldown: cooldownFastWalk,
+  });
+  const d: WorkoutDay = Object.freeze({
+    id: 'cardio-4',
+    name: 'Rameur + marche',
+    subtitle: '4ᵉ séance de la semaine · cardio continu',
+    exercises: Object.freeze([
+      timed('rameur-15-min', 'Rameur — 15 minutes', 15 * 60, 1, 60, undefined, manualDurations, activeWeek),
+      timed('marche-cardio', 'Marche sur tapis — 25 minutes', 25 * 60, 1, 0, undefined, manualDurations, activeWeek),
+    ]),
+    warmup: cardioWarmup,
+    cooldown: cooldownFastWalk,
+  });
+  return Object.freeze({
+    profileId,
+    displayName: profileId === 'ottman' ? 'Ottman' : 'Laura',
+    coach: 'SELVA Adrien',
+    warmup,
+    days: Object.freeze([a, b, c, d]),
+  });
 }
 
 export const ottmanProgram = plan('ottman');

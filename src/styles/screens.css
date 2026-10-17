@@ -1,0 +1,1466 @@
+/* ============================================================================
+   Finitions des écrans Accueil, Historique, Progression, Bilan, Réglages.
+   ----------------------------------------------------------------------------
+   Chargée APRÈS styles.css, tokens.css, mobile.css et workout.css : elle ne
+   crée que des classes dédiées à ces écrans et surcharge la densité.
+   Règles respectées : titres ≤ 40 px, texte ≥ 12 px, chiffres tabulaires,
+   cibles ≥ 44 px, un seul accent par écran, aucun dégradé décoratif.
+   ========================================================================== */
+
+/* ============================================================== ACCUEIL === */
+
+/* Séance en cours : reprendre (action principale) ou supprimer (action
+   distincte, jamais imbriquée dans le bouton de reprise). */
+.resume-banner-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+}
+
+.resume-banner-wrap .resume-banner {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.resume-discard {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  min-width: 48px;
+  height: 48px;
+  min-height: 48px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-md, 10px);
+  background: var(--surface-1);
+  color: var(--text-2);
+}
+
+.resume-discard:hover,
+.resume-discard:focus-visible {
+  color: #ff9c9c;
+  border-color: rgba(255, 120, 120, 0.45);
+}
+
+.history-delete {
+  flex: none;
+  display: grid;
+  place-items: center;
+  min-width: 44px;
+  min-height: 44px;
+  border: 1px solid transparent;
+  border-radius: var(--r-md, 10px);
+  background: transparent;
+  color: var(--text-3);
+}
+
+.history-delete:hover,
+.history-delete:focus-visible {
+  color: #ff9c9c;
+  border-color: rgba(255, 120, 120, 0.4);
+  background: rgba(255, 120, 120, 0.06);
+}
+
+/* Action destructive du dialogue de sortie de séance : présente, jamais
+   confondue avec la mise en pause. */
+.abandon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  border: 1px solid rgba(255, 120, 120, 0.38);
+  border-radius: var(--r-md, 10px);
+  background: rgba(255, 120, 120, 0.08);
+  color: #ffb3b3;
+  font-weight: 600;
+}
+
+.abandon-button.full {
+  width: 100%;
+}
+
+.abandon-button:hover,
+.abandon-button:focus-visible {
+  background: rgba(255, 120, 120, 0.14);
+}
+
+/* Le compteur « 5 / 30 » ouvre la liste des exercices : il doit se lire comme
+   un bouton, sans prendre plus de place qu'avant. */
+.progress-pill-action {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  /* 44 px : le plancher tactile du projet, retabli apres le retour en arriere
+     du 14/09 qui l'avait ramene a 24 px (soit 31 px mesure). */
+  min-height: 44px;
+  padding-inline: var(--sp-4);
+  cursor: pointer;
+}
+
+.progress-pill-action:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Aucun espace mort au-dessus de l'action principale : l'en-tête est compact. */
+.home-content {
+  padding-top: var(--sp-9);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+}
+
+.home-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-8);
+}
+
+.home-head h1 {
+  margin: var(--sp-2) 0 0;
+  font-size: clamp(1.375rem, 5.5vw, 1.75rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.home-head > .avatar {
+  flex: none;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: var(--r-md);
+  font-size: var(--fs-6);
+}
+
+/* Carte de la séance du jour : l'action dominante, seule cible accentuée. */
+.today-card {
+  display: grid;
+  gap: var(--sp-4);
+  padding: var(--sp-8) var(--sp-9);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-lg);
+  background: var(--surface-1);
+}
+
+.today-card.done {
+  border-color: var(--line);
+  background: var(--surface-0);
+}
+
+.today-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-6);
+}
+
+.today-card h2 {
+  margin: 0;
+  font-size: var(--fs-8);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.today-card-sub {
+  margin: 0;
+  color: var(--text-2);
+  font-size: var(--fs-3);
+  line-height: 1.45;
+}
+
+.today-card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-6);
+  margin-top: var(--sp-2);
+}
+
+.today-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-3);
+  color: var(--text-2);
+  font-size: var(--fs-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.today-meta svg {
+  color: var(--text-3);
+}
+
+.today-cta {
+  min-height: 48px;
+  padding: var(--sp-6) var(--sp-9);
+}
+
+/* Le tableau complet vit dans une feuille : l'accueil garde seulement son
+   action compacte, sans perdre l'accès aux charges prescrites. */
+.program-load-trigger {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-5);
+  width: 100%;
+  padding: var(--sp-6) var(--sp-7);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface-1);
+  color: var(--text-1);
+  text-align: left;
+}
+
+.program-load-trigger:hover {
+  border-color: rgb(var(--accent-rgb) / 0.45);
+  background: var(--surface-2);
+}
+
+.program-load-trigger-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--r-md);
+  background: rgb(var(--accent-rgb) / 0.13);
+  color: var(--accent);
+}
+
+.program-load-trigger > span:nth-child(2) {
+  display: grid;
+  flex: 1;
+  gap: var(--sp-1);
+}
+
+.program-load-trigger small {
+  color: var(--text-3);
+  font-size: var(--fs-2);
+}
+
+.program-load-trigger > svg {
+  color: var(--text-3);
+}
+
+.program-load-sheet {
+  display: grid;
+  gap: var(--sp-6);
+}
+
+.program-load-sheet .program-load-head {
+  margin-top: var(--sp-2);
+}
+
+.program-load-sheet .program-load-table-wrap {
+  max-height: 48dvh;
+}
+
+.program-load-sheet .program-load-note {
+  margin-top: calc(var(--sp-2) * -1);
+}
+
+.program-load-card {
+  display: grid;
+  gap: var(--sp-5);
+  padding: var(--sp-7);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface-1);
+}
+
+.program-load-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sp-6);
+}
+
+.program-load-head h2 {
+  margin: var(--sp-2) 0 0;
+  font-size: var(--fs-6);
+}
+
+.program-load-head p:not(.eyebrow) {
+  max-width: 42rem;
+  margin: var(--sp-2) 0 0;
+  color: var(--text-2);
+  font-size: var(--fs-2);
+  line-height: 1.4;
+}
+
+.program-week-select {
+  display: grid;
+  flex: none;
+  gap: var(--sp-2);
+  color: var(--text-3);
+  font-size: var(--fs-2);
+}
+
+.program-week-select select {
+  min-height: 40px;
+  padding: 0 var(--sp-4);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-md);
+  background: var(--surface-0);
+  color: var(--text-1);
+  font: inherit;
+}
+
+.program-load-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+}
+
+.program-load-table {
+  width: 100%;
+  min-width: 680px;
+  border-collapse: collapse;
+  font-size: var(--fs-2);
+}
+
+.program-load-table th,
+.program-load-table td {
+  padding: var(--sp-3) var(--sp-4);
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.program-load-table thead th {
+  color: var(--text-3);
+  font-size: var(--fs-2);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.program-load-table thead th:not(:first-child),
+.program-load-table td:not(:first-child) {
+  text-align: center;
+}
+
+.program-load-table tbody tr:last-child th,
+.program-load-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.program-load-table .active {
+  background: rgb(var(--accent-rgb) / 0.09);
+  color: var(--accent);
+}
+
+.program-load-table .program-load-day th {
+  padding-top: var(--sp-5);
+  color: var(--text-2);
+  font-size: var(--fs-2);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.program-load-note {
+  color: var(--text-3);
+  font-size: var(--fs-2);
+}
+
+/* Rail de la semaine : quatre créneaux, état explicite.
+   Deux colonnes et non trois : mesuré à 390 px, trois créneaux de 109 px
+   laissaient le quatrième seul sur une rangée à lui, étiré à 67 px parce que son
+   intitulé passait à la ligne. Deux par deux, chaque créneau garde sa place et
+   la hauteur est régulière. */
+.week-rail {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-4);
+}
+
+.week-slot {
+  display: grid;
+  gap: var(--sp-2);
+  min-height: 56px;
+  padding: var(--sp-5) var(--sp-5);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface-1);
+  text-align: left;
+  transition:
+    border-color var(--t-mid) var(--ease),
+    background var(--t-mid) var(--ease);
+}
+
+.week-slot:hover {
+  background: var(--surface-2);
+}
+
+.week-slot-name {
+  color: var(--text-1);
+  font-size: var(--fs-3);
+  font-weight: 560;
+  /* Un nom de séance passe à la ligne plutôt que d'être tronqué : la colonne
+     fait cent dix pixels et « Full Body A » n'y tient pas toujours avec son
+     badge de durée. */
+  overflow-wrap: anywhere;
+}
+
+.week-slot-state {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  color: var(--text-3);
+  font-size: var(--fs-2);
+  letter-spacing: 0.02em;
+}
+
+/* État actif : le seul créneau accentué du rail. */
+.week-slot.today {
+  border-color: rgb(var(--accent-rgb) / 0.45);
+  background: rgb(var(--accent-rgb) / 0.07);
+}
+
+.week-slot.today .week-slot-state {
+  color: var(--accent);
+  font-weight: 590;
+}
+
+.week-slot.done .week-slot-state {
+  color: var(--text-2);
+}
+
+.week-slot.done .week-slot-name {
+  color: var(--text-2);
+}
+
+.week-slot.upcoming {
+  border-style: dashed;
+}
+
+/* Métriques compactes : deux cellules basses, pas des cartes identiques. */
+.home-metrics {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: var(--sp-4);
+}
+
+.home-metric {
+  display: grid;
+  gap: var(--sp-3);
+  align-content: start;
+  padding: var(--sp-6) var(--sp-7);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface-1);
+}
+
+.home-metric > span {
+  color: var(--text-3);
+  font-size: var(--fs-2);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.home-metric strong {
+  font-size: var(--fs-9);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.home-metric strong small {
+  color: var(--text-2);
+  font-size: var(--fs-2);
+  font-weight: 500;
+}
+
+.home-metric.accent {
+  border-color: rgb(var(--accent-rgb) / 0.28);
+}
+
+.home-metric.accent strong {
+  color: var(--accent);
+}
+
+.home-metric-foot {
+  color: var(--text-3);
+  font-size: var(--fs-2);
+}
+
+.home-content .coach-note {
+  margin-top: 0;
+}
+
+/* ============================================================ HISTORIQUE === */
+
+.history-weeks {
+  display: grid;
+  gap: var(--sp-11);
+}
+
+.history-week {
+  display: grid;
+  gap: var(--sp-5);
+}
+
+.week-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-6);
+}
+
+.week-heading h2 {
+  margin: 0;
+  font-size: var(--fs-6);
+  letter-spacing: -0.01em;
+}
+
+.week-heading span {
+  color: var(--text-3);
+  font-size: var(--fs-2);
+}
+
+.history-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  min-height: 56px;
+  padding: var(--sp-6) var(--sp-6) var(--sp-6) var(--sp-7);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface-1);
+}
+
+.history-row.in-progress {
+  border-style: dashed;
+}
+
+.history-row-main {
+  display: grid;
+  gap: var(--sp-1);
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.history-row-main strong {
+  font-size: var(--fs-4);
+  font-weight: 560;
+  /* Le libellé de séance doit rester lisible en entier : il passe à la ligne
+     plutôt que d'être tronqué par le bouton de suppression.
+     Les trois lignes de troncature qui suivaient ont été retirées : le
+     commentaire annonçait depuis un moment un comportement que le code
+     démentait, et « Full Body A » sortait bel et bien en « Full Bod… ». */
+  overflow-wrap: anywhere;
+}
+
+.history-row-main small {
+  color: var(--text-3);
+  font-size: var(--fs-2);
+}
+
+.history-row-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--sp-2) var(--sp-4);
+  justify-content: flex-end;
+  max-width: 46%;
+}
+
+.history-figure {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  color: var(--text-2);
+  font-size: var(--fs-2);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.history-figure svg {
+  color: var(--text-3);
+}
+
+.history-row .history-check {
+  flex: none;
+}
+
+/* État vide : compact, avec une action explicite. */
+.empty-state {
+  padding: var(--sp-13) var(--sp-8);
+}
+
+.empty-state p {
+  max-width: 26rem;
+  margin: var(--sp-4) auto 0;
+  font-size: var(--fs-3);
+  line-height: 1.5;
+}
+
+.empty-cta {
+  margin-top: var(--sp-10);
+  min-height: 48px;
+}
+
+/* ============================================================ PROGRESSION == */
+
+.progression-duo-switcher {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  width: min(100%, 20rem);
+  margin: 0 0 var(--sp-6);
+  padding: var(--sp-2);
+  border: 1px solid #ffffff12;
+  border-radius: var(--r-full);
+  background: #00000050;
+}
+
+.progression-duo-switcher .duo-pill-btn {
+  min-height: 32px;
+  padding: var(--sp-2) var(--sp-5);
+}
+
+/* Rangée d'indicateurs compacts : une ligne dense, quatre valeurs. */
+.metric-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--sp-4);
+  margin-top: var(--sp-10);
+}
+
+.metric-cell {
+  display: grid;
+  gap: var(--sp-2);
+  align-content: start;
+  min-width: 0;
+  padding: var(--sp-4) var(--sp-5);
+  border: 0;
+  border-left: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent;
+}
+
+.metric-cell:first-child {
+  border-left: 0;
+}
+
+.metric-cell > span {
+  color: var(--text-3);
+  font-size: var(--fs-2);
+  line-height: 1.25;
+}
+
+.metric-cell strong {
+  font-size: var(--fs-8);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.metric-cell small {
+  color: var(--text-3);
+  font-size: var(--fs-2);
+}
+
+.metric-cell.accent {
+  border-color: var(--line);
+}
+
+.metric-cell.accent strong {
+  color: var(--accent);
+}
+
+/* Comparaison chiffrée avec la semaine précédente. */
+.comparison-card {
+  display: grid;
+  gap: var(--sp-7);
+  margin-top: var(--sp-8);
+  padding: var(--sp-8);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface-1);
+}
+
+.comparison-card h2 {
+  font-size: var(--fs-6);
+}
+
+.trend-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-4);
+  border: 1px solid var(--line);
+  border-radius: var(--r-full);
+  background: var(--surface-2);
+  color: var(--text-2);
+  font-size: var(--fs-2);
+  font-weight: 590;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.trend-chip.up {
+  color: var(--accent);
+  border-color: rgb(var(--accent-rgb) / 0.35);
+}
+
+.comparison-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-4);
+}
+
+.comparison-item {
+  display: grid;
+  gap: var(--sp-2);
+  min-width: 0;
+  padding: var(--sp-6) var(--sp-6);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+}
+
+.comparison-item > span {
+  color: var(--text-3);
+  font-size: var(--fs-2);
+}
+
+.comparison-item strong {
+  font-size: var(--fs-6);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.comparison-item small {
+  color: var(--text-2);
+  font-size: var(--fs-2);
+  line-height: 1.35;
+}
+
+/* Tendance du volume. */
+.trend-chart-wrap {
+  margin-top: var(--sp-6);
+}
+
+.progression-content .progression-card .chart-wrap {
+  height: 200px;
+}
+
+.trend-chart-wrap .progress-chart {
+  display: block;
+  width: 100%;
+  height: 180px;
+  overflow: visible;
+}
+
+.trend-last {
+  margin: var(--sp-4) 0 0;
+  color: var(--text-2);
+  font-size: var(--fs-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.trend-last strong {
+  color: var(--text-1);
+}
+
+/* Records par mouvement. */
+.records-list {
+  display: grid;
+  gap: var(--sp-3);
+  margin-top: var(--sp-7);
+}
+
+.record-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-5);
+  min-height: 48px;
+  padding: var(--sp-4) var(--sp-6);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+}
+
+.record-rank {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: var(--r-sm);
+  background: var(--surface-0);
+  color: var(--text-3);
+  font-size: var(--fs-2);
+  font-weight: 590;
+  font-variant-numeric: tabular-nums;
+}
+
+.record-main {
+  display: grid;
+  gap: var(--sp-1);
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.record-main strong {
+  font-size: var(--fs-3);
+  font-weight: 560;
+  /* « Développé couché machine convergente » ne tiendra jamais sur une ligne
+     dans une colonne de téléphone : il passe à la ligne, en entier. */
+  overflow-wrap: anywhere;
+}
+
+.record-main small {
+  color: var(--text-3);
+  font-size: var(--fs-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.record-value {
+  flex: none;
+  color: var(--text-1);
+  font-size: var(--fs-3);
+  font-weight: 590;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ================================================================= BILAN === */
+
+/* Écran de fin : le formulaire se resserre (décision du 6 octobre). « Enregistrer
+   et terminer » restait à 1 158 px sur un écran de 844 — 448 px de défilement
+   après 52 minutes de séance. On ne déplace pas le bouton : on rend de la hauteur
+   au formulaire, en resserrant les respirations et en rangeant les trois choix de
+   chaque question sur une seule rangée. */
+.completion-screen {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+}
+
+.completion-head {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-7);
+}
+
+.completion-head .completion-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: var(--r-md);
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.completion-head h1 {
+  margin: var(--sp-2) 0 0;
+  font-size: clamp(1.25rem, 5.5vw, 1.5rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+/* 1. Résumé factuel. */
+.bilan-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-4);
+  width: min(100%, 34rem);
+}
+
+.bilan-cell {
+  display: grid;
+  gap: var(--sp-2);
+  min-width: 0;
+  padding: var(--sp-6) var(--sp-6);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface-1);
+}
+
+.bilan-cell > span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  color: var(--text-3);
+  font-size: var(--fs-2);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.bilan-cell strong {
+  font-size: var(--fs-7);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bilan-cell.accent {
+  border-color: rgb(var(--accent-rgb) / 0.28);
+}
+
+.bilan-cell.accent strong {
+  color: var(--accent);
+}
+
+/* 2. Ressenti. */
+.feedback-heading {
+  display: grid;
+  gap: var(--sp-2);
+}
+
+.feedback-heading .muted-copy {
+  margin: 0;
+}
+
+.completion-screen .feedback-card {
+  width: min(100%, 34rem);
+  margin-top: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface-1);
+}
+
+.completion-screen .feedback-card label span {
+  color: var(--text-2);
+}
+
+/* 3. Appel à l'action final. */
+.bilan-actions {
+  display: grid;
+  gap: var(--sp-4);
+  width: min(100%, 34rem);
+}
+
+.bilan-actions .primary-button,
+.bilan-actions .secondary-button {
+  min-height: 48px;
+}
+
+/* ============================================================== RÉGLAGES === */
+
+.settings-section {
+  display: grid;
+  gap: var(--sp-5);
+  margin-top: var(--sp-11);
+}
+
+.settings-title {
+  margin: 0;
+  color: var(--text-3);
+  font-size: var(--fs-2);
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.settings-section .settings-list {
+  margin-top: 0;
+}
+
+.settings-section-intro {
+  max-width: 42rem;
+  margin: var(--sp-3) 0 0;
+  color: var(--text-2);
+  font-size: var(--fs-3);
+  line-height: 1.45;
+}
+
+.manual-loads-list {
+  display: grid;
+  gap: var(--sp-4);
+}
+
+.manual-load-card {
+  display: grid;
+  gap: var(--sp-5);
+  padding: var(--sp-6);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface-1);
+}
+
+.manual-load-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sp-4);
+}
+
+.manual-load-card-head > div {
+  display: grid;
+  gap: var(--sp-1);
+}
+
+.manual-load-card-head small {
+  color: var(--text-3);
+  font-size: var(--fs-2);
+}
+
+.manual-load-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--sp-3);
+}
+
+.manual-load-grid label {
+  display: grid;
+  gap: var(--sp-2);
+  color: var(--text-3);
+  font-size: var(--fs-2);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.manual-load-grid input {
+  width: 100%;
+  min-width: 0;
+  min-height: 42px;
+  padding: 0 var(--sp-3);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-md);
+  background: var(--surface-0);
+  color: var(--text-1);
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+}
+
+.manual-load-grid input:focus {
+  border-color: var(--accent);
+  outline: 2px solid rgb(var(--accent-rgb) / 0.22);
+  outline-offset: 1px;
+}
+
+.device-diagnostic .card-heading h3 {
+  margin: var(--sp-3) 0 0;
+  font-size: var(--fs-6);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+/* Confirmation explicite avant effacement : mot à saisir + conséquences. */
+.danger-confirm {
+  display: grid;
+  gap: var(--sp-6);
+  padding: var(--sp-8);
+  border: 1px solid rgba(231, 146, 146, 0.4);
+  border-left: 2px solid var(--danger);
+  border-radius: var(--r-lg);
+  background: rgba(231, 146, 146, 0.08);
+}
+
+.danger-confirm-head {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  color: var(--danger);
+}
+
+.danger-confirm-head strong {
+  font-size: var(--fs-5);
+}
+
+.danger-lead {
+  margin: 0;
+  color: var(--text-2);
+  font-size: var(--fs-3);
+  line-height: 1.5;
+}
+
+.danger-lead strong {
+  color: var(--text-1);
+}
+
+.danger-word {
+  display: grid;
+  gap: var(--sp-3);
+  color: var(--text-2);
+  font-size: var(--fs-2);
+}
+
+.danger-word input {
+  width: 100%;
+  min-height: 44px;
+  padding: var(--sp-5) var(--sp-6);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-md);
+  background: var(--surface-0);
+  color: var(--text-1);
+  letter-spacing: 0.08em;
+}
+
+.danger-actions {
+  display: flex;
+  gap: var(--sp-4);
+}
+
+.danger-actions .secondary-button,
+.danger-actions .danger-button {
+  flex: 1 1 0;
+  min-height: 48px;
+}
+
+.danger-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-4);
+  padding: var(--sp-8) var(--sp-10);
+  border: 1px solid rgba(231, 146, 146, 0.45);
+  border-radius: var(--r-md);
+  background: rgba(231, 146, 146, 0.14);
+  color: #f3d6d6;
+  font-weight: 700;
+}
+
+.danger-button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.settings-footnote a {
+  color: var(--accent);
+}
+
+/* Choix du profil : statut de la semaine, information secondaire. */
+.profile-week {
+  color: var(--text-3);
+}
+
+/* ======================================================== ÉCRANS ÉTROITS === */
+
+@media (max-width: 430px) {
+  .week-slot {
+    padding: var(--sp-4) var(--sp-4);
+  }
+
+  .week-slot-name {
+    font-size: var(--fs-2);
+  }
+
+  .metric-strip {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .history-row-meta {
+    max-width: 52%;
+  }
+}
+
+/* Très petits écrans : la comparaison reste lisible sur une colonne. */
+@media (max-width: 360px) {
+  .comparison-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* --- Quiz de fin de séance -------------------------------------------------
+   Quatre questions, en boutons et non en listes déroulantes : on y répond
+   debout, une main sur le téléphone. Cibles de 44 px minimum. */
+.quiz-question {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-5) 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.quiz-question:last-of-type {
+  border-bottom: 0;
+}
+
+.quiz-label {
+  font-size: var(--fs-3);
+  font-weight: 600;
+}
+
+.quiz-scale {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--sp-3);
+}
+
+.quiz-chip {
+  min-height: 44px;
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  color: var(--text-2);
+  font-size: var(--fs-5);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.quiz-chip.on {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.quiz-help {
+  color: var(--text-3);
+  font-size: var(--fs-1);
+}
+
+/* Trois réponses de même nature se rangent en trois colonnes (décision du
+   6 octobre) : en `flex-wrap`, « Moins bien » se retrouvait seul sur sa rangée,
+   étiré à 317 px — le même escalier que la rangée d'actions. Trois colonnes de
+   ~115 px gardent des cibles bien au-dessus des 44 px, là où dix puces d'effort
+   sur une seule rangée seraient descendues à 34 px : le resserrement se fait ici,
+   pas sur les cibles. */
+.quiz-choices {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--sp-3);
+}
+
+.quiz-choice {
+  flex: 1 1 auto;
+  min-height: 44px;
+  padding: var(--sp-5) var(--sp-6);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  color: var(--text-2);
+  font-size: var(--fs-2);
+  font-weight: 600;
+}
+
+.quiz-choice.on {
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 800;
+}
+
+.quiz-input,
+.quiz-notes textarea {
+  width: 100%;
+  padding: var(--sp-6);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface-0);
+  color: var(--text-1);
+  font: inherit;
+}
+
+.quiz-input {
+  margin-top: var(--sp-4);
+}
+
+.quiz-notes {
+  display: grid;
+  gap: var(--sp-3);
+  padding-top: var(--sp-6);
+}
+
+.quiz-notes span {
+  font-size: var(--fs-3);
+  font-weight: 600;
+}
+
+.quiz-notes textarea {
+  resize: vertical;
+}
+
+/* --- Choix de la couleur ---------------------------------------------------
+   Cinq pastilles, la couleur réelle à l'écran : on choisit ce qu'on voit, pas
+   une étiquette. Cible de 44 px, marque de sélection à l'anneau + au texte. */
+.accent-teaser {
+  margin: 0 0 var(--sp-5);
+  color: var(--text-2);
+  font-size: var(--fs-3);
+  font-style: italic;
+}
+
+.accent-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-4);
+}
+
+.accent-choice {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-4);
+  min-height: 44px;
+  padding: var(--sp-4) var(--sp-7) var(--sp-4) var(--sp-5);
+  border: 1px solid var(--line);
+  border-radius: var(--r-full);
+  background: var(--surface-1);
+  color: var(--text-2);
+  font-size: var(--fs-3);
+  font-weight: 600;
+}
+
+.accent-choice.on {
+  border-color: var(--accent);
+  color: var(--text-1);
+  box-shadow:
+    0 0 0 1px var(--accent),
+    0 0 14px rgb(var(--accent-rgb) / 0.25);
+}
+
+.accent-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid rgb(255 255 255 / 0.18);
+}
+
+.accent-choice.on .accent-dot::after {
+  content: "";
+  display: block;
+  width: 8px;
+  height: 8px;
+  margin: var(--sp-3) auto 0;
+  border-radius: 50%;
+  background: var(--surface-0);
+}
+
+/* --- Rappel de sauvegarde -------------------------------------------------
+   Ambre plutôt que rouge : c'est un conseil, pas une panne. La carte disparaît
+   d'elle-même une fois la sauvegarde faite, ou pour une semaine si on reporte. */
+.backup-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-6);
+  padding: var(--sp-7);
+  border: 1px solid rgb(246 193 119 / 0.4);
+  border-radius: var(--r-lg);
+  background: rgb(246 193 119 / 0.08);
+}
+
+.backup-card strong {
+  display: block;
+  margin: var(--sp-1) 0 var(--sp-2);
+  font-size: var(--fs-5);
+}
+
+.backup-card small {
+  color: var(--text-2);
+  font-size: var(--fs-2);
+}
+
+.backup-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-5);
+}
+
+.backup-actions .primary-button {
+  flex: 1;
+}
+
+/* --- Régularité -----------------------------------------------------------
+   Des points, pas un graphique : on lit sa série d'un coup d'œil en ouvrant
+   l'application. Aucune couleur d'alerte — une semaine manquée n'est pas une
+   faute, c'est une semaine manquée. */
+.streak-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+  padding: var(--sp-7);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface-1);
+}
+
+.streak-head strong {
+  display: block;
+  margin-top: var(--sp-1);
+  font-size: var(--fs-6);
+}
+
+.streak-weeks {
+  display: flex;
+  gap: var(--sp-3);
+}
+
+.streak-weeks i {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
+  color: var(--accent-ink);
+}
+
+.streak-weeks i.fait {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.streak-card small {
+  color: var(--text-3);
+  font-size: var(--fs-1);
+}
+
+/* ---------------------------------------------------------------------------
+   Silhouette de chargement.
+
+   Un dessin qui respire, sans texte : la page se remplit au lieu d'apparaître
+   d'un bloc, et rien n'est annoncé à un lecteur d'écran (aria-hidden).
+   --------------------------------------------------------------------------- */
+.skeleton-card {
+  display: grid;
+  gap: var(--sp-4);
+  padding: var(--sp-8);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface-1);
+}
+
+.skeleton-line {
+  display: block;
+  height: 12px;
+  border-radius: var(--r-sm);
+  background: linear-gradient(
+    90deg,
+    var(--surface-2) 0%,
+    color-mix(in srgb, var(--text-3) 22%, var(--surface-2)) 50%,
+    var(--surface-2) 100%
+  );
+  background-size: 200% 100%;
+  animation: respiration 1.4s ease-in-out infinite;
+}
+
+.skeleton-line.short {
+  width: 35%;
+  height: 10px;
+}
+
+.skeleton-line.strong {
+  width: 62%;
+  height: 20px;
+}
+
+.skeleton-line.half {
+  width: 48%;
+}
+
+@keyframes respiration {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-line {
+    animation: none;
+  }
+}
+
+/*
+ * Appareil bridé : la respiration du squelette est coupée elle aussi. Elle anime
+ * `background-position`, qui n'est pas composée par le GPU — une repainte par
+ * image pendant tout le chargement de l'historique, c'est-à-dire au pire moment.
+ * Un squelette immobile vaut mieux qu'un historique qui met trois secondes à
+ * apparaître. Verdict posé par src/perf/fluidite.ts.
+ */
+html[data-perf="bas"] .skeleton-line {
+  animation: none;
+}

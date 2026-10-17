@@ -1,0 +1,682 @@
+/* ============================================================================
+   Finitions de l'écran de séance — Coach Ottman & Laura
+   ----------------------------------------------------------------------------
+   Feuille dédiée à la colonne de séance. Chargée après styles.css, tokens.css
+   et mobile.css : elle resserre la densité et ajoute les finitions propres à
+   la séance (repère de la dernière fois, préréglages de repos, carte de repos
+   utile) sans redéfinir les tokens ni les autres écrans.
+
+   Objectifs mesurables :
+     · la colonne tient dans 100dvh à 390 px sans défilement ;
+     · aucun élément interactif ne passe sous la barre d'accueil ;
+     · chaque cible tactile garde au moins 44 px.
+   ========================================================================== */
+
+/* --- [1] Repère de la dernière fois, juste au-dessus du champ -------------- */
+.workout-content .ghost-perf-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-3) var(--sp-4);
+  margin: 0 0 var(--sp-4);
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--r-md);
+  background: var(--surface-1);
+  color: var(--text-2);
+  font-size: var(--fs-2);
+  line-height: 1.3;
+}
+
+.workout-content .ghost-perf-strip .ghost-icon {
+  flex: none;
+  color: var(--accent);
+}
+
+.workout-content .ghost-perf-strip .ghost-perf-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.workout-content .ghost-perf-strip strong {
+  color: var(--text-1);
+  font-weight: 590;
+  font-variant-numeric: tabular-nums;
+}
+
+.workout-content .ghost-perf-strip .ghost-delta {
+  flex: none;
+  margin-left: auto;
+  padding: var(--sp-1) var(--sp-4);
+  border: 1px solid rgb(var(--accent-rgb) / 0.32);
+  border-radius: var(--r-sm);
+  background: rgb(var(--accent-rgb) / 0.12);
+  color: var(--accent);
+  font-size: var(--fs-2);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.workout-content .ghost-perf-strip .ghost-delta.at-parity {
+  border-color: var(--line);
+  background: var(--surface-2);
+  color: var(--text-2);
+}
+
+/* --- [2] Préréglages de repos (paliers une main, ≥ 44 px) ------------------ */
+.rest-presets {
+  display: grid;
+  /* Quatre cellules : −15 s et les trois paliers d'ajout. Elles mesurent 44 px de
+     haut au minimum, la largeur suit la place disponible. */
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--sp-3);
+  margin-top: var(--sp-4);
+}
+
+.rest-presets .rest-preset-btn {
+  min-height: 44px;
+  padding: var(--sp-4) var(--sp-2);
+  border: 1px solid rgb(var(--accent-rgb) / 0.3);
+  border-radius: var(--r-md);
+  background: rgb(var(--accent-rgb) / 0.1);
+  color: var(--accent);
+  font-size: var(--fs-3);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  transition:
+    background var(--t-fast) var(--ease),
+    border-color var(--t-fast) var(--ease);
+}
+
+.rest-presets .rest-preset-btn:active {
+  background: rgb(var(--accent-rgb) / 0.22);
+}
+
+/* --- [3] Carte de repos utile : exercice suivant, séries, charge ----------- */
+.workout-content .rest-cockpit-container {
+  gap: var(--sp-4);
+}
+
+/* L'exercice revient : il avait été reporté parce que la machine était prise.
+   Le dire évite l'impression de refaire un mouvement déjà fait. */
+.report-chip {
+  display: inline-flex;
+  align-items: center;
+  margin-left: var(--sp-3);
+  padding: 1px var(--sp-3);
+  border-radius: var(--r-full);
+  border: 1px solid rgb(var(--accent-rgb) / 0.45);
+  color: var(--accent);
+  font-size: var(--fs-2);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+
+.workout-content .rest-orbit-svg-container {
+  /* Le cercle suit le chiffre (--fs-repos) : 128 px pour un chiffre de 40 px. */
+  width: 128px;
+  height: 128px;
+}
+
+.workout-content .rest-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: var(--sp-6);
+  align-items: center;
+  padding: var(--sp-6);
+  border-color: color-mix(in srgb, var(--rest) 38%, var(--line));
+  background: linear-gradient(135deg, color-mix(in srgb, var(--rest) 11%, var(--surface-1)), var(--surface-1) 42%);
+}
+
+.workout-content .rest-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-3);
+  margin-top: var(--sp-3);
+}
+
+.rest-next-preview-card {
+  padding: var(--sp-5) var(--sp-6);
+  gap: var(--sp-2);
+  border-radius: var(--r-md);
+}
+
+.workout-content .rest-card > .sr-only,
+.workout-content .rest-card > p {
+  display: none;
+}
+
+.workout-content .rest-card .rest-actions,
+.workout-content .rest-card .rest-presets {
+  grid-column: 1 / -1;
+}
+
+.workout-content .rest-card .rest-actions button {
+  min-height: 44px;
+}
+
+.workout-content .rest-card .rest-skip-button {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.rest-next-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  font-size: var(--fs-2);
+}
+
+.rest-next-remaining {
+  color: var(--text-1);
+  font-weight: 590;
+}
+
+.rest-next-target {
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.workout-content .rest-next-preview-card .plate-badge-container {
+  margin: var(--sp-2) 0 0;
+  padding: var(--sp-3) var(--sp-4);
+}
+
+/* --- [4] Densité : la colonne de séance tient dans 100dvh ------------------ */
+.workout-content {
+  gap: var(--sp-3);
+  padding-top: var(--sp-2);
+  /* La barre d'accueil est déjà réservée par .workout-shell
+     (padding-bottom: env(safe-area-inset-bottom)) ; on garde une respiration
+     minimale sans la compter deux fois. */
+  padding-bottom: var(--sp-4);
+}
+
+.workout-content .duo-wrapper {
+  gap: var(--sp-2);
+  margin-bottom: 0;
+}
+
+.workout-content .duo-switcher-bar {
+  margin-bottom: 0;
+}
+
+.workout-content .workout-heading {
+  min-height: 2.75rem;
+}
+
+.workout-content .progress-track.large {
+  height: 3px;
+}
+
+.workout-content .workout-actions {
+  gap: var(--sp-3);
+}
+
+.workout-content .prescription-card.compact {
+  padding: var(--sp-5) var(--sp-6);
+  gap: var(--sp-2);
+  overflow: hidden;
+}
+
+/* La carte cède — mais jamais son texte.
+   On est revenus ici deux fois, alors l'historique compte. `overflow: hidden`
+   rognait la prescription dès que la colonne de hauteur fixe écrasait la carte :
+   mesuré à 390 px, 124 px de carte pour 148 px de contenu — le chiffre des
+   répétitions était bien dans la page, mais peint hors de la carte. Le premier
+   correctif a figé la carte entière (`flex-shrink: 0`) : plus rien n'était rogné,
+   mais plus rien ne pouvait céder non plus, et l'illustration — libre de grandir —
+   a pris 186 px. Mesuré pendant le repos : 1 418 px de colonne pour 782 visibles,
+   le compte à rebours à 804 px, « Passer le repos » à 951.
+   La bonne règle est plus étroite : la carte peut céder, l'illustration cède la
+   première, et tout ce qui est du texte ne cède pas. `overflow: hidden` ne peut
+   donc plus rien cacher, et la colonne n'est plus poussée par une carte rigide. */
+.workout-content .prescription-card.compact {
+  flex-shrink: 1;
+}
+
+.workout-content .prescription-card.compact > *:not(.exercise-illustration) {
+  flex-shrink: 0;
+}
+
+.workout-content .prescription-card.compact .prescription-main {
+  margin: var(--sp-2) 0;
+}
+
+/* L'illustration est le seul bloc élastique de la carte : elle prend la place que
+   le texte lui laisse, et elle cède la première quand la carte est serrée. Elle ne
+   doit ni descendre à une lamelle — 40 px, c'est une image qu'on croit coupée — ni
+   être tranchée : `object-fit: contain` la réduit au lieu de la rogner.
+   On est passés par les deux extrêmes avant de trouver ce milieu : figée
+   (`flex-shrink: 0`), elle gonflait la carte à 499 px et poussait le repos hors de
+   l'écran ; libre de rétrécir mais privée de croissance, elle laissait 230 px de
+   vide sous l'image, mesurés à 390 × 844 — exactement la zone morte que la règle
+   de `tokens.css` avait été écrite pour supprimer. */
+.workout-content .exercise-illustration {
+  flex: 1 1 auto;
+  min-height: 4.5rem;
+  margin: var(--sp-2) 0 var(--sp-3);
+}
+
+.workout-content .exercise-illustration img {
+  min-height: 4.5rem;
+  max-height: 34dvh;
+}
+
+/* ---- Décision A (6 octobre) : pendant le repos, la carte se réduit à une ligne.
+   La carte de la série terminée occupait 499 px — illustration, prescription,
+   bloc « par côté », disques, astuce — et poussait le compte à rebours à 804 px
+   sur un écran de 844. Pendant un repos, rien de tout cela ne sert : on ne fait
+   pas le mouvement, on le récupère. Ne reste que le résumé de ce qui vient
+   d'être fait, et la place va au compte à rebours et à ce qu'il faut préparer.
+   Une seule règle suffit : tous les enfants sauf la ligne de résumé s'effacent. */
+.workout-content .prescription-card.repose > :not(.repose-line) {
+  display: none;
+}
+
+.workout-content .prescription-card.repose {
+  flex-grow: 0;
+}
+
+.workout-content .prescription-card.repose .repose-line {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  margin: 0;
+  font-size: var(--fs-2);
+  color: var(--text-2);
+}
+
+.workout-content .prescription-card.repose .repose-line strong {
+  color: var(--text-1);
+  font-variant-numeric: tabular-nums;
+}
+
+/* La carte de saisie ne se laisse pas comprimer non plus : un bouton rogné est
+   pire qu'un bouton qu'on atteint en défilant. */
+.workout-content .log-card.compact {
+  padding: var(--sp-5) var(--sp-6);
+  flex-shrink: 0;
+}
+
+.workout-content .log-card.compact .log-card-heading {
+  margin-bottom: var(--sp-3);
+}
+
+.workout-content .log-card.compact .input-row-modern {
+  gap: var(--sp-4);
+  margin-bottom: var(--sp-4);
+}
+
+.workout-content .log-card.compact .stepper-group {
+  gap: var(--sp-2);
+}
+
+.workout-content .log-card.compact .primary-button {
+  min-height: 44px;
+  padding: var(--sp-5) var(--sp-7);
+}
+
+.workout-content .exercise-timer {
+  margin-bottom: var(--sp-4);
+  padding: var(--sp-4) var(--sp-6);
+}
+
+.workout-content .next-hint {
+  margin: 0;
+}
+
+/* Sans illustration à absorber l'espace libre, la carte se contente de son
+   contenu : sinon elle s'étire sur les grands écrans et laisse une zone morte
+   sous le repère clé (constaté à 430 × 932). */
+.workout-content .prescription-card.compact:not(:has(.exercise-illustration)) {
+  flex: 0 0 auto;
+}
+
+/* Repère clé du tutoriel, affiché à la place de l'illustration quand le
+   mouvement n'en a pas : sans lui, la carte étirée laissait une zone vide. */
+.workout-content .key-cue-strip {
+  display: grid;
+  gap: var(--sp-2);
+  margin: var(--sp-1) 0 var(--sp-2);
+  padding: var(--sp-3) var(--sp-5);
+  border-left: 2px solid var(--accent);
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
+}
+
+.workout-content .key-cue-strip span:last-child {
+  color: var(--text-1);
+  font-size: var(--fs-3);
+  line-height: 1.35;
+}
+
+/* Démonstration du mouvement : les positions de départ et d'arrivée alternent.
+   Aucune ressource supplémentaire (pas de GIF ni de vidéo), les deux visuels
+   sont déjà précachés hors ligne. Le mouvement se met en pause si l'utilisateur
+   a demandé moins d'animations dans son système. */
+.workout-content .exercise-illustration.animated {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  place-items: center;
+  gap: 0;
+}
+
+.workout-content .exercise-illustration.animated .movement-frame {
+  grid-area: 1 / 1;
+  width: auto;
+  max-width: 13rem;
+  animation: coach-movement-alt 1.5s steps(1, end) infinite;
+}
+
+/* Les deux images se relaient : une visible, l'autre masquée. */
+.workout-content .exercise-illustration.animated .frame-start {
+  animation-name: coach-movement-start;
+}
+
+.workout-content .exercise-illustration.animated .frame-peak {
+  animation-name: coach-movement-peak;
+}
+
+@keyframes coach-movement-start {
+  0%,
+  49.99% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes coach-movement-peak {
+  0%,
+  49.99% {
+    opacity: 0;
+  }
+  50%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .workout-content .exercise-illustration.animated .movement-frame {
+    animation: none;
+  }
+
+  .workout-content .exercise-illustration.animated .frame-peak {
+    opacity: 0;
+  }
+}
+
+/* Sur un écran court (barre d'adresse visible, petit téléphone), l'action
+   principale reste collée au bas de la colonne : impossible de se retrouver
+   sans moyen de valider la série, même sans défiler. */
+@media (max-height: 780px) {
+  /* Toute la carte de saisie se fixe en bas, fond opaque : l'utilisateur garde
+     sous les yeux la valeur en cours ET le bouton de validation, et le reste de
+     la séance défile derrière. Un bouton seul collé par-dessus masquait la
+     rangée de saisie. */
+  .workout-content .log-card.compact {
+    position: static;
+
+    z-index: 3;
+    background: var(--surface-1);
+    box-shadow: 0 -14px 28px rgba(0, 0, 0, 0.5);
+  }
+
+  /* La marge basse du conteneur ne doit pas créer de vide sous le panneau. */
+  .workout-content {
+    padding-bottom: 0;
+  }
+}
+
+/* --- Jamais d'action inatteignable -----------------------------------------
+   La colonne de séance était en `overflow: hidden` : sur un écran plus court
+   (barre d'adresse du navigateur, petit téléphone) le contenu dépassait et le
+   bouton « Valider la série » se retrouvait coupé, sans aucun moyen de défiler.
+   Le défilement redevient possible, et les cartes gardent leur taille naturelle
+   au lieu d'être comprimées. */
+.workout-content {
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: calc(0.7rem + env(safe-area-inset-bottom, 0px));
+}
+
+.workout-content > * {
+  flex-shrink: 0;
+}
+
+/* --- Chrono de tempo -------------------------------------------------------
+   Mesuré à 390 px sur la carte de 340 px : la colonne d'actions (3 boutons de
+   44 px empilés, 143 px de haut) écrasait la lecture dans 158 px de large.
+   Résultat : intitulé sur deux lignes, état « Prêt à démarrer » sur deux lignes
+   et surtout un chevauchement de 20 px entre le chiffre et l'état.
+   La lecture reprend toute la largeur, les actions passent dessous, le bouton
+   principal (Démarrer / Pause) sur une ligne à lui pour rester visable au pouce. */
+.workout-content .exercise-timer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: stretch;
+  gap: var(--sp-4);
+}
+
+.workout-content .exercise-timer > div:first-of-type {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--sp-1) var(--sp-4);
+  min-width: 0;
+}
+
+/* L'intitulé occupe sa propre ligne : plus de « COMPTEUR TEMPO » coupé en deux. */
+.workout-content .exercise-timer .eyebrow {
+  flex-basis: 100%;
+  white-space: nowrap;
+}
+
+.workout-content .exercise-timer small {
+  white-space: nowrap;
+}
+
+.workout-content .timer-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-3);
+  justify-content: stretch;
+}
+
+.workout-content .timer-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+}
+
+/* Deux rangées explicites, quel que soit l'ordre du DOM :
+   [ Démarrer / Reprendre / Pause  — pleine largeur, sous le pouce ]
+   [ Passer ]              [ Recommencer ]                        */
+.workout-content .timer-actions button:not(.skip-tempo-btn):not(:last-child) {
+  grid-area: 1 / 1 / 2 / 3;
+}
+
+.workout-content .timer-actions .skip-tempo-btn {
+  grid-area: 2 / 1 / 3 / 2;
+}
+
+.workout-content .timer-actions button:last-child {
+  grid-area: 2 / 2 / 3 / 3;
+}
+
+/* Chrono terminé : il ne reste que « Recommencer », sur toute la largeur.
+   La règle doit suivre celle du dernier bouton pour l'emporter. */
+.workout-content .timer-actions.finished {
+  grid-template-columns: 1fr;
+}
+
+.workout-content .timer-actions.finished button {
+  grid-area: 1 / 1 / 2 / 2;
+}
+
+/* Écrans bas (paysage, petits Android) : on resserre encore d'un cran. */
+@media (max-height: 700px) {
+  .workout-content .exercise-illustration {
+    min-height: 3.5rem;
+    margin: var(--sp-1) 0 var(--sp-2);
+  }
+
+  .workout-content .exercise-illustration img {
+    min-height: 3rem;
+    max-height: 18dvh;
+  }
+
+  .workout-content .rest-orbit-svg-container {
+    /* Réduit avec le chiffre, sans repasser sous l'ancienne taille. */
+    width: 108px;
+    height: 108px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rest-presets .rest-preset-btn {
+    transition: none;
+  }
+}
+
+/*
+ * Le bouton de montée en gamme n'avait aucune règle vivante : sa hauteur venait
+ * des styles hérités et il mesurait 27 px. Ma première version avait un antislash
+ * parasite devant le sélecteur (règle morte, jamais appliquée) — signalé par
+ * l'audit des contradictions commentaire/code. Le voici écrite correctement.
+ */
+.warmup-ramp-toggle {
+  min-height: 44px;
+}
+
+/* ================================================== le bandeau du tempo == */
+
+/*
+ * FIGÉ EN HAUT. Un seul élément collé en haut, un seul collé en bas (la barre de
+ * validation) : la consigne de Laura était « fige tout ou rien ». Entre les
+ * deux, le contenu défile.
+ *
+ * La cause des cinq chevauchements de la soirée du 14/09 n'était pas ici : les
+ * animations d'écran en `animation-fill-mode: both` laissaient une MATRICE
+ * IDENTITÉ posée à demeure sur le conteneur de défilement, donc un bloc
+ * conteneur et un contexte d'empilement permanents. Corrigé dans matiere.css.
+ */
+.tempo-band {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  margin-bottom: var(--sp-5);
+  padding: var(--sp-3) var(--sp-5) var(--sp-4);
+  border-radius: var(--r-lg);
+  /*
+   * Fond opaque, et surtout PAS de flou ici.
+   *
+   * Un `backdrop-filter` était posé sous ce fond opaque : entièrement recouvert,
+   * donc invisible à l'œil — mais WebKit le peignait quand même et
+   * ré-échantillonnait l'arrière-plan à chaque image de défilement. C'était le
+   * seul flou restant à l'écran pendant une séance (la barre du bas n'est pas
+   * montée, celui de la barre du haut est coupé sur appareil bridé), et il
+   * couvrait le bandeau du chrono, affiché pendant TOUT exercice chronométré.
+   * Le retirer ne change rien au rendu et retire le premier poste de dépense
+   * d'une heure de salle.
+   */
+  background: var(--surface-1);
+  box-shadow: inset 0 -1px 0 var(--line);
+}
+
+.workout-content .tempo-band .exercise-timer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--sp-3);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+/*
+ * LE CORRECTIF MESURÉ PAR L'AUDIT : le conteneur du chiffre est en
+ * `flex-direction: column; flex-wrap: wrap`. Avec le retour à la ligne actif, le
+ * chiffre basculait dans une SECONDE COLONNE, à 150,19 px plus à droite — soit
+ * exactement la largeur de l'intitulé (146,19) plus l'écart (4). Le chiffre
+ * finissait à 444 px pour un écran de 390.
+ */
+.workout-content .tempo-band .exercise-timer > div:first-of-type {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: var(--sp-2);
+  min-width: 0;
+  text-align: center;
+}
+
+/* L'intitulé partageait la ligne du chiffre : le bandeau EST le compteur. */
+.workout-content .tempo-band .eyebrow {
+  display: none;
+}
+
+.workout-content .tempo-band .exercise-timer strong {
+  width: 100%;
+  max-width: 100%;
+  text-align: center;
+  font-size: var(--fs-tempo);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 1.04;
+  font-variant-numeric: tabular-nums;
+}
+
+.tempo-unite {
+  font-size: var(--fs-tempo-unite);
+  font-weight: 460;
+  letter-spacing: 0;
+  color: var(--text-2);
+}
+
+.workout-content .tempo-band .timer-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-3);
+}
+
+.workout-content .tempo-band .timer-actions button:last-child {
+  display: none;
+}
+
+.workout-content .tempo-band .timer-actions button:first-child {
+  grid-column: 1 / -1;
+}
+
+.warmup-ramp-toggle {
+  min-height: 44px;
+}
+
+/* ============================================ équilibre des deux figeages == */
+
+/*
+ * Constat de Laura : « le compteur tempo et Performance sont figés, ça
+ * chevauche ». La carte de saisie portait une règle de l'application écrite bien
+ * avant ce soir — `.workout-content .log-card.compact { position: static;
+ * bottom: 0 }` — qui l'épinglait en bas de l'écran et la faisait passer
+ * par-dessus ce qui suivait.
+ *
+ * Règle retenue, la sienne : DEUX figés, un en haut, un en bas, et rien entre
+ * les deux. Le bandeau du tempo en haut, la barre de validation en bas ; la
+ * carte de saisie et la consigne défilent normalement.
+ */
+.workout-content .log-card.compact {
+  position: static;
+}
+
+/* La barre de validation reste au fond de l'écran : on réserve sa place dans le
+   contenu, sinon elle recouvre le bas du formulaire. */

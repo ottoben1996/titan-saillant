@@ -1,0 +1,817 @@
+/* ============================================================================
+   SUIVI HEBDOMADAIRE — saisie du samedi et bilan destiné au coach.
+
+   Deux contextes dans un même fichier, volontairement :
+   - `.followup` vit dans l'application, thème sombre, accent du profil actif ;
+   - `.bilan` est un document clair, pensé pour être lu et imprimé par le coach.
+     C'est un parti pris : un PDF sombre se lit mal et consomme de l'encre.
+   ========================================================================== */
+
+/* ------------------------------------------------------ Saisie du samedi --- */
+
+.followup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-7);
+  padding-top: var(--sp-4);
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-3);
+  align-self: flex-start;
+  padding: var(--sp-4) var(--sp-5);
+  border-radius: var(--r-md);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-2);
+  font-size: var(--fs-2);
+  font-weight: 700;
+}
+
+.followup h1 {
+  margin: 0;
+  font-size: clamp(1.6rem, 8vw, 2.2rem);
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+}
+
+.followup h1 em {
+  color: var(--accent);
+  font-style: normal;
+}
+
+/* Rail du cycle : on voit d'un coup d'œil où on en est sur les huit semaines. */
+.cycle-track {
+  display: flex;
+  gap: var(--sp-2);
+}
+
+.cycle-track i {
+  flex: 1;
+  height: 4px;
+  border-radius: var(--r-full);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.cycle-track i.done {
+  background: var(--accent);
+}
+
+.cycle-track i.now {
+  background: var(--accent);
+  opacity: 0.45;
+}
+
+.report-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-4);
+  min-height: 48px;
+  padding: var(--sp-6);
+  border-radius: var(--r-lg);
+  border: 1px solid rgb(var(--accent-rgb) / 0.35);
+  background: rgb(var(--accent-rgb) / 0.12);
+  color: var(--accent);
+  font-weight: 700;
+  font-size: var(--fs-3);
+}
+
+.report-button:disabled {
+  opacity: 0.45;
+}
+
+.followup-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface-1);
+  padding: var(--sp-2) var(--sp-7);
+}
+
+.followup-field {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-5);
+  padding: var(--sp-5) 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.followup-field:last-child {
+  border-bottom: 0;
+}
+
+.followup-field.alarming {
+  background: rgb(var(--rest-rgb, 243 189 107) / 0.08);
+}
+
+.followup-label {
+  flex: 1;
+  min-width: 0;
+}
+
+.followup-label b {
+  display: block;
+  font-size: var(--fs-3);
+  font-weight: 600;
+}
+
+.followup-label small {
+  display: block;
+  color: var(--text-3);
+  font-size: var(--fs-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.followup-stepper {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.followup-stepper button {
+  display: grid;
+  place-items: center;
+  /* 44 px : la cible tactile recommandée pour un pouce, mesurée par audit. */
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  color: var(--text-2);
+}
+
+.followup-stepper input {
+  width: 64px;
+  height: 44px;
+  padding: var(--sp-4) var(--sp-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface-0);
+  color: var(--text-1);
+  font-size: var(--fs-6);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.followup-stepper input::placeholder {
+  color: var(--text-3);
+  font-weight: 500;
+}
+
+.followup-delta {
+  min-width: 46px;
+  text-align: right;
+  font-size: var(--fs-2);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-3);
+}
+
+.followup-delta.up {
+  color: var(--accent);
+}
+
+.followup-delta.down {
+  color: var(--rest);
+}
+
+.followup-warning {
+  display: flex;
+  gap: var(--sp-4);
+  padding: var(--sp-5) var(--sp-6);
+  border-radius: var(--r-lg);
+  border: 1px solid rgb(243 189 107 / 0.32);
+  background: rgb(243 189 107 / 0.1);
+  color: #f0d6a8;
+  font-size: var(--fs-2);
+  line-height: 1.45;
+}
+
+.followup-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3) var(--sp-7);
+  color: var(--text-3);
+  font-size: var(--fs-1);
+}
+
+.followup-summary b {
+  color: var(--text-2);
+}
+
+.followup-saved {
+  margin: 0;
+  color: var(--accent);
+  font-size: var(--fs-2);
+  font-weight: 700;
+}
+
+.bilan-button {
+  margin-top: var(--sp-1);
+}
+
+.followup-next {
+  align-self: center;
+  padding: var(--sp-5) var(--sp-2);
+}
+
+.followup-history-title {
+  margin: var(--sp-5) 0 0;
+  font-size: var(--fs-3);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-3);
+}
+
+.followup-history {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.followup-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-6);
+  padding: var(--sp-5) var(--sp-6);
+  border-radius: var(--r-lg);
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+}
+
+.followup-week {
+  min-width: 58px;
+  color: var(--accent);
+  font-size: var(--fs-2);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.followup-row-values {
+  display: grid;
+  flex: 1;
+  gap: var(--sp-1);
+}
+
+.followup-row-values b {
+  font-size: var(--fs-5);
+}
+
+.followup-row-values small {
+  color: var(--text-3);
+  font-size: var(--fs-1);
+}
+
+/* Entrée depuis l'écran Progression. */
+.followup-cta {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-6);
+  width: 100%;
+  margin: var(--sp-9) 0 var(--sp-3);
+  padding: var(--sp-7);
+  border-radius: var(--r-lg);
+  border: 1px solid rgb(var(--accent-rgb) / 0.28);
+  background: rgb(var(--accent-rgb) / 0.08);
+  text-align: left;
+}
+
+.followup-cta-icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--r-md);
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.followup-cta-text {
+  display: grid;
+  flex: 1;
+  gap: var(--sp-1);
+}
+
+.followup-cta-text strong {
+  font-size: var(--fs-4);
+}
+
+.followup-cta-text small {
+  color: var(--text-3);
+  font-size: var(--fs-1);
+}
+
+.followup-cta > svg {
+  color: var(--accent);
+}
+
+/* ------------------------------------------------------------------ Bilan --- */
+
+.bilan {
+  padding: var(--sp-5) 0 var(--sp-13);
+}
+
+.bilan-bar {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-5);
+  margin-bottom: var(--sp-7);
+  padding: var(--sp-5) var(--sp-6);
+  border-radius: var(--r-lg);
+  border: 1px solid var(--line);
+  background: rgb(16 22 21 / 0.92);
+  /*
+   * Pas de flou : la barre est opaque à 92 %, donc seuls 8 % du flou étaient
+   * visibles — pour une re-peinture de l'arrière-plan à chaque image de
+   * défilement, sur l'écran le plus long de l'application (le bilan, un document
+   * de plusieurs pages).
+   */
+}
+
+.bilan-bar .primary-button {
+  padding: var(--sp-5) var(--sp-7);
+  font-size: var(--fs-3);
+}
+
+.bilan-doc {
+  width: min(100%, 820px);
+  margin: 0 auto;
+  padding: var(--sp-11) var(--sp-11) var(--sp-12);
+  border-radius: var(--r-lg);
+  background: #ffffff;
+  color: #16211c;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+}
+
+.bilan-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sp-7);
+  padding-bottom: var(--sp-6);
+  border-bottom: 2px solid #16211c;
+}
+
+.bilan-head h2 {
+  margin: 0;
+  font-size: var(--fs-8);
+  letter-spacing: -0.03em;
+}
+
+.bilan-head p {
+  margin: var(--sp-2) 0 0;
+  font-size: var(--fs-1);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #55655c;
+}
+
+.bilan-tag {
+  text-align: right;
+  font-size: var(--fs-1);
+  color: #55655c;
+}
+
+.bilan-tag b {
+  display: block;
+  font-size: var(--fs-5);
+  color: #16211c;
+  letter-spacing: -0.02em;
+}
+
+.bilan-kpis {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-4);
+  margin: var(--sp-8) 0 var(--sp-3);
+}
+
+.bilan-kpis > div {
+  border: 1px solid #d8e0db;
+  border-radius: var(--r-md);
+  padding: var(--sp-4) var(--sp-5);
+}
+
+.bilan-kpis span {
+  display: block;
+  font-size: var(--fs-1);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #55655c;
+}
+
+.bilan-kpis b {
+  display: block;
+  margin-top: var(--sp-2);
+  font-size: var(--fs-7);
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.bilan-kpis small {
+  display: block;
+  font-size: var(--fs-1);
+  color: #55655c;
+}
+
+.bilan-doc h3 {
+  margin: var(--sp-10) 0 var(--sp-4);
+  font-size: var(--fs-2);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #55655c;
+}
+
+.bilan-doc h4 {
+  margin: var(--sp-7) 0 var(--sp-3);
+  font-size: var(--fs-3);
+}
+
+.bilan-charges h4 {
+  display: flex;
+  gap: var(--sp-3);
+  align-items: baseline;
+}
+
+.bilan-doc table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-2);
+}
+
+.bilan-doc th {
+  padding: var(--sp-3) 0 var(--sp-3) 0;
+  border-bottom: 1px solid #d8e0db;
+  font-size: var(--fs-1);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #55655c;
+  text-align: left;
+}
+
+.bilan-doc td {
+  padding: var(--sp-3) 0;
+  border-bottom: 1px solid #eef2ef;
+  font-variant-numeric: tabular-nums;
+}
+
+.bilan-doc td.num,
+.bilan-doc th.num {
+  text-align: right;
+  white-space: nowrap;
+  padding-left: var(--sp-8);
+}
+
+.bilan-doc td.note,
+.bilan-doc th.note {
+  text-align: left;
+  padding-left: var(--sp-10);
+  font-size: var(--fs-1);
+  color: #55655c;
+}
+
+.bilan-doc .pos {
+  color: #3f7a3a;
+  font-weight: 700;
+}
+
+.bilan-doc .neg {
+  color: #9a6a12;
+  font-weight: 700;
+}
+
+.bilan-coach {
+  margin: 0 0 var(--sp-8);
+  padding: var(--sp-5) var(--sp-6);
+  border-left: 3px solid #b98cc9;
+  border-radius: 0 var(--r-md) var(--r-md) 0;
+  background: #f6eefa;
+}
+
+.bilan-coach b {
+  display: block;
+  margin-bottom: var(--sp-2);
+  font-size: var(--fs-1);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #6b4a78;
+}
+
+.bilan-coach p {
+  margin: 0;
+  font-size: var(--fs-3);
+  font-style: italic;
+}
+
+/* Reprendre la valeur précédente d'un appui : cible large, texte discret. */
+.followup-reuse {
+  /* 40 px : c'est un raccourci, pas l'action principale, mais il doit rester
+     attrapable au pouce. Mesuré par audit, comme le reste. */
+  min-height: 40px;
+  padding: var(--sp-4) var(--sp-5);
+  border: 1px dashed var(--line);
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--text-3);
+  font-size: var(--fs-1);
+  font-weight: 600;
+}
+
+.cycle-pause {
+  margin: 0;
+  padding: var(--sp-5) var(--sp-6);
+  border-left: 3px solid var(--rest);
+  border-radius: 0 var(--r-md) var(--r-md) 0;
+  background: var(--surface-2);
+  color: var(--text-2);
+  font-size: var(--fs-2);
+}
+
+.followup-coach {
+  display: grid;
+  gap: var(--sp-3);
+}
+
+.followup-coach > span {
+  font-size: var(--fs-3);
+  font-weight: 600;
+}
+
+.followup-coach small {
+  display: block;
+  color: var(--text-3);
+  font-size: var(--fs-1);
+  font-weight: 500;
+}
+
+.followup-coach textarea {
+  width: 100%;
+  padding: var(--sp-6);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface-1);
+  color: var(--text-1);
+  font: inherit;
+  resize: vertical;
+}
+
+.progression-allgement {
+  margin: 0;
+  padding: var(--sp-5) var(--sp-6);
+  border-left: 3px solid var(--rest);
+  border-radius: 0 var(--r-md) var(--r-md) 0;
+  background: var(--surface-2);
+  color: var(--text-2);
+  font-size: var(--fs-2);
+}
+
+.bilan-chart-legende {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+}
+
+.bilan-chart-legende span {
+  display: inline-block;
+  width: 18px;
+  height: 0;
+  border-top-width: 2px;
+  border-top-style: solid;
+}
+
+.bilan-chart-legende .trait-plein {
+  border-top-color: #5f9b3f;
+}
+
+.bilan-chart-legende .trait-moyenne {
+  border-top-color: #3f7dbf;
+  border-top-style: dashed;
+}
+
+.bilan-chart {
+  margin: var(--sp-2) 0 var(--sp-5);
+}
+
+.bilan-chart h4 {
+  display: flex;
+  gap: var(--sp-4);
+  align-items: baseline;
+  margin: 0 0 var(--sp-1);
+  font-size: var(--fs-2);
+}
+
+.bilan-chart h4 span {
+  font-size: var(--fs-1);
+  color: #55655c;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.bilan-chart svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.bilan-note {
+  margin: var(--sp-2) 0 0;
+  font-size: var(--fs-1);
+  line-height: 1.5;
+  color: #55655c;
+}
+
+.bilan-read {
+  border-left: 3px solid var(--accent);
+  background: #f4fbf0;
+  padding: var(--sp-5) var(--sp-6);
+  font-size: var(--fs-2);
+  line-height: 1.55;
+}
+
+.bilan-read.alert {
+  border-left-color: #e0a13c;
+  background: #fdf6ea;
+}
+
+.bilan-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sp-5);
+  margin-top: var(--sp-10);
+  padding-top: var(--sp-5);
+  border-top: 1px solid #d8e0db;
+  font-size: var(--fs-1);
+  color: #55655c;
+}
+
+/* Impression : seul le document doit sortir, sur fond blanc, sans habillage. */
+@media print {
+  /* Le fond sombre de l'application est porté par ses conteneurs, pas seulement
+     par <body> : sans ce rappel, la bande autour du document reste noire et les
+     derniers chiffres du tableau, qui débordent d'un rien, y deviennent
+     invisibles. */
+  html,
+  body,
+  #root,
+  .app,
+  .app-shell {
+    background: #ffffff !important;
+    color: #16211c !important;
+  }
+
+  /* Tout le chrome de l'application disparaît : il ne reste que le document. */
+  .bilan-bar,
+  .bottom-nav,
+  .topbar,
+  .toast {
+    display: none !important;
+  }
+
+  .app-shell {
+    padding: 0 !important;
+  }
+
+  .bilan {
+    padding: 0;
+  }
+
+  .bilan-doc {
+    width: 100%;
+    margin: 0;
+    /* Un filet de marge intérieure : sans lui, le tableau de largeur 100 %
+       dépasse d'un cheveu le fond blanc du document. */
+    padding: 0 var(--sp-2);
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .bilan-doc h3,
+  .bilan-chart,
+  .bilan-read,
+  .bilan-charges {
+    break-inside: avoid;
+  }
+
+  /* Sur A4, le tableau doit tenir dans la largeur utile : sinon la dernière
+     colonne (« Début ») mord sur la marge et se fait couper. Largeurs fixes,
+     en-têtes qui peuvent passer à la ligne. */
+  .bilan-doc table {
+    table-layout: fixed;
+    width: 100%;
+    font-size: var(--fs-2);
+  }
+
+  .bilan-doc th {
+    white-space: normal;
+    font-size: var(--fs-1);
+    padding-left: var(--sp-4);
+  }
+
+  .bilan-doc td:first-child,
+  .bilan-doc th:first-child {
+    width: 32%;
+    white-space: normal;
+  }
+
+  .bilan-doc td.num,
+  .bilan-doc th.num {
+    padding-left: var(--sp-4);
+  }
+
+  /* Un filet de sécurité : aucun glyphe ne doit toucher le bord du cadre. */
+  .bilan-doc td:last-child,
+  .bilan-doc th:last-child {
+    padding-right: var(--sp-3);
+  }
+
+  .bilan-tag {
+    max-width: 45%;
+  }
+
+  .bilan-doc h3 {
+    font-size: var(--fs-5);
+    break-after: avoid;
+  }
+}
+
+/* Format du document imprimé.
+   ATTENTION : une règle @page placée DANS un bloc @media print est ignorée par le
+   navigateur — le PDF sortait alors au format US, et la dernière colonne du
+   tableau mordait sur la marge. Elle doit rester à la racine de la feuille. */
+@page {
+  size: A4 portrait;
+  margin: 12mm;
+}
+
+/* Sur un téléphone, un bouton de texte reste une cible : il doit atteindre
+   44 px de haut, même s'il ressemble à un simple lien. */
+@media (max-width: 480px) {
+  .text-button,
+  .back-link {
+    min-height: 44px;
+    padding-top: var(--sp-5);
+    padding-bottom: var(--sp-5);
+  }
+}
+
+/* Sur un téléphone, le document ne doit jamais être tronqué ni défiler de côté :
+   en-têtes compacts, marges resserrées. La version imprimée garde sa respiration. */
+@media (max-width: 480px) {
+  .bilan-doc {
+    padding: var(--sp-9) var(--sp-7) var(--sp-10);
+  }
+
+  .bilan-doc table {
+    font-size: var(--fs-1);
+    table-layout: fixed;
+  }
+
+  .bilan-doc th {
+    font-size: var(--fs-1);
+    letter-spacing: 0.04em;
+  }
+
+  .bilan-doc td.num,
+  .bilan-doc th.num {
+    padding-left: var(--sp-3);
+  }
+
+  .bilan-doc td:first-child,
+  .bilan-doc th:first-child {
+    width: 34%;
+    white-space: normal;
+  }
+
+  .bilan-kpis b {
+    font-size: var(--fs-6);
+  }
+
+  .bilan-head h2 {
+    font-size: var(--fs-7);
+  }
+}
+
+/* Écran étroit : les libellés et les pas de saisie doivent tenir sur une ligne. */
+@media (max-width: 380px) {
+  .followup-stepper input {
+    width: 64px;
+  }
+
+  .followup-delta {
+    min-width: 44px;
+  }
+
+  .bilan-doc {
+    padding: var(--sp-10) var(--sp-8) var(--sp-11);
+  }
+}

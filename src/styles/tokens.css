@@ -1,0 +1,971 @@
+/* ============================================================================
+   Coach Ottman & Laura — couche de tokens et de discipline visuelle
+   ----------------------------------------------------------------------------
+   Chargée APRÈS styles.css : elle ne remplace aucune structure, elle corrige
+   les valeurs. Objectifs :
+     1. un seul jeu de tokens (couleurs, rayons, typo, mouvement) ;
+     2. hiérarchie typographique bornée (aucun titre au-delà de 40 px) ;
+     3. une seule couleur d'accent utilisée comme action ;
+     4. surfaces à bordure plutôt qu'ombres empilées ;
+     5. suppression des dégradés décoratifs ;
+     6. chiffres tabulaires pour tous les chronos et charges.
+   Périmètre : application Ottman/Laura. L'espace MUSTAPHA (sélecteurs
+   .mustapha-*) conserve ses propres tokens.
+   ========================================================================== */
+
+/* Police auto-hébergée : deux sous-ensembles, aucune requête externe */
+@font-face {
+  font-family: "Inter Variable";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/fonts/inter-latin-var.woff2") format("woff2-variations");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
+    U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Inter Variable";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("/fonts/inter-latin-ext-var.woff2") format("woff2-variations");
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304,
+    U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0,
+    U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+:root {
+  /* Surfaces */
+  --surface-0: #0b0f0e;
+  --surface-1: #121715;
+  --surface-2: #18201d;
+  --line: rgba(255, 255, 255, 0.09);
+  --line-strong: rgba(255, 255, 255, 0.16);
+
+  /* Texte */
+  --text-1: #f1f5f2;
+  --text-2: #a9b7ae;
+  --text-3: #78877e;
+
+  /* Accents — l'accent suit le profil actif (voir [data-profile] plus bas).
+     Les canaux séparés permettent les voiles translucides sans coder la teinte
+     en dur dans chaque composant. */
+  --accent: #b8f36b;
+  --accent-rgb: 184 243 107;
+  --accent-ink: #0e1710;
+  --accent-2: #5fbf97;
+  --accent-3: #243129;
+  --rest: #f3bd6b;
+  --danger: #e79292;
+  --profile-laura: #e3c0f7;
+
+  /* Laura : lilas pastel, même structure, teinte plus douce */
+  --accent-laura: #e3c0f7;
+  --accent-laura-rgb: 227 192 247;
+  --accent-laura-ink: #1a1024;
+  --accent-laura-2: #a98bc4;
+  --accent-laura-3: #2a2434;
+
+  /* Rayons */
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 14px;
+
+  /* Mouvement */
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --t-fast: 120ms;
+  --t-mid: 180ms;
+  --t-slow: 240ms;
+
+  /* Élévation unique, réservée aux surfaces flottantes */
+  --elevation: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 8px 24px rgba(0, 0, 0, 0.35);
+
+  /* Typographie : Inter auto-hébergée (voir les @font-face ci-dessus) */
+  font-family: "Inter Variable", Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+
+/* ---------------------------------------------------------------- base ---- */
+body {
+  background: var(--surface-0);
+  color: var(--text-1);
+  font-family: "Inter Variable", Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: rgb(var(--accent-rgb) / 0.25);
+  color: var(--text-1);
+}
+
+.app-shell button,
+.app-shell input,
+.app-shell select {
+  touch-action: manipulation;
+}
+
+.app-shell button:focus-visible,
+.app-shell input:focus-visible,
+.app-shell select:focus-visible {
+  outline: 2px solid rgb(var(--accent-rgb) / 0.75);
+  outline-offset: 2px;
+}
+
+/* Largeur utile : éviter la colonne étroite sur écran large */
+.content,
+.topbar {
+  width: min(100%, 72rem);
+}
+
+/* ------------------------------------------------ hiérarchie typographique - */
+.profile-card h1,
+.hero-row h1,
+.completion-screen h1 {
+  font-size: clamp(1.75rem, 7vw, 2.5rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.page-heading h1 {
+  font-size: clamp(1.5rem, 6vw, 2rem);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.workout-heading h1,
+.workout-content .workout-heading h1 {
+  font-size: clamp(1.25rem, 5.5vw, 1.875rem);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.section-heading h2 {
+  font-size: var(--fs-7);
+  letter-spacing: -0.01em;
+}
+
+.tutorial-modal h2 {
+  font-size: var(--fs-9);
+  letter-spacing: -0.01em;
+}
+
+.tutorial-modal h3 {
+  font-size: var(--fs-2);
+  letter-spacing: 0.12em;
+}
+
+/* Chiffres de prescription : 40 px maximum, comme le chrono */
+.prescription-main strong {
+  font-size: var(--fs-12);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.prescription-card.compact .prescription-main strong {
+  font-size: clamp(2rem, 9vw, 2.5rem);
+}
+
+.rest-orbit strong {
+  font-size: var(--fs-12);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.workout-content .rest-orbit strong {
+  font-size: var(--fs-11);
+}
+
+/* Indicateurs : compacts, lisibles, sans surdimensionnement */
+.metric-card strong {
+  font-size: var(--fs-9);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.day-number {
+  font-size: var(--fs-7);
+  color: var(--text-3);
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Chronos et charges : largeur stable pendant le décompte */
+.session-elapsed,
+.rest-orbit strong,
+.exercise-timer strong,
+.progress-pill,
+.history-date,
+.prescription-main b,
+.plate-badge,
+.mustapha-progress + * {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ------------------------------------------------------- surfaces etcartes - */
+.workout-card,
+.metric-card,
+.prescription-card,
+.log-card,
+.rest-card,
+.history-item,
+.settings-profile,
+.settings-list button,
+.profile-choice,
+.coach-note,
+.resume-banner {
+  border: 1px solid var(--line);
+  box-shadow: none;
+}
+
+.workout-card,
+.metric-card,
+.prescription-card,
+.log-card,
+.rest-card {
+  border-radius: var(--r-lg);
+}
+
+.history-item,
+.settings-profile,
+.settings-list button,
+.profile-choice,
+.coach-note,
+.resume-banner {
+  border-radius: var(--r-lg);
+}
+
+/* Une seule carte accentuée par écran : la métrique de volume */
+.metric-card.accent {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-color: transparent;
+}
+
+.metric-card.accent span,
+.metric-card.accent small {
+  color: rgba(14, 23, 16, 0.72);
+}
+
+/* Tint par index : sans signification, on neutralise */
+.card-1,
+.card-2 {
+  background: var(--surface-1);
+}
+
+.workout-card:hover,
+.profile-choice:hover {
+  background: var(--surface-2);
+  transform: none;
+}
+
+/* Pastilles et étiquettes : neutres, l'accent reste l'action */
+.tag,
+.chip-row span {
+  background: var(--surface-2);
+  color: var(--text-2);
+  border: 1px solid var(--line);
+}
+
+.text-button,
+.tutorial-link {
+  color: var(--accent);
+  font-weight: 590;
+}
+
+.alternative-link {
+  background: var(--surface-2);
+  color: var(--text-2);
+  border: 1px solid var(--line);
+  font-weight: 510;
+}
+
+.alternative-link:hover {
+  color: var(--text-1);
+  border-color: var(--line-strong);
+}
+
+.alternative-link svg {
+  color: var(--text-3);
+}
+
+/* Alertes de tempo et de repos : une seule couleur d'alerte */
+.warmup-ramp-badge,
+.rest-circle-alert .rest-circle-progress {
+  color: var(--rest);
+}
+
+.rest-circle-alert .rest-circle-progress {
+  stroke: var(--rest);
+  filter: none;
+}
+
+.legend-dot.secondary {
+  background: var(--text-3);
+}
+
+.barbell-collar {
+  background: #55606a;
+}
+
+/* Boutons : rayons et transitions homogènes */
+.primary-button,
+.round-action,
+.tutorial-link,
+.icon-button,
+.timer-actions button,
+.rest-actions button,
+.settings-list button,
+.input-row input {
+  border-radius: var(--r-md);
+}
+
+.round-action,
+.icon-button {
+  border-radius: var(--r-pill, 999px);
+}
+
+.primary-button,
+.round-action,
+.tutorial-link,
+.icon-button,
+.text-button,
+.profile-choice,
+.workout-card,
+.history-item {
+  transition:
+    background var(--t-mid) var(--ease),
+    border-color var(--t-mid) var(--ease),
+    color var(--t-mid) var(--ease),
+    transform var(--t-fast) var(--ease);
+}
+
+.primary-button:hover {
+  transform: none;
+  box-shadow: none;
+  /* Était un vert lime écrit en dur (#c4f884) : quand on changeait la couleur,
+     le bouton restait vert. Sur téléphone l'état :hover colle après l'appui, donc
+     il restait vert jusqu'au geste suivant — signalé par Laura. On éclaircit
+     l'accent courant, quelle que soit la couleur choisie. */
+  background: color-mix(in srgb, var(--accent) 86%, white);
+}
+
+.round-action:hover {
+  transform: none;
+}
+
+/* ------------------------------------ discipline d'accent et de densité ---- */
+/* Une seule couleur d'action par écran : le titre de marque et les libellés
+   secondaires restent neutres, l'accent est réservé à l'action et à l'état actif. */
+.topbar-brand {
+  color: var(--text-2);
+}
+
+.eyebrow {
+  color: var(--text-3);
+}
+
+.brand-mark {
+  box-shadow: none;
+}
+
+/* Le badge « en ligne » reste masqué : seule la perte de connexion s'affiche. */
+.connection-pill.online {
+  display: none;
+}
+
+.connection-pill.offline {
+  display: inline-flex;
+  color: var(--rest);
+  background: rgba(243, 189, 107, 0.12);
+}
+
+.connection-pill.offline .connection-dot {
+  background: var(--rest);
+  box-shadow: none;
+}
+
+.status-dot {
+  background: var(--text-3);
+  box-shadow: none;
+}
+
+/* La métrique mise en avant n'est plus un aplat saturé : elle reste une surface,
+   seule sa valeur porte l'accent. */
+.metric-card.accent {
+  background: var(--surface-1);
+  border-color: rgb(var(--accent-rgb) / 0.28);
+  color: var(--text-1);
+}
+
+.metric-card.accent strong {
+  color: var(--accent);
+}
+
+.metric-card.accent span,
+.metric-card.accent small {
+  color: var(--text-2);
+}
+
+/* Barre de progression : discrète, plus de rail lumineux décoratif */
+.progress-track {
+  height: 3px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+/* Cible tactile minimale de l'action de lancement */
+.round-action {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.toggle-row .toggle-pill {
+  position: relative;
+  flex: none;
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  width: 42px;
+  height: 24px;
+  padding: var(--sp-1);
+  border-radius: var(--r-2xl);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--line);
+  transition:
+    background var(--t-mid) var(--ease),
+    border-color var(--t-mid) var(--ease);
+}
+
+.toggle-row .toggle-pill i {
+  flex: none;
+  display: block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--text-2);
+  transition:
+    transform var(--t-mid) var(--ease),
+    background var(--t-mid) var(--ease);
+}
+
+.toggle-row .toggle-pill.on {
+  background: rgb(var(--accent-rgb) / 0.25);
+  border-color: rgb(var(--accent-rgb) / 0.45);
+}
+
+.toggle-row .toggle-pill.on i {
+  background: var(--accent);
+  transform: translateX(18px);
+}
+
+.last-session-strip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3, 12px);
+  margin-top: var(--sp-8);
+  padding: var(--sp-6) var(--sp-7);
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-left: 2px solid var(--accent);
+  border-radius: var(--r-lg);
+}
+
+.last-session-strip strong {
+  display: block;
+  margin-top: var(--sp-1);
+  font-size: var(--fs-5);
+  font-weight: 590;
+}
+
+.last-session-strip small {
+  display: block;
+  margin-top: var(--sp-1);
+  color: var(--text-2);
+  font-size: var(--fs-2);
+}
+
+/* L'illustration du mouvement occupe l'espace laissé vide par la prescription :
+   plus de zone morte de 300 px au milieu de l'écran de séance. */
+.prescription-card.compact {
+  justify-content: flex-start;
+  gap: var(--sp-3);
+}
+
+.exercise-illustration {
+  flex: 1 1 auto;
+  min-height: 6rem;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: var(--sp-4);
+  margin: var(--sp-2) 0 var(--sp-4);
+}
+
+.exercise-illustration.single {
+  grid-template-columns: 1fr;
+}
+
+.exercise-illustration img {
+  width: 100%;
+  height: 100%;
+  max-height: 26dvh;
+  min-height: 5.5rem;
+  object-fit: contain;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+}
+
+.exercise-illustration .illustration-arrow {
+  color: var(--text-3);
+}
+
+/* Bandeau duo : information secondaire, traitée comme telle */
+.duo-switcher-bar {
+  max-width: 20rem;
+}
+
+.duo-pill-btn {
+  padding: var(--sp-3) var(--sp-5);
+  font-size: var(--fs-2);
+  min-height: 32px;
+}
+
+.duo-pill-badge {
+  font-size: var(--fs-1);
+}
+
+.chip-tempo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  border-color: rgb(var(--accent-rgb) / 0.35) !important;
+  color: var(--accent) !important;
+  font-weight: 590;
+}
+
+.tutorial-arrow {
+  color: var(--accent);
+}
+
+.best-item svg:last-child {
+  color: var(--text-3);
+}
+
+/* ------------------------------------------- suppression des décorations --- */
+.exercise-visual {
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  color: var(--text-3);
+}
+
+.tutorial-cover {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  color: var(--accent);
+}
+
+/* Échec du stockage local : visible, jamais silencieux. */
+.storage-alert {
+  flex: none;
+  width: min(100%, 72rem);
+  margin: 0 auto var(--sp-6);
+  padding: var(--sp-6) var(--sp-7);
+  border: 1px solid rgba(231, 146, 146, 0.35);
+  border-left: 2px solid var(--danger);
+  border-radius: var(--r-lg);
+  background: rgba(231, 146, 146, 0.1);
+  color: #f3d6d6;
+  font-size: var(--fs-3);
+  line-height: 1.45;
+}
+
+/* L'écran de séance est une grille à deux rangées : la bannière d'erreur a
+   besoin de sa propre rangée, sinon elle est écrasée par le contenu. */
+.workout-shell:has(.storage-alert) {
+  grid-template-rows: auto auto minmax(0, 1fr);
+}
+
+/* Filet de sécurité d'affichage */
+.error-shell {
+  display: grid;
+  place-items: center;
+  min-height: 100dvh;
+}
+
+.error-panel {
+  width: min(100%, 34rem);
+  padding: var(--sp-11);
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-left: 2px solid var(--danger);
+  border-radius: var(--r-lg);
+}
+
+.error-panel h1 {
+  margin: var(--sp-4) 0 var(--sp-6);
+  font-size: clamp(1.5rem, 6vw, 2rem);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.error-panel .primary-button {
+  margin-top: var(--sp-10);
+}
+
+.error-detail {
+  margin: var(--sp-6) 0 0;
+  padding: var(--sp-4) var(--sp-5);
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
+  color: var(--text-3);
+  font-size: var(--fs-2);
+  font-family: ui-monospace, "SFMono-Regular", "Cascadia Mono", monospace;
+  overflow-wrap: anywhere;
+}
+
+/* Mise à jour disponible : discrète, jamais au milieu d'une séance */
+.update-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-6);
+  width: min(100%, 72rem);
+  margin: 0 auto var(--sp-6);
+  padding: var(--sp-5) var(--sp-6);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface-2);
+  color: var(--text-2);
+  font-size: var(--fs-3);
+}
+
+.update-banner button {
+  flex: none;
+  min-height: 44px;
+  padding: 0 var(--sp-8);
+  border: 0;
+  border-radius: var(--r-md);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font: inherit;
+  font-weight: 590;
+  cursor: pointer;
+}
+
+.toast {
+  background: var(--accent);
+  color: var(--accent-ink);
+  box-shadow: var(--elevation);
+}
+
+.modal-backdrop {
+  background: rgba(0, 0, 0, 0.68);
+}
+
+.tutorial-modal {
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+}
+
+.safety-callout {
+  background: rgba(243, 189, 107, 0.1);
+  color: #e7cfa9;
+  border: 1px solid rgba(243, 189, 107, 0.22);
+  border-radius: var(--r-md);
+}
+
+.settings-list .danger-row,
+.settings-list .danger-row > svg:first-child {
+  color: var(--danger);
+}
+
+.empty-state {
+  color: var(--text-3);
+}
+
+.empty-state h2 {
+  color: var(--text-1);
+}
+
+/* Profil actif : Laura remplace l'accent lime par son lilas pastel.
+   Un seul attribut sur <html> suffit — aucun composant ne connaît le profil. */
+:root[data-profile="laura"] {
+  --accent: var(--accent-laura);
+  --accent-rgb: var(--accent-laura-rgb);
+  --accent-ink: var(--accent-laura-ink);
+  --accent-2: var(--accent-laura-2);
+  --accent-3: var(--accent-laura-3);
+}
+
+/* Couleur choisie dans les réglages, une par profil.
+   Ce bloc vient APRÈS celui du profil : à spécificité égale, il gagne. Les cinq
+   paires couleur / encre sont mesurées à plus de 10:1 de contraste (seuil AAA : 7:1). */
+:root[data-accent="vert"] {
+  --accent: #b8f36b;
+  --accent-rgb: 184 243 107;
+  --accent-ink: #0e1710;
+  --accent-2: #97c758;
+  --accent-3: #2b3923;
+}
+
+:root[data-accent="rose"] {
+  --accent: #e3c0f7;
+  --accent-rgb: 227 192 247;
+  --accent-ink: #1a1024;
+  --accent-2: #ba9dcb;
+  --accent-3: #323139;
+}
+
+:root[data-accent="bleu"] {
+  --accent: #8fc7ff;
+  --accent-rgb: 143 199 255;
+  --accent-ink: #0a1622;
+  --accent-2: #75a3d1;
+  --accent-3: #24323a;
+}
+
+:root[data-accent="ambre"] {
+  --accent: #f6c177;
+  --accent-rgb: 246 193 119;
+  --accent-ink: #1f1305;
+  --accent-2: #ca9e62;
+  --accent-3: #353125;
+}
+
+:root[data-accent="turquoise"] {
+  --accent: #7fe3d2;
+  --accent-rgb: 127 227 210;
+  --accent-ink: #04211d;
+  --accent-2: #68baac;
+  --accent-3: #223733;
+}
+
+/* ---------------------------------------------------------------------------
+   Échelles du système.
+
+   Avant : 93 valeurs de marge intérieure, 45 tailles de police, 40 écarts et
+   19 rayons différents, chacun réinventé au moment de l'écriture. Les écarts se
+   voyaient, et chaque nouvel écran ajoutait de la dérive.
+
+   Maintenant : une grille de 2 px pour l'espacement, une échelle typographique
+   en rem (elle suit donc la taille de police choisie par la personne, ce qui
+   n'était pas le cas des valeurs en pixels), et six rayons nommés.
+
+   Le test `src/styles/systeme.test.ts` refuse toute valeur écrite à la main.
+   --------------------------------------------------------------------------- */
+:root {
+  /* Espacement : la base est 2 px, les pas utiles montent jusqu'à 48 px. */
+  --sp-0: 0;
+  --sp-1: 2px;
+  --sp-2: 4px;
+  --sp-3: 6px;
+  --sp-4: 8px;
+  --sp-5: 10px;
+  --sp-6: 12px;
+  --sp-7: 14px;
+  --sp-8: 16px;
+  --sp-9: 18px;
+  --sp-10: 20px;
+  --sp-11: 24px;
+  --sp-12: 32px;
+  --sp-13: 40px;
+  --sp-14: 48px;
+
+  /* Typographie en rem : suit les préférences du système. */
+  --fs-1: 0.6875rem;
+  --fs-2: 0.75rem;
+  --fs-3: 0.8125rem;
+  --fs-4: 0.875rem;
+  --fs-5: 0.9375rem;
+  --fs-6: 1rem;
+  --fs-7: 1.125rem;
+  --fs-8: 1.25rem;
+  --fs-9: 1.375rem;
+  --fs-10: 1.75rem;
+  --fs-11: 2rem;
+  --fs-12: 2.5rem;
+
+  /* Le chiffre du repos.
+     C'est le seul nombre qu'on lit debout, à un mètre, en marchant vers la machine
+     suivante — et il mesurait 28 px, contre 94 px pour le tempo, soit 3,3 fois
+     plus petit. 2.5rem (40 px) : le gain de lisibilité est de 43 %, et le cercle
+     qui l'entoure passe de 108 à 128 px, ce que la carte de repos absorbe encore
+     (elle laisse environ 247 px de marge sous elle). */
+  --fs-repos: 2.5rem;
+
+  /* Le chiffre du compteur tempo, figé en haut de la séance. Mesuré à 390 px :
+     à 148 px, « 40s » faisait 331 px de large dans une zone de 331 et sortait de
+     140 px. 24 vw donnent 94 px ici : « 40s » tient en 210 px, et le pire cas
+     « 12:00 » en 300 — sous les 327 disponibles. */
+  --fs-tempo: clamp(4.5rem, 24vw, 7rem);
+  --fs-tempo-unite: 0.42em;
+
+  /* Rayons : prolonge les trois qui existaient déjà. */
+  --r-xs: 4px;
+  --r-xl: 20px;
+  --r-2xl: 24px;
+  --r-full: 99px;
+}
+
+/* ---------------------------------------------------------------------------
+   Mouvement : des ressorts, pas des courbes inventées.
+
+   iOS ne connaît pas les transitions linéaires : tout est ressort amorti. Une
+   courbe de ressort se calcule — x(t) = 1 − e^(−ζωt)(cos ω_d t + (ζω/ω_d) sin ω_d t)
+   — puis s'échantillonne dans `linear()`, que les navigateurs savent interpoler.
+
+   Trois ressorts, trois usages, et une seule raison de les avoir calculés
+   plutôt que copiés : chacun se termine exactement sur 1. Une courbe qui
+   n'atteint pas sa cible laisse un saut visible à la fin de l'animation.
+
+     --ressort         ζ = 1,00   aucun dépassement   → les feuilles, les écrans
+     --ressort-vif     ζ = 0,72   dépassement 3,8 %   → l'enfoncement d'un bouton
+     --ressort-rebond  ζ = 0,50   dépassement 16 %    → une apparition à fêter
+
+   La durée de chacune est son temps de stabilisation, pas un chiffre choisi à
+   l'œil : c'est ce qui garantit l'arrivée franche.
+   --------------------------------------------------------------------------- */
+:root {
+  --ressort: linear(
+    0,
+    0.0196 2.5%,
+    0.0684 5%,
+    0.1344 7.5%,
+    0.2093 10%,
+    0.2873 12.5%,
+    0.3644 15%,
+    0.438 17.5%,
+    0.5068 20%,
+    0.5699 22.5%,
+    0.6268 25%,
+    0.6778 27.5%,
+    0.7229 30%,
+    0.7625 32.5%,
+    0.7971 35%,
+    0.8272 37.5%,
+    0.8532 40%,
+    0.8756 42.5%,
+    0.8948 45%,
+    0.9112 47.5%,
+    0.9251 50%,
+    0.937 52.5%,
+    0.9471 55%,
+    0.9556 57.5%,
+    0.9628 60%,
+    0.9689 62.5%,
+    0.974 65%,
+    0.9783 67.5%,
+    0.9819 70%,
+    0.9849 72.5%,
+    0.9874 75%,
+    0.9896 77.5%,
+    0.9913 80%,
+    0.9928 82.5%,
+    0.994 85%,
+    0.995 87.5%,
+    0.9959 90%,
+    0.9966 92.5%,
+    0.9972 95%,
+    0.9977 97.5%,
+    1 100%
+  );
+  --ressort-vif: linear(
+    0,
+    0.0162 2.5%,
+    0.0591 5%,
+    0.121 7.5%,
+    0.1954 10%,
+    0.2771 12.5%,
+    0.3618 15%,
+    0.4462 17.5%,
+    0.5277 20%,
+    0.6045 22.5%,
+    0.6753 25%,
+    0.7393 27.5%,
+    0.7962 30%,
+    0.8459 32.5%,
+    0.8886 35%,
+    0.9246 37.5%,
+    0.9543 40%,
+    0.9785 42.5%,
+    0.9975 45%,
+    1.0121 47.5%,
+    1.0228 50%,
+    1.0303 52.5%,
+    1.0351 55%,
+    1.0376 57.5%,
+    1.0384 60%,
+    1.0378 62.5%,
+    1.0362 65%,
+    1.0338 67.5%,
+    1.031 70%,
+    1.0278 72.5%,
+    1.0246 75%,
+    1.0213 77.5%,
+    1.0182 80%,
+    1.0152 82.5%,
+    1.0125 85%,
+    1.0101 87.5%,
+    1.0079 90%,
+    1.0059 92.5%,
+    1.0043 95%,
+    1.0029 97.5%,
+    1 100%
+  );
+  --ressort-rebond: linear(
+    0,
+    0.0108 2.5%,
+    0.0409 5%,
+    0.087 7.5%,
+    0.1459 10%,
+    0.2146 12.5%,
+    0.2902 15%,
+    0.3701 17.5%,
+    0.4522 20%,
+    0.5343 22.5%,
+    0.6147 25%,
+    0.692 27.5%,
+    0.7649 30%,
+    0.8326 32.5%,
+    0.8943 35%,
+    0.9497 37.5%,
+    0.9983 40%,
+    1.0402 42.5%,
+    1.0753 45%,
+    1.104 47.5%,
+    1.1264 50%,
+    1.1431 52.5%,
+    1.1544 55%,
+    1.1609 57.5%,
+    1.163 60%,
+    1.1615 62.5%,
+    1.1567 65%,
+    1.1493 67.5%,
+    1.1398 70%,
+    1.1287 72.5%,
+    1.1164 75%,
+    1.1034 77.5%,
+    1.0901 80%,
+    1.0767 82.5%,
+    1.0635 85%,
+    1.0509 87.5%,
+    1.039 90%,
+    1.0279 92.5%,
+    1.0178 95%,
+    1.0087 97.5%,
+    1 100%
+  );
+
+  /* Durées du système, en millisecondes. */
+  --duree-enfonce: 90ms;
+  --duree-matiere: 220ms;
+  --duree-ecran: 200ms;
+}
