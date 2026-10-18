@@ -40,7 +40,7 @@ export function addDays(date: Date, days: number): Date {
 
 /** Horodatage de référence : la fin de séance si elle existe, sinon le début. */
 export function sessionTimestamp(session: WorkoutSession): number {
-  const raw = session.completedAt ?? session.startedAt;
+  const raw = session.completedAt ?? session.abandonedAt ?? session.startedAt;
   const parsed = Date.parse(raw);
   return Number.isFinite(parsed) ? parsed : 0;
 }
@@ -69,8 +69,9 @@ export function sessionBestLoadKg(session: WorkoutSession): number {
 
 /** Durée écoulée entre le début et la fin ; 0 si la séance n'est pas terminée. */
 export function sessionDurationSeconds(session: WorkoutSession): number {
-  if (!session.completedAt) return 0;
-  const elapsed = (Date.parse(session.completedAt) - Date.parse(session.startedAt)) / 1000;
+  const endAt = session.completedAt ?? session.abandonedAt;
+  if (!endAt) return 0;
+  const elapsed = (Date.parse(endAt) - Date.parse(session.startedAt)) / 1000;
   return Number.isFinite(elapsed) && elapsed > 0 ? Math.round(elapsed) : 0;
 }
 

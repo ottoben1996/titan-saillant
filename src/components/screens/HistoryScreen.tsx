@@ -104,7 +104,7 @@ export function HistoryScreen({ history, onBack, onDelete }: HistoryScreenProps)
                       >
                         <Trash size={16} />
                       </button>
-                      <span className="sr-only">{done ? 'Séance terminée' : 'Séance en cours'}</span>
+                      <span className="sr-only">{done ? 'Séance terminée' : interrupted ? 'Séance interrompue' : 'Séance en cours'}</span>
                     </article>
                   );
                 })}

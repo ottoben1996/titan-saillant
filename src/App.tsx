@@ -266,6 +266,10 @@ export default function App() {
         setSession(null);
         return;
       }
+      if (active.completedAt || active.abandonedAt) {
+        setSession(null);
+        return;
+      }
       const restoredTimer = active.activeTimer
         ? { ...active.activeTimer, remainingSeconds: restoreRemainingSeconds(active.activeTimer) }
         : undefined;
@@ -451,7 +455,6 @@ export default function App() {
 
   const switchDuoProfile = async (target: ProfileId, fallbackScreen: Screen = 'home') => {
     if (target === profile) return;
-    const generation = ++profileGeneration.current;
     if (session) {
       await withStorageGuard(saveSession({ ...session, updatedAt: new Date().toISOString() }), onStorageFailure, undefined);
     }
@@ -464,7 +467,7 @@ export default function App() {
       withStorageGuard(lireDureesPersonnalisees(target), onStorageFailure, {}),
       withStorageGuard(getActiveSession(target), onStorageFailure, undefined),
     ]);
-    if (generation !== profileGeneration.current) return;
+    // State is committed; profile hydration for target will run and sync any remainder.
     setProgramWeek(targetWeek);
     setManualLoads(targetLoads);
     setManualLoadsProfile(target);
@@ -546,7 +549,7 @@ export default function App() {
     }
   };
 
-  const confirmWorkoutStart = (energy: EnergyLevel, multiplier: number) => {
+  const confirmWorkoutStart = async (energy: EnergyLevel, multiplier: number) => {
     if (!pendingDay) return;
 
     // Une seule séance peut rester en cours. Sans cette clôture, démarrer un autre
