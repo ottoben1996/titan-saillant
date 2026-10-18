@@ -48,6 +48,10 @@ const sessionSchema = z
     notes: z.string().optional(),
     coachNote: z.string().optional(),
   })
+  .refine((data) => !(data.completedAt && data.abandonedAt), {
+    message: 'Une séance ne peut pas être à la fois terminée et interrompue.',
+    path: ['completedAt'],
+  })
   .passthrough();
 
 /** Les huit zones mesurées, plus la date et les notes. */

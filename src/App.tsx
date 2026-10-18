@@ -438,12 +438,47 @@ export default function App() {
    * points. `refreshHistory` ne relit que l'historique.
    */
   const rechargerApresImport = async (id: ProfileId) => {
-    await refreshHistory(id);
-    setProgramWeek(lireSemaineProgramme(id));
-    setMeasurements(await withStorageGuard(listMeasurements(id), onStorageFailure, []));
-    setManualLoads(await withStorageGuard(lireChargesPersonnalisees(id), onStorageFailure, {}));
-    setManualDurations(await withStorageGuard(lireDureesPersonnalisees(id), onStorageFailure, {}));
+    const generation = ++profileGeneration.current;
+    await refreshHistory(id, generation);
+    if (generation !== profileGeneration.current) return;
+    const week = lireSemaineProgramme(id);
+    const [loads, durations, measurements, active] = await Promise.all([
+      withStorageGuard(lireChargesPersonnalisees(id), onStorageFailure, {}),
+      withStorageGuard(lireDureesPersonnalisees(id), onStorageFailure, {}),
+      withStorageGuard(listMeasurements(id), onStorageFailure, []),
+      withStorageGuard(getActiveSession(id), onStorageFailure, undefined),
+    ]);
+    if (generation !== profileGeneration.current) return;
+    setProgramWeek(week);
+    setManualLoads(loads);
+    setManualDurations(durations);
+    setMeasurements(measurements);
     setManualLoadsProfile(id);
+    if (!active || active.completedAt || active.abandonedAt) {
+      setSession(null);
+      setSelectedDay(null);
+      setRestSeconds(0);
+      setIsResting(false);
+      return;
+    }
+    const restoredTimer = active.activeTimer
+      ? { ...active.activeTimer, remainingSeconds: restoreRemainingSeconds(active.activeTimer) }
+      : undefined;
+    const restored = restoredTimer ? { ...active, activeTimer: restoredTimer } : active;
+    setSession(restored);
+    const program = getProgram(id, active.programWeek ?? week, loads, durations);
+    const day = program.days.find((item) => item.id === active.dayId);
+    if (day) {
+      setSelectedDay(day);
+      setScreen('workout');
+    }
+    if (restored.activeTimer?.kind === 'rest' && restored.activeTimer.remainingSeconds > 0) {
+      setRestSeconds(restored.activeTimer.remainingSeconds);
+      setIsResting(true);
+    } else {
+      setRestSeconds(0);
+      setIsResting(false);
+    }
   };
 
   const leaveProfile = () => {

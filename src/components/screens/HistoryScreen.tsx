@@ -19,7 +19,8 @@ interface HistoryScreenProps {
 }
 
 function sessionDateLabel(item: WorkoutSession): string {
-  return new Date(item.completedAt ?? item.startedAt).toLocaleDateString('fr-FR', {
+  const endAt = item.completedAt ?? item.abandonedAt ?? item.startedAt;
+  return new Date(endAt).toLocaleDateString('fr-FR', {
     weekday: 'short',
     day: 'numeric',
     month: 'short',
