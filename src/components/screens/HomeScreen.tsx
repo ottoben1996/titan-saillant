@@ -48,6 +48,10 @@ export function getNextBestAction(options: {
   if (activeSession && !activeSession.completedAt) {
     return { kind: 'resume', label: 'Reprendre la séance', description: 'Continue là où tu t’es arrêté.' };
   }
+  const today = weekSlots(program.days, history, now).find((slot) => slot.state === 'today');
+  if (today) {
+    return { kind: 'workout', label: `Démarrer ${today.day.name}`, description: today.day.subtitle, day: today.day };
+  }
   const latestMeasurement = [...measurements]
     .filter((item) => item.measuredOn)
     .sort((a, b) => Date.parse(b.measuredOn ?? '') - Date.parse(a.measuredOn ?? ''))[0];
@@ -57,10 +61,6 @@ export function getNextBestAction(options: {
       label: 'Faire ton point hebdomadaire',
       description: 'Mets à jour tes mesures pour suivre ta progression.',
     };
-  }
-  const today = weekSlots(program.days, history, now).find((slot) => slot.state === 'today');
-  if (today) {
-    return { kind: 'workout', label: `Démarrer ${today.day.name}`, description: today.day.subtitle, day: today.day };
   }
   return {
     kind: 'recovery',
@@ -153,7 +153,6 @@ export function HomeScreen({
       weekSessions: comparison.current.sessions,
       weekVolume: comparison.current.volumeKg,
       volume7Days: volumeLastDays(history, now),
-      completedCount: history.filter((item) => item.completedAt).length,
     };
   }, [program.days, history, activeSession]);
 
@@ -257,6 +256,12 @@ export function HomeScreen({
       {/* Première lecture du stockage : une silhouette, pas une page vide.
           Le lecteur d'écran n'a rien à annoncer d'un dessin. */}
       {chargement && (
+        <div className="loading-status" role="status" aria-live="polite">
+          Chargement de ton accueil…
+        </div>
+      )}
+
+      {chargement && (
         <div className="skeleton-card" aria-hidden="true">
           <span className="skeleton-line short" />
           <span className="skeleton-line strong" />
@@ -288,12 +293,15 @@ export function HomeScreen({
       )}
 
       {!view.isResuming && !todaySlot && (
-        <article className="today-card done">
+        <article className="today-card done" aria-labelledby="week-complete-title">
           <p className="eyebrow">SEMAINE COMPLÈTE</p>
-          <h2>Les {WEEKLY_TARGET} créneaux sont validés</h2>
+          <h2 id="week-complete-title">Les {WEEKLY_TARGET} créneaux sont validés</h2>
           <p className="today-card-sub">
-            Rien d’obligatoire aujourd’hui. Tu peux refaire une séance si tu te sens frais.
+            Rien d’obligatoire aujourd’hui. Tu peux revoir ta progression ou refaire une séance si tu te sens frais.
           </p>
+          <button className="primary-button" type="button" onClick={onOpenProgression}>
+            Revoir ma progression
+          </button>
         </article>
       )}
 
@@ -339,7 +347,7 @@ export function HomeScreen({
             type="button"
             className={`week-slot ${slot.state}`}
             onClick={() => onStart(slot.day)}
-            aria-label={`${slot.day.name} — ${SLOT_STATES[slot.state]}`}
+            aria-label={`${slot.day.name}, ${SLOT_STATES[slot.state]}`}
           >
             <span className="week-slot-name">{slot.day.name}</span>
             <span className="week-slot-state">
@@ -368,9 +376,6 @@ export function HomeScreen({
             {formatVolume(view.volume7Days)}
             <small> kg·rép.</small>
           </strong>
-          <small className="home-metric-foot">
-            {view.completedCount} séance{view.completedCount > 1 ? 's' : ''} au total
-          </small>
         </div>
       </div>
 

@@ -10,7 +10,7 @@ import { describe, expect, it } from 'vitest';
 import { getProgram } from '../../domain/programs';
 import type { WorkoutSession } from '../../domain/types';
 import { weekSlots } from '../../workout/summary';
-import { estimatedMinutes, getNextBestAction } from './HomeScreen';
+import { estimatedMinutes, getNextBestAction, HomeScreen } from './HomeScreen';
 
 const program = getProgram('ottman');
 
@@ -108,5 +108,38 @@ describe('durée annoncée', () => {
   it('ne descend jamais sous une minute', () => {
     const vide = { ...jour('cardio'), exercises: [] };
     expect(estimatedMinutes(vide)).toBeGreaterThanOrEqual(1);
+  });
+});
+
+import { render, screen } from '@testing-library/react';
+
+describe('hiérarchie de l’accueil', () => {
+  const baseProps = {
+    profile: 'ottman' as const,
+    program,
+    history: [],
+    measurements: [],
+    activeSession: null,
+    onStart: () => undefined,
+    onResume: () => undefined,
+    onDiscard: () => undefined,
+  };
+
+  it('annonce le chargement et garde la séance du jour comme action dominante', () => {
+    const { rerender } = render(<HomeScreen {...baseProps} chargement />);
+    expect(screen.getByRole('status')).toHaveTextContent('Chargement');
+
+    rerender(<HomeScreen {...baseProps} />);
+    expect(screen.getByRole('button', { name: /^Démarrer .+/i })).toHaveClass('primary-button');
+    expect(screen.getByText('Volume 7 jours')).toBeInTheDocument();
+    expect(screen.queryByText(/au total/)).not.toBeInTheDocument();
+  });
+
+  it('donne un sens explicite aux créneaux terminés et à venir', () => {
+    const history = [completedSession(program.days[0].id, '2026-10-12T09:00:00')];
+    render(<HomeScreen {...baseProps} history={history} />);
+
+    expect(screen.getByRole('button', { name: /Full Body A/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Full Body B, A/ })).toBeInTheDocument();
   });
 });

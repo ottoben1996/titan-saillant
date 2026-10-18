@@ -13,17 +13,24 @@ interface ProfileChooserProps {
   onChoose: (profile: ProfileId) => void;
 }
 
+type ProfileLoadState =
+  | { status: 'loading' }
+  | { status: 'ready'; counts: Record<ProfileId, number> }
+  | { status: 'error' };
+
 function weekStatusLabel(count: number): string {
   if (count === 0) return 'Aucune séance cette semaine';
   return `${count} séance${count > 1 ? 's' : ''} cette semaine`;
 }
 
 export function ProfileChooser({ onChoose }: ProfileChooserProps) {
-  const [weekCounts, setWeekCounts] = useState<Record<ProfileId, number> | null>(null);
+  const [profileLoad, setProfileLoad] = useState<ProfileLoadState>({ status: 'loading' });
+  const [retryToken, setRetryToken] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
     const now = new Date();
+    void retryToken;
     const load = async () => {
       try {
         const entries = await Promise.all(
@@ -32,16 +39,17 @@ export function ProfileChooser({ onChoose }: ProfileChooserProps) {
             return [profile.id, totalsForWeek(sessions, now).sessions] as const;
           }),
         );
-        if (!cancelled) setWeekCounts(Object.fromEntries(entries) as Record<ProfileId, number>);
+        if (!cancelled)
+          setProfileLoad({ status: 'ready', counts: Object.fromEntries(entries) as Record<ProfileId, number> });
       } catch {
-        if (!cancelled) setWeekCounts(null);
+        if (!cancelled) setProfileLoad({ status: 'error' });
       }
     };
     void load();
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [retryToken]);
 
   return (
     <main className="app-shell profile-screen">
@@ -59,6 +67,25 @@ export function ProfileChooser({ onChoose }: ProfileChooserProps) {
         <p className="intro">
           Choisis ton espace personnel. Les programmes et l’historique restent séparés sur cet appareil.
         </p>
+        {profileLoad.status === 'loading' && (
+          <p role="status" aria-live="polite">
+            Chargement des séances…
+          </p>
+        )}
+        {profileLoad.status === 'error' && (
+          <div role="alert">
+            <p>Impossible de charger les séances.</p>
+            <button
+              type="button"
+              onClick={() => {
+                setProfileLoad({ status: 'loading' });
+                setRetryToken((token) => token + 1);
+              }}
+            >
+              Réessayer
+            </button>
+          </div>
+        )}
         <div className="profile-actions">
           {PROFILES.map((profile) => (
             <button className="profile-choice" type="button" key={profile.id} onClick={() => onChoose(profile.id)}>
@@ -67,7 +94,7 @@ export function ProfileChooser({ onChoose }: ProfileChooserProps) {
                 <strong>{profile.name}</strong>
                 <small>{profile.description}</small>
                 <small className="profile-week">
-                  {weekCounts ? weekStatusLabel(weekCounts[profile.id]) : '\u00A0'}
+                  {profileLoad.status === 'ready' ? weekStatusLabel(profileLoad.counts[profile.id]) : '\u00A0'}
                 </small>
               </span>
               <ArrowRight size={20} />
