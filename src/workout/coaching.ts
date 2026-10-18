@@ -114,6 +114,11 @@ export function getExerciseRecommendation(
   const confidence: RecommendationConfidence = observations >= 3 ? 'high' : observations >= 2 ? 'medium' : 'low';
   if (exercise.kind === 'strength') {
     if (!finite(load)) return base('maintain', 'La prescription ne contient pas de charge active exploitable.', 'low', ['missing-load']);
+    const prescribedLoads = activeSets.map(({ set }) => set.loadKg).filter(finite);
+    const prescribedRepetitions = activeSets.map(({ set }) => set.repetitions).filter(finite);
+    if (new Set(prescribedLoads).size > 1 || new Set(prescribedRepetitions).size > 1) {
+      return base('maintain', 'Les séries ont des prescriptions différentes : aucune progression uniforme n’est proposée.', 'low', ['heterogeneous-prescription']);
+    }
     const repsTarget = activeSets.map(({ set }) => set.repetitions).find(finite);
     const valid = latest.sets.every((set) => finite(set.actualLoadKg) && finite(set.actualRepetitions) && (repsTarget === undefined || set.actualRepetitions >= repsTarget) && set.actualLoadKg >= load);
     if (!valid) return base('maintain', 'Les séries n’ont pas validé la charge et les répétitions prescrites.', confidence, ['below-target']);
