@@ -48,7 +48,7 @@
 - `src/App.tsx`: verified as UTF-8 and verified that the preview notice contains the correctly rendered French accents (`Aperçu disponible après le chargement des détails de la séance.`). No source edit was needed because the prior fix is already present.
 
 ### Commit
-- `74e2fd2960d3ca5e78d49104c3b9508440aa6319` `fix: align preview interaction coverage`
+- `4367d2c4f9f48201c5c5976ba555de908186e0af` `fix: align preview interaction coverage`
 
 ### Commands and output
 - `npx vitest run src/components/screens/HomeScreen.test.tsx src/components/screens/ProfileChooser.test.tsx src/components/session-flow.test.tsx`
