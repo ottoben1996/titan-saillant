@@ -107,9 +107,9 @@ export function getExerciseRecommendation(
   const lowEnergy = finite(session.energy) && session.energy <= 2;
   if (pain || hard || lowEnergy) {
     const signals = [pain ? 'pain' : '', hard ? 'high-rpe' : '', lowEnergy ? 'low-energy' : '', !complete || malformed ? 'incomplete-sets' : ''].filter(Boolean);
-    return base('reduce', pain ? 'Une douleur a été signalée : priorité à la sécurité.' : 'La récupération ou l’effort récent ne permet pas de progresser en sécurité.', 'low', signals, true);
+    return base('reduce', pain ? 'Une douleur a été signalée : priorité à la sécurité.' : 'La récupération ou l’effort récent ne permet pas de progresser en sécurité.', 'low', signals, true);
   }
-  if (!complete || malformed) return base('maintain', 'Les séries comparables sont incomplètes ou invalides : on conserve la prescription.', 'low', ['incomplete-sets']);
+  if (!complete || malformed) return base('maintain', 'Les séries comparables sont incomplètes ou invalides : on conserve la prescription.', 'low', ['incomplete-sets']);
   const observations = relevant.length;
   const confidence: RecommendationConfidence = observations >= 3 ? 'high' : observations >= 2 ? 'medium' : 'low';
   if (exercise.kind === 'strength') {
@@ -117,13 +117,13 @@ export function getExerciseRecommendation(
     const prescribedLoads = activeSets.map(({ set }) => set.loadKg).filter(finite);
     const prescribedRepetitions = activeSets.map(({ set }) => set.repetitions).filter(finite);
     if (new Set(prescribedLoads).size > 1 || new Set(prescribedRepetitions).size > 1) {
-      return base('maintain', 'Les séries ont des prescriptions différentes : aucune progression uniforme n’est proposée.', 'low', ['heterogeneous-prescription']);
+      return base('maintain', 'Les séries ont des prescriptions différentes : aucune progression uniforme n’est proposée.', 'low', ['heterogeneous-prescription']);
     }
     const repsTarget = activeSets.map(({ set }) => set.repetitions).find(finite);
     const valid = latest.sets.every((set) => finite(set.actualLoadKg) && finite(set.actualRepetitions) && (repsTarget === undefined || set.actualRepetitions >= repsTarget) && set.actualLoadKg >= load);
     if (!valid) return base('maintain', 'Les séries n’ont pas validé la charge et les répétitions prescrites.', confidence, ['below-target']);
     const increment = ({ 'presse-cuisses-inclinee': 5, 'squat-smith': 2.5, 'chest-press': 2.5, 'developpe-couche-machine': 2.5, 'tirage-horizontal': 2.5, 'tirage-vertical': 2.5, 'leg-curl-allonge': 2, 'leg-extension': 2, 'developpe-clavicule': 1 } as Record<string, number>)[exercise.id] ?? 2.5;
-    return { ...base('increase', 'Toutes les séries ont atteint la cible sans signal de risque : progression d’un seul palier.', confidence, ['completed-target', 'comfortable']), suggestedLoadKg: load + increment };
+    return { ...base('increase', 'Toutes les séries ont atteint la cible sans signal de risque : progression d’un seul palier.', confidence, ['completed-target', 'comfortable']), suggestedLoadKg: load + increment };
   }
   if (!finite(duration)) return base('maintain', 'La prescription ne contient pas de durée active exploitable.', 'low', ['missing-duration']);
   const valid = latest.sets.every((set) => finite(set.actualDurationSeconds) && set.actualDurationSeconds >= duration);
@@ -133,5 +133,5 @@ export function getExerciseRecommendation(
   if (successfulExposures.length < 2) return base('maintain', 'Deux séances comparables réussies sont nécessaires avant de progresser.', 'low', ['insufficient-observations']);
   const cap = finite(options.maxDurationSeconds) ? options.maxDurationSeconds as number : duration + increment;
   if (cap <= duration) return base('maintain', 'La durée maximale autorisée est déjà atteinte.', confidence, ['duration-cap']);
-  return { ...base('increase', 'La durée a été validée avec aisance : on ajoute un petit palier, sans dépasser la limite.', confidence, ['completed-duration', 'comfortable']), suggestedDurationSeconds: Math.min(cap, duration + increment) };
+  return { ...base('increase', 'La durée a été validée avec aisance : on ajoute un petit palier, sans dépasser la limite.', confidence, ['completed-duration', 'comfortable']), suggestedDurationSeconds: Math.min(cap, duration + increment) };
 }
