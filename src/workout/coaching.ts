@@ -92,7 +92,7 @@ export function getExerciseRecommendation(
     .filter((session) => Boolean(session.completedAt))
     .filter((session) => !options.profileId || session.profileId === options.profileId)
     .sort((a, b) => dateOf(b).localeCompare(dateOf(a)))
-    .map((session) => ({ session, sets: session.loggedSets.filter((logged) => logged.exerciseId === exercise.id && activeSets.some(({ index }) => index === logged.setIndex)) }))
+    .map((session) => ({ session, sets: session.loggedSets.filter((logged) => logged.exerciseId === exercise.id) }))
     .filter(({ sets }) => sets.length > 0);
   const base = (action: CoachingRecommendation, reason: string, confidence: RecommendationConfidence, signals: string[], safety = false): ExerciseRecommendation => ({ exerciseId: exercise.id, kind: exercise.kind, action, reason, confidence, signals, safety });
   const latest = relevant[0];

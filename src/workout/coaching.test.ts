@@ -144,6 +144,23 @@ describe('adaptive coaching', () => {
       expect(recommendation?.suggestedLoadKg).toBeUndefined();
     });
 
+    it('rejects an otherwise complete exposure containing an out-of-range set index', () => {
+      const loggedSets = [...completeSets(strengthExercise), {
+        exerciseId: strengthExercise.id,
+        setIndex: 99,
+        actualRepetitions: 10,
+        actualLoadKg: 110,
+        completedAt: '2026-09-08T09:00:00.000Z',
+      }];
+      const recommendation = getExerciseRecommendation(
+        strengthExercise,
+        [exposure('out-of-range', strengthExercise, { loggedSets })],
+        options,
+      );
+      expect(recommendation?.action).toBe('maintain');
+      expect(recommendation?.suggestedLoadKg).toBeUndefined();
+    });
+
     it('does not mutate the exercise prescription or history inputs', () => {
       const history = [exposure('snapshot', strengthExercise)];
       const exerciseBefore = JSON.parse(JSON.stringify(strengthExercise));
