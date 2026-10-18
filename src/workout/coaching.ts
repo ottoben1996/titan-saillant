@@ -9,7 +9,7 @@ export interface AdaptiveAdvice {
   safety: boolean;
 }
 
-/** Retourne le conseil basé sur le dernier bilan complet, sans modifier la prescription PDF. */
+/** Retourne le conseil basÃ© sur le dernier bilan complet, sans modifier la prescription PDF. */
 export function getAdaptiveAdvice(history: readonly WorkoutSession[]): AdaptiveAdvice | null {
   const latest = [...history]
     .filter((session) => Boolean(session.completedAt))
@@ -20,9 +20,9 @@ export function getAdaptiveAdvice(history: readonly WorkoutSession[]): AdaptiveA
   if (pain && pain !== 'aucune') {
     return {
       recommendation: 'reduce',
-      title: 'Priorité à la sécurité',
+      title: 'PrioritÃ© Ã  la sÃ©curitÃ©',
       message:
-        'Une gêne ou une douleur a été signalée. Garde la charge ou réduis-la, et arrête l’exercice si la douleur est vive ou inhabituelle.',
+        'Une gÃªne ou une douleur a Ã©tÃ© signalÃ©e. Garde la charge ou rÃ©duis-la, et arrÃªte lâ€™exercice si la douleur est vive ou inhabituelle.',
       safety: true,
     };
   }
@@ -32,9 +32,9 @@ export function getAdaptiveAdvice(history: readonly WorkoutSession[]): AdaptiveA
   if (rpe !== undefined && rpe >= 9) {
     return {
       recommendation: 'reduce',
-      title: 'Allège la prochaine séance',
+      title: 'AllÃ¨ge la prochaine sÃ©ance',
       message:
-        'L’effort était très élevé. Maintiens la technique et réduis légèrement la charge ou le volume au prochain passage.',
+        'Lâ€™effort Ã©tait trÃ¨s Ã©levÃ©. Maintiens la technique et rÃ©duis lÃ©gÃ¨rement la charge ou le volume au prochain passage.',
       safety: false,
     };
   }
@@ -43,14 +43,14 @@ export function getAdaptiveAdvice(history: readonly WorkoutSession[]): AdaptiveA
       recommendation: 'increase',
       title: 'Tu peux progresser',
       message:
-        'La séance semble bien maîtrisée. Si la technique reste propre, augmente très progressivement la charge lors de la prochaine séance.',
+        'La sÃ©ance semble bien maÃ®trisÃ©e. Si la technique reste propre, augmente trÃ¨s progressivement la charge lors de la prochaine sÃ©ance.',
       safety: false,
     };
   }
   return {
     recommendation: 'maintain',
     title: 'Reste sur cette base',
-    message: 'Conserve la charge actuelle et cherche des répétitions régulières et contrôlées avant de progresser.',
+    message: 'Conserve la charge actuelle et cherche des rÃ©pÃ©titions rÃ©guliÃ¨res et contrÃ´lÃ©es avant de progresser.',
     safety: false,
   };
 }
@@ -96,34 +96,37 @@ export function getExerciseRecommendation(
     .filter(({ sets }) => sets.length > 0);
   const base = (action: CoachingRecommendation, reason: string, confidence: RecommendationConfidence, signals: string[], safety = false): ExerciseRecommendation => ({ exerciseId: exercise.id, kind: exercise.kind, action, reason, confidence, signals, safety });
   const latest = relevant[0];
-  if (!latest) return base('maintain', 'Aucune s�ance compl�te et comparable pour cet exercice.', 'low', ['missing-history']);
+  if (!latest) return base('maintain', 'Aucune séance complète et comparable pour cet exercice.', 'low', ['missing-history']);
   const expectedIndexes = new Set(activeSets.map(({ index }) => index));
   const actualIndexes = new Set(latest.sets.map((set) => set.setIndex));
   const complete = actualIndexes.size === expectedIndexes.size && [...expectedIndexes].every((index) => actualIndexes.has(index)) && latest.sets.length === expectedIndexes.size && latest.sets.every((set) => finite(set.actualRepetitions) || finite(set.actualDurationSeconds));
   const malformed = latest.sets.some((set) => set.setIndex < 0 || !expectedIndexes.has(set.setIndex));
-  if (!complete || malformed) return base('maintain', 'Les s�ries comparables sont incompl�tes ou invalides : on conserve la prescription.', 'low', ['incomplete-sets']);
   const { session } = latest;
   const pain = !painFree(session.pain);
   const hard = finite(session.perceivedExertion) && session.perceivedExertion >= 9;
   const lowEnergy = finite(session.energy) && session.energy <= 2;
   if (pain || hard || lowEnergy) {
-    const signals = [pain ? 'pain' : '', hard ? 'high-rpe' : '', lowEnergy ? 'low-energy' : ''].filter(Boolean);
-    return base('reduce', pain ? 'Une douleur a �t� signal�e : priorit� � la s�curit�.' : 'La r�cup�ration ou l�effort r�cent ne permet pas de progresser en s�curit�.', 'medium', signals, pain);
+    const signals = [pain ? 'pain' : '', hard ? 'high-rpe' : '', lowEnergy ? 'low-energy' : '', !complete || malformed ? 'incomplete-sets' : ''].filter(Boolean);
+    return base('reduce', pain ? 'Une douleur a été signalée : priorité à la sécurité.' : 'La récupération ou l’effort récent ne permet pas de progresser en sécurité.', 'low', signals, true);
   }
+  if (!complete || malformed) return base('maintain', 'Les séries comparables sont incomplètes ou invalides : on conserve la prescription.', 'low', ['incomplete-sets']);
   const observations = relevant.length;
   const confidence: RecommendationConfidence = observations >= 3 ? 'high' : observations >= 2 ? 'medium' : 'low';
   if (exercise.kind === 'strength') {
     if (!finite(load)) return base('maintain', 'La prescription ne contient pas de charge active exploitable.', 'low', ['missing-load']);
     const repsTarget = activeSets.map(({ set }) => set.repetitions).find(finite);
     const valid = latest.sets.every((set) => finite(set.actualLoadKg) && finite(set.actualRepetitions) && (repsTarget === undefined || set.actualRepetitions >= repsTarget) && set.actualLoadKg >= load);
-    if (!valid) return base('maintain', 'Les s�ries n�ont pas valid� la charge et les r�p�titions prescrites.', confidence, ['below-target']);
+    if (!valid) return base('maintain', 'Les séries n’ont pas validé la charge et les répétitions prescrites.', confidence, ['below-target']);
     const increment = ({ 'presse-cuisses-inclinee': 5, 'squat-smith': 2.5, 'chest-press': 2.5, 'developpe-couche-machine': 2.5, 'tirage-horizontal': 2.5, 'tirage-vertical': 2.5, 'leg-curl-allonge': 2, 'leg-extension': 2, 'developpe-clavicule': 1 } as Record<string, number>)[exercise.id] ?? 2.5;
-    return { ...base('increase', 'Toutes les s�ries ont atteint la cible sans signal de risque : progression d�un seul palier.', confidence, ['completed-target', 'comfortable']), suggestedLoadKg: load + increment };
+    return { ...base('increase', 'Toutes les séries ont atteint la cible sans signal de risque : progression d’un seul palier.', confidence, ['completed-target', 'comfortable']), suggestedLoadKg: load + increment };
   }
-  if (!finite(duration)) return base('maintain', 'La prescription ne contient pas de dur�e active exploitable.', 'low', ['missing-duration']);
+  if (!finite(duration)) return base('maintain', 'La prescription ne contient pas de durée active exploitable.', 'low', ['missing-duration']);
   const valid = latest.sets.every((set) => finite(set.actualDurationSeconds) && set.actualDurationSeconds >= duration);
-  if (!valid) return base('maintain', 'La dur�e prescrite n�a pas �t� valid�e sur toutes les s�ries.', confidence, ['below-target']);
+  if (!valid) return base('maintain', 'La durée prescrite n’a pas été validée sur toutes les séries.', confidence, ['below-target']);
   const increment = Math.max(15, Math.round(duration * 0.1));
-  const cap = finite(options.maxDurationSeconds) ? Math.max(duration, options.maxDurationSeconds as number) : duration + increment;
-  return { ...base('increase', 'La dur�e a �t� valid�e avec aisance : on ajoute un petit palier, sans d�passer la limite.', confidence, ['completed-duration', 'comfortable']), suggestedDurationSeconds: Math.min(cap, duration + increment) };
+  const successfulExposures = relevant.filter(({ session: candidate, sets }) => painFree(candidate.pain) && (!finite(candidate.perceivedExertion) || candidate.perceivedExertion < 9) && (!finite(candidate.energy) || candidate.energy > 2) && sets.length === expectedIndexes.size && sets.every((set) => finite(set.actualDurationSeconds) && set.actualDurationSeconds >= duration));
+  if (successfulExposures.length < 2) return base('maintain', 'Deux séances comparables réussies sont nécessaires avant de progresser.', 'low', ['insufficient-observations']);
+  const cap = finite(options.maxDurationSeconds) ? options.maxDurationSeconds as number : duration + increment;
+  if (cap <= duration) return base('maintain', 'La durée maximale autorisée est déjà atteinte.', confidence, ['duration-cap']);
+  return { ...base('increase', 'La durée a été validée avec aisance : on ajoute un petit palier, sans dépasser la limite.', confidence, ['completed-duration', 'comfortable']), suggestedDurationSeconds: Math.min(cap, duration + increment) };
 }

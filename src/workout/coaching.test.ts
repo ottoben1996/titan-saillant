@@ -119,7 +119,7 @@ describe('adaptive coaching', () => {
     });
 
     it('recommends duration rather than load for timed exercises', () => {
-      const recommendation = getExerciseRecommendation(timedExercise, [exposure('timed', timedExercise)], options);
+      const recommendation = getExerciseRecommendation(timedExercise, [exposure('timed-1', timedExercise), exposure('timed-2', timedExercise, { completedAt: '2026-09-09T09:00:00.000Z' })], options);
       expect(recommendation?.suggestedLoadKg).toBeUndefined();
       expect(recommendation?.suggestedDurationSeconds).toBeGreaterThan(30);
       expect(recommendation?.suggestedDurationSeconds).toBeLessThanOrEqual(90);
