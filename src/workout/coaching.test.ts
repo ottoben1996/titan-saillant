@@ -124,5 +124,35 @@ describe('adaptive coaching', () => {
       expect(recommendation?.suggestedDurationSeconds).toBeGreaterThan(30);
       expect(recommendation?.suggestedDurationSeconds).toBeLessThanOrEqual(90);
     });
+
+    it.each([
+      ['missing repetitions', { actualRepetitions: undefined, actualLoadKg: 110 }],
+      ['missing load', { actualRepetitions: 10, actualLoadKg: undefined }],
+      ['invalid set index', { setIndex: -1, actualRepetitions: 10, actualLoadKg: 110 }],
+      ['duplicate set index', { setIndex: 0, actualRepetitions: 10, actualLoadKg: 110 }],
+    ])('stays safe with %s in logged sets', (_case, malformedSet) => {
+      const loggedSets = completeSets(strengthExercise).map((loggedSet, index) => {
+        if (_case === 'duplicate set index' && index === 1) return { ...loggedSet, setIndex: 0 };
+        return index === 0 ? { ...loggedSet, ...malformedSet } : loggedSet;
+      });
+      const recommendation = getExerciseRecommendation(
+        strengthExercise,
+        [exposure('malformed', strengthExercise, { loggedSets })],
+        options,
+      );
+      expect(recommendation?.action).toMatch(/^(maintain|reduce)$/);
+      expect(recommendation?.suggestedLoadKg).toBeUndefined();
+    });
+
+    it('does not mutate the exercise prescription or history inputs', () => {
+      const history = [exposure('snapshot', strengthExercise)];
+      const exerciseBefore = JSON.parse(JSON.stringify(strengthExercise));
+      const historyBefore = JSON.parse(JSON.stringify(history));
+
+      getExerciseRecommendation(strengthExercise, history, options);
+
+      expect(strengthExercise).toEqual(exerciseBefore);
+      expect(history).toEqual(historyBefore);
+    });
   });
 });
