@@ -1,4 +1,4 @@
-import type { WorkoutSession } from '../domain/types';
+import type { ExercisePrescription, WorkoutSession } from '../domain/types';
 
 export type CoachingRecommendation = 'increase' | 'maintain' | 'reduce';
 
@@ -53,4 +53,77 @@ export function getAdaptiveAdvice(history: readonly WorkoutSession[]): AdaptiveA
     message: 'Conserve la charge actuelle et cherche des rÃ©pÃ©titions rÃ©guliÃ¨res et contrÃ´lÃ©es avant de progresser.',
     safety: false,
   };
+}
+
+
+export type RecommendationConfidence = 'low' | 'medium' | 'high';
+
+export interface ExerciseRecommendation {
+  exerciseId: string;
+  kind: ExercisePrescription['kind'];
+  action: CoachingRecommendation;
+  suggestedLoadKg?: number;
+  suggestedDurationSeconds?: number;
+  reason: string;
+  confidence: RecommendationConfidence;
+  signals: string[];
+  safety: boolean;
+}
+
+export interface ExerciseRecommendationOptions {
+  profileId?: WorkoutSession['profileId'];
+  maxDurationSeconds?: number;
+}
+
+const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value);
+const painFree = (pain?: string) => !pain?.trim() || pain.trim().toLowerCase() === 'aucune';
+const dateOf = (session: WorkoutSession) => session.completedAt ?? session.updatedAt;
+
+export function getExerciseRecommendation(
+  exercise: ExercisePrescription,
+  history: readonly WorkoutSession[],
+  options: ExerciseRecommendationOptions = {},
+): ExerciseRecommendation | null {
+  const activeSets = exercise.sets.map((set, index) => ({ set, index })).filter(({ set }) => set.phase !== 'warmup');
+  if (activeSets.length === 0) return null;
+  const load = activeSets.map(({ set }) => set.loadKg).find(finite);
+  const duration = activeSets.map(({ set }) => set.durationSeconds).find(finite);
+  const relevant = [...history]
+    .filter((session) => Boolean(session.completedAt))
+    .filter((session) => !options.profileId || session.profileId === options.profileId)
+    .sort((a, b) => dateOf(b).localeCompare(dateOf(a)))
+    .map((session) => ({ session, sets: session.loggedSets.filter((logged) => logged.exerciseId === exercise.id && activeSets.some(({ index }) => index === logged.setIndex)) }))
+    .filter(({ sets }) => sets.length > 0);
+  const base = (action: CoachingRecommendation, reason: string, confidence: RecommendationConfidence, signals: string[], safety = false): ExerciseRecommendation => ({ exerciseId: exercise.id, kind: exercise.kind, action, reason, confidence, signals, safety });
+  const latest = relevant[0];
+  if (!latest) return base('maintain', 'Aucune séance complète et comparable pour cet exercice.', 'low', ['missing-history']);
+  const expectedIndexes = new Set(activeSets.map(({ index }) => index));
+  const actualIndexes = new Set(latest.sets.map((set) => set.setIndex));
+  const complete = actualIndexes.size === expectedIndexes.size && [...expectedIndexes].every((index) => actualIndexes.has(index)) && latest.sets.length === expectedIndexes.size && latest.sets.every((set) => finite(set.actualRepetitions) || finite(set.actualDurationSeconds));
+  const malformed = latest.sets.some((set) => set.setIndex < 0 || !expectedIndexes.has(set.setIndex));
+  if (!complete || malformed) return base('maintain', 'Les séries comparables sont incomplètes ou invalides : on conserve la prescription.', 'low', ['incomplete-sets']);
+  const { session } = latest;
+  const pain = !painFree(session.pain);
+  const hard = finite(session.perceivedExertion) && session.perceivedExertion >= 9;
+  const lowEnergy = finite(session.energy) && session.energy <= 2;
+  if (pain || hard || lowEnergy) {
+    const signals = [pain ? 'pain' : '', hard ? 'high-rpe' : '', lowEnergy ? 'low-energy' : ''].filter(Boolean);
+    return base('reduce', pain ? 'Une douleur a été signalée : priorité à la sécurité.' : 'La récupération ou l’effort récent ne permet pas de progresser en sécurité.', 'medium', signals, pain);
+  }
+  const observations = relevant.length;
+  const confidence: RecommendationConfidence = observations >= 3 ? 'high' : observations >= 2 ? 'medium' : 'low';
+  if (exercise.kind === 'strength') {
+    if (!finite(load)) return base('maintain', 'La prescription ne contient pas de charge active exploitable.', 'low', ['missing-load']);
+    const repsTarget = activeSets.map(({ set }) => set.repetitions).find(finite);
+    const valid = latest.sets.every((set) => finite(set.actualLoadKg) && finite(set.actualRepetitions) && (repsTarget === undefined || set.actualRepetitions >= repsTarget) && set.actualLoadKg >= load);
+    if (!valid) return base('maintain', 'Les séries n’ont pas validé la charge et les répétitions prescrites.', confidence, ['below-target']);
+    const increment = ({ 'presse-cuisses-inclinee': 5, 'squat-smith': 2.5, 'chest-press': 2.5, 'developpe-couche-machine': 2.5, 'tirage-horizontal': 2.5, 'tirage-vertical': 2.5, 'leg-curl-allonge': 2, 'leg-extension': 2, 'developpe-clavicule': 1 } as Record<string, number>)[exercise.id] ?? 2.5;
+    return { ...base('increase', 'Toutes les séries ont atteint la cible sans signal de risque : progression d’un seul palier.', confidence, ['completed-target', 'comfortable']), suggestedLoadKg: load + increment };
+  }
+  if (!finite(duration)) return base('maintain', 'La prescription ne contient pas de durée active exploitable.', 'low', ['missing-duration']);
+  const valid = latest.sets.every((set) => finite(set.actualDurationSeconds) && set.actualDurationSeconds >= duration);
+  if (!valid) return base('maintain', 'La durée prescrite n’a pas été validée sur toutes les séries.', confidence, ['below-target']);
+  const increment = Math.max(15, Math.round(duration * 0.1));
+  const cap = finite(options.maxDurationSeconds) ? Math.max(duration, options.maxDurationSeconds as number) : duration + increment;
+  return { ...base('increase', 'La durée a été validée avec aisance : on ajoute un petit palier, sans dépasser la limite.', confidence, ['completed-duration', 'comfortable']), suggestedDurationSeconds: Math.min(cap, duration + increment) };
 }

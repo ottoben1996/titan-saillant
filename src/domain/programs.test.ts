@@ -123,6 +123,22 @@ describe('seed programs from PDFs', () => {
     ).toEqual([80, 80, 100]);
   });
 
+  it('garde une prescription active et finie pour chaque profil, semaine et exercice', () => {
+    for (const profile of ['ottman', 'laura'] as const) {
+      for (let week = 1; week <= 8; week += 1) {
+        const exercises = getProgram(profile, week).days.flatMap((day) => day.exercises);
+        for (const item of exercises) {
+          const active = item.sets.filter((set) => set.phase !== 'warmup');
+          expect(active.length, `${profile} S${week} ${item.id}`).toBeGreaterThan(0);
+          expect(active.some((set) =>
+            (typeof set.loadKg === 'number' && Number.isFinite(set.loadKg)) ||
+            (typeof set.durationSeconds === 'number' && Number.isFinite(set.durationSeconds)),
+          ), `${profile} S${week} ${item.id}`).toBe(true);
+        }
+      }
+    }
+  });
+
   it('accepte des charges et durées personnalisées jusqu’à S8', () => {
     const custom = getProgram(
       'ottman',

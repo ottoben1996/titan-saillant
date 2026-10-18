@@ -74,13 +74,20 @@ const strength = (
       const value = overrides[index];
       return typeof value === 'number' && Number.isFinite(value) && value >= 0 ? value : undefined;
     };
+    const lastWeeklyLoad = weeklyLoadKg?.findLast((value) => typeof value === 'number' && Number.isFinite(value));
     const resolvedWeeklyLoadKg = weeklyLoadKg
-      ? (Array.from({ length: PROGRAM_WEEKS }, (_, index) => overrideAt(index) ?? weeklyLoadKg[index]) as number[])
+      ? (Array.from({ length: PROGRAM_WEEKS }, (_, index) =>
+          overrideAt(index) ?? weeklyLoadKg[index] ?? lastWeeklyLoad,
+        ) as number[])
       : undefined;
-    const resolvedWeeklySetLoadsKg = weeklySetLoadsKg?.map((loads, index) => {
-      const override = overrideAt(index);
-      return override === undefined ? [...loads] : loads.map(() => override);
-    });
+    const lastSetLoads = weeklySetLoadsKg?.at(-1);
+    const resolvedWeeklySetLoadsKg = weeklySetLoadsKg
+      ? Array.from({ length: PROGRAM_WEEKS }, (_, index) => {
+          const loads = weeklySetLoadsKg[index] ?? lastSetLoads ?? [];
+          const override = overrideAt(index);
+          return override === undefined ? [...loads] : loads.map(() => override);
+        })
+      : undefined;
 
     return exercise({
       id,
@@ -119,7 +126,10 @@ const timed = (
     name,
     kind: 'timed',
     sets: Array.from({ length: setsCount }, () => ({
-      durationSeconds: manualDurations?.[id]?.[week - 1] ?? durationSeconds,
+      durationSeconds:
+        typeof manualDurations?.[id]?.[week - 1] === 'number' && Number.isFinite(manualDurations[id][week - 1])
+          ? manualDurations[id][week - 1]!
+          : durationSeconds,
       loadLabel: 'PDC',
     })),
     restAfterSeconds,
