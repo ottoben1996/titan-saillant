@@ -45,13 +45,26 @@ export function getWorkoutExercises(day: WorkoutDay, session?: WorkoutSession): 
 export function getWorkoutSteps(day: WorkoutDay, session?: WorkoutSession): readonly RunnerStep[] {
   const exercises = getWorkoutExercises(day, session);
   const reportes = new Set(session?.deferredExerciseIds ?? []);
+  const skipped = new Set(session?.skippedExerciseIds ?? []);
   const travail: RunnerStep[] = [];
   const attente: RunnerStep[] = [];
   const retour: RunnerStep[] = [];
   let exerciseIndex = 0;
 
+  // Track which sets have been logged for deferred exercises
+  const loggedSetIndices = new Map<string, Set<number>>();
+  if (session?.loggedSets) {
+    for (const logged of session.loggedSets) {
+      if (!loggedSetIndices.has(logged.exerciseId)) {
+        loggedSetIndices.set(logged.exerciseId, new Set());
+      }
+      loggedSetIndices.get(logged.exerciseId)!.add(logged.setIndex);
+    }
+  }
+
   const retenir = (index: number, setIndex: number) => {
     const exercice = exercises[index];
+    if (skipped.has(exercice.id)) return;
     const pas: RunnerStep = { kind: 'exercise', exerciseIndex: index, setIndex };
     if (exercice.kind === 'cooldown') retour.push(pas);
     else if (reportes.has(exercice.id)) attente.push(pas);
@@ -127,7 +140,7 @@ export function completeSet(
   next.activeTimer = undefined;
   if (next.sequenceVersion === 2) {
     const steps = getWorkoutSteps(day, next);
-    const nextIndex = (next.currentStepIndex ?? 0) + 1;
+    const nextIndex = (current.sequenceIndex ?? next.currentStepIndex ?? 0) + 1;
     next.currentStepIndex = nextIndex;
     const nextStep = steps[nextIndex];
     if (!nextStep || nextStep.kind === 'complete') {
@@ -150,7 +163,21 @@ export function completeSet(
 export function getNextStep(session: WorkoutSession, day?: WorkoutDay): RunnerStep {
   if (session.completedAt) return { kind: 'complete' };
   if (session.sequenceVersion === 2 && day) {
-    return getWorkoutSteps(day, session)[session.currentStepIndex ?? 0] ?? { kind: 'complete' };
+    const steps = getWorkoutSteps(day, session);
+    const exercises = getWorkoutExercises(day, session);
+    const deferred = new Set(session.deferredExerciseIds ?? []);
+    const logged = new Set(session.loggedSets.map((set) => `${set.exerciseId}:${set.setIndex}`));
+    const rawIndex = session.currentStepIndex ?? 0;
+    if (rawIndex < 0 || rawIndex >= steps.length) return { kind: 'complete' };
+    const currentIndex = rawIndex;
+    for (let index = currentIndex; index < steps.length; index += 1) {
+      const step = steps[index];
+      if (!step) break;
+      const id = step.kind === 'exercise' ? exercises[step.exerciseIndex ?? 0]?.id : undefined;
+      if (step.kind === 'exercise' && id && deferred.has(id) && logged.has(`${id}:${step.setIndex}`)) continue;
+      return step;
+    }
+    return { kind: 'complete' };
   }
   return { kind: 'exercise', exerciseIndex: session.currentExerciseIndex, setIndex: session.currentSetIndex };
 }
@@ -177,25 +204,39 @@ export function skipExercise(session: WorkoutSession, day: WorkoutDay): WorkoutS
   const courant = steps[index];
   if (!courant || courant.kind !== 'exercise' || courant.exerciseIndex === undefined) return session;
 
-  // On saute la suite contiguë du même exercice : dans un circuit, on quitte donc
-  // l'exercice pour le tour en cours, sans toucher aux autres.
+  // Skip ALL remaining steps for this exercise across the entire circuit,
+  // not just contiguous ones. In interleaved circuits, the same exercise
+  // appears multiple times - we must skip all of them.
   let suivant = index + 1;
   while (suivant < steps.length) {
     const pas = steps[suivant];
-    if (!pas || pas.kind !== 'exercise' || pas.exerciseIndex !== courant.exerciseIndex) break;
-    suivant += 1;
+    if (!pas || pas.kind === 'complete') break;
+    // If this step is for the SAME exercise, skip it and continue looking
+    if (pas.kind === 'exercise' && pas.exerciseIndex === courant.exerciseIndex) {
+      suivant += 1;
+      continue;
+    }
+    // Found a different exercise (or cooldown) - this is our target
+    break;
   }
 
-  const next = structuredClone(session) as WorkoutSession;
-  next.activeTimer = undefined;
   const cible = steps[suivant];
-  if (!cible || cible.kind === 'complete') {
-    next.currentStepIndex = steps.length;
+  const next = structuredClone(session) as WorkoutSession;
+  next.skippedExerciseIds = [...new Set([...(next.skippedExerciseIds ?? []), exerciceDuPas(day, session, courant)!])];
+  next.activeTimer = undefined;
+  const newSteps = getWorkoutSteps(day, next);
+  const newIndex = cible?.kind === 'exercise'
+    ? newSteps.findIndex(
+        (step) => step.kind === 'exercise' && step.exerciseIndex === cible.exerciseIndex && step.setIndex === cible.setIndex,
+      )
+    : -1;
+  if (newIndex === -1) {
+    next.currentStepIndex = newSteps.length;
     next.completedAt = new Date().toISOString();
   } else {
-    next.currentStepIndex = suivant;
-    next.currentExerciseIndex = cible.exerciseIndex ?? 0;
-    next.currentSetIndex = cible.setIndex ?? 0;
+    next.currentStepIndex = newIndex;
+    next.currentExerciseIndex = newSteps[newIndex].exerciseIndex ?? 0;
+    next.currentSetIndex = newSteps[newIndex].setIndex ?? 0;
   }
   next.updatedAt = new Date().toISOString();
   return next;

@@ -41,6 +41,7 @@ const sessionSchema = z
     // Les exercices reportés dans la séance (machine occupée). Absent des
     // sauvegardes antérieures : l'absence vaut « rien de reporté ».
     deferredExerciseIds: z.array(z.string()).optional(),
+    skippedExerciseIds: z.array(z.string()).optional(),
     perceivedExertion: z.number().min(1).max(10).optional(),
     energy: z.number().min(1).max(5).optional(),
     loadConsigne: z.enum(['increase', 'decrease', 'same']).optional(),

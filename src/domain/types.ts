@@ -139,4 +139,6 @@ export interface WorkoutSession {
    * l'absence vaut Â« rien de reportÃ© Â».
    */
   deferredExerciseIds?: string[];
+  /** Exercices dont toutes les séries restantes ont été ignorées. */
+  skippedExerciseIds?: string[];
 }

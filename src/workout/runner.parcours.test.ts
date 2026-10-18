@@ -11,7 +11,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import { getProgram } from '../domain/programs';
-import { completeSet, createRunner, getNextStep, getWorkoutExercises, skipExercise, undoLastSet } from './runner';
+import { completeSet, createRunner, getNextStep, getWorkoutExercises, getWorkoutSteps, skipExercise, undoLastSet } from './runner';
 
 const premierJour = () => getProgram('ottman').days[0];
 
@@ -52,8 +52,8 @@ describe('passer un exercice', () => {
 
     const pas = getNextStep(apres, day);
     expect(exercices[pas.exerciseIndex ?? 0].id).not.toBe(identifiant);
-    // Un seul saut, pas un par série.
-    expect(apres.currentStepIndex ?? 0).toBeGreaterThan(pasAvant);
+    // The current index now points at the next step in the rebuilt sequence.
+    expect(apres.currentStepIndex ?? 0).toBeGreaterThanOrEqual(pasAvant);
     expect(apres.loggedSets).toHaveLength(1);
   });
 
@@ -63,9 +63,7 @@ describe('passer un exercice', () => {
 
     // On saute d'exercice en exercice jusqu'au bout.
     for (let garde = 0; garde < 40 && getNextStep(session, day).kind === 'exercise'; garde += 1) {
-      const avant = session.currentStepIndex ?? 0;
       session = skipExercise(session, day);
-      if ((session.currentStepIndex ?? 0) <= avant) break;
     }
 
     expect(session.completedAt).toBeDefined();
@@ -127,5 +125,93 @@ describe('annuler la dernière série', () => {
 
     expect(undoLastSet(terminee, day)).toBe(terminee);
     expect(skipExercise(terminee, day)).toBe(terminee);
+  });
+});
+
+describe('regression: skipExercise in interleaved circuit', () => {
+  it('skips ALL remaining steps for current exercise across entire circuit, not just contiguous ones', () => {
+    const day = premierJour();
+    let session = createRunner(day, 'ottman');
+
+    // Advance to the circuit portion (jumping-jack / gainage-planche circuit)
+    const steps = getWorkoutSteps(day, session);
+    const exercises = getWorkoutExercises(day, session);
+
+    // Find first circuit exercise step
+    let circuitStartIndex = -1;
+    for (let i = 0; i < steps.length; i++) {
+      const ex = exercises[steps[i].exerciseIndex!];
+      if (ex.circuitId === 'finisher-a') {
+        circuitStartIndex = i;
+        break;
+      }
+    }
+
+    expect(circuitStartIndex).toBeGreaterThan(-1);
+
+    // Advance to the first circuit step
+    session.currentStepIndex = circuitStartIndex;
+    session.currentExerciseIndex = steps[circuitStartIndex].exerciseIndex!;
+    session.currentSetIndex = steps[circuitStartIndex].setIndex!;
+
+    const currentStep = getNextStep(session, day);
+    const exerciseId = exercises[currentStep.exerciseIndex!].id; // e.g., 'jumping-jack'
+
+    // Skip the current exercise (jumping-jack) immediately.
+    // The skip should skip ALL remaining sets of jumping-jack across the circuit.
+    session = skipExercise(session, day);
+
+    // After skip, we should NOT see any more jumping-jack steps
+    const remainingSteps = getWorkoutSteps(day, session).slice(session.currentStepIndex ?? 0);
+    const hasMoreJumpingJack = remainingSteps.some(step => {
+      if (step.kind !== 'exercise') return false;
+      return exercises[step.exerciseIndex!].id === exerciseId;
+    });
+
+    expect(hasMoreJumpingJack).toBe(false);
+
+    // Should be on the NEXT exercise after all jumping-jack sets are gone
+    // (either gainage-planche or cooldown)
+    const nextStep = getNextStep(session, day);
+    if (nextStep.kind === 'exercise') {
+      expect(exercises[nextStep.exerciseIndex!].id).not.toBe(exerciseId);
+    }
+  });
+
+  it('skipExercise preserves other exercises in the circuit', () => {
+    const day = premierJour();
+    let session = createRunner(day, 'ottman');
+
+    // Advance to circuit
+    const steps = getWorkoutSteps(day, session);
+    const exercises = getWorkoutExercises(day, session);
+
+    let circuitStartIndex = -1;
+    for (let i = 0; i < steps.length; i++) {
+      const ex = exercises[steps[i].exerciseIndex!];
+      if (ex.circuitId === 'finisher-a') {
+        circuitStartIndex = i;
+        break;
+      }
+    }
+
+    session.currentStepIndex = circuitStartIndex;
+    session.currentExerciseIndex = steps[circuitStartIndex].exerciseIndex!;
+    session.currentSetIndex = steps[circuitStartIndex].setIndex!;
+
+    const currentStep = getNextStep(session, day);
+    const otherExerciseId = exercises[currentStep.exerciseIndex!].id === 'jumping-jack' ? 'gainage-planche' : 'jumping-jack';
+
+    // Skip the first exercise immediately
+    session = skipExercise(session, day);
+
+    // The other exercise should still be present in remaining steps
+    const remainingSteps = getWorkoutSteps(day, session).slice(session.currentStepIndex ?? 0);
+    const hasOtherExercise = remainingSteps.some(step => {
+      if (step.kind !== 'exercise') return false;
+      return exercises[step.exerciseIndex!].id === otherExerciseId;
+    });
+
+    expect(hasOtherExercise).toBe(true);
   });
 });

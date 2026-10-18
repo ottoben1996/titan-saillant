@@ -137,6 +137,40 @@ describe('reporter un exercice', () => {
     expect(session.completedAt).toBeDefined();
   });
 
+  it('ne rejoue pas les séries déjà faites après un report partiel en circuit', () => {
+    const day = premierJour();
+    const initial = createRunner(day, 'ottman');
+    const exercises = getWorkoutExercises(day, initial);
+    const circuitStart = getWorkoutSteps(day, initial).findIndex(
+      (step) => exercises[step.exerciseIndex ?? 0]?.circuitId === 'finisher-a',
+    );
+    let session: typeof initial = { ...initial, currentStepIndex: circuitStart };
+
+    // Complete round 1 of both circuit exercises. The next step is round 2 of
+    // the first exercise, which already has one logged set.
+    for (let count = 0; count < 2; count += 1) {
+      const step = getNextStep(session, day);
+      session = completeSet(session, day, {
+        exerciseId: idDuPas(day, session, step),
+        setIndex: step.setIndex ?? 0,
+      });
+    }
+    const deferredId = idDuPas(day, session, getNextStep(session, day));
+    const loggedBefore = session.loggedSets.filter((set) => set.exerciseId === deferredId);
+    expect(loggedBefore).toHaveLength(1);
+
+    const deferredSession = deferExercise(session, day);
+    const nextStep = getNextStep(deferredSession, day);
+
+    // The logged set remains in the canonical sequence for stable ordering, but
+    // the cursor skips it and points at the first unlogged set.
+    expect(idDuPas(day, deferredSession, nextStep)).not.toBe(deferredId);
+    const deferredStep = getWorkoutSteps(day, deferredSession).find(
+      (step) => idDuPas(day, deferredSession, step) === deferredId && step.setIndex === 1,
+    );
+    expect(deferredStep).toBeDefined();
+  });
+
   it('ne reporte pas deux fois le même exercice', () => {
     const day = premierJour();
     let session = deferExercise(avancer(day, createRunner(day, 'ottman'), 3), day);
