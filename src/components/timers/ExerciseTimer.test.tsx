@@ -3,6 +3,35 @@ import { describe, expect, it, vi } from 'vitest';
 import { ExerciseTimer } from './ExerciseTimer';
 
 describe('ExerciseTimer (Compteur Tempo)', () => {
+  it('resets to an applied recommendation duration', () => {
+    const onStateChange = vi.fn();
+    const { rerender } = render(
+      <ExerciseTimer
+        exerciseId="bosu"
+        setIndex={0}
+        durationSeconds={40}
+        suspended={false}
+        onStateChange={onStateChange}
+        onDone={() => undefined}
+        restartNonce={0}
+      />,
+    );
+
+    rerender(
+      <ExerciseTimer
+        exerciseId="bosu"
+        setIndex={0}
+        durationSeconds={55}
+        suspended={false}
+        onStateChange={onStateChange}
+        onDone={() => undefined}
+        restartNonce={1}
+      />,
+    );
+
+    expect(screen.getByText('00:55')).toBeInTheDocument();
+  });
+
   it('renders initial tempo countdown and has a Passer button', () => {
     const onStateChange = vi.fn();
     const onDone = vi.fn();
@@ -24,6 +53,46 @@ describe('ExerciseTimer (Compteur Tempo)', () => {
     expect(screen.getByText('00:40')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /passer/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /démarrer/i })).toBeInTheDocument();
+  });
+
+  it('uses edited duration instead of stale persisted remaining time', () => {
+    const onStateChange = vi.fn();
+    const initialState = {
+      kind: 'tempo' as const,
+      exerciseId: 'bosu',
+      setIndex: 0,
+      remainingSeconds: 12,
+      paused: true,
+      started: true,
+      updatedAt: '2026-09-01T09:00:00.000Z',
+    };
+    const { rerender } = render(
+      <ExerciseTimer
+        exerciseId="bosu"
+        setIndex={0}
+        durationSeconds={40}
+        initialState={initialState}
+        suspended={false}
+        onStateChange={onStateChange}
+        onDone={() => undefined}
+        restartNonce={0}
+      />,
+    );
+
+    rerender(
+      <ExerciseTimer
+        exerciseId="bosu"
+        setIndex={0}
+        durationSeconds={25}
+        initialState={initialState}
+        suspended={false}
+        onStateChange={onStateChange}
+        onDone={() => undefined}
+        restartNonce={1}
+      />,
+    );
+
+    expect(screen.getByText('00:25')).toBeInTheDocument();
   });
 
   it('triggers onSkip and onDone when clicking Passer', () => {

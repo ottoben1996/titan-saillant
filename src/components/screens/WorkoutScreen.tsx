@@ -7,6 +7,7 @@ import type { ProfileId, SessionTimerState, WorkoutDay, WorkoutSession } from '.
 import { calculatePlateDelta } from '../../workout/duoManager';
 import { etiquettePalier, paliersDeCharge } from '../../workout/loadSteps';
 import { computeProgressiveOverload, demandeAllegement } from '../../workout/progressionEngine';
+import { getExerciseRecommendation } from '../../workout/coaching';
 import { estReporte, getNextStep, getWorkoutExercises, getWorkoutSteps } from '../../workout/runner';
 import { parseSafeFloat, parseSafeInt } from '../../workout/sanitizer';
 import { formatLoadKg } from '../../workout/summary';
@@ -174,6 +175,10 @@ export function WorkoutScreen({
   const [load, setLoad] = useState('');
   const [duration, setDuration] = useState('');
   const [tempoSkipped, setTempoSkipped] = useState(false);
+  const [recommendationDismissed, setRecommendationDismissed] = useState(false);
+  const [timerRestartNonce, setTimerRestartNonce] = useState(0);
+  const [loadDirty, setLoadDirty] = useState(false);
+  const [durationDirty, setDurationDirty] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [advancedInputsOpen, setAdvancedInputsOpen] = useState(!quickLogMode);
   const advancedInputsRef = useRef<HTMLDivElement>(null);
@@ -221,6 +226,9 @@ export function WorkoutScreen({
     const suggestedAltLoad = activeAlternative?.suggestedLoadKg?.(prescription?.loadKg);
     setLoad(suggestedAltLoad ? suggestedAltLoad.toString() : (prescription?.loadKg?.toString() ?? ''));
     setDuration(prescription?.durationSeconds?.toString() ?? '');
+    setLoadDirty(false);
+    setDurationDirty(false);
+    setTimerRestartNonce(0);
   }, [stepKey, activeAlternative, quickLogMode]);
 
   useEffect(() => {
@@ -259,6 +267,7 @@ export function WorkoutScreen({
     const current = parseSafeFloat(load, 0);
     const nextVal = Math.max(0, Math.round((current + delta) * 10) / 10);
     setLoad(nextVal.toString());
+    setLoadDirty(true);
   };
 
   const handleAdjustReps = (delta: number) => {
@@ -273,7 +282,9 @@ export function WorkoutScreen({
     const current = parseSafeInt(duration, 0);
     const nextVal = Math.max(0, current + delta);
     setDuration(nextVal.toString());
-    setTempoSkipped(true);
+    setDurationDirty(true);
+    setTimerRestartNonce((value) => value + 1);
+    setTempoSkipped(false);
   };
 
   const isSubmittingRef = useRef(false);
@@ -306,7 +317,10 @@ export function WorkoutScreen({
   const handleQuickAction = (kind: 'same-load' | 'same-reps' | 'validate' | 'edit') => {
     triggerHaptic(35);
     if (kind === 'same-load') {
-      if (ghostPerf?.loadKg !== undefined) setLoad(String(ghostPerf.loadKg));
+      if (ghostPerf?.loadKg !== undefined) {
+        setLoad(String(ghostPerf.loadKg));
+        setLoadDirty(true);
+      }
       return;
     }
     if (kind === 'same-reps') {
@@ -347,6 +361,13 @@ export function WorkoutScreen({
     () => (exercise && step.setIndex !== undefined ? findGhostPerformance(history, exercise.id, step.setIndex) : null),
     [exercise?.id, step.setIndex, history],
   );
+  const recommendation = useMemo(
+    () => (exercise && !activeAlternative ? getExerciseRecommendation(exercise, history, { profileId: profile }) : null),
+    [exercise, history, profile, activeAlternative],
+  );
+  useEffect(() => {
+    setRecommendationDismissed(false);
+  }, [stepKey]);
   const currentLoadVal = parseSafeFloat(load, 0);
   const ghostSummary = ghostPerf ? formatGhostPerformance(ghostPerf) : '';
   const ghostDelta =
@@ -469,7 +490,7 @@ export function WorkoutScreen({
                 key={`${exercise.id}-${step.setIndex}`}
                 exerciseId={exercise.id}
                 setIndex={step.setIndex!}
-                durationSeconds={prescription.durationSeconds}
+                durationSeconds={duration.trim() !== '' ? parseSafeInt(duration, prescription.durationSeconds, 0, 3600) : prescription.durationSeconds}
                 initialState={matchingTimer?.kind === 'tempo' ? matchingTimer : undefined}
                 suspended={timerSuspended}
                 onStateChange={onTimerStateChange}
@@ -478,6 +499,7 @@ export function WorkoutScreen({
                   onTimerDone('tempo');
                 }}
                 onSkip={() => setTempoSkipped(true)}
+                restartNonce={timerRestartNonce}
               />
             </div>
           ) : null}
@@ -593,8 +615,48 @@ export function WorkoutScreen({
               <PlateBadge totalLoadKg={currentLoadVal || prescription.loadKg} exerciseId={exercise.id} />
             )}
 
+            {recommendation && prescription.phase !== 'warmup' && !recommendationDismissed && (
+              <div className="coaching-recommendation" role="region" aria-label="Recommandation du coach">
+                <div className="coaching-recommendation-copy">
+                  <strong>
+                    {recommendation.action === 'increase'
+                      ? 'Progression possible'
+                      : recommendation.action === 'reduce'
+                        ? 'Priorité à la sécurité'
+                        : 'Prescription à conserver'}
+                  </strong>
+                  <span>{recommendation.reason}</span>
+                  <small>
+                    Confiance : {recommendation.confidence === 'high' ? 'élevée' : recommendation.confidence === 'medium' ? 'moyenne' : 'prudente'}
+                  </small>
+                </div>
+                <div className="coaching-recommendation-actions">
+                  {recommendation.action === 'increase' &&
+                    (recommendation.suggestedLoadKg !== undefined || recommendation.suggestedDurationSeconds !== undefined) && (
+                      <button
+                        type="button"
+                        className="coaching-apply-btn"
+                        onClick={() => {
+                          if (recommendation.suggestedLoadKg !== undefined && !loadDirty) setLoad(String(recommendation.suggestedLoadKg));
+                          if (recommendation.suggestedDurationSeconds !== undefined && !durationDirty) {
+                            setDuration(String(recommendation.suggestedDurationSeconds));
+                            setTimerRestartNonce((value) => value + 1);
+                            setTempoSkipped(false);
+                          }
+                        }}
+                      >
+                        Appliquer à cette séance
+                      </button>
+                    )}
+                  <button type="button" className="coaching-keep-btn" onClick={() => setRecommendationDismissed(true)}>
+                    Garder la prescription
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Surcharge progressive conseillée : par l'aisance, ou parce qu'elle a été demandée */}
-            {progression && prescription.phase !== 'warmup' && (
+            {progression && prescription.phase !== 'warmup' && !recommendation && (
               <div className="progression-hint-banner">
                 <span className="prog-pill">{progression.source === 'demande' ? 'Ta consigne' : 'Défi coach'}</span>
                 <span>
@@ -613,7 +675,10 @@ export function WorkoutScreen({
                 <button
                   type="button"
                   className="prog-apply-btn"
-                  onClick={() => setLoad(progression.suggestedLoadKg.toString())}
+                  onClick={() => {
+                    setLoad(progression.suggestedLoadKg.toString());
+                    setLoadDirty(true);
+                  }}
                 >
                   Appliquer
                 </button>
@@ -660,7 +725,10 @@ export function WorkoutScreen({
                         <button
                           type="button"
                           className="warmup-ramp-apply-btn"
-                          onClick={() => setLoad(ws.loadKg.toString())}
+                          onClick={() => {
+                            setLoad(ws.loadKg.toString());
+                            setLoadDirty(true);
+                          }}
                           title="Charger ce palier"
                         >
                           Tester
@@ -805,7 +873,9 @@ export function WorkoutScreen({
                         value={duration}
                         onChange={(e) => {
                           setDuration(e.target.value);
-                          setTempoSkipped(true);
+                          setDurationDirty(true);
+                          setTimerRestartNonce((value) => value + 1);
+                          setTempoSkipped(false);
                         }}
                       />
                       <button type="button" className="step-btn" onClick={() => handleAdjustDuration(+5)}>
@@ -859,7 +929,10 @@ export function WorkoutScreen({
                         inputMode="decimal"
                         className="stepper-input"
                         value={load}
-                        onChange={(e) => setLoad(e.target.value)}
+                        onChange={(e) => {
+                          setLoad(e.target.value);
+                          setLoadDirty(true);
+                        }}
                       />
                       <button
                         type="button"

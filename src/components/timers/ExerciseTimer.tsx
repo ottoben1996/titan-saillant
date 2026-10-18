@@ -14,6 +14,7 @@ interface ExerciseTimerProps {
   onStateChange: (state: SessionTimerState | null) => void;
   onDone: () => void;
   onSkip?: () => void;
+  restartNonce?: number;
 }
 
 export function ExerciseTimer({
@@ -25,6 +26,7 @@ export function ExerciseTimer({
   onStateChange,
   onDone,
   onSkip,
+  restartNonce = 0,
 }: ExerciseTimerProps) {
   const controller = useRef<CountdownController | null>(null);
   const onTickRef = useRef<(remaining: number) => void>(() => undefined);
@@ -69,7 +71,7 @@ export function ExerciseTimer({
     controller.current?.cancel();
     lastPublishedRef.current = null;
     lastPausedRef.current = null;
-    const isReset = resetNonce > 0;
+    const isReset = resetNonce > 0 || restartNonce > 0;
     const start = isReset ? durationSeconds : (initialState?.remainingSeconds ?? durationSeconds);
     const initialStarted = isReset ? false : initialState ? initialState.started !== false : false;
     const initialPaused = isReset || !initialStarted || (initialState?.paused ?? false);
@@ -108,7 +110,7 @@ export function ExerciseTimer({
     }
 
     return () => timer.cancel();
-  }, [durationSeconds, resetNonce]);
+  }, [durationSeconds, resetNonce, restartNonce]);
 
   useEffect(() => {
     if (!controller.current || !running) return;

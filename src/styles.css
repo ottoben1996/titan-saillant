@@ -2922,6 +2922,48 @@ input:focus-visible {
   padding-left: var(--sp-2);
 }
 
+/* Recommandation explicite, appliquée seulement à l'entrée courante. */
+.coaching-recommendation {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  margin: var(--sp-5) 0;
+  padding: var(--sp-4) var(--sp-5);
+  border: 1px solid rgb(var(--accent-rgb) / 0.28);
+  border-radius: var(--r-lg);
+  background: rgb(var(--accent-rgb) / 0.08);
+}
+.coaching-recommendation-copy {
+  display: grid;
+  gap: var(--sp-1);
+  min-width: 0;
+}
+.coaching-recommendation-copy strong { color: #f5f6f2; }
+.coaching-recommendation-copy span { color: #dcefd9; }
+.coaching-recommendation-copy small { color: #b9c9bd; }
+.coaching-recommendation-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--sp-2);
+  flex-shrink: 0;
+}
+.coaching-apply-btn,
+.coaching-keep-btn {
+  min-height: 44px;
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-md);
+  font-weight: 800;
+}
+.coaching-apply-btn { background: var(--accent); color: var(--accent-ink); }
+.coaching-keep-btn { border: 1px solid #ffffff2a; color: #f5f6f2; background: transparent; }
+@media (max-width: 600px) {
+  .coaching-recommendation { flex-direction: column; }
+  .coaching-recommendation-actions { width: 100%; justify-content: stretch; }
+  .coaching-apply-btn, .coaching-keep-btn { flex: 1; }
+}
+
 /* Surcharge progressive (Progression Hint Banner) */
 .progression-hint-banner {
   display: flex;
