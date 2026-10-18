@@ -43,6 +43,13 @@
   --surface-0: #0b0f0e;
   --surface-1: #121715;
   --surface-2: #18201d;
+  /* Mesures de lecture et réserves de chrome, bornées pour rester stables
+     entre téléphone, tablette et grand écran. */
+  --measure-reading: 68ch;
+  --measure-wide: 72rem;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  /* Invariants: --measure-wide stays <= 72rem, --fs-12 is the title cap,
+     and --sp-14 is the spacing cap. Keep these bounds when extending tokens. */
   --line: rgba(255, 255, 255, 0.09);
   --line-strong: rgba(255, 255, 255, 0.16);
 
@@ -119,7 +126,8 @@ body {
 /* Largeur utile : éviter la colonne étroite sur écran large */
 .content,
 .topbar {
-  width: min(100%, 72rem);
+  width: min(100%, var(--measure-wide));
+  max-width: 100%;
 }
 
 /* ------------------------------------------------ hiérarchie typographique - */
@@ -813,6 +821,9 @@ body {
   --r-xl: 20px;
   --r-2xl: 24px;
   --r-full: 99px;
+
+  /* Bornes contractuelles du système : aucun titre ne dépasse 2.5rem et
+     aucun espacement ne dépasse 48px sans passer par une fonction fluide. */
 }
 
 /* ---------------------------------------------------------------------------

@@ -124,8 +124,9 @@ html[data-replie="true"] .workout-heading h1 {
   backdrop-filter: blur(20px) saturate(180%);
 }
 
-/* Sans flou disponible, la barre doit rester lisible : fond plein. */
+/* Sans flou disponible, les deux barres restent lisibles : fond plein. */
 @supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .topbar::before,
   .bottom-nav {
     background: var(--surface-1);
   }

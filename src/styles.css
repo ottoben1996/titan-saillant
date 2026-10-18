@@ -23,7 +23,8 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background: radial-gradient(circle at 85% -5%, #294437 0, #111b19 24%, #090d0d 60%);
+  /* Solid fallback keeps text contrast stable across the page. */
+  background: #0b0f0e;
   color: #f5f6f2;
 }
 button,
@@ -45,12 +46,12 @@ input:focus-visible {
   padding: 0 var(--sp-8) var(--sp-14);
 }
 .content {
-  width: min(100%, 62rem);
+  width: min(100%, var(--measure-wide));
   margin: auto;
   padding: var(--sp-13) 0;
 }
 .topbar {
-  width: min(100%, 62rem);
+  width: min(100%, var(--measure-wide));
   margin: auto;
   padding: var(--sp-10) 0;
   display: flex;
@@ -826,6 +827,22 @@ input:focus-visible {
   font-size: var(--fs-2);
 }
 @media (max-width: 700px) {
+  .topbar {
+    flex-wrap: wrap;
+  }
+
+  .topbar-brand {
+    flex: 1 1 auto;
+    min-width: 0;
+    justify-content: center;
+  }
+
+  .connection-pill {
+    max-width: 8rem;
+    white-space: normal;
+    text-align: center;
+  }
+
   .app-shell {
     padding-left: var(--sp-8);
     padding-right: var(--sp-8);
@@ -843,7 +860,7 @@ input:focus-visible {
     min-height: 12rem;
   }
   .metric-grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
   }
   .metric-card {
     padding: var(--sp-8);
@@ -1037,10 +1054,7 @@ input:focus-visible {
 }
 .prescription-card.compact p {
   margin: var(--sp-2) 0 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  overflow-wrap: anywhere;
 }
 .log-card.compact {
   flex: 0 0 auto;
@@ -1083,9 +1097,7 @@ input:focus-visible {
   min-height: 1rem;
   margin: 0;
   font-size: var(--fs-2);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow-wrap: anywhere;
 }
 .alternative-modal h2 {
   padding-right: var(--sp-13);
@@ -3707,4 +3719,46 @@ input:focus-visible {
   border: 0;
   background: transparent;
   cursor: pointer;
+}
+
+
+/* Content resilience for the Coach application only. */
+.app-shell :where(*, *::before, *::after) {
+  min-width: 0;
+}
+
+.app-shell :where(p, li, small, strong, h1, h2, h3, label, button, a, span) {
+  overflow-wrap: anywhere;
+}
+
+.app-shell :where(h1, h2, h3, p, small, button, input, select, textarea) {
+  line-height: 1.4;
+}
+
+.app-shell :where(h1, h2, h3) {
+  line-height: 1.15;
+}
+
+.app-shell :where(.content, .home-content, .workout-content, .settings-content, .progression-content, .followup-content) {
+  max-width: var(--measure-wide);
+}
+
+.app-shell :where(.intro, .coach-note p, .today-card-sub, .next-action-card p, .program-load-head p) {
+  max-width: var(--measure-reading);
+}
+
+/* Tablet: two readable columns. Phone rules below remain one column. */
+@media (min-width: 701px) and (max-width: 1080px) {
+  .workout-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .metric-grid,
+  .home-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .content {
+    padding-inline: var(--sp-6);
+  }
 }

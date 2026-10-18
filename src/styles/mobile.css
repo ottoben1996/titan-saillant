@@ -226,3 +226,60 @@
     background: var(--accent);
   }
 }
+
+/* --- état tablette : deux colonnes seulement quand la lecture reste stable -- */
+@media (min-width: 701px) and (max-width: 1080px) {
+  .workout-grid,
+  .metric-grid,
+  .home-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .workout-card,
+  .metric-card,
+  .home-metric,
+  .today-card,
+  .next-action-card {
+    min-width: 0;
+  }
+}
+
+/* --- état téléphone : une colonne, aucune carte comprimée ---------------- */
+@media (max-width: 700px) {
+  .workout-grid,
+  .metric-grid,
+  .home-metrics {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .topbar,
+  .hero-row,
+  .home-head,
+  .today-card-foot,
+  .resume-banner-wrap,
+  .history-row,
+  .program-load-head {
+    min-width: 0;
+  }
+
+  .topbar-brand,
+  .hero-row > div,
+  .today-card-head,
+  .today-card-foot,
+  .history-row-main,
+  .program-load-head > div {
+    min-width: 0;
+  }
+
+  .bottom-nav {
+    padding-bottom: calc(var(--sp-3) + env(safe-area-inset-bottom, 0px));
+  }
+
+  .modal-backdrop,
+  .tutorial-modal,
+  .alternative-modal,
+  .sheet-content {
+    max-width: 100%;
+    min-width: 0;
+  }
+}
