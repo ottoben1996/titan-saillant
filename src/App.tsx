@@ -1043,7 +1043,7 @@ export default function App() {
           activeSession={session}
           onStart={handleInitiateStart}
           onReviewSlot={() => setScreen('progression')}
-          onPreviewSlot={() => setNotice('Aperçu disponible après le chargement des détails de la séance.')}
+          onPreviewSlot={() => setNotice('AperÃ§u disponible aprÃ¨s le chargement des dÃ©tails de la sÃ©ance.')}
           onResume={resumeWorkout}
           onDiscard={() => setAbandonOpen(true)}
           serie={serieAssiduite(history, program, new Date())}
