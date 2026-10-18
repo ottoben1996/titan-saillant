@@ -8,10 +8,14 @@
  */
 import { describe, expect, it } from 'vitest';
 import { getProgram } from '../../domain/programs';
+import type { WorkoutSession } from '../../domain/types';
+import { weekSlots } from '../../workout/summary';
 import { estimatedMinutes, getNextBestAction } from './HomeScreen';
 
+const program = getProgram('ottman');
+
 const jour = (id: string) => {
-  const trouve = getProgram('ottman').days.find((item) => item.id === id);
+  const trouve = program.days.find((item) => item.id === id);
   if (!trouve) throw new Error(`Créneau introuvable : ${id}`);
   return trouve;
 };
@@ -50,6 +54,40 @@ describe('next best action', () => {
     });
     expect(action.kind).toBe('workout');
     if (action.kind === 'workout') expect(action.day).toBeDefined();
+  });
+});
+
+const completedSession = (dayId: WorkoutSession['dayId'], completedAt: string): WorkoutSession => ({
+  id: `${dayId}-${completedAt}`,
+  profileId: 'ottman',
+  dayId,
+  startedAt: completedAt,
+  updatedAt: completedAt,
+  completedAt,
+  currentExerciseIndex: 0,
+  currentSetIndex: 0,
+  loggedSets: [],
+});
+
+describe('rail de la semaine', () => {
+  const now = new Date('2026-10-17T10:00:00');
+
+  it('marks the first unfinished slot today and later slots upcoming', () => {
+    const slots = weekSlots(program.days, [completedSession(program.days[0].id, '2026-10-12T09:00:00')], now);
+    expect(slots.map((slot) => slot.state)).toEqual(['done', 'today', 'upcoming', 'upcoming']);
+    expect(slots[1].completedAt).toBeNull();
+  });
+
+  it('keeps completed and upcoming slots distinct when an earlier slot is missing', () => {
+    const slots = weekSlots(
+      program.days,
+      [
+        completedSession(program.days[1].id, '2026-10-13T09:00:00'),
+        completedSession(program.days[3].id, '2026-10-16T09:00:00'),
+      ],
+      now,
+    );
+    expect(slots.map((slot) => slot.state)).toEqual(['today', 'done', 'upcoming', 'done']);
   });
 });
 
