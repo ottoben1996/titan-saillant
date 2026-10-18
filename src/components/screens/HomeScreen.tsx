@@ -105,6 +105,8 @@ interface HomeScreenProps {
   chargement?: boolean;
   activeSession: WorkoutSession | null;
   onStart: (day: WorkoutDay) => void;
+  onReviewSlot?: (day: WorkoutDay) => void;
+  onPreviewSlot?: (day: WorkoutDay) => void;
   onResume: () => void;
   /** Supprime la séance en cours (lancée par erreur). */
   onDiscard: () => void;
@@ -132,6 +134,8 @@ export function HomeScreen({
   chargement = false,
   activeSession,
   onStart,
+  onReviewSlot = onOpenProgression,
+  onPreviewSlot = () => undefined,
   onResume,
   onDiscard,
   sauvegarde,
@@ -339,45 +343,62 @@ export function HomeScreen({
         </aside>
       )}
 
-      {/* Rail de la semaine : état explicite de chaque créneau. */}
-      <nav className="week-rail" aria-label="Créneaux de la semaine en cours">
-        {view.slots.map((slot) => (
-          <button
-            key={slot.day.id}
-            type="button"
-            className={`week-slot ${slot.state}`}
-            onClick={() => onStart(slot.day)}
-            aria-label={`${slot.day.name}, ${SLOT_STATES[slot.state]}`}
-          >
-            <span className="week-slot-name">{slot.day.name}</span>
-            <span className="week-slot-state">
-              {slot.state === 'done' && <Check size={13} weight="bold" />}
-              {SLOT_STATES[slot.state]}
-            </span>
-          </button>
-        ))}
-      </nav>
+      {!chargement && (
+        <nav className="week-rail" aria-label="Créneaux de la semaine en cours">
+          {view.slots.map((slot) => {
+            const actionLabel =
+              slot.state === 'done'
+                ? `Revoir ${slot.day.name}`
+                : slot.state === 'upcoming'
+                  ? `Prévisualiser ${slot.day.name}`
+                  : `Démarrer ${slot.day.name}`;
+            const handleSlot = () =>
+              slot.state === 'done'
+                ? onReviewSlot(slot.day)
+                : slot.state === 'upcoming'
+                  ? onPreviewSlot(slot.day)
+                  : onStart(slot.day);
+            return (
+              <button
+                key={slot.day.id}
+                type="button"
+                className={`week-slot ${slot.state}`}
+                onClick={handleSlot}
+                aria-label={`${actionLabel} — ${SLOT_STATES[slot.state]}`}
+              >
+                <span className="week-slot-name">{slot.day.name}</span>
+                <span className="week-slot-state">
+                  {slot.state === 'done' && <Check size={13} weight="bold" />}
+                  {SLOT_STATES[slot.state]}
+                </span>
+              </button>
+            );
+          })}
+        </nav>
+      )}
 
       {/* Métriques compactes : pas de cartes identiques de grande hauteur. */}
-      <div className="home-metrics">
-        <div className="home-metric">
-          <span>Séances cette semaine</span>
-          <strong>
-            {view.weekSessions}
-            <small> / {WEEKLY_TARGET}</small>
-          </strong>
-          <div className="progress-track">
-            <i style={{ width: `${weekProgress}%` }} />
+      {!chargement && (
+        <div className="home-metrics">
+          <div className="home-metric">
+            <span>Séances cette semaine</span>
+            <strong>
+              {view.weekSessions}
+              <small> / {WEEKLY_TARGET}</small>
+            </strong>
+            <div className="progress-track">
+              <i style={{ width: `${weekProgress}%` }} />
+            </div>
+          </div>
+          <div className="home-metric accent">
+            <span>Volume 7 jours</span>
+            <strong>
+              {formatVolume(view.volume7Days)}
+              <small> kg·rép.</small>
+            </strong>
           </div>
         </div>
-        <div className="home-metric accent">
-          <span>Volume 7 jours</span>
-          <strong>
-            {formatVolume(view.volume7Days)}
-            <small> kg·rép.</small>
-          </strong>
-        </div>
-      </div>
+      )}
 
       <div className="coach-note">
         <div className="coach-symbol">
