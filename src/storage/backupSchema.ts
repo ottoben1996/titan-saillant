@@ -34,6 +34,7 @@ const sessionSchema = z
     startedAt: isoDate,
     updatedAt: isoDate,
     completedAt: isoDate.optional(),
+    abandonedAt: isoDate.optional(),
     currentExerciseIndex: z.number().int().min(0),
     currentSetIndex: z.number().int().min(0),
     loggedSets: z.array(loggedSetSchema),

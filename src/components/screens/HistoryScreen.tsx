@@ -67,8 +67,9 @@ export function HistoryScreen({ history, onBack, onDelete }: HistoryScreenProps)
                 {group.sessions.map((item) => {
                   const summary = summarizeSession(item);
                   const done = Boolean(item.completedAt);
+                  const interrupted = Boolean(item.abandonedAt && !item.completedAt);
                   return (
-                    <article className={`history-row${done ? '' : ' in-progress'}`} key={item.id}>
+                    <article className={`history-row${done || interrupted ? '' : ' in-progress'}`} key={item.id}>
                       <div className="history-row-main">
                         <strong>{workoutDayLabel(item.dayId)}</strong>
                         <small>{sessionDateLabel(item)}</small>
@@ -76,7 +77,11 @@ export function HistoryScreen({ history, onBack, onDelete }: HistoryScreenProps)
                       <div className="history-row-meta">
                         <span className="history-figure">
                           <Clock size={13} />
-                          {done ? formatMinutes(sessionDurationSeconds(item)) : 'En cours'}
+                          {done
+                            ? formatMinutes(sessionDurationSeconds(item))
+                            : interrupted
+                              ? 'Interrompue'
+                              : 'En cours'}
                         </span>
                         <span className="history-figure">
                           {sessionSetCount(item)} série{sessionSetCount(item) > 1 ? 's' : ''}

@@ -9,7 +9,7 @@ export async function getActiveSession(profileId: ProfileId) {
   const active = await db.sessions
     .where('profileId')
     .equals(profileId)
-    .and((s) => !s.completedAt)
+    .and((s) => !s.completedAt && !s.abandonedAt)
     .toArray();
   return active.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))[0];
 }

@@ -18,7 +18,13 @@ import { enregistrerAccent, lireAccent } from './storage/accentPreference';
 import { enregistrerModeSaisieRapide, lireModeSaisieRapide } from './storage/quickLogPreference';
 import { telechargerSauvegarde } from './storage/backupFile';
 import { etatSauvegarde, reporterSauvegarde } from './storage/backupReminder';
-import { STORAGE_UNAVAILABLE_MESSAGE, withStorageGuard } from './storage/guard';
+import {
+  STORAGE_UNAVAILABLE_MESSAGE,
+  readLocalStorage,
+  removeLocalStorage,
+  withStorageGuard,
+  writeLocalStorage,
+} from './storage/guard';
 import { enregistrerDureesPersonnalisees, lireDureesPersonnalisees } from './storage/manualDurations';
 import { enregistrerChargesPersonnalisees, lireChargesPersonnalisees } from './storage/manualLoads';
 import { listMeasurements, saveMeasurement, seedMeasurementsIfEmpty } from './storage/measurementRepository';
@@ -70,7 +76,7 @@ type BeforeInstallPromptEvent = Event & {
 
 export default function App() {
   const [profile, setProfile] = useState<ProfileId | null>(() => {
-    const saved = localStorage.getItem(profileKey);
+    const saved = readLocalStorage(profileKey, () => undefined);
     return saved === 'ottman' || saved === 'laura' ? saved : null;
   });
 
@@ -189,6 +195,7 @@ export default function App() {
   );
 
   const [storageMessage, setStorageMessage] = useState('');
+  const profileGeneration = useRef(0);
   const [updateReady, setUpdateReady] = useState(false);
   const [confirmSwitchOpen, setConfirmSwitchOpen] = useState(false);
   const [abandonOpen, setAbandonOpen] = useState(false);
@@ -217,56 +224,61 @@ export default function App() {
   const persist = (sessionToSave: WorkoutSession) =>
     void withStorageGuard(saveSession(sessionToSave), onStorageFailure, undefined);
 
-  const refreshHistory = async (id: ProfileId) => {
-    setHistory(await withStorageGuard(listSessions(id), onStorageFailure, []));
-    // L'écran d'accueil attend cette première lecture : tant qu'elle n'est pas
-    // revenue, il montre une silhouette plutôt qu'une page qui se remplit.
+  const refreshHistory = async (id: ProfileId, generation = profileGeneration.current) => {
+    const nextHistory = await withStorageGuard(listSessions(id), onStorageFailure, []);
+    if (generation !== profileGeneration.current) return;
+    setHistory(nextHistory);
     setHistoriqueCharge(true);
   };
 
   useEffect(() => {
+    const generation = ++profileGeneration.current;
     if (!profile) {
       setManualLoads({});
       setManualDurations({});
       setManualLoadsProfile(null);
+      setSelectedDay(null);
       return;
     }
     setManualLoads({});
     setManualDurations({});
     setManualLoadsProfile(null);
-    setProgramWeek(lireSemaineProgramme(profile));
+    setSelectedDay(null);
+    const week = lireSemaineProgramme(profile);
+    setProgramWeek(week);
     setHistoriqueCharge(false);
-    void refreshHistory(profile);
-    void lireChargesPersonnalisees(profile)
-      .then((loads) => {
-        setManualLoads(loads);
-        setManualLoadsProfile(profile);
-      })
-      .catch(onStorageFailure);
-    void lireDureesPersonnalisees(profile).then(setManualDurations).catch(onStorageFailure);
-    // Reprise de l'historique de la feuille de suivi au premier lancement, puis
-    // lecture des points enregistrés (revalider une semaine remplace la valeur).
-    void withStorageGuard(seedMeasurementsIfEmpty(profile), onStorageFailure, 0).then(() =>
-      withStorageGuard(listMeasurements(profile), onStorageFailure, []).then(setMeasurements),
-    );
-    void withStorageGuard(getActiveSession(profile), onStorageFailure, undefined).then((active) => {
-      if (!active) return;
+    void refreshHistory(profile, generation);
+    void (async () => {
+      const loads = await withStorageGuard(lireChargesPersonnalisees(profile), onStorageFailure, {});
+      const durations = await withStorageGuard(lireDureesPersonnalisees(profile), onStorageFailure, {});
+      const nextMeasurements = await withStorageGuard(
+        seedMeasurementsIfEmpty(profile).then(() => listMeasurements(profile)),
+        onStorageFailure,
+        [],
+      );
+      const active = await withStorageGuard(getActiveSession(profile), onStorageFailure, undefined);
+      if (generation !== profileGeneration.current) return;
+      setManualLoads(loads);
+      setManualLoadsProfile(profile);
+      setManualDurations(durations);
+      setMeasurements(nextMeasurements);
+      if (!active) {
+        setSession(null);
+        return;
+      }
       const restoredTimer = active.activeTimer
         ? { ...active.activeTimer, remainingSeconds: restoreRemainingSeconds(active.activeTimer) }
         : undefined;
       const restored = restoredTimer ? { ...active, activeTimer: restoredTimer } : active;
       setSession(restored);
-
-      // Reprise directe anti-crash : restauration immédiate sur la séance en cours
       if (!active.completedAt) {
-        const prog = getProgram(profile, active.programWeek ?? lireSemaineProgramme(profile));
-        const day = prog.days.find((d) => d.id === active.dayId);
+        const prog = getProgram(profile, active.programWeek ?? week, loads, durations);
+        const day = prog.days.find((item) => item.id === active.dayId);
         if (day) {
           setSelectedDay(day);
           setScreen('workout');
         }
       }
-
       if (restored.activeTimer?.kind === 'rest' && restored.activeTimer.remainingSeconds > 0) {
         setRestSeconds(restored.activeTimer.remainingSeconds);
         setIsResting(true);
@@ -277,7 +289,7 @@ export default function App() {
       if (restoredTimer && restoredTimer.remainingSeconds <= 0) {
         persist({ ...restored, activeTimer: undefined, updatedAt: new Date().toISOString() });
       }
-    });
+    })();
   }, [profile]);
 
   useEffect(() => {
@@ -406,7 +418,7 @@ export default function App() {
   };
 
   const chooseProfile = (next: ProfileId) => {
-    localStorage.setItem(profileKey, next);
+    writeLocalStorage(profileKey, next, onStorageFailure);
     setProfile(next);
     setScreen('home');
     setSession(null);
@@ -431,7 +443,7 @@ export default function App() {
   };
 
   const leaveProfile = () => {
-    localStorage.removeItem(profileKey);
+    removeLocalStorage(profileKey, onStorageFailure);
     setProfile(null);
     setSession(null);
     setHistory([]);
@@ -439,27 +451,32 @@ export default function App() {
 
   const switchDuoProfile = async (target: ProfileId, fallbackScreen: Screen = 'home') => {
     if (target === profile) return;
+    const generation = ++profileGeneration.current;
     if (session) {
-      await withStorageGuard(
-        saveSession({ ...session, updatedAt: new Date().toISOString() }),
-        onStorageFailure,
-        undefined,
-      );
+      await withStorageGuard(saveSession({ ...session, updatedAt: new Date().toISOString() }), onStorageFailure, undefined);
     }
-    localStorage.setItem(profileKey, target);
+    writeLocalStorage(profileKey, target, onStorageFailure);
     setProfile(target);
     const targetWeek = lireSemaineProgramme(target);
+    const [targetHistory, targetLoads, targetDurations, active] = await Promise.all([
+      withStorageGuard(listSessions(target), onStorageFailure, []),
+      withStorageGuard(lireChargesPersonnalisees(target), onStorageFailure, {}),
+      withStorageGuard(lireDureesPersonnalisees(target), onStorageFailure, {}),
+      withStorageGuard(getActiveSession(target), onStorageFailure, undefined),
+    ]);
+    if (generation !== profileGeneration.current) return;
     setProgramWeek(targetWeek);
-    const targetHistory = await listSessions(target);
+    setManualLoads(targetLoads);
+    setManualLoadsProfile(target);
+    setManualDurations(targetDurations);
     setHistory(targetHistory);
-    const active = await getActiveSession(target);
-    const targetProgram = getProgram(target, targetWeek);
     if (active) {
       const restoredTimer = active.activeTimer
         ? { ...active.activeTimer, remainingSeconds: restoreRemainingSeconds(active.activeTimer) }
         : undefined;
       const restored = restoredTimer ? { ...active, activeTimer: restoredTimer } : active;
       setSession(restored);
+      const targetProgram = getProgram(target, active.programWeek ?? targetWeek, targetLoads, targetDurations);
       const day = targetProgram.days.find((item) => item.id === restored.dayId);
       if (day) setSelectedDay(day);
       if (restored.activeTimer?.kind === 'rest' && restored.activeTimer.remainingSeconds > 0) {
@@ -474,7 +491,7 @@ export default function App() {
       setSession(null);
       setSelectedDay(null);
       setScreen(fallbackScreen);
-      setNotice(`Session ${target === 'ottman' ? 'Ottman' : 'Laura'} : choisis ta séance.`);
+      setNotice(`Session ${target === 'ottman' ? 'Ottman' : 'Laura'} : choisis ta seance.`);
       window.setTimeout(() => setNotice(''), 3000);
     }
   };
@@ -539,7 +556,8 @@ export default function App() {
     if (session && !session.completedAt) {
       const closed: WorkoutSession = {
         ...session,
-        completedAt: new Date().toISOString(),
+        abandonedAt: new Date().toISOString(),
+        completedAt: undefined,
         activeTimer: undefined,
         updatedAt: new Date().toISOString(),
       };
@@ -564,7 +582,7 @@ export default function App() {
 
   const resumeWorkout = () => {
     if (!session) return;
-    const sessionProgram = getProgram(profile, session.programWeek ?? programWeek, effectiveManualLoads);
+    const sessionProgram = getProgram(profile, session.programWeek ?? programWeek, effectiveManualLoads, manualDurations);
     const day = sessionProgram.days.find((item) => item.id === session.dayId);
     if (!day) return;
     const restoredTimer = session.activeTimer

@@ -1,20 +1,20 @@
 export type ProfileId = 'ottman' | 'laura';
 
 /**
- * Les quatre créneaux du programme, dans l'ordre où ils sont proposés.
+ * Les quatre crÃ©neaux du programme, dans l'ordre oÃ¹ ils sont proposÃ©s.
  *
- * Source unique : le schéma de lecture d'une sauvegarde les énumérait à la main
- * et avait divergé — une sauvegarde contenant la quatrième séance, « Rameur +
- * marche », était refusée en bloc à la restauration. Dériver le type de la liste
- * empêche les deux de repartir chacun de leur côté.
+ * Source unique : le schÃ©ma de lecture d'une sauvegarde les Ã©numÃ©rait Ã  la main
+ * et avait divergÃ© â€” une sauvegarde contenant la quatriÃ¨me sÃ©ance, Â« Rameur +
+ * marche Â», Ã©tait refusÃ©e en bloc Ã  la restauration. DÃ©river le type de la liste
+ * empÃªche les deux de repartir chacun de leur cÃ´tÃ©.
  */
 export const WORKOUT_DAY_IDS = ['full-body-a', 'full-body-b', 'cardio', 'cardio-4'] as const;
 export type WorkoutDayId = (typeof WORKOUT_DAY_IDS)[number];
 export type ExerciseKind = 'strength' | 'timed' | 'cardio' | 'warmup' | 'cooldown';
 
-/** Charges saisies manuellement, indexées par exercice puis par semaine S1 → S8. */
+/** Charges saisies manuellement, indexÃ©es par exercice puis par semaine S1 â†’ S8. */
 export type ManualLoadOverrides = Readonly<Record<string, readonly (number | null)[]>>;
-/** Durées saisies manuellement, en secondes, indexées par exercice puis S1 → S8. */
+/** DurÃ©es saisies manuellement, en secondes, indexÃ©es par exercice puis S1 â†’ S8. */
 export type ManualDurationOverrides = Readonly<Record<string, readonly (number | null)[]>>;
 
 export interface SetPrescription {
@@ -31,9 +31,9 @@ export interface ExercisePrescription {
   readonly name: string;
   readonly kind: ExerciseKind;
   readonly sets: readonly SetPrescription[];
-  /** Charges de travail prévues par semaine (S1 → S8). */
+  /** Charges de travail prÃ©vues par semaine (S1 â†’ S8). */
   readonly weeklyLoadKg?: readonly number[];
-  /** Exception quand une semaine comporte plusieurs charges dans le même exercice. */
+  /** Exception quand une semaine comporte plusieurs charges dans le mÃªme exercice. */
   readonly weeklySetLoadsKg?: readonly (readonly number[])[];
   readonly notes?: string;
   readonly circuitId?: string;
@@ -78,7 +78,7 @@ export interface Tutorial {
   readonly keyCue?: string;
 }
 
-/** Consigne du quiz de fin de séance, reprise dans le bilan hebdomadaire. */
+/** Consigne du quiz de fin de sÃ©ance, reprise dans le bilan hebdomadaire. */
 export type LoadConsigne = 'increase' | 'same' | 'decrease';
 
 export interface LoggedSet {
@@ -98,7 +98,7 @@ export interface SessionTimerState {
   setIndex: number;
   remainingSeconds: number;
   paused: boolean;
-  /** Faux au chargement d'une série tempo, avant l'appui explicite sur « Démarrer ». */
+  /** Faux au chargement d'une sÃ©rie tempo, avant l'appui explicite sur Â« DÃ©marrer Â». */
   started?: boolean;
   updatedAt: string;
 }
@@ -107,34 +107,36 @@ export interface WorkoutSession {
   id: string;
   profileId: ProfileId;
   dayId: WorkoutDayId;
-  /** Semaine de prescription utilisée pour cette séance, absent dans les anciennes sauvegardes. */
+  /** Semaine de prescription utilisÃ©e pour cette sÃ©ance, absent dans les anciennes sauvegardes. */
   programWeek?: number;
   sequenceVersion?: 2;
   currentStepIndex?: number;
   startedAt: string;
   updatedAt: string;
   completedAt?: string;
+  /** Séance interrompue par le démarrage d’une nouvelle séance. */
+  abandonedAt?: string;
   currentExerciseIndex: number;
   currentSetIndex: number;
   loggedSets: LoggedSet[];
   activeTimer?: SessionTimerState;
-  /** Retour post-séance, facultatif pour rester compatible avec les anciennes sauvegardes. */
+  /** Retour post-sÃ©ance, facultatif pour rester compatible avec les anciennes sauvegardes. */
   perceivedExertion?: number;
-  /** 1 à 5 : 5 « mieux que d'habitude », 3 « comme d'habitude », 1 « moins bien ». */
+  /** 1 Ã  5 : 5 Â« mieux que d'habitude Â», 3 Â« comme d'habitude Â», 1 Â« moins bien Â». */
   energy?: number;
   pain?: string;
-  /** Où se situe la gêne, quand il y en a une. */
+  /** OÃ¹ se situe la gÃªne, quand il y en a une. */
   painLocation?: string;
-  /** Ce que l'athlète demande pour la prochaine fois. */
+  /** Ce que l'athlÃ¨te demande pour la prochaine fois. */
   loadConsigne?: LoadConsigne;
   notes?: string;
   alternativesUsed?: string[];
   /**
-   * Exercices mis de côté parce que leur machine était prise, à reprendre plus
-   * tard dans la même séance.
+   * Exercices mis de cÃ´tÃ© parce que leur machine Ã©tait prise, Ã  reprendre plus
+   * tard dans la mÃªme sÃ©ance.
    *
-   * Facultatif : absent des séances enregistrées avant cette fonctionnalité, et
-   * l'absence vaut « rien de reporté ».
+   * Facultatif : absent des sÃ©ances enregistrÃ©es avant cette fonctionnalitÃ©, et
+   * l'absence vaut Â« rien de reportÃ© Â».
    */
   deferredExerciseIds?: string[];
 }
