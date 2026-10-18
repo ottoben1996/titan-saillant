@@ -680,3 +680,16 @@
 
 /* La barre de validation reste au fond de l'écran : on réserve sa place dans le
    contenu, sinon elle recouvre le bas du formulaire. */
+
+/* Dense controls stay available, but the quick path remains the first decision. */
+.advanced-inputs-toggle {
+  width: 100%;
+  min-height: 44px;
+  margin: var(--sp-3) 0;
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  color: var(--text-1);
+  font-weight: 700;
+}

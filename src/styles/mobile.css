@@ -208,3 +208,21 @@
     padding-top: var(--sp-12);
   }
 }
+
+/* Keep the final action above the home indicator and reserve its visual footprint. */
+.workout-content {
+  scroll-padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
+}
+
+.workout-content .primary-button.full.action-bar {
+  position: sticky;
+  bottom: calc(var(--sp-3) + env(safe-area-inset-bottom, 0px));
+  margin-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+@supports not (color: color-mix(in srgb, white, black)) {
+  .workout-content .primary-button.full.action-bar {
+    background: var(--accent);
+  }
+}

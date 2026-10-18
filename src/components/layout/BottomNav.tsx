@@ -17,59 +17,43 @@ interface BottomNavProps {
   onNavigate: (screen: Screen) => void;
 }
 
+/** Returns the primary navigation destination that owns a contextual screen. */
+export function navigationParent(screen: Screen): Screen {
+  switch (screen) {
+    case 'followup':
+    case 'bilan':
+      return 'progression';
+    default:
+      return screen;
+  }
+}
+
+const navItems = [
+  { screen: 'loads' as const, label: 'Charges', Icon: Gear },
+  { screen: 'home' as const, label: 'Séances', Icon: Barbell },
+  { screen: 'progression' as const, label: 'Progression', Icon: ChartLine },
+  { screen: 'history' as const, label: 'Historique', Icon: Repeat },
+  { screen: 'settings' as const, label: 'Profil', Icon: UserCircle },
+];
+
 export function BottomNav({ currentScreen, onNavigate }: BottomNavProps) {
+  const activeScreen = navigationParent(currentScreen);
+
   return (
     <nav className="bottom-nav" aria-label="Navigation principale">
-      <button
-        type="button"
-        aria-label="Charges"
-        aria-current={currentScreen === 'loads' ? 'page' : undefined}
-        className={currentScreen === 'loads' ? 'active' : ''}
-        onClick={() => onNavigate('loads')}
-      >
-        <Gear size={21} />
-        <span>Charges</span>
-      </button>
-      <button
-        type="button"
-        aria-label="Séances"
-        aria-current={currentScreen === 'home' ? 'page' : undefined}
-        className={currentScreen === 'home' ? 'active' : ''}
-        onClick={() => onNavigate('home')}
-      >
-        <Barbell size={21} />
-        <span>Séances</span>
-      </button>
-      <button
-        type="button"
-        aria-label="Progression"
-        aria-current={currentScreen === 'progression' ? 'page' : undefined}
-        className={currentScreen === 'progression' ? 'active' : ''}
-        onClick={() => onNavigate('progression')}
-      >
-        <ChartLine size={21} />
-        <span>Progression</span>
-      </button>
-      <button
-        type="button"
-        aria-label="Historique"
-        aria-current={currentScreen === 'history' ? 'page' : undefined}
-        className={currentScreen === 'history' ? 'active' : ''}
-        onClick={() => onNavigate('history')}
-      >
-        <Repeat size={21} />
-        <span>Historique</span>
-      </button>
-      <button
-        type="button"
-        aria-label="Profil"
-        aria-current={currentScreen === 'settings' ? 'page' : undefined}
-        className={currentScreen === 'settings' ? 'active' : ''}
-        onClick={() => onNavigate('settings')}
-      >
-        <UserCircle size={21} />
-        <span>Profil</span>
-      </button>
+      {navItems.map(({ screen, label, Icon }) => (
+        <button
+          key={screen}
+          type="button"
+          aria-label={label}
+          aria-current={activeScreen === screen ? 'page' : undefined}
+          className={activeScreen === screen ? 'active' : ''}
+          onClick={() => onNavigate(screen)}
+        >
+          <Icon size={21} />
+          <span>{label}</span>
+        </button>
+      ))}
     </nav>
   );
 }

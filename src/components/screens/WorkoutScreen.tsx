@@ -175,6 +175,9 @@ export function WorkoutScreen({
   const [duration, setDuration] = useState('');
   const [tempoSkipped, setTempoSkipped] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [advancedInputsOpen, setAdvancedInputsOpen] = useState(!quickLogMode);
+  const advancedInputsRef = useRef<HTMLDivElement>(null);
+  const advancedInputsWasOpenRef = useRef(advancedInputsOpen);
 
   const isComplete = step.kind === 'complete';
   const [elapsedSeconds, setElapsedSeconds] = useState(() =>
@@ -203,12 +206,22 @@ export function WorkoutScreen({
   const reporte = estReporte(session, day);
 
   useEffect(() => {
+    setAdvancedInputsOpen(!quickLogMode);
+  }, [quickLogMode]);
+
+  useEffect(() => {
+    if (advancedInputsOpen && !advancedInputsWasOpenRef.current) advancedInputsRef.current?.querySelector<HTMLInputElement>('input')?.focus();
+    advancedInputsWasOpenRef.current = advancedInputsOpen;
+  }, [advancedInputsOpen]);
+
+  useEffect(() => {
+    setAdvancedInputsOpen(!quickLogMode);
     setTempoSkipped(false);
     setReps(prescription?.repetitions?.toString() ?? '');
     const suggestedAltLoad = activeAlternative?.suggestedLoadKg?.(prescription?.loadKg);
     setLoad(suggestedAltLoad ? suggestedAltLoad.toString() : (prescription?.loadKg?.toString() ?? ''));
     setDuration(prescription?.durationSeconds?.toString() ?? '');
-  }, [stepKey, activeAlternative]);
+  }, [stepKey, activeAlternative, quickLogMode]);
 
   useEffect(() => {
     if (isComplete) return;
@@ -742,11 +755,12 @@ export function WorkoutScreen({
                 </div>
               )}
 
-              {quickLogMode && (
-                <div className="quick-log-panel" role="group" aria-label="Actions rapides, mains occupées">
+              {quickLogMode && !advancedInputsOpen && (
+                <fieldset className="quick-log-panel">
+                  <legend>Actions rapides, mains occupées</legend>
                   <div className="quick-log-heading">
                     <strong>Mode mains occupées</strong>
-                    <button type="button" className="quick-log-edit" onClick={() => handleQuickAction('edit')}>
+                    <button type="button" className="quick-log-edit" onClick={() => setAdvancedInputsOpen(true)}>
                       Modifier
                     </button>
                   </div>
@@ -755,16 +769,28 @@ export function WorkoutScreen({
                       <strong>Même charge</strong><span>{ghostPerf?.loadKg !== undefined ? `${formatFrenchNumber(ghostPerf.loadKg)} kg` : 'indisponible'}</span>
                     </button>
                     <button type="button" className="quick-log-action" onClick={() => handleQuickAction('same-reps')} disabled={ghostPerf?.repetitions === undefined}>
-                      <strong>Mêmes répétitions</strong><span>{ghostPerf?.repetitions !== undefined ? `${ghostPerf.repetitions} reps` : 'indisponible'}</span>
+                      <strong>Mêmes répétitions</strong><span>{ghostPerf?.repetitions !== undefined ? `${ghostPerf.repetitions} répétitions` : 'indisponible'}</span>
                     </button>
                     <button type="button" className="quick-log-action quick-log-validate" onClick={() => handleQuickAction('validate')} disabled={isSubmitting}>
                       <Check size={22} weight="bold" /><strong>Valider</strong>
                     </button>
                   </div>
-                </div>
+                </fieldset>
               )}
 
-              <div className="input-row-modern">
+              <button
+                type="button"
+                className="advanced-inputs-toggle"
+                aria-expanded={advancedInputsOpen}
+                aria-controls="workout-advanced-inputs"
+                onClick={() => setAdvancedInputsOpen((open) => !open)}
+              >
+                {advancedInputsOpen ? 'Masquer les réglages détaillés' : 'Afficher les réglages détaillés'}
+              </button>
+
+              {advancedInputsOpen && (
+                <>
+                  <div id="workout-advanced-inputs" className="input-row-modern" ref={advancedInputsRef}>
                 {prescription.durationSeconds ? (
                   <div className="stepper-group">
                     <span className="stepper-label">Durée (secondes)</span>
@@ -854,7 +880,9 @@ export function WorkoutScreen({
                     </div>
                   </div>
                 )}
-              </div>
+                  </div>
+                </>
+              )}
 
               <button
                 type="button"

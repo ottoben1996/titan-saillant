@@ -42,6 +42,7 @@
   bottom: calc(-1 * var(--sp-10));
   left: calc(-1 * max(1rem, env(safe-area-inset-left)));
   right: calc(-1 * max(1rem, env(safe-area-inset-right)));
+  background: var(--surface-1);
   background: color-mix(in srgb, var(--surface-0) 72%, transparent);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   backdrop-filter: blur(20px) saturate(180%);
@@ -117,6 +118,7 @@ html[data-replie="true"] .workout-heading h1 {
 /* ---------------------------------------------------------- barre du bas --- */
 
 .bottom-nav {
+  background: var(--surface-1);
   background: color-mix(in srgb, var(--surface-0) 76%, transparent);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   backdrop-filter: blur(20px) saturate(180%);
@@ -337,7 +339,7 @@ html[data-perf="bas"] .topbar::before {
   .app-shell[data-sens="revient"] > .content,
   .app-shell[data-sens="onglet"] > section,
   .app-shell[data-sens="onglet"] > .content {
-    animation: commute 120ms ease-out;
+    animation: none;
   }
 }
 
@@ -355,7 +357,7 @@ html[data-perf="bas"] .topbar::before {
  *
  * La barre résiste à l'encoche : elle remonte de la zone sûre.
  */
-.action-bar {
+.workout-content .primary-button.full.action-bar {
   position: sticky;
   left: max(0.75rem, env(safe-area-inset-left));
   right: max(0.75rem, env(safe-area-inset-right));
@@ -391,7 +393,7 @@ html[data-perf="bas"] .topbar::before {
    (« on garde une respiration minimale sans la compter deux fois ») : c'est
    cette feuille-ci, chargée après, qui annulait sa décision. */
 .workout-content {
-  padding-bottom: var(--sp-4);
+  padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -399,14 +401,4 @@ html[data-perf="bas"] .topbar::before {
   .next-hint {
     transition: none;
   }
-}
-
-/*
- * ATTENTION : `.action-bar` est portée par DEUX éléments — la barre du haut de
- * l'écran de séance (avec la flèche de retour) et le bouton « Valider la série ».
- * Dépingler la classe entière emportait la flèche de retour hors de l'écran au
- * défilement. On ne dépingle donc que le bouton, par sa classe complète.
- */
-.primary-button.full.action-bar {
-  position: static;
 }
