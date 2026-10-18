@@ -3762,3 +3762,52 @@ input:focus-visible {
     padding-inline: var(--sp-6);
   }
 }
+/* Redesign visuel : surfaces spatiales lisibles, sans modifier les parcours. */
+.app-shell {
+  position: relative;
+  isolation: isolate;
+  overflow-x: clip;
+  background: var(--surface-0);
+}
+.app-shell::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(circle at 82% 0%, rgb(var(--accent-rgb) / 0.1), transparent 34rem);
+}
+.app-shell :where(.today-card, .next-action-card, .resume-banner, .profile-choice, .coach-note, .backup-card, .metric-strip, .comparison-card, .progression-card, .prescription-card) {
+  background: var(--surface-glass-1);
+  border: 1px solid var(--line);
+  box-shadow: var(--elevation);
+}
+.app-shell :where(.today-card, .next-action-card, .prescription-card) {
+  border-radius: var(--r-lg);
+  border-top-color: rgb(var(--accent-rgb) / 0.4);
+}
+.app-shell :where(.metric-cell strong, .record-value, .week-slot-state) {
+  font-variant-numeric: tabular-nums;
+}
+.app-shell .bottom-nav {
+  background: var(--surface-pill);
+  border-color: var(--line-strong);
+  box-shadow: var(--elevation);
+}
+.app-shell .sheet-content {
+  background: var(--surface-glass-3);
+  border-color: var(--line-strong);
+}
+@media (max-width: 700px) {
+  .app-shell :where(.today-card, .next-action-card, .prescription-card) {
+    border-radius: var(--r-md);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .app-shell *, .app-shell *::before, .app-shell *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

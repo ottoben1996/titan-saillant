@@ -82,22 +82,6 @@ describe('WorkoutScreen input ergonomics', () => {
     await waitFor(() => expect(onCompleteSet).toHaveBeenCalledWith({ repetitions: 11, loadKg: 22.5 }));
   });
 
-  it('keeps the quick path visible and opens advanced inputs without changing values', () => {
-    renderWorkout({ quickLogMode: true });
-
-    expect(screen.getByRole('group', { name: 'Actions rapides, mains occupées' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Afficher les réglages détaillés' })).toHaveAttribute(
-      'aria-expanded',
-      'false',
-    );
-    fireEvent.click(screen.getByRole('button', { name: 'Modifier' }));
-    expect(screen.getByRole('textbox', { name: 'Répétitions réalisées' })).toHaveFocus();
-    expect(screen.getByRole('button', { name: 'Masquer les réglages détaillés' })).toHaveAttribute(
-      'aria-expanded',
-      'true',
-    );
-    expect(screen.getByRole('textbox', { name: 'Répétitions réalisées' })).toHaveValue('10');
-  });
 
   it('shows a safe recommendation and applies only the current input', () => {
     renderWorkout({ history: completedHistoryForCurrentExercise() });

@@ -15,7 +15,6 @@ import type {
   WorkoutSession,
 } from './domain/types';
 import { enregistrerAccent, lireAccent } from './storage/accentPreference';
-import { enregistrerModeSaisieRapide, lireModeSaisieRapide } from './storage/quickLogPreference';
 import { telechargerSauvegarde } from './storage/backupFile';
 import { etatSauvegarde, reporterSauvegarde } from './storage/backupReminder';
 import {
@@ -46,8 +45,6 @@ import {
 import { totalsForWeek } from './workout/summary';
 import { restoreRemainingSeconds } from './workout/timer';
 
-// L'espace MUSTAPHA est aiguillé depuis main.tsx, avant le montage : un retour
-// anticipé ici placerait tous les hooks de cette application sous condition.
 
 import { BottomNav, type Screen } from './components/layout/BottomNav';
 import { TopBar } from './components/layout/TopBar';
@@ -89,7 +86,6 @@ export default function App() {
    */
   /** Couleur d'affichage du profil actif, choisie dans les réglages. */
   const [accent, setAccent] = useState<AccentId>(() => (profile ? lireAccent(profile) : 'vert'));
-  const [quickLogMode, setQuickLogMode] = useState(() => (profile ? lireModeSaisieRapide(profile) : false));
 
   useEffect(() => {
     const root = document.documentElement;
@@ -112,7 +108,6 @@ export default function App() {
   useEffect(() => {
     if (profile) {
       setAccent(lireAccent(profile));
-      setQuickLogMode(lireModeSaisieRapide(profile));
     }
   }, [profile]);
 
@@ -860,7 +855,6 @@ export default function App() {
       window.setTimeout(() => setNotice(''), 3500);
     }
   };
-
   const revertAlternative = (exerciseId: string) => {
     if (!session) return;
     const used = (session.alternativesUsed ?? []).filter((id) => id !== exerciseId);
@@ -874,6 +868,8 @@ export default function App() {
     setNotice('Retour au mouvement original.');
     window.setTimeout(() => setNotice(''), 3000);
   };
+
+
 
   const handleTimerStateChange = (state: SessionTimerState | null) => {
     if (!session) return;
@@ -927,7 +923,7 @@ export default function App() {
       try {
         new Notification(kind === 'tempo' ? 'Coach · tempo terminé' : 'Coach · repos terminé', {
           body: message,
-          icon: `${import.meta.env.BASE_URL}icons/logo-mark.png`,
+          icon: `${import.meta.env.BASE_URL}icon.svg`,
           tag: 'coach-timer',
         });
       } catch {
@@ -1138,15 +1134,10 @@ export default function App() {
           onAlternative={setAlternativeId}
           onSkipExercise={() => void passerExercice()}
           onDeferExercise={() => void reporterExercice()}
+          onRevertAlternative={revertAlternative}
           onJumpToExercise={(identifiant) => void allerAExercice(identifiant)}
           onUndoSet={() => void annulerDerniereSerie()}
           onSessionChange={(updated) => void correctCompletedSession(updated)}
-          onRevertAlternative={revertAlternative}
-          quickLogMode={quickLogMode}
-          onQuickLogModeChange={(enabled) => {
-            setQuickLogMode(enabled);
-            enregistrerModeSaisieRapide(profile, enabled);
-          }}
           onFinish={finishWorkout}
         />
       )}

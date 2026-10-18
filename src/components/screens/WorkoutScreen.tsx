@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { equipmentAlternatives } from '../../domain/alternatives';
-import { exerciseMedia } from '../../domain/media';
 import { getProgram } from '../../domain/programs';
 import { tutorials } from '../../domain/tutorials';
 import type { ProfileId, SessionTimerState, WorkoutDay, WorkoutSession } from '../../domain/types';
@@ -125,8 +124,7 @@ interface WorkoutScreenProps {
   onJumpToExercise: (exerciseId: string) => void;
   onSessionChange?: (session: WorkoutSession) => void;
   onRevertAlternative?: (id: string) => void;
-  quickLogMode?: boolean;
-  onQuickLogModeChange?: (enabled: boolean) => void;
+  // Les réglages détaillés restent disponibles via un panneau repliable.
   onFinish: (
     feedback?: Pick<
       WorkoutSession,
@@ -155,8 +153,6 @@ export function WorkoutScreen({
   onJumpToExercise,
   onSessionChange,
   onRevertAlternative,
-  quickLogMode = false,
-  onQuickLogModeChange,
   onFinish,
 }: WorkoutScreenProps) {
   const steps = getWorkoutSteps(day, session);
@@ -180,7 +176,7 @@ export function WorkoutScreen({
   const [loadDirty, setLoadDirty] = useState(false);
   const [durationDirty, setDurationDirty] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [advancedInputsOpen, setAdvancedInputsOpen] = useState(!quickLogMode);
+  const [advancedInputsOpen, setAdvancedInputsOpen] = useState(true);
   const advancedInputsRef = useRef<HTMLDivElement>(null);
   const advancedInputsWasOpenRef = useRef(advancedInputsOpen);
 
@@ -210,9 +206,6 @@ export function WorkoutScreen({
    */
   const reporte = estReporte(session, day);
 
-  useEffect(() => {
-    setAdvancedInputsOpen(!quickLogMode);
-  }, [quickLogMode]);
 
   useEffect(() => {
     if (advancedInputsOpen && !advancedInputsWasOpenRef.current) advancedInputsRef.current?.querySelector<HTMLInputElement>('input')?.focus();
@@ -220,7 +213,7 @@ export function WorkoutScreen({
   }, [advancedInputsOpen]);
 
   useEffect(() => {
-    setAdvancedInputsOpen(!quickLogMode);
+    setAdvancedInputsOpen(true);
     setTempoSkipped(false);
     setReps(prescription?.repetitions?.toString() ?? '');
     const suggestedAltLoad = activeAlternative?.suggestedLoadKg?.(prescription?.loadKg);
@@ -229,7 +222,7 @@ export function WorkoutScreen({
     setLoadDirty(false);
     setDurationDirty(false);
     setTimerRestartNonce(0);
-  }, [stepKey, activeAlternative, quickLogMode]);
+  }, [stepKey, activeAlternative]);
 
   useEffect(() => {
     if (isComplete) return;
@@ -314,25 +307,6 @@ export function WorkoutScreen({
     }
   };
 
-  const handleQuickAction = (kind: 'same-load' | 'same-reps' | 'validate' | 'edit') => {
-    triggerHaptic(35);
-    if (kind === 'same-load') {
-      if (ghostPerf?.loadKg !== undefined) {
-        setLoad(String(ghostPerf.loadKg));
-        setLoadDirty(true);
-      }
-      return;
-    }
-    if (kind === 'same-reps') {
-      if (ghostPerf?.repetitions !== undefined) setReps(String(ghostPerf.repetitions));
-      return;
-    }
-    if (kind === 'edit') {
-      document.querySelector<HTMLInputElement>('.log-card input')?.focus();
-      return;
-    }
-    void handleCompleteSet();
-  };
 
   const completedInDay = session.loggedSets.length;
   const totalSets = steps.length;
@@ -345,7 +319,6 @@ export function WorkoutScreen({
       ? activeTimer
       : undefined;
   const tempoReady = !prescription?.durationSeconds || tempoSkipped || matchingTimer?.remainingSeconds === 0;
-  const movementMedia = exercise ? exerciseMedia[exercise.id] : undefined;
 
   // Calcul de la surcharge progressive & performance précédente (Ghost Data) - mémoïsé
   const progression = useMemo(
@@ -418,12 +391,6 @@ export function WorkoutScreen({
 
   return (
     <section className="content workout-content">
-      {onQuickLogModeChange && (
-        <label className="quick-log-toggle">
-          <input type="checkbox" checked={quickLogMode} onChange={(event) => onQuickLogModeChange(event.target.checked)} />
-          <span>Mode mains occupées</span>
-        </label>
-      )}
       <div className="workout-heading">
         <div>
           {/* Le nom du créneau ne tient pas ici : à 390 px, « FULL BODY A ·
@@ -549,34 +516,6 @@ export function WorkoutScreen({
                 </strong>
               </p>
             )}
-            {movementMedia && (
-              <div className={`exercise-illustration${movementMedia.start ? ' animated' : ' single'}`}>
-                {movementMedia.start ? (
-                  <>
-                    {/* Les deux positions alternent : le mouvement se lit sans vidéo
-                        ni GIF, hors ligne, avec des visuels déjà sous licence. */}
-                    <img
-                      className="movement-frame frame-start"
-                      src={movementMedia.start}
-                      alt={`Position de départ : ${exercise.name}`}
-                      decoding="async"
-                    />
-                    <img
-                      className="movement-frame frame-peak"
-                      src={movementMedia.peak ?? movementMedia.start}
-                      alt={`Position finale : ${exercise.name}`}
-                      decoding="async"
-                    />
-                  </>
-                ) : (
-                  <img
-                    src={movementMedia.main ?? movementMedia.start ?? ''}
-                    alt={`Illustration : ${exercise.name}`}
-                    decoding="async"
-                  />
-                )}
-              </div>
-            )}
             <span className="eyebrow">
               {phaseLabel} · SÉRIE {step.setIndex! + 1}
               {reporte && <span className="report-chip">REPRISE</span>}
@@ -600,15 +539,6 @@ export function WorkoutScreen({
               )}
             </div>
 
-            {/* Ce mouvement n'a pas d'illustration honnête : l'espace que l'image
-                occuperait accueille le repère clé du tutoriel — du contenu réel
-                plutôt qu'un vide au milieu de la carte. */}
-            {!movementMedia && tutorials[exercise.id]?.keyCue && (
-              <p className="key-cue-strip">
-                <span className="eyebrow">REPÈRE CLÉ</span>
-                <span>{tutorials[exercise.id]?.keyCue}</span>
-              </p>
-            )}
 
             {/* Calculateur de disques par côté avec tare automatique */}
             {prescription.loadKg !== undefined && prescription.loadKg >= 20 && !activeAlternative && (
@@ -823,28 +753,6 @@ export function WorkoutScreen({
                 </div>
               )}
 
-              {quickLogMode && !advancedInputsOpen && (
-                <fieldset className="quick-log-panel">
-                  <legend>Actions rapides, mains occupées</legend>
-                  <div className="quick-log-heading">
-                    <strong>Mode mains occupées</strong>
-                    <button type="button" className="quick-log-edit" onClick={() => setAdvancedInputsOpen(true)}>
-                      Modifier
-                    </button>
-                  </div>
-                  <div className="quick-log-actions">
-                    <button type="button" className="quick-log-action" onClick={() => handleQuickAction('same-load')} disabled={ghostPerf?.loadKg === undefined}>
-                      <strong>Même charge</strong><span>{ghostPerf?.loadKg !== undefined ? `${formatFrenchNumber(ghostPerf.loadKg)} kg` : 'indisponible'}</span>
-                    </button>
-                    <button type="button" className="quick-log-action" onClick={() => handleQuickAction('same-reps')} disabled={ghostPerf?.repetitions === undefined}>
-                      <strong>Mêmes répétitions</strong><span>{ghostPerf?.repetitions !== undefined ? `${ghostPerf.repetitions} répétitions` : 'indisponible'}</span>
-                    </button>
-                    <button type="button" className="quick-log-action quick-log-validate" onClick={() => handleQuickAction('validate')} disabled={isSubmitting}>
-                      <Check size={22} weight="bold" /><strong>Valider</strong>
-                    </button>
-                  </div>
-                </fieldset>
-              )}
 
               <button
                 type="button"

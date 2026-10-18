@@ -18,21 +18,6 @@ export default defineConfig(({ command }) => ({
       injectRegister: false,
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,webp,webmanifest,woff2}'],
-        // Les bibliothèques d'images lourdes de l'espace MUSTAPHA ne sont pas
-        // précachées : elles sont mises en cache à la première utilisation.
-        globIgnores: ['**/mustapha/assets/**'],
-        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
-        runtimeCaching: [
-          {
-            urlPattern: /\/mustapha\/assets\//,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'mustapha-assets',
-              expiration: { maxEntries: 400, maxAgeSeconds: 5184000 },
-              cacheableResponse: { statuses: [0, 200] },
-            },
-          },
-        ],
         skipWaiting: true,
         clientsClaim: true,
       },
@@ -57,9 +42,8 @@ export default defineConfig(({ command }) => ({
         functions: 54,
         lines: 68,
       },
-      // L'espace MUSTAPHA est un second produit, mesuré à part ; les fichiers de
-      // test, les styles et les déclarations de types ne se mesurent pas.
-      exclude: ['src/**/*.test.*', 'src/mustapha/**', 'src/styles/**', 'src/vite-env.d.ts', 'src/test/**'],
+      // Les fichiers de test, les styles et les déclarations de types ne se mesurent pas.
+      exclude: ['src/**/*.test.*', 'src/styles/**', 'src/vite-env.d.ts', 'src/test/**'],
     },
   },
 }));

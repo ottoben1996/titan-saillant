@@ -237,9 +237,6 @@
   flex-shrink: 1;
 }
 
-.workout-content .prescription-card.compact > *:not(.exercise-illustration) {
-  flex-shrink: 0;
-}
 
 .workout-content .prescription-card.compact .prescription-main {
   margin: var(--sp-2) 0;
@@ -254,16 +251,6 @@
    l'écran ; libre de rétrécir mais privée de croissance, elle laissait 230 px de
    vide sous l'image, mesurés à 390 × 844 — exactement la zone morte que la règle
    de `tokens.css` avait été écrite pour supprimer. */
-.workout-content .exercise-illustration {
-  flex: 1 1 auto;
-  min-height: 4.5rem;
-  margin: var(--sp-2) 0 var(--sp-3);
-}
-
-.workout-content .exercise-illustration img {
-  min-height: 4.5rem;
-  max-height: 34dvh;
-}
 
 /* ---- Décision A (6 octobre) : pendant le repos, la carte se réduit à une ligne.
    La carte de la série terminée occupait 499 px — illustration, prescription,
@@ -332,9 +319,6 @@
 /* Sans illustration à absorber l'espace libre, la carte se contente de son
    contenu : sinon elle s'étire sur les grands écrans et laisse une zone morte
    sous le repère clé (constaté à 430 × 932). */
-.workout-content .prescription-card.compact:not(:has(.exercise-illustration)) {
-  flex: 0 0 auto;
-}
 
 /* Repère clé du tutoriel, affiché à la place de l'illustration quand le
    mouvement n'en a pas : sans lui, la carte étirée laissait une zone vide. */
@@ -354,64 +338,6 @@
   line-height: 1.35;
 }
 
-/* Démonstration du mouvement : les positions de départ et d'arrivée alternent.
-   Aucune ressource supplémentaire (pas de GIF ni de vidéo), les deux visuels
-   sont déjà précachés hors ligne. Le mouvement se met en pause si l'utilisateur
-   a demandé moins d'animations dans son système. */
-.workout-content .exercise-illustration.animated {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  place-items: center;
-  gap: 0;
-}
-
-.workout-content .exercise-illustration.animated .movement-frame {
-  grid-area: 1 / 1;
-  width: auto;
-  max-width: 13rem;
-  animation: coach-movement-alt 1.5s steps(1, end) infinite;
-}
-
-/* Les deux images se relaient : une visible, l'autre masquée. */
-.workout-content .exercise-illustration.animated .frame-start {
-  animation-name: coach-movement-start;
-}
-
-.workout-content .exercise-illustration.animated .frame-peak {
-  animation-name: coach-movement-peak;
-}
-
-@keyframes coach-movement-start {
-  0%,
-  49.99% {
-    opacity: 1;
-  }
-  50%,
-  100% {
-    opacity: 0;
-  }
-}
-
-@keyframes coach-movement-peak {
-  0%,
-  49.99% {
-    opacity: 0;
-  }
-  50%,
-  100% {
-    opacity: 1;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .workout-content .exercise-illustration.animated .movement-frame {
-    animation: none;
-  }
-
-  .workout-content .exercise-illustration.animated .frame-peak {
-    opacity: 0;
-  }
-}
 
 /* Sur un écran court (barre d'adresse visible, petit téléphone), l'action
    principale reste collée au bas de la colonne : impossible de se retrouver
@@ -523,20 +449,10 @@
   grid-area: 1 / 1 / 2 / 2;
 }
 
-/* Écrans bas (paysage, petits Android) : on resserre encore d'un cran. */
+
+/* Écrans bas : le cadran reste lisible sans dépendre des médias d'exercice. */
 @media (max-height: 700px) {
-  .workout-content .exercise-illustration {
-    min-height: 3.5rem;
-    margin: var(--sp-1) 0 var(--sp-2);
-  }
-
-  .workout-content .exercise-illustration img {
-    min-height: 3rem;
-    max-height: 18dvh;
-  }
-
   .workout-content .rest-orbit-svg-container {
-    /* Réduit avec le chiffre, sans repasser sous l'ancienne taille. */
     width: 108px;
     height: 108px;
   }

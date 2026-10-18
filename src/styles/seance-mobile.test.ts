@@ -28,19 +28,10 @@ describe('écran de séance au téléphone', () => {
   const screens = lire('src/styles/screens.css');
   const ecran = lire('src/components/screens/WorkoutScreen.tsx');
 
-  it('protège le texte de la prescription, et laisse céder l’illustration', () => {
-    // La carte peut se comprimer : sinon elle pousse le bouton hors de l'écran.
-    expect(workout).toMatch(/\.workout-content \.prescription-card\.compact\s*\{[^}]*flex-shrink:\s*1/);
-    // Mais rien de ce qui est du texte ne se comprime.
-    expect(workout).toMatch(
-      /\.workout-content \.prescription-card\.compact\s*>\s*\*:not\(\.exercise-illustration\)\s*\{[^}]*flex-shrink:\s*0/,
-    );
-    // L'illustration, elle, reprend la place laissée vide — avec un plancher
-    // lisible : à 40 px, une image paraît coupée. Deux extrêmes ont été mesurés
-    // avant ce milieu : figée, elle gonflait la carte à 499 px ; privée de
-    // croissance, elle laissait 230 px de vide sous l'image.
-    expect(workout).toMatch(/\.workout-content \.exercise-illustration\s*\{[^}]*flex:\s*1 1 auto/);
-    expect(workout).toMatch(/\.workout-content \.exercise-illustration img\s*\{[^}]*min-height:\s*4\.5rem/);
+  it('supprime les illustrations média de la carte de prescription', () => {
+    expect(ecran).not.toContain('exercise-illustration');
+    expect(ecran).not.toContain('movement-frame');
+    expect(workout).not.toContain('.exercise-illustration');
   });
 
   it('garde le tutoriel au rapport 9:16 sans trancher la vidéo', () => {

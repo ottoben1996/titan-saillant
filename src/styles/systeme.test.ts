@@ -13,8 +13,6 @@
  * Ce qui reste autorisé, et pourquoi :
  *   - zéro, les pourcentages, et les valeurs négatives (ce sont des calages) ;
  *   - tout ce qui passe par une fonction, `calc()` ou `color-mix()` ;
- *   - les sélecteurs `.mustapha-*`, qui gardent volontairement leurs propres
- *     valeurs : c'est un second produit, isolé du premier.
  */
 import { readdirSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
@@ -54,7 +52,7 @@ interface Infraction {
   declaration: string;
 }
 
-/** Parcourt une feuille et relève les valeurs en dur, hors MUSTAPHA. */
+/** Parcourt les feuilles de style de l'application principale. */
 function infractions(fichier: string): Infraction[] {
   const texte = readFileSync(fichier, 'utf8');
   const trouvees: Infraction[] = [];

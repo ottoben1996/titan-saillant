@@ -14,7 +14,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
 const FICHIERS: string[] = [];
-for (const dossier of ['src/components', 'src/domain', 'src/workout', 'src/storage', 'src/mustapha']) {
+for (const dossier of ['src/components', 'src/domain', 'src/workout', 'src/storage']) {
   for (const nom of readdirSync(dossier, { recursive: true }) as string[]) {
     if (/\.(ts|tsx)$/.test(nom) && !/\.test\./.test(nom)) FICHIERS.push(`${dossier}/${nom}`);
   }

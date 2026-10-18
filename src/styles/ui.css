@@ -18,6 +18,15 @@
   border: 0;
 }
 
+/* Signature iconographique : optique nette, alignement stable et aucune
+   décoration ajoutée au glyph. Le relief vient du tracé, pas d'un effet. */
+.premium-icon {
+  display: block;
+  flex: 0 0 auto;
+  overflow: visible;
+  color: currentColor;
+}
+
 /* ============================ 1. PLATE BADGE =============================== */
 /* Objectif : lisible d'un coup d'œil, téléphone à bout de bras (390–430 px). */
 

@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
-import { exerciseMedia } from '../../domain/media';
 import type { Tutorial } from '../../domain/types';
-import { ArrowLeft, ArrowRight, ArrowUpRight, Barbell, Bolt, Play, Repeat, Timer, Video, Warning } from '../ui/Icons';
+import { ArrowLeft, ArrowUpRight, Barbell, Bolt, Repeat, Timer, Video, Warning } from '../ui/Icons';
 import { MuscleMap } from '../ui/MuscleMap';
 import { Sheet, SheetContent, SheetTitle } from '../ui/Sheet';
 
@@ -11,9 +10,6 @@ interface TutorialModalProps {
 }
 
 export function TutorialModal({ tutorial, onClose }: TutorialModalProps) {
-  const media = exerciseMedia[tutorial.exerciseId];
-  const [activeFrame, setActiveFrame] = useState<'start' | 'peak'>('start');
-  const [isAnimating, setIsAnimating] = useState(true);
   const [isOnline, setIsOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine : true);
 
   const hasShort = Boolean(tutorial.youtubeShortId);
@@ -36,16 +32,6 @@ export function TutorialModal({ tutorial, onClose }: TutorialModalProps) {
     };
   }, []);
 
-  // Animation ping-pong (départ <-> pic) toutes les 1200ms quand on est sur l'onglet anatomie
-  useEffect(() => {
-    if (!media?.start || !media?.peak || !isAnimating || activeTab !== 'anatomy') return;
-    const interval = window.setInterval(() => {
-      setActiveFrame((prev) => (prev === 'start' ? 'peak' : 'start'));
-    }, 1200);
-    return () => window.clearInterval(interval);
-  }, [media?.start, media?.peak, isAnimating, activeTab]);
-
-  const frameStyle = { width: '45%', height: '100%', objectFit: 'contain' } as const;
 
   return (
     <Sheet open onOpenChange={(open) => !open && onClose()}>
@@ -109,65 +95,12 @@ export function TutorialModal({ tutorial, onClose }: TutorialModalProps) {
             )}
           </div>
         ) : (
-          /* Tab 2: Animation RepDB / Cover anatomique */
-          <div
-            className="tutorial-cover"
-            style={media ? { background: '#101713', overflow: 'hidden', position: 'relative' } : undefined}
-          >
-            {media?.start && media?.peak ? (
-              <div className="tutorial-animation-container">
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '.6rem',
-                    width: '100%',
-                    height: '100%',
-                  }}
-                >
-                  <img
-                    src={activeFrame === 'start' ? media.start : media.peak}
-                    alt={`Position ${activeFrame} : ${tutorial.title}`}
-                    className="tutorial-animated-frame"
-                    style={{ maxHeight: '7.5rem', objectFit: 'contain', transition: 'opacity 0.25s ease' }}
-                  />
-                  <button
-                    type="button"
-                    className="motion-toggle-pill"
-                    onClick={() => setIsAnimating(!isAnimating)}
-                    title={isAnimating ? 'Mettre en pause l’animation' : 'Animer le mouvement'}
-                  >
-                    <Play size={12} weight={isAnimating ? 'fill' : 'regular'} />
-                    <span>{isAnimating ? 'Boucle' : 'Pause'}</span>
-                  </button>
-                </div>
-              </div>
-            ) : media?.start ? (
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '.4rem',
-                  width: '100%',
-                  height: '100%',
-                }}
-              >
-                <img src={media.start} alt={`Départ : ${tutorial.title}`} style={frameStyle} />
-                <ArrowRight size={20} className="tutorial-arrow" />
-                <img src={media.peak ?? media.main ?? media.start} alt={`Fin : ${tutorial.title}`} style={frameStyle} />
-              </div>
-            ) : media?.main ? (
-              <img
-                src={media.main}
-                alt={tutorial.title}
-                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-              />
-            ) : (
+          <>
+            {/* Les médias d'exercice sont retirés de cette vue pour préserver la mise en page mobile. */}
+            <div className="tutorial-cover">
               <Barbell size={52} weight="duotone" />
-            )}
-          </div>
+            </div>
+          </>
         )}
 
         <p className="eyebrow">TUTORIEL & ANATOMIE</p>
@@ -221,11 +154,6 @@ export function TutorialModal({ tutorial, onClose }: TutorialModalProps) {
           <div className="safety-callout">
             <Warning size={16} /> {tutorial.safety[0]}
           </div>
-          {media && (
-            <p style={{ marginTop: '1rem', color: 'var(--text-3)', fontSize: '0.75rem' }}>
-              Illustrations : Exercise data by RepDB (repdb.co) · attribution conservée.
-            </p>
-          )}
         </div>
 
         <button

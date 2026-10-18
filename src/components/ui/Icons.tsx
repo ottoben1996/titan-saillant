@@ -1,10 +1,10 @@
 import type { ReactNode } from 'react';
 
-/** Épaisseur de trait unique pour toute l'iconographie Titan. */
-export const ICON_STROKE_WIDTH = 1.5;
-
-/** Taille par défaut des icônes : 20 px, alignée sur la grille 24. */
+/** Épaisseur et taille de la signature iconographique Titan. */
+export const ICON_STROKE_WIDTH = 1.65;
 export const ICON_DEFAULT_SIZE = 20;
+
+const PREMIUM_ICON_CLASS = 'premium-icon';
 
 export type IconProps = {
   size?: number;
@@ -25,13 +25,15 @@ export const Icon = ({
     focusable="false"
     width={size}
     height={size}
-    className={className}
+    className={[PREMIUM_ICON_CLASS, className].filter(Boolean).join(' ')}
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
     strokeWidth={strokeWidth}
     strokeLinecap="round"
     strokeLinejoin="round"
+    shapeRendering="geometricPrecision"
+    vectorEffect="non-scaling-stroke"
   >
     <path d={String(children)} />
   </svg>

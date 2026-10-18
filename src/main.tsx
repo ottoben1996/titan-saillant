@@ -1,5 +1,5 @@
 import { registerSW } from 'virtual:pwa-register';
-import { lazy, StrictMode, Suspense } from 'react';
+import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
 import { AppErrorBoundary } from './components/layout/ErrorBoundary';
@@ -8,7 +8,6 @@ import './styles.css';
 import './styles/tokens.css';
 import './styles/mobile.css';
 import './styles/workout.css';
-import './styles/quick-log.css';
 import './styles/screens.css';
 import './styles/ui.css';
 import './styles/followup.css';
@@ -103,30 +102,10 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('coach-force-update', () => void forceUpdate());
 }
 
-/**
- * L'espace MUSTAPHA n'est chargé que si on l'ouvre : son code ne part plus dans
- * le paquet initial de l'application Ottman, pour toutes les personnes, à
- * chaque ouverture.
- *
- * Le test passe par `BASE_URL` : écrit en dur, « /mustapha » ne correspondait
- * qu'en développement, où la base vaut « / ». En ligne, la base est
- * « /titan-saillant/ » et le second produit n'était donc jamais monté — sans
- * que rien ne le signale, puisque tout fonctionnait en local.
- */
-const MustaphaApp = lazy(() => import('./mustapha/MustaphaApp'));
-
-const estEspaceMustapha = window.location.pathname.startsWith(`${import.meta.env.BASE_URL}mustapha`);
-
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <AppErrorBoundary>
-      {estEspaceMustapha ? (
-        <Suspense fallback={<div className="app-shell" aria-busy="true" />}>
-          <MustaphaApp />
-        </Suspense>
-      ) : (
-        <App />
-      )}
+      <App />
     </AppErrorBoundary>
   </StrictMode>,
 );

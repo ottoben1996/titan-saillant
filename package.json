@@ -60,11 +60,6 @@
       "name": "styles",
       "path": "dist/assets/index-*.css",
       "limit": "22 kB"
-    },
-    {
-      "name": "espace MUSTAPHA (chargé à l'ouverture seulement)",
-      "path": "dist/assets/MustaphaApp-*.js",
-      "limit": "16 kB"
     }
   ]
 }

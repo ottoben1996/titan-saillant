@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import type { ProfileId } from '../../domain/types';
 import { listSessions } from '../../storage/sessionRepository';
 import { totalsForWeek } from '../../workout/summary';
-import { ArrowRight, Barbell } from '../ui/Icons';
+import { ArrowRight } from '../ui/Icons';
+import { LogoMark } from '../ui/LogoMark';
 
 const PROFILES: ReadonlyArray<{ id: ProfileId; name: string; description: string }> = [
   { id: 'ottman', name: 'Ottman', description: 'Programme force & cardio' },
@@ -54,10 +55,13 @@ export function ProfileChooser({ onChoose }: ProfileChooserProps) {
   return (
     <main className="app-shell profile-screen">
       <section className="profile-card">
-        <div className="brand-mark">
-          <Barbell size={24} weight="duotone" />
+        <div className="brand-lockup" aria-label="Coach Ottman et Laura">
+          <span className="brand-mark" aria-hidden="true">
+            <LogoMark size={34} />
+          </span>
+          <span className="brand-wordmark">COACH</span>
         </div>
-        <p className="eyebrow">COACH · HORS LIGNE</p>
+        <p className="eyebrow">ESPACE PERSONNEL · HORS LIGNE</p>
         <h1>
           Ta séance,
           <br />
