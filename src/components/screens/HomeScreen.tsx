@@ -309,7 +309,9 @@ export function HomeScreen({
         </article>
       )}
 
-      <ProgramLoadCard program={prescribedProgram} week={programWeek} onWeekChange={onProgramWeekChange} />
+      {!chargement && (
+        <ProgramLoadCard program={prescribedProgram} week={programWeek} onWeekChange={onProgramWeekChange} />
+      )}
 
       {/* Série de semaines complètes : un repère de régularité, jamais un score. */}
       {serie && serie.seancesFaites > 0 && (
