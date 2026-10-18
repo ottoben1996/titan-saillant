@@ -441,13 +441,7 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
     expect(saved[0].loadConsigne).toBe('increase');
   });
 
-  /* ------------------------------------------------------------------------- *\
-   |  DÉFAUT DOCUMENTÉ — test maintenu en `it.fails` tant que le défaut existe.  |
-   |  Le jour où le comportement attendu est implémenté, ce test échouera et     |
-   |  signalera qu'il faut le repasser en `it`.                                  |
-   \* ------------------------------------------------------------------------- */
-
-  it('[6] démarrer une 2e séance clôture la précédente : une seule séance reste en cours (orpheline corrigée)', async () => {
+  it('[6] une séance en cours bloque le démarrage d’un autre créneau : le rail prévisualise sans lancer la séance', async () => {
     await openAsOttman();
     await startDayFromHome('Full Body A');
     await validateSet(); // une série validée → la séance A existe en base
@@ -458,22 +452,16 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
     fireEvent.click(screen.getByRole('button', { name: /mettre en pause/i }));
     await flush();
 
-    // Depuis l'accueil, l'utilisateur peut démarrer un AUTRE créneau :
-    // le bandeau de reprise n'empêche pas le rail de semaine d'être cliquable
-    // et confirmWorkoutStart (App.tsx:279) ne vérifie aucune séance en cours.
-    fireEvent.click(screen.getByRole('button', { name: /full body b/i }));
+    // Un autre créneau est une prévisualisation : il ne contourne pas la séance en cours.
+    fireEvent.click(screen.getByRole('button', { name: /prévisualiser full body b — à venir/i }));
     await flush();
-    fireEvent.click(screen.getByRole('button', { name: /démarrer full body b/i }));
-    await flush();
+    expect(screen.getByText(/aperçu disponible après le chargement des détails de la séance/i)).toBeInTheDocument();
+    expect(screen.queryByRole('dialog')).toBeNull();
 
-    // La séance B est bien ouverte : les deux séances de musculation partagent
-    // le même échauffement, on vérifie donc la séance réellement en base plutôt
-    // qu'un titre d'exercice, plus robuste et plus proche du comportement attendu.
-    expect(document.querySelector('.workout-shell')).not.toBeNull();
     const inProgress = (await listSessions('ottman')).filter((item) => !item.completedAt);
     expect(inProgress).toHaveLength(1);
-    expect(inProgress[0].dayId).toBe('full-body-b');
-    expect(inProgress[0].loggedSets).toHaveLength(0);
+    expect(inProgress[0].dayId).toBe('full-body-a');
+    expect(inProgress[0].loggedSets).toHaveLength(1);
   });
 
   it('[6b] les champs de saisie portent un nom accessible (accessibilité corrigée)', async () => {

@@ -111,7 +111,8 @@ describe('durée annoncée', () => {
   });
 });
 
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
+import { vi } from 'vitest';
 
 describe('hiérarchie de l’accueil', () => {
   const baseProps = {
@@ -130,16 +131,36 @@ describe('hiérarchie de l’accueil', () => {
     expect(screen.getByRole('status')).toHaveTextContent('Chargement');
 
     rerender(<HomeScreen {...baseProps} />);
-    expect(screen.getByRole('button', { name: /^Démarrer .+/i })).toHaveClass('primary-button');
+    const todayCard = screen.getByRole('article');
+    expect(within(todayCard).getByRole('button', { name: /^Démarrer .+/i })).toHaveClass('primary-button');
     expect(screen.getByText('Volume 7 jours')).toBeInTheDocument();
     expect(screen.queryByText(/au total/)).not.toBeInTheDocument();
   });
 
-  it('donne un sens explicite aux créneaux terminés et à venir', () => {
+  it('déclenche l’action correspondant à chaque état du rail', () => {
+    const onStart = vi.fn();
+    const onReviewSlot = vi.fn();
+    const onPreviewSlot = vi.fn();
     const history = [completedSession(program.days[0].id, '2026-10-12T09:00:00')];
-    render(<HomeScreen {...baseProps} history={history} />);
+    render(
+      <HomeScreen
+        {...baseProps}
+        history={history}
+        onStart={onStart}
+        onReviewSlot={onReviewSlot}
+        onPreviewSlot={onPreviewSlot}
+      />,
+    );
 
-    expect(screen.getByRole('button', { name: /Full Body A/ })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Full Body B, A/ })).toBeInTheDocument();
+    const rail = screen.getByRole('navigation', { name: /créneaux de la semaine/i });
+    fireEvent.click(within(rail).getByRole('button', { name: /Revoir Full Body A — Terminée/i }));
+    expect(onReviewSlot).toHaveBeenCalledWith(program.days[0]);
+
+    const todayCard = screen.getByRole('article');
+    fireEvent.click(within(todayCard).getByRole('button', { name: /Démarrer Full Body B · \d+ min/i }));
+    expect(onStart).toHaveBeenCalledWith(program.days[1]);
+
+    fireEvent.click(within(rail).getByRole('button', { name: /Prévisualiser Cardio circuit — À venir/i }));
+    expect(onPreviewSlot).toHaveBeenCalledWith(program.days[2]);
   });
 });
