@@ -12,13 +12,16 @@ import { WORKOUT_DAY_IDS } from '../domain/types';
 const profileIdSchema = z.enum(['ottman', 'laura']);
 const isoDate = z.string().refine((valeur) => Number.isFinite(Date.parse(valeur)), 'date invalide');
 const nombreOptionnel = z.number().finite().optional();
+const nombreNonNegatifOptionnel = z.number().finite().nonnegative().optional();
 
 const loggedSetSchema = z.object({
+  setId: z.string().min(1).optional(),
   exerciseId: z.string().min(1),
   setIndex: z.number().int().min(0),
   completedAt: isoDate,
-  actualRepetitions: z.number().optional(),
-  actualLoadKg: z.number().optional(),
+  actualRepetitions: nombreNonNegatifOptionnel,
+  actualDurationSeconds: nombreNonNegatifOptionnel,
+  actualLoadKg: nombreNonNegatifOptionnel,
 });
 
 const sessionSchema = z
