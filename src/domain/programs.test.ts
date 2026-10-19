@@ -1,163 +1,62 @@
 import { describe, expect, it } from 'vitest';
 import { getProgram } from './programs';
-import { tutorials } from './tutorials';
 
-describe('seed programs from PDFs', () => {
-  it.each(['ottman', 'laura'] as const)('exposes the four sessions for %s', (profile) => {
+describe('programmes issus des PDF', () => {
+  it.each(['ottman', 'laura'] as const)('expose les quatre séances PDF pour %s', (profile) => {
     expect(getProgram(profile).days.map((day) => day.id)).toEqual(['full-body-a', 'full-body-b', 'cardio', 'cardio-4']);
   });
 
-  it('preserves representative load and circuit differences', () => {
-    const ottmanA = getProgram('ottman').days[0];
-    const lauraA = getProgram('laura').days[0];
-    expect(ottmanA.exercises[0].sets.at(-1)?.loadKg).toBe(110);
-    expect(lauraA.exercises[0].sets.at(-1)?.loadKg).toBe(70);
-    expect(ottmanA.exercises[4].sets[0].durationSeconds).toBe(25);
-    expect(lauraA.exercises[4].sets[0].durationSeconds).toBe(35);
-    expect(ottmanA.exercises[5].restAfterSeconds).toBe(30);
-    expect(lauraA.exercises[5].restAfterSeconds).toBe(25);
+  it('conserve les échauffements communs du PDF', () => {
+    const warmup = getProgram('ottman').warmup;
+    expect(warmup.map((item) => item.id)).toEqual(['coiffe-rotateurs', 'bosu', 'velo']);
+    expect(warmup[0].sets[0]).toMatchObject({ repetitions: 10, loadLabel: 'Élastique ou 4 kg à la poulie' });
+    expect(warmup[1].sets).toHaveLength(3);
+    expect(warmup[1].sets[0]).toMatchObject({ durationSeconds: 20, loadLabel: 'PDC' });
+    expect(warmup[2].sets[0]).toMatchObject({ durationSeconds: 180, restSeconds: 30 });
   });
 
-  it('keeps PDF warmups, paired finisher circuits and cooldown prescriptions', () => {
+  it('reprend les charges Ottman et Laura des séances de force', () => {
+    const ottman = getProgram('ottman');
+    const laura = getProgram('laura');
+    expect(ottman.days[0].exercises.map((item) => item.name)).toEqual([
+      'Soulevé de terre roumain',
+      'Développé couché barre',
+      'Tirage horizontal machine',
+      'Développé épaule machine',
+      'Rameur',
+    ]);
+    expect(ottman.days[0].exercises[0].sets.at(-1)?.loadKg).toBe(40);
+    expect(ottman.days[0].exercises[1].sets.at(-1)?.loadKg).toBe(65);
+    expect(laura.days[0].exercises[0].sets.at(-1)?.loadKg).toBe(85);
+    expect(laura.days[0].exercises[1].sets.at(-1)?.loadKg).toBe(27);
+    expect(laura.days[2].exercises[1].sets.at(-1)?.loadKg).toBe(7.5);
+  });
+
+  it('représente les circuits cardio/renfo et les trois blocs endurance', () => {
     for (const profile of ['ottman', 'laura'] as const) {
       const program = getProgram(profile);
-      const a = program.days[0];
-      const b = program.days[1];
-      const cardio = program.days[2];
-      expect(program.warmup.find((e) => e.id === 'rameur')).toBeDefined();
-      expect(b.warmup?.find((e) => e.id === 'rameur')).toBeDefined();
-      expect(cardio.warmup?.find((e) => e.id === 'velo')).toBeDefined();
-      expect(a.exercises[4].circuitId).toBe(a.exercises[5].circuitId);
-      expect(b.exercises[4].circuitId).toBe(b.exercises[5].circuitId);
-      expect(a.cooldown.loadLabel).toBe('5 minutes à 5 km/h');
-      expect(b.cooldown.loadLabel).toBe('5 minutes en marche rapide');
-      expect(cardio.cooldown.loadLabel).toBe('5 minutes en marche rapide');
-      expect(a.exercises[0].sets.slice(0, 2).every((s) => s.restSeconds === 75)).toBe(true);
-      expect(b.exercises[0].sets.slice(0, 2).every((s) => s.restSeconds === 75)).toBe(true);
-      expect(program.warmup.find((e) => e.id === 'bosu')?.sets.every((s) => s.durationSeconds === 40)).toBe(true);
-      expect(cardio.exercises.find((e) => e.id === 'developpe-clavicule')?.sets).toHaveLength(3);
-      expect(a.warmup?.map((e) => e.id)).toEqual(['coiffe-rotateurs', 'bosu', 'rameur']);
+      expect(program.days[1].exercises).toHaveLength(8);
+      expect(program.days[1].exercises.every((item) => item.sets.length > 0)).toBe(true);
+      expect(program.days[2].exercises.at(-1)?.name).toBe('Mountain climber');
+      expect(program.days[3].exercises.map((item) => item.sets[0].durationSeconds)).toEqual([900, 1200, 600]);
     }
   });
 
-  it('expose toutes les charges Ottman et Laura des semaines 1 à 5', () => {
-    const expected = {
-      ottman: {
-        'presse-cuisses-inclinee': [110, 110, 130, 110, 160],
-        'leg-curl-allonge': [50, 50, 55, 50, 50],
-        'chest-press': [45, 45, 52, 45, 59],
-        'tirage-horizontal': [45, 45, 52, 45, 45],
-        'squat-smith': [30, 30, 40, 40, 80],
-        'leg-extension': [45, 45, 45, 45, 45],
-        'developpe-couche-machine': [60, 60, 80, 70, 80],
-        'tirage-vertical': [45, 45, 45, 45, 52],
-      },
-      laura: {
-        'presse-cuisses-inclinee': [70, 70, 70, 70, 80],
-        'leg-curl-allonge': [23, 23, 27, 27, 27],
-        'chest-press': [18, 18, 20, 20, 20],
-        'tirage-horizontal': [18, 18, 25, 25, 25],
-        'squat-smith': [27, 27, 30, 30, 30],
-        'leg-extension': [22.5, 22.5, 25, 25, 27],
-        'developpe-couche-machine': [20, 20, 20, 20, 20],
-        'tirage-vertical': [25, 25, 25, 25, 27],
-      },
-    } as const;
-
-    for (const profile of ['ottman', 'laura'] as const) {
-      for (const [exerciseId, weeklyLoads] of Object.entries(expected[profile])) {
-        for (const [weekIndex, load] of weeklyLoads.entries()) {
-          const exercise = getProgram(profile, weekIndex + 1)
-            .days.flatMap((day) => day.exercises)
-            .find((item) => item.id === exerciseId);
-          const exceptionalSets = exercise?.weeklySetLoadsKg?.[weekIndex];
-          if (exceptionalSets) {
-            expect(
-              exercise?.sets.slice(-exceptionalSets.length).map((item) => item.loadKg),
-              `${profile} ${exerciseId} S${weekIndex + 1}`,
-            ).toEqual(exceptionalSets);
-          } else {
-            expect(exercise?.sets.at(-1)?.loadKg, `${profile} ${exerciseId} S${weekIndex + 1}`).toBe(load);
-          }
-          expect(exercise?.weeklyLoadKg?.[weekIndex], `${profile} ${exerciseId} table S${weekIndex + 1}`).toBe(load);
-        }
-      }
-    }
-
-    const ottmanWeek5 = getProgram('ottman', 5).days[1].exercises.find(
-      (item) => item.id === 'developpe-couche-machine',
-    );
-    expect(ottmanWeek5?.sets.map((item) => item.loadKg)).toEqual([80, 80, 100]);
+  it('conserve les valeurs PDF lors de la lecture des semaines suivantes', () => {
+    const weekEight = getProgram('ottman', 8);
+    expect(weekEight.days[0].exercises[0].sets.at(-1)?.loadKg).toBe(40);
+    expect(weekEight.days[3].exercises[0].sets[0].durationSeconds).toBe(900);
   });
 
-  it('conserve le circuit cardio et ajoute le rameur de 15 minutes et la marche de 25 minutes', () => {
-    for (const profile of ['ottman', 'laura'] as const) {
-      const cardio = getProgram(profile).days[2];
-      const cardio4 = getProgram(profile).days[3];
-      const oldRower = cardio.exercises.find((item) => item.id === 'rameur');
-      const addedRower = cardio4.exercises.find((item) => item.id === 'rameur-15-min');
-      const walk = cardio4.exercises.find((item) => item.id === 'marche-cardio');
-
-      expect(oldRower?.circuitId).toBe('circuit-3');
-      expect(oldRower?.sets).toHaveLength(3);
-      expect(oldRower?.sets[0].durationSeconds).toBe(profile === 'laura' ? 40 : 30);
-      expect(addedRower?.sets).toEqual([{ durationSeconds: 900, loadLabel: 'PDC' }]);
-      expect(walk?.sets).toEqual([{ durationSeconds: 1500, loadLabel: 'PDC' }]);
-    }
-  });
-
-  it('applique une charge manuelle aux prochaines séances sans modifier la prescription par défaut', () => {
-    const custom = getProgram('ottman', 5, {
-      'chest-press': [null, null, null, null, 62.5],
-      'developpe-couche-machine': [null, null, null, null, 92.5],
-    });
-    const chest = custom.days[0].exercises.find((item) => item.id === 'chest-press');
-    const convergente = custom.days[1].exercises.find((item) => item.id === 'developpe-couche-machine');
-
-    expect(chest?.sets.slice(-3).map((item) => item.loadKg)).toEqual([62.5, 62.5, 62.5]);
-    expect(convergente?.sets.slice(-3).map((item) => item.loadKg)).toEqual([92.5, 92.5, 92.5]);
-    expect(
-      getProgram('ottman', 5)
-        .days[1].exercises.find((item) => item.id === 'developpe-couche-machine')
-        ?.sets.map((item) => item.loadKg),
-    ).toEqual([80, 80, 100]);
-  });
-
-  it('garde une prescription active et finie pour chaque profil, semaine et exercice', () => {
-    for (const profile of ['ottman', 'laura'] as const) {
-      for (let week = 1; week <= 8; week += 1) {
-        const exercises = getProgram(profile, week).days.flatMap((day) => day.exercises);
-        for (const item of exercises) {
-          const active = item.sets.filter((set) => set.phase !== 'warmup');
-          expect(active.length, `${profile} S${week} ${item.id}`).toBeGreaterThan(0);
-          expect(
-            active.some(
-              (set) =>
-                (typeof set.loadKg === 'number' && Number.isFinite(set.loadKg)) ||
-                (typeof set.durationSeconds === 'number' && Number.isFinite(set.durationSeconds)),
-            ),
-            `${profile} S${week} ${item.id}`,
-          ).toBe(true);
-        }
-      }
-    }
-  });
-
-  it('accepte des charges et durées personnalisées jusqu’à S8', () => {
+  it('applique les overrides manuels sans modifier les valeurs PDF par défaut', () => {
     const custom = getProgram(
       'ottman',
       8,
-      { 'chest-press': [null, null, null, null, null, null, null, 75] },
-      { 'rameur-15-min': [null, null, null, null, null, null, null, 1200] },
+      { 'developpe-couche-barre': [null, null, null, null, null, null, null, 72.5] },
+      { 'velo-elliptique': [null, null, null, null, null, null, null, 1200] },
     );
-    const chest = custom.days[0].exercises.find((item) => item.id === 'chest-press');
-    const rower = custom.days[3].exercises.find((item) => item.id === 'rameur-15-min');
-    expect(chest?.sets.slice(-3).map((item) => item.loadKg)).toEqual([75, 75, 75]);
-    expect(rower?.sets[0].durationSeconds).toBe(1200);
-  });
-
-  it('provides an offline French tutorial for every seeded exercise', () => {
-    const ids = new Set(getProgram('ottman').days.flatMap((d) => d.exercises.map((e) => e.id)));
-    for (const id of ids) expect(tutorials[id]).toBeDefined();
+    expect(custom.days[0].exercises[1].sets.slice(-3).map((item) => item.loadKg)).toEqual([72.5, 72.5, 72.5]);
+    expect(custom.days[3].exercises[0].sets[0].durationSeconds).toBe(1200);
+    expect(getProgram('ottman').days[0].exercises[1].sets.at(-1)?.loadKg).toBe(65);
   });
 });

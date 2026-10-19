@@ -4,7 +4,7 @@ import type { WorkoutSession } from '../domain/types';
 import { progressionForce } from './progressionForce';
 
 const programme = getProgram('ottman');
-// Presse à cuisse : deux séries d'échauffement (indices 0 et 1) puis trois séries de travail (2, 3, 4).
+// Soulevé de terre roumain : une série d'échauffement puis quatre séries de travail.
 const seancePresse = (date: string, charge: number, id: string, avecEchauffement = true): WorkoutSession =>
   ({
     id,
@@ -20,14 +20,14 @@ const seancePresse = (date: string, charge: number, id: string, avecEchauffement
       ...(avecEchauffement
         ? [
             {
-              exerciseId: 'presse-cuisses-inclinee',
+              exerciseId: 'souleve-terre-roumain',
               setIndex: 0,
               actualRepetitions: 10,
               actualLoadKg: 50,
               completedAt: date,
             },
             {
-              exerciseId: 'presse-cuisses-inclinee',
+              exerciseId: 'souleve-terre-roumain',
               setIndex: 1,
               actualRepetitions: 10,
               actualLoadKg: 80,
@@ -36,7 +36,7 @@ const seancePresse = (date: string, charge: number, id: string, avecEchauffement
           ]
         : []),
       ...[2, 3, 4].map((setIndex) => ({
-        exerciseId: 'presse-cuisses-inclinee',
+        exerciseId: 'souleve-terre-roumain',
         setIndex,
         actualRepetitions: 10,
         actualLoadKg: charge,
@@ -46,7 +46,7 @@ const seancePresse = (date: string, charge: number, id: string, avecEchauffement
   }) as WorkoutSession;
 
 const presse = (resultats: ReturnType<typeof progressionForce>) =>
-  resultats.find((resultat) => resultat.exerciseId === 'presse-cuisses-inclinee');
+  resultats.find((resultat) => resultat.exerciseId === 'souleve-terre-roumain');
 
 describe('force par exercice', () => {
   it('retient la charge de travail, jamais celle de l’échauffement', () => {

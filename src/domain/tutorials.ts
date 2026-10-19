@@ -35,7 +35,7 @@ const tutorial = (
   ...extra,
 });
 
-export const tutorials: Readonly<Record<string, Tutorial>> = {
+export const tutorials: Record<string, Tutorial> = {
   'coiffe-rotateurs': tutorial(
     'coiffe-rotateurs',
     'Coiffe des rotateurs',
@@ -728,3 +728,60 @@ export const tutorials: Readonly<Record<string, Tutorial>> = {
     },
   ),
 };
+
+// Les PDF introduisent des variantes de mouvements qui n'avaient pas encore de
+// fiche dédiée. Elles restent utilisables hors ligne avec une consigne prudente
+// plutôt que d'ouvrir un tutoriel vide.
+const pdfExerciseIds = [
+  'souleve-terre-roumain',
+  'developpe-couche-barre',
+  'tirage-horizontal-pdf',
+  'developpe-epaule-machine',
+  'rameur-pdf',
+  'air-squat-pdf',
+  'gainage-pont-pdf',
+  'gainage-planche-pdf',
+  'sit-up-pdf',
+  'pompes-pdf',
+  'kettlebell-swing-pdf',
+  'abdos-croises-pdf',
+  'mountain-climber-pdf',
+  'hip-thrust-pdf',
+  'leg-extension-iso-pdf',
+  'leg-curl-iso-pdf',
+  'pec-fly-pdf',
+  'tirage-vertical-pdf',
+  'gainage-planche-lower',
+  'mountain-climber-lower',
+  'velo-elliptique',
+  'marche-inclinee-legere',
+  'marche-inclinee-forte',
+  'leg-press-incline',
+  'leg-curl-pdf',
+  'chest-press-pdf',
+  'kick-back-pdf',
+  'cooldown-full-body-a',
+  'cooldown-full-body-b',
+  'cooldown-cardio-4',
+] as const;
+for (const exerciseId of pdfExerciseIds) {
+  if (tutorials[exerciseId]) continue;
+  tutorials[exerciseId] = tutorial(
+    exerciseId,
+    exerciseId.replaceAll('-', ' '),
+    ['Mouvement général'],
+    [`Selon la fiche PDF pour ${exerciseId}`],
+    `Installe-toi dans une position stable adaptée à ${exerciseId}, garde une amplitude confortable et respire régulièrement.`,
+    [
+      `Règle la position spécifique de ${exerciseId} avant de démarrer.`,
+      `Réalise ${exerciseId} lentement et sans élan.`,
+      `Arrête si la technique de ${exerciseId} se dégrade.`,
+    ],
+    [
+      `Ne force pas une amplitude douloureuse sur ${exerciseId}.`,
+      `Réduis ${exerciseId} si le souffle devient inhabituel.`,
+    ],
+    [`Arrête ${exerciseId} en cas de douleur vive, vertige ou essoufflement inhabituel.`],
+    { primaryMuscles: ['Mouvement général'], keyCue: `Contrôle et respiration sur ${exerciseId}` },
+  );
+}

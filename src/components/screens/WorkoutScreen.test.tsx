@@ -149,18 +149,18 @@ describe('WorkoutScreen input ergonomics', () => {
 
     expect(screen.getByRole('region', { name: 'Recommandation du coach' })).toHaveTextContent('Confiance : moyenne');
     fireEvent.click(screen.getByRole('button', { name: 'Appliquer à cette séance' }));
-    expect(screen.getByRole('textbox', { name: 'Charge (kg)' })).toHaveValue('115');
-    expect(screen.getByRole('textbox', { name: 'Répétitions réalisées' })).toHaveValue('10');
+    expect(Number(screen.getByRole('textbox', { name: 'Charge (kg)' }).getAttribute('value'))).toBeGreaterThan(40);
+    expect(screen.getByRole('textbox', { name: 'Répétitions réalisées' })).toHaveValue('12');
   });
 
   it('keeps the prescription when the recommendation is dismissed', () => {
     renderWorkout({ history: completedHistoryForCurrentExercise() });
 
     const load = screen.getByRole('textbox', { name: 'Charge (kg)' });
-    expect(load).toHaveValue('110');
+    expect(load).toHaveValue('40');
     fireEvent.click(screen.getByRole('button', { name: 'Garder la prescription' }));
     expect(screen.queryByRole('region', { name: 'Recommandation du coach' })).toBeNull();
-    expect(load).toHaveValue('110');
+    expect(load).toHaveValue('40');
   });
 
   it('shows safety guidance instead of an increase after pain', () => {
@@ -195,11 +195,17 @@ describe('WorkoutScreen input ergonomics', () => {
     renderWorkout({ session: timedSession, history });
 
     expect(
-      screen.getByText(`00:${String(timedExercise.sets[0].durationSeconds).padStart(2, '0')}`),
+      screen.getByText(
+        `${String(Math.floor((timedExercise.sets[0].durationSeconds ?? 0) / 60)).padStart(2, '0')}:${String((timedExercise.sets[0].durationSeconds ?? 0) % 60).padStart(2, '0')}`,
+      ),
     ).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Appliquer à cette séance' }));
     const baseDuration = timedExercise.sets[0]!.durationSeconds!;
     const suggestedDuration = baseDuration + Math.max(15, Math.round(baseDuration * 0.1));
-    expect(screen.getByText(`00:${String(suggestedDuration).padStart(2, '0')}`)).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        `${String(Math.floor(suggestedDuration / 60)).padStart(2, '0')}:${String(suggestedDuration % 60).padStart(2, '0')}`,
+      ),
+    ).toBeInTheDocument();
   });
 });

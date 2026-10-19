@@ -9,21 +9,19 @@ describe('workout runner', () => {
     const exercises = getWorkoutExercises(day, session);
     const steps = getWorkoutSteps(day, session);
 
-    expect(steps).toHaveLength(26);
+    expect(steps).toHaveLength(21);
     expect(steps.slice(0, 5).map((step) => exercises[step.exerciseIndex!].id)).toEqual([
       'coiffe-rotateurs',
       'bosu',
       'bosu',
       'bosu',
-      'rameur',
+      'velo',
     ]);
-    expect(steps.slice(-7, -1).map((step) => exercises[step.exerciseIndex!].id)).toEqual([
-      'jumping-jack',
-      'gainage-planche',
-      'jumping-jack',
-      'gainage-planche',
-      'jumping-jack',
-      'gainage-planche',
+    expect(steps.slice(-5, -1).map((step) => exercises[step.exerciseIndex!].id)).toEqual([
+      'developpe-epaule-machine',
+      'developpe-epaule-machine',
+      'developpe-epaule-machine',
+      'rameur-pdf',
     ]);
     expect(exercises[steps.at(-1)?.exerciseIndex ?? 0].id).toBe('cooldown-full-body-a');
 

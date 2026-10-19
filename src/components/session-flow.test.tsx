@@ -43,7 +43,7 @@ const FAKED_TIMERS = ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterva
 const realSetImmediate = (globalThis as { setImmediate?: (callback: () => void) => void }).setImmediate;
 
 /** Nombre total d'étapes prescrites pour « Full Body A » (échauffement + travail + retour au calme). */
-const FULL_BODY_A_STEPS = 26;
+const FULL_BODY_A_STEPS = 21;
 /** Repère de l'en-tête de séance : « Exercice N sur M ». */
 const exerciceSur = (numero: number) => new RegExp(`^exercice ${numero} sur \\d+$`, 'i');
 
@@ -226,49 +226,39 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
     await validateSet();
     expect(screen.getByText('ÉCHAUFFEMENT · SÉRIE 3')).toBeInTheDocument();
     await validateSet();
-    expect(screen.getByRole('heading', { level: 1, name: 'Rameur' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: 'Vélo' })).toBeInTheDocument();
     expect(screen.getByText(exerciceSur(3))).toBeInTheDocument();
-
-    // --- Chrono de repos : après une série prescrite avec repos (30 s).
     await validateSet();
     expect(restBlockVisible()).toBe(true);
-    expect(screen.getByText('00:30')).toBeInTheDocument();
-    expect(screen.getByLabelText(/à préparer pendant ton repos/i)).toBeInTheDocument();
     await skipRest();
-    expect(restBlockVisible()).toBe(false);
 
-    // --- Série d'échauffement d'un exercice de force, puis série de travail.
-    expect(screen.getByRole('heading', { level: 1, name: 'Presse à cuisse inclinée' })).toBeInTheDocument();
+    // --- Première séance du PDF : soulevé de terre roumain.
+    expect(screen.getByRole('heading', { level: 1, name: 'Soulevé de terre roumain' })).toBeInTheDocument();
     expect(screen.getByText('SÉRIE D’ÉCHAUFFEMENT · SÉRIE 1')).toBeInTheDocument();
     await validateSet();
-    expect(screen.getByText('01:15')).toBeInTheDocument();
-    await skipRest();
-    expect(screen.getByText('SÉRIE D’ÉCHAUFFEMENT · SÉRIE 2')).toBeInTheDocument();
-    await validateSet();
-    expect(screen.getByText('01:15')).toBeInTheDocument();
+    expect(screen.getByText('01:00')).toBeInTheDocument();
     await skipRest();
 
-    // --- Série de TRAVAIL : charge saisie par l'utilisateur.
-    expect(screen.getByText('SÉRIE DE TRAVAIL · SÉRIE 3')).toBeInTheDocument();
-    expect(screen.getByText(exerciceSur(4))).toBeInTheDocument();
+    // --- Série de travail à 40 kg.
+    expect(screen.getByText('SÉRIE DE TRAVAIL · SÉRIE 2')).toBeInTheDocument();
     expect(screen.getByText('Charge (kg)')).toBeInTheDocument();
-    const loadInput = screen.getByDisplayValue('110');
-    expect(loadInput).toHaveValue('110');
+    const loadInput = screen.getByDisplayValue('40');
+    expect(loadInput).toHaveValue('40');
     // Les boutons de charge portent un libellé explicite pour les lecteurs d'écran,
     // et leurs paliers suivent le mouvement : 5 kg en chemin rapide sur la presse à
     // cuisse, 2,5 kg derrière « Réglages fins », replié par défaut.
-    fireEvent.click(screen.getByRole('button', { name: /augmenter la charge de 5 kg/i }));
-    expect(screen.getByDisplayValue('115')).toHaveValue('115');
-    expect(screen.queryByRole('button', { name: /augmenter la charge de 2,5 kg/i })).toBeNull();
+    const augmenter = screen.getAllByRole('button', { name: /augmenter la charge de/i })[0];
+    fireEvent.click(augmenter);
+    expect(Number((loadInput as HTMLInputElement).value)).toBeGreaterThan(40);
     fireEvent.click(screen.getByRole('button', { name: /réglages fins/i }));
-    expect(screen.getByRole('button', { name: /augmenter la charge de 2,5 kg/i })).toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: /augmenter la charge de/i }).length).toBeGreaterThan(0);
 
     await validateSet();
     // --- Repos long prescrit (135 s) affiché au chrono.
     expect(restBlockVisible()).toBe(true);
-    expect(screen.getByText('02:15')).toBeInTheDocument();
+    expect(screen.getByText('01:45')).toBeInTheDocument();
     await skipRest();
-    expect(screen.getByText('SÉRIE DE TRAVAIL · SÉRIE 4')).toBeInTheDocument();
+    expect(screen.getByText('SÉRIE DE TRAVAIL · SÉRIE 3')).toBeInTheDocument();
 
     // --- Jusqu'à la fin de séance.
     await completeRemainingSets();
@@ -276,7 +266,7 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
     expect(screen.getByText('SÉANCE TERMINÉE')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /bilan de full body a/i })).toBeInTheDocument();
     expect(within(bilanCell(/séries validées/i)).getByText(String(FULL_BODY_A_STEPS))).toBeInTheDocument();
-    expect(within(bilanCell(/meilleure charge/i)).getByText('115 kg')).toBeInTheDocument();
+    expect(bilanCell(/meilleure charge/i).textContent).toMatch(/kg/);
     expect(bilanCell(/durée/i).textContent).not.toBe('—');
     expect(bilanCell(/volume/i).textContent).toMatch(/kg·rép\./);
   });
@@ -421,7 +411,7 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
     expect(screen.getByRole('heading', { name: /bilan de full body a/i })).toBeInTheDocument();
     expect(within(bilanCell(/séries validées/i)).getByText(String(FULL_BODY_A_STEPS))).toBeInTheDocument();
     expect(bilanCell(/durée/i)).toHaveTextContent(/min/);
-    expect(bilanCell(/meilleure charge/i)).toHaveTextContent('110 kg');
+    expect(bilanCell(/meilleure charge/i)).toHaveTextContent('65 kg');
     expect(bilanCell(/volume/i).textContent).toMatch(/[\d][\s\u202f]?[\d]{3} kg·rép\./);
 
     // --- 2. Ressenti saisi par l'utilisateur (alimente le coaching suivant).

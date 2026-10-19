@@ -138,7 +138,7 @@ describe('annuler la dernière série', () => {
 
 describe('regression: skipExercise in interleaved circuit', () => {
   it('skips ALL remaining steps for current exercise across entire circuit, not just contiguous ones', () => {
-    const day = premierJour();
+    const day = getProgram('ottman').days[1];
     let session = createRunner(day, 'ottman');
 
     // Advance to the circuit portion (jumping-jack / gainage-planche circuit)
@@ -149,7 +149,7 @@ describe('regression: skipExercise in interleaved circuit', () => {
     let circuitStartIndex = -1;
     for (let i = 0; i < steps.length; i++) {
       const ex = exercises[steps[i].exerciseIndex!];
-      if (ex.circuitId === 'finisher-a') {
+      if (ex.circuitId === 'renfo-lower') {
         circuitStartIndex = i;
         break;
       }
@@ -163,7 +163,7 @@ describe('regression: skipExercise in interleaved circuit', () => {
     session.currentSetIndex = steps[circuitStartIndex].setIndex!;
 
     const currentStep = getNextStep(session, day);
-    const exerciseId = exercises[currentStep.exerciseIndex!].id; // e.g., 'jumping-jack'
+    const exerciseId = exercises[currentStep.exerciseIndex!].id; // e.g., 'air-squat-pdf'
 
     // Skip the current exercise (jumping-jack) immediately.
     // The skip should skip ALL remaining sets of jumping-jack across the circuit.
@@ -187,7 +187,7 @@ describe('regression: skipExercise in interleaved circuit', () => {
   });
 
   it('skipExercise preserves other exercises in the circuit', () => {
-    const day = premierJour();
+    const day = getProgram('ottman').days[1];
     let session = createRunner(day, 'ottman');
 
     // Advance to circuit
@@ -197,7 +197,7 @@ describe('regression: skipExercise in interleaved circuit', () => {
     let circuitStartIndex = -1;
     for (let i = 0; i < steps.length; i++) {
       const ex = exercises[steps[i].exerciseIndex!];
-      if (ex.circuitId === 'finisher-a') {
+      if (ex.circuitId === 'renfo-lower') {
         circuitStartIndex = i;
         break;
       }
@@ -209,7 +209,7 @@ describe('regression: skipExercise in interleaved circuit', () => {
 
     const currentStep = getNextStep(session, day);
     const otherExerciseId =
-      exercises[currentStep.exerciseIndex!].id === 'jumping-jack' ? 'gainage-planche' : 'jumping-jack';
+      exercises[currentStep.exerciseIndex!].id === 'air-squat-pdf' ? 'gainage-pont-pdf' : 'air-squat-pdf';
 
     // Skip the first exercise immediately
     session = skipExercise(session, day);

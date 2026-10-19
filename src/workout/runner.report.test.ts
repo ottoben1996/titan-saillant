@@ -138,11 +138,11 @@ describe('reporter un exercice', () => {
   });
 
   it('ne rejoue pas les séries déjà faites après un report partiel en circuit', () => {
-    const day = premierJour();
+    const day = getProgram('ottman').days[1];
     const initial = createRunner(day, 'ottman');
     const exercises = getWorkoutExercises(day, initial);
     const circuitStart = getWorkoutSteps(day, initial).findIndex(
-      (step) => exercises[step.exerciseIndex ?? 0]?.circuitId === 'finisher-a',
+      (step) => exercises[step.exerciseIndex ?? 0]?.circuitId === 'renfo-lower',
     );
     let session: typeof initial = { ...initial, currentStepIndex: circuitStart };
 

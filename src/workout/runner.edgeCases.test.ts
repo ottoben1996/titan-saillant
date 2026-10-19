@@ -134,15 +134,15 @@ describe('workout runner — cas limites', () => {
     expect(getNextStep(next, day)).toMatchObject(steps[target + 1]);
   });
 
-  it('dernier exercice du dernier bloc : la planche précède le retour au calme', () => {
+  it('le rameur précède le retour au calme dans la séance PDF', () => {
     const day = getProgram('ottman').days[0];
     const exercises = getWorkoutExercises(day, createRunner(day, 'ottman'));
     const steps = getWorkoutSteps(day, createRunner(day, 'ottman'));
 
     const lastExerciseStep = steps.at(-2)!;
     const cooldownStep = steps.at(-1)!;
-    expect(exercises[lastExerciseStep.exerciseIndex!].id).toBe('gainage-planche');
-    expect(lastExerciseStep.setIndex).toBe(2);
+    expect(exercises[lastExerciseStep.exerciseIndex!].id).toBe('rameur-pdf');
+    expect(lastExerciseStep.setIndex).toBe(0);
     expect(exercises[cooldownStep.exerciseIndex!].id).toBe('cooldown-full-body-a');
   });
 
@@ -152,24 +152,18 @@ describe('workout runner — cas limites', () => {
     const exercises = getWorkoutExercises(day, session);
     const steps = getWorkoutSteps(day, session);
 
-    // 3 exercices d'échauffement (coiffe, bosu, vélo) puis le premier circuit.
+    // 3 exercices d'échauffement (coiffe, bosu, vélo) puis la séance PDF.
     expect(exercises.slice(0, 5).map((item) => item.id)).toEqual([
       'coiffe-rotateurs',
       'bosu',
       'velo',
-      'jumping-jack',
-      'mountain-climber',
+      'hip-thrust-pdf',
+      'leg-extension-iso-pdf',
     ]);
-    const circuit1 = steps
-      .map((step) => exercises[step.exerciseIndex!].id)
-      .filter((id) => id === 'jumping-jack' || id === 'mountain-climber');
-    expect(circuit1).toEqual([
-      'jumping-jack',
-      'mountain-climber',
-      'jumping-jack',
-      'mountain-climber',
-      'jumping-jack',
-      'mountain-climber',
+    expect(steps.slice(5, 8).map((step) => exercises[step.exerciseIndex!].id)).toEqual([
+      'hip-thrust-pdf',
+      'hip-thrust-pdf',
+      'hip-thrust-pdf',
     ]);
 
     const finished = runToEnd(day, session);
