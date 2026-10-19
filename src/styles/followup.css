@@ -670,6 +670,25 @@
   color: #55655c;
 }
 
+/* La carte musculaire du bilan : la même silhouette que la fiche d'exercice,
+   mais en encre sur papier — les accents de thème ne veulent rien dire à
+   l'impression, et le fond sombre du composant mangerait la page. */
+.bilan-doc .bilan-muscle-map {
+  margin: var(--sp-5) 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+}
+
+.bilan-doc .bilan-muscle-map .muscle-map-title {
+  color: #24312a;
+}
+
+.bilan-doc .bilan-muscle-map .figure-label,
+.bilan-doc .bilan-muscle-map .muscle-map-legend {
+  color: #55655c;
+}
+
 /* Impression : seul le document doit sortir, sur fond blanc, sans habillage. */
 @media print {
   /* Le fond sombre de l'application est porté par ses conteneurs, pas seulement
@@ -713,6 +732,7 @@
 
   .bilan-doc h3,
   .bilan-chart,
+  .bilan-doc .bilan-muscle-map,
   .bilan-read,
   .bilan-charges {
     break-inside: avoid;

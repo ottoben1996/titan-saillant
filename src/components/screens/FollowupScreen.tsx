@@ -12,6 +12,7 @@ import { debutDePause } from '../../storage/cyclePause';
 import { implausibleZones, nextTargetWeek, previousMeasurement, zoneDelta } from '../../workout/followup';
 import { ChartLine, Check, Minus, Plus, Repeat, Warning } from '../ui/Icons';
 import { type ProgressScreen, ProgressTabs } from '../ui/SegmentedControl';
+import { useListeAnimee } from '../ui/useListeAnimee';
 
 interface FollowupScreenProps {
   profileId: ProfileId;
@@ -41,6 +42,7 @@ export function FollowupScreen({
   onOpenBilan,
   onNavigate,
 }: FollowupScreenProps) {
+  const listeAnimee = useListeAnimee();
   const body = profileBody[profileId];
   /**
    * Semaine renseignée pendant cette visite. Tant qu'elle est là, l'écran reste
@@ -290,7 +292,7 @@ export function FollowupScreen({
       {historique.length > 0 && (
         <>
           <h2 className="followup-history-title">Suivi semaine par semaine</h2>
-          <div className="followup-history">
+          <div className="followup-history" ref={listeAnimee}>
             {historique.map((item) => {
               const poids = typeof item.weightKg === 'number' ? afficher(item.weightKg) : '—';
               const taille = typeof item.waistCm === 'number' ? `${afficher(item.waistCm)} cm` : 'non renseignée';

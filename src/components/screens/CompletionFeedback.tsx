@@ -1,13 +1,28 @@
 import { useMemo, useState } from 'react';
+import { exerciseLabel } from '../../domain/labels';
 import { getProgram } from '../../domain/programs';
 import type { LoadConsigne, WorkoutSession } from '../../domain/types';
-import { formatLoadKg, formatMinutes, formatVolume, summarizeSession, workoutDayLabel } from '../../workout/summary';
+import {
+  beatenRecords,
+  formatLoadKg,
+  formatMinutes,
+  formatSignedInt,
+  formatSignedKg,
+  previousSessionFor,
+  sessionBestLoadKg,
+  sessionVolume,
+  summarizeSession,
+  workoutDayLabel,
+} from '../../workout/summary';
 import { SetCorrectionTimeline } from '../SetCorrectionTimeline';
-import { ArrowRight, Check, Clock } from '../ui/Icons';
+import { ArrowRight, Bolt, Check, Clock } from '../ui/Icons';
+import { NombreAnime } from '../ui/NombreAnime';
 
 interface CompletionFeedbackProps {
   session: WorkoutSession;
   profileId?: import('../../domain/types').ProfileId;
+  /** L'historique des séances terminées : référence des écarts et des records. */
+  history?: readonly WorkoutSession[];
   onSessionChange?: (session: WorkoutSession) => void;
   onFinish: (
     feedback?: Pick<
@@ -38,7 +53,13 @@ const consignes: readonly { label: string; value: LoadConsigne }[] = Object.free
  * geste — mais chaque réponse alimente le bilan du samedi et le coaching de la
  * prochaine séance.
  */
-export function CompletionFeedback({ session, profileId, onSessionChange, onFinish }: CompletionFeedbackProps) {
+export function CompletionFeedback({
+  session,
+  profileId,
+  history = [],
+  onSessionChange,
+  onFinish,
+}: CompletionFeedbackProps) {
   const [rpe, setRpe] = useState(() => session.perceivedExertion?.toString() ?? '');
   const [energy, setEnergy] = useState(() => session.energy ?? 0);
   const [pain, setPain] = useState(() => session.pain ?? 'Aucune');
@@ -55,6 +76,24 @@ export function CompletionFeedback({ session, profileId, onSessionChange, onFini
   }, [session.dayId, profileId]);
 
   const summary = useMemo(() => summarizeSession(session), [session]);
+
+  /**
+   * Les écarts contre la dernière séance du même jour. Sans référence, rien ne
+   * s'affiche : une première fois n'est pas un point de comparaison.
+   */
+  const comparaison = useMemo(() => {
+    const precedente = previousSessionFor(history, session);
+    if (!precedente) return null;
+    return {
+      volume: sessionVolume(session) - sessionVolume(precedente),
+      charge: sessionBestLoadKg(session) - sessionBestLoadKg(precedente),
+    };
+  }, [history, session]);
+
+  /** Records battus cette séance, contre l'historique hors séance en cours. */
+  const records = useMemo(() => beatenRecords(session, history), [history, session]);
+
+  const noms = useMemo(() => new Map(exercises.map((item) => [item.id, item.name])), [exercises]);
 
   const submit = async (skip = false) => {
     if (saving) return;
@@ -99,17 +138,55 @@ export function CompletionFeedback({ session, profileId, onSessionChange, onFini
         </div>
         <div className="bilan-cell">
           <span>Séries validées</span>
-          <strong>{summary.sets}</strong>
+          <strong>
+            <NombreAnime valeur={summary.sets} decimals={0} />
+          </strong>
         </div>
         <div className="bilan-cell accent">
           <span>Volume</span>
-          <strong>{summary.volumeKg > 0 ? `${formatVolume(summary.volumeKg)} kg·rép.` : 'PDC / cardio'}</strong>
+          <strong>
+            {summary.volumeKg > 0 ? (
+              <NombreAnime valeur={summary.volumeKg} decimals={0} suffixe="kg·rép." />
+            ) : (
+              'PDC / cardio'
+            )}
+          </strong>
+          {comparaison && summary.volumeKg > 0 && (
+            <small className="bilan-delta">{formatSignedInt(comparaison.volume)} kg·rép. vs ta dernière fois</small>
+          )}
         </div>
         <div className="bilan-cell">
           <span>Meilleure charge</span>
-          <strong>{summary.bestLoadKg > 0 ? `${formatLoadKg(summary.bestLoadKg)} kg` : '—'}</strong>
+          <strong>
+            {summary.bestLoadKg > 0 ? (
+              <NombreAnime
+                valeur={summary.bestLoadKg}
+                decimals={Number.isInteger(summary.bestLoadKg) ? 0 : 1}
+                suffixe="kg"
+              />
+            ) : (
+              '—'
+            )}
+          </strong>
+          {comparaison && summary.bestLoadKg > 0 && (
+            <small className="bilan-delta">{formatSignedKg(comparaison.charge)} kg vs ta dernière fois</small>
+          )}
         </div>
       </div>
+
+      {/* Les records tombent rarement : quand il y en a un, il se voit. Les
+          valeurs restent en clair — la comparaison « avant » compte autant que
+          le nouveau chiffre. */}
+      {records.slice(0, 3).map((record) => (
+        <p className="bilan-record" key={record.exerciseId}>
+          <Bolt size={15} />
+          <span>
+            Record battu — {exerciseLabel(record.exerciseId, noms.get(record.exerciseId))}
+            {'\u00a0'}: <b>{formatLoadKg(record.loadKg)} kg</b>{' '}
+            <small>(avant {formatLoadKg(record.previousLoadKg)} kg)</small>
+          </span>
+        </p>
+      ))}
 
       {/* Les chiffres ci-dessus sont ceux du carnet : ils comptent l'échauffement
           et le retour au calme, parce que c'est ce qui a réellement été fait.

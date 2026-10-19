@@ -39,6 +39,13 @@ export const Icon = ({
   </svg>
 );
 
+/** Buste et deux repères : l'onglet « Anatomie & Repères » du tutoriel. */
+export const Anatomie = (p: IconProps) => (
+  <Icon {...p}>
+    M14.4 6.2a2.4 2.4 0 1 1-4.8 0 2.4 2.4 0 0 1 4.8 0ZM12 8.6v2.8M8.6 21v-5.2c0-2.5 1.5-4.4 3.4-4.4s3.4 1.9 3.4
+    4.4V21h-6.8ZM10.7 17h.01M13.3 17h.01
+  </Icon>
+);
 export const ArrowLeft = (p: IconProps) => <Icon {...p}>M19 12H5m7 7-7-7 7-7</Icon>;
 export const ArrowRight = (p: IconProps) => <Icon {...p}>M5 12h14m-7-7 7 7-7 7</Icon>;
 export const ArrowUpRight = (p: IconProps) => <Icon {...p}>M7 17 17 7M8 7h9v9</Icon>;

@@ -4,8 +4,9 @@ import { PROGRAM_WEEKS } from '../../domain/programs';
 import type { ProfileId, WorkoutDay, WorkoutPlan, WorkoutSession } from '../../domain/types';
 import type { SerieAssiduite } from '../../workout/assiduite';
 import { getWorkoutExercises } from '../../workout/runner';
-import { formatVolume, type WeekSlotState, weeklyComparison, weekSlots, workoutDayLabel } from '../../workout/summary';
+import { type WeekSlotState, weeklyComparison, weekSlots, workoutDayLabel } from '../../workout/summary';
 import { Check, Play, Trash } from '../ui/Icons';
+import { NombreAnime } from '../ui/NombreAnime';
 
 export const profileLabels: Record<ProfileId, string> = { ottman: 'Ottman', laura: 'Laura' };
 
@@ -331,7 +332,7 @@ export function HomeScreen({
           <div className="home-metric">
             <span>Séances</span>
             <strong>
-              {view.weekSessions}
+              <NombreAnime valeur={view.weekSessions} decimals={0} />
               <small> / {WEEKLY_TARGET}</small>
             </strong>
             <small>cette semaine</small>
@@ -339,7 +340,7 @@ export function HomeScreen({
           <div className="home-metric">
             <span>Volume</span>
             <strong>
-              {formatVolume(view.weekVolume)}
+              <NombreAnime valeur={view.weekVolume} decimals={0} />
               <small> kg·rép.</small>
             </strong>
             <small>cette semaine</small>

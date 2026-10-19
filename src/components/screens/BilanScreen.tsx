@@ -20,9 +20,11 @@ import {
   weightVelocity,
   zoneDelta,
 } from '../../workout/followup';
+import { muscleVolume, zoneIntensities } from '../../workout/muscleVolume';
 import { progressionForce } from '../../workout/progressionForce';
-import { sessionVolume, workoutDayLabel } from '../../workout/summary';
+import { addDays, formatVolume, sessionVolume, workoutDayLabel } from '../../workout/summary';
 import { DownloadSimple } from '../ui/Icons';
+import { MuscleMap } from '../ui/MuscleMap';
 import { NombreAnime } from '../ui/NombreAnime';
 
 interface BilanScreenProps {
@@ -245,6 +247,11 @@ export function BilanScreen({ profileId, measurements, current, sessions }: Bila
   /** Charge la plus lourde par exercice, du premier au dernier passage du cycle. */
   const force = progressionForce(sessions, getProgram(profileId));
   const stagnations = force.filter((item) => item.stagnation);
+
+  /** Volume par zone sur sept jours glissants : les mêmes zones que les fiches
+      d'exercice, cumulées sur les séries réellement validées du moment. */
+  const zonesMuscles = muscleVolume(sessions, addDays(new Date(), -7));
+  const intensitesMuscles = zoneIntensities(zonesMuscles);
 
   const seancesSemaine = seancesDeLaSemaine(sessions, {
     depuis: previous?.measuredOn,
@@ -566,6 +573,40 @@ export function BilanScreen({ profileId, measurements, current, sessions }: Bila
               {stagnations.length > 0
                 ? ` Sans progression depuis trois passages : ${stagnations.map((item) => item.nom.toLowerCase()).join(', ')}.`
                 : ''}
+            </p>
+          </>
+        )}
+
+        {zonesMuscles.length > 0 && (
+          <>
+            <h3>Volume par zone musculaire</h3>
+            <MuscleMap
+              intensite={intensitesMuscles}
+              monochrome
+              titre="Sept derniers jours"
+              className="bilan-muscle-map"
+            />
+            <table>
+              <thead>
+                <tr>
+                  <th>Zone</th>
+                  <th className="num">Séries</th>
+                  <th className="num">Volume</th>
+                </tr>
+              </thead>
+              <tbody>
+                {zonesMuscles.map((zone) => (
+                  <tr key={zone.id}>
+                    <td>{zone.label}</td>
+                    <td className="num">{zone.sets}</td>
+                    <td className="num">{formatVolume(zone.volumeKg)} kg·rép.</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <p className="bilan-note">
+              Charge × répétitions cumulées sur sept jours : plein tarif pour les muscles moteurs, moitié pour les
+              synergistes. Le gainage et le cardio, sans charge, n'entrent pas dans ce volume.
             </p>
           </>
         )}

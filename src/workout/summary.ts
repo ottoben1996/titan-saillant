@@ -344,6 +344,72 @@ export function personalRecords(history: readonly WorkoutSession[], limit = 5): 
     .slice(0, limit);
 }
 
+/* --------------------------------------------------------- fin de séance -- */
+
+/**
+ * La dernière séance terminée du même jour de programme, hors `session`
+ * elle-même. C'est la référence des écarts de fin de séance : on se compare à
+ * la même séance, jamais à un autre jour.
+ */
+export function previousSessionFor(history: readonly WorkoutSession[], session: WorkoutSession): WorkoutSession | null {
+  const at = sessionTimestamp(session);
+  let reference: WorkoutSession | null = null;
+  let referenceAt = Number.NEGATIVE_INFINITY;
+  for (const item of history) {
+    if (item.id === session.id || item.dayId !== session.dayId || !isCompleted(item)) continue;
+    const itemAt = sessionTimestamp(item);
+    if (itemAt > at || itemAt <= referenceAt) continue;
+    reference = item;
+    referenceAt = itemAt;
+  }
+  return reference;
+}
+
+export interface BeatenRecord {
+  exerciseId: string;
+  loadKg: number;
+  previousLoadKg: number;
+  /** Écart de charge, en kilogrammes. */
+  deltaKg: number;
+}
+
+/**
+ * Records battus pendant la séance : pour chaque mouvement, la meilleure charge
+ * de la séance strictement supérieure au record de l'historique — séance en
+ * cours exclue. Un premier passage n'est pas un record battu : il faut un
+ * antérieur. Trié par charge décroissante.
+ */
+export function beatenRecords(session: WorkoutSession, history: readonly WorkoutSession[]): BeatenRecord[] {
+  const meilleuresCharges = (sets: readonly { exerciseId: string; actualLoadKg?: number }[]): Map<string, number> => {
+    const best = new Map<string, number>();
+    for (const set of sets) {
+      const load = set.actualLoadKg ?? 0;
+      if (load <= 0) continue;
+      if (load > (best.get(set.exerciseId) ?? 0)) best.set(set.exerciseId, load);
+    }
+    return best;
+  };
+
+  const avant = meilleuresCharges(
+    history.filter((item) => item.id !== session.id && isCompleted(item)).flatMap((item) => item.loggedSets),
+  );
+  const pendant = meilleuresCharges(session.loggedSets);
+
+  const battus: BeatenRecord[] = [];
+  for (const [exerciseId, loadKg] of pendant) {
+    const previousLoadKg = avant.get(exerciseId);
+    if (previousLoadKg !== undefined && loadKg > previousLoadKg) {
+      battus.push({
+        exerciseId,
+        loadKg,
+        previousLoadKg,
+        deltaKg: Math.round((loadKg - previousLoadKg) * 10) / 10,
+      });
+    }
+  }
+  return battus.sort((a, b) => b.loadKg - a.loadKg || b.deltaKg - a.deltaKg);
+}
+
 /* ------------------------------------------------------------ formatage ---- */
 
 const nbsp = '\u202F';

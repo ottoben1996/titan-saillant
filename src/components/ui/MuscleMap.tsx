@@ -1,84 +1,45 @@
 import { useId } from 'react';
+import { MUSCLE_LABELS, type MuscleId, muscleIds } from '../../domain/muscles';
 
-export type MuscleId =
-  | 'chest'
-  | 'shoulders'
-  | 'biceps'
-  | 'triceps'
-  | 'forearms'
-  | 'abs'
-  | 'quads'
-  | 'calves'
-  | 'lats'
-  | 'traps'
-  | 'glutes'
-  | 'hamstrings'
-  | 'lower-back';
+export { normalizeMuscle } from '../../domain/muscles';
 
 interface MuscleMapProps {
   primaryMuscles?: readonly string[];
   secondaryMuscles?: readonly string[];
+  /**
+   * Mode volume : niveau de 0 à 1 par zone, déjà rapporté au maximum de la
+   * période. Les zones absentes du relevé restent éteintes, et les muscles
+   * principaux ou synergistes ne pilotent plus la couleur.
+   */
+  intensite?: Readonly<Partial<Record<MuscleId, number>>>;
+  /** Rendu encre sur papier : le bilan imprimé, sans accent de thème. */
+  monochrome?: boolean;
+  /** Titre affiché et nom accessible du schéma. */
+  titre?: string;
   size?: 'sm' | 'md' | 'lg';
   className?: string;
 }
 
-const MUSCLE_LABELS: Record<MuscleId, string> = {
-  chest: 'Pectoraux',
-  shoulders: 'Épaules',
-  biceps: 'Biceps',
-  triceps: 'Triceps',
-  forearms: 'Avant-bras',
-  abs: 'Abdominaux',
-  quads: 'Quadriceps',
-  calves: 'Mollets',
-  lats: 'Grands dorsaux',
-  traps: 'Trapèzes',
-  glutes: 'Fessiers',
-  hamstrings: 'Ischio-jambiers',
-  'lower-back': 'Lombaires',
-};
-
-// Normalise les chaînes de muscles françaises ou anglaises vers MuscleId
-export function normalizeMuscle(name: string): MuscleId | null {
-  const n = name.toLowerCase().trim();
-  if (n.includes('pect') || n.includes('chest') || n.includes('pec')) return 'chest';
-  if (n.includes('épaul') || n.includes('delto') || n.includes('shoulder')) return 'shoulders';
-  if (n.includes('bicep')) return 'biceps';
-  if (n.includes('tricep')) return 'triceps';
-  if (n.includes('avant-bras') || n.includes('forearm')) return 'forearms';
-  if (n.includes('abdo') || n.includes('ventre') || n.includes('core') || n.includes('gain')) return 'abs';
-  if (n.includes('quadri') || n.includes('cuisse') || n.includes('quad')) return 'quads';
-  if (n.includes('ischio') || n.includes('hamstring')) return 'hamstrings';
-  if (n.includes('fessier') || n.includes('glute') || n.includes('fesse')) return 'glutes';
-  if (n.includes('mollet') || n.includes('calf') || n.includes('calves')) return 'calves';
-  if (n.includes('dors') || n.includes('grand dorsal') || n.includes('lat') || n.includes('dos')) return 'lats';
-  if (n.includes('trapèz') || n.includes('trap')) return 'traps';
-  if (n.includes('lombair') || n.includes('bas du dos')) return 'lower-back';
-  return null;
-}
-
-/** Convertit une liste de libellés bruts en identifiants dédupliqués, ordre préservé. */
-function toIds(muscles: readonly string[]): MuscleId[] {
-  const seen = new Set<MuscleId>();
-  const ids: MuscleId[] = [];
-  for (const muscle of muscles) {
-    const id = normalizeMuscle(muscle);
-    if (id && !seen.has(id)) {
-      seen.add(id);
-      ids.push(id);
-    }
-  }
-  return ids;
-}
-
-export function MuscleMap({ primaryMuscles = [], secondaryMuscles = [], size = 'md', className = '' }: MuscleMapProps) {
+export function MuscleMap({
+  primaryMuscles = [],
+  secondaryMuscles = [],
+  intensite,
+  monochrome = false,
+  titre = 'Muscles sollicités',
+  size = 'md',
+  className = '',
+}: MuscleMapProps) {
   const titleId = useId();
   const descId = useId();
 
-  const primaryIds = toIds(primaryMuscles);
-  const secondaryIds = toIds(secondaryMuscles);
+  const primaryIds = muscleIds(primaryMuscles);
+  const secondaryIds = muscleIds(secondaryMuscles).filter((id) => !primaryIds.includes(id));
   const primaries = new Set(primaryIds);
   const secondaries = new Set(secondaryIds);
+
+  // Deux lectures du même schéma : une fiche d'exercice (moteur / synergiste)
+  // ou un relevé de volume (zones d'autant plus vives qu'elles ont travaillé).
+  const enVolume = intensite !== undefined;
 
   const scale = size === 'sm' ? 0.75 : size === 'lg' ? 1.25 : 1.0;
   const width = Math.round(220 * scale);
@@ -87,27 +48,51 @@ export function MuscleMap({ primaryMuscles = [], secondaryMuscles = [], size = '
   // Alternative textuelle : la même information que le schéma, en mots.
   const primaryText = primaryIds.map((id) => MUSCLE_LABELS[id]).join(', ');
   const secondaryText = secondaryIds.map((id) => MUSCLE_LABELS[id]).join(', ');
-  const altText =
-    primaryIds.length === 0 && secondaryIds.length === 0
+  const motNiveau = (niveau: number): string => (niveau >= 0.6 ? 'élevé' : niveau >= 0.3 ? 'moyen' : 'faible');
+  const zonesTexte = enVolume
+    ? (Object.entries(intensite ?? {}) as [MuscleId, number][])
+        .sort((a, b) => b[1] - a[1])
+        .map(([id, niveau]) => `${MUSCLE_LABELS[id]}\u00a0: volume ${motNiveau(niveau)}`)
+    : [];
+  const altText = enVolume
+    ? zonesTexte.length === 0
+      ? 'Aucun volume musculaire sur la période.'
+      : `Volume par zone — ${zonesTexte.join(', ')}.`
+    : primaryIds.length === 0 && secondaryIds.length === 0
       ? 'Aucun muscle renseigné pour cet exercice.'
       : [
-          primaryIds.length > 0 ? `Muscles principaux : ${primaryText}.` : null,
-          secondaryIds.length > 0 ? `Muscles synergistes : ${secondaryText}.` : null,
+          primaryIds.length > 0 ? `Muscles principaux\u00a0: ${primaryText}.` : null,
+          secondaryIds.length > 0 ? `Muscles synergistes\u00a0: ${secondaryText}.` : null,
         ]
           .filter(Boolean)
           .join(' ');
 
+  const zoneActive = monochrome ? '#24312a' : 'var(--accent)';
+  const zoneEteinte = monochrome ? '#d9dedb' : 'var(--accent-3)';
+
   const getColor = (id: MuscleId): string => {
-    if (primaries.has(id)) return 'var(--accent)';
-    if (secondaries.has(id)) return 'var(--accent-2)';
-    return 'var(--accent-3)';
+    if (enVolume) return intensite?.[id] !== undefined ? zoneActive : zoneEteinte;
+    if (primaries.has(id)) return zoneActive;
+    if (secondaries.has(id)) return monochrome ? '#6b7a71' : 'var(--accent-2)';
+    return zoneEteinte;
   };
 
   const getOpacity = (id: MuscleId): number => {
+    if (enVolume) {
+      const niveau = intensite?.[id];
+      if (niveau === undefined) return 1;
+      const borne = Math.max(0, Math.min(1, niveau));
+      return Math.round((0.18 + 0.82 * borne) * 100) / 100;
+    }
     if (primaries.has(id)) return 1;
     if (secondaries.has(id)) return 0.95;
     return 1;
   };
+
+  // La silhouette : sombre dans l'application, encre douce sur le bilan imprimé.
+  const silhouette = monochrome
+    ? { tete: '#eef1ef', trait: '#c6cec9', cou: '#e4e9e6' }
+    : { tete: '#141d18', trait: '#2a3d32', cou: '#18231d' };
 
   return (
     <div
@@ -117,7 +102,7 @@ export function MuscleMap({ primaryMuscles = [], secondaryMuscles = [], size = '
       aria-describedby={descId}
     >
       <p id={titleId} className="muscle-map-title">
-        Muscles sollicités
+        {titre}
       </p>
       <p id={descId} className="visually-hidden">
         {altText}
@@ -141,8 +126,8 @@ export function MuscleMap({ primaryMuscles = [], secondaryMuscles = [], size = '
               </filter>
             </defs>
             {/* Silhouette / Tête */}
-            <circle cx="50" cy="12" r="8" fill="#141d18" stroke="#2a3d32" strokeWidth="1" />
-            <path d="M46 20 L54 20 L55 24 L45 24 Z" fill="#18231d" />
+            <circle cx="50" cy="12" r="8" fill={silhouette.tete} stroke={silhouette.trait} strokeWidth="1" />
+            <path d="M46 20 L54 20 L55 24 L45 24 Z" fill={silhouette.cou} />
 
             {/* Épaules / Deltoïdes antérieurs */}
             <path
@@ -227,8 +212,8 @@ export function MuscleMap({ primaryMuscles = [], secondaryMuscles = [], size = '
           <svg viewBox="0 0 100 160" className="muscle-svg" width={width / 2} height={height} role="img">
             <title>Vue de dos des muscles sollicités</title>
             {/* Tête dos */}
-            <circle cx="50" cy="12" r="8" fill="#141d18" stroke="#2a3d32" strokeWidth="1" />
-            <path d="M46 20 L54 20 L55 24 L45 24 Z" fill="#18231d" />
+            <circle cx="50" cy="12" r="8" fill={silhouette.tete} stroke={silhouette.trait} strokeWidth="1" />
+            <path d="M46 20 L54 20 L55 24 L45 24 Z" fill={silhouette.cou} />
 
             {/* Trapèzes */}
             <path
@@ -315,19 +300,38 @@ export function MuscleMap({ primaryMuscles = [], secondaryMuscles = [], size = '
         </div>
       </div>
 
-      {/* Légende : identifie les couleurs du schéma */}
-      <div className="muscle-map-legend">
-        <div className="legend-item">
-          <span className="legend-dot primary" aria-hidden="true" />
-          <span>Moteur principal</span>
+      {/* Légende : identifie la lecture du schéma — rôles ou niveaux de volume. */}
+      {enVolume ? (
+        <div className="muscle-map-legend">
+          {[
+            { opacite: 0.34, libelle: 'Peu' },
+            { opacite: 0.67, libelle: 'Moyen' },
+            { opacite: 1, libelle: 'Beaucoup' },
+          ].map((palier) => (
+            <div className="legend-item" key={palier.libelle}>
+              <span
+                className="legend-dot"
+                style={{ background: zoneActive, opacity: palier.opacite }}
+                aria-hidden="true"
+              />
+              <span>{palier.libelle}</span>
+            </div>
+          ))}
         </div>
-        {secondaries.size > 0 && (
+      ) : (
+        <div className="muscle-map-legend">
           <div className="legend-item">
-            <span className="legend-dot secondary" aria-hidden="true" />
-            <span>Synergiste / stabilisateur</span>
+            <span className="legend-dot primary" aria-hidden="true" />
+            <span>Moteur principal</span>
           </div>
-        )}
-      </div>
+          {secondaries.size > 0 && (
+            <div className="legend-item">
+              <span className="legend-dot secondary" aria-hidden="true" />
+              <span>Synergiste / stabilisateur</span>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

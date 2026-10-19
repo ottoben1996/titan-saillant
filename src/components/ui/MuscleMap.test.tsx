@@ -64,3 +64,35 @@ describe('MuscleMap component', () => {
     expect(altText).toContain('Aucun muscle');
   });
 });
+
+describe('MuscleMap en mode volume', () => {
+  it('colore les zones par niveau et remplace la légende de rôles', () => {
+    const { container } = render(<MuscleMap intensite={{ quads: 1, glutes: 0.5 }} titre="Répartition musculaire" />);
+
+    expect(screen.getByText('Répartition musculaire')).toBeInTheDocument();
+    expect(screen.getByText(/Quadriceps : volume élevé/)).toBeInTheDocument();
+    expect(screen.getByText(/Fessiers : volume moyen/)).toBeInTheDocument();
+
+    // La légende dit l'échelle de volume, pas les rôles.
+    expect(screen.getByText('Peu')).toBeInTheDocument();
+    expect(screen.getByText('Beaucoup')).toBeInTheDocument();
+    expect(screen.queryByText('Moteur principal')).not.toBeInTheDocument();
+
+    // Plein régime : opacité 1 ; moitié : 0,59 ; zone absente : éteinte.
+    const opacites = [...container.querySelectorAll('path[opacity]')].map((node) => node.getAttribute('opacity'));
+    expect(opacites).toContain('0.59');
+    expect(opacites).toContain('1');
+    const styles = [...container.querySelectorAll('path[style]')].map((node) => node.getAttribute('style') ?? '');
+    expect(styles.some((style) => style.includes('var(--accent-3)'))).toBe(true);
+  });
+
+  it('rend le bilan imprimé en encre, sans accent de thème', () => {
+    const { container } = render(<MuscleMap intensite={{ quads: 1 }} monochrome />);
+
+    const styles = [...container.querySelectorAll('path[style]')].map((node) => node.getAttribute('style') ?? '');
+    // jsdom sérialise les couleurs hexadécimales en rgb() : on accepte les deux écritures.
+    expect(styles.some((style) => /#24312a|rgb\(36,\s*49,\s*42\)/.test(style))).toBe(true);
+    expect(styles.some((style) => /#d9dedb|rgb\(217,\s*222,\s*219\)/.test(style))).toBe(true);
+    expect(styles.every((style) => !style.includes('var(--accent'))).toBe(true);
+  });
+});

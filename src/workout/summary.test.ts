@@ -15,6 +15,7 @@ describe('formatLoadKg', () => {
 import type { WorkoutDay, WorkoutSession } from '../domain/types';
 import {
   addDays,
+  beatenRecords,
   formatLoadKg,
   formatMinutes,
   formatSignedInt,
@@ -25,6 +26,7 @@ import {
   historyTotals,
   isCompleted,
   personalRecords,
+  previousSessionFor,
   sessionActiveSeconds,
   sessionBestLoadKg,
   sessionDurationSeconds,
@@ -354,6 +356,81 @@ describe('tendances et records', () => {
       session({ loggedSets: [{ exerciseId: 'gainage-planche', setIndex: 0, completedAt: local(2026, 9, 8) }] }),
     ]);
     expect(records).toEqual([]);
+  });
+});
+
+describe('records battus et séance précédente', () => {
+  const charge = (exerciseId: string, load: number, reps: number, at = local(2026, 9, 8, 9, 30)) => ({
+    exerciseId,
+    setIndex: 0,
+    actualLoadKg: load,
+    actualRepetitions: reps,
+    completedAt: at,
+  });
+
+  it('retrouve la dernière séance terminée du même jour, et rien d’autre', () => {
+    const ancienne = session({ id: 'a', completedAt: local(2026, 9, 1, 10, 0) });
+    const reference = session({ id: 'b', completedAt: local(2026, 9, 5, 10, 0) });
+    const autreJour = session({ id: 'c', dayId: 'full-body-b', completedAt: local(2026, 9, 6, 10, 0) });
+    const enCours = session({ id: 'd', completedAt: local(2026, 9, 8, 10, 0) });
+
+    expect(previousSessionFor([ancienne, reference, autreJour], enCours)?.id).toBe('b');
+    // La séance en cours ne se compare pas à elle-même.
+    expect(previousSessionFor([reference], reference)).toBeNull();
+  });
+
+  it('ignore les séances ouvertes et celles d’un autre jour', () => {
+    const ouverte = session({ id: 'x', completedAt: undefined });
+    const autreJour = session({ id: 'y', dayId: 'cardio', completedAt: local(2026, 9, 5, 10, 0) });
+    const enCours = session({ id: 'd', completedAt: local(2026, 9, 8, 10, 0) });
+
+    expect(previousSessionFor([ouverte, autreJour], enCours)).toBeNull();
+  });
+
+  it('ne signale un record que si la charge dépasse un passage antérieur', () => {
+    const ancienne = session({
+      id: 'a',
+      completedAt: local(2026, 9, 1, 10, 0),
+      loggedSets: [
+        charge('presse', 80, 10, local(2026, 9, 1, 9, 30)),
+        charge('tirage', 60, 12, local(2026, 9, 1, 9, 40)),
+      ],
+    });
+    const courante = session({
+      id: 'b',
+      completedAt: local(2026, 9, 8, 10, 0),
+      loggedSets: [charge('presse', 85, 8), charge('tirage', 55, 12)],
+    });
+
+    expect(beatenRecords(courante, [ancienne])).toEqual([
+      { exerciseId: 'presse', loadKg: 85, previousLoadKg: 80, deltaKg: 5 },
+    ]);
+  });
+
+  it('ne transforme pas un premier passage en record battu', () => {
+    const courante = session({ id: 'b', loggedSets: [charge('gainage-planche', 20, 8)] });
+    expect(beatenRecords(courante, [])).toEqual([]);
+  });
+
+  it('arrondit le gain au dixième et trie par charge décroissante', () => {
+    const ancienne = session({
+      id: 'a',
+      completedAt: local(2026, 9, 1, 10, 0),
+      loggedSets: [
+        charge('presse', 80, 10, local(2026, 9, 1, 9, 30)),
+        charge('tirage', 60, 12, local(2026, 9, 1, 9, 40)),
+      ],
+    });
+    const courante = session({
+      id: 'b',
+      completedAt: local(2026, 9, 8, 10, 0),
+      loggedSets: [charge('presse', 82.5, 10), charge('tirage', 70, 10)],
+    });
+
+    expect(beatenRecords(courante, [ancienne])).toEqual([
+      { exerciseId: 'presse', loadKg: 82.5, previousLoadKg: 80, deltaKg: 2.5 },
+      { exerciseId: 'tirage', loadKg: 70, previousLoadKg: 60, deltaKg: 10 },
+    ]);
   });
 });
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { Tutorial } from '../../domain/types';
-import { ArrowLeft, ArrowUpRight, Barbell, Bolt, Repeat, Timer, Video, Warning } from '../ui/Icons';
+import { Anatomie, ArrowLeft, ArrowUpRight, Barbell, Bolt, Repeat, Timer, Video, Warning } from '../ui/Icons';
 import { MuscleMap } from '../ui/MuscleMap';
 import { Sheet, SheetContent, SheetTitle } from '../ui/Sheet';
 
@@ -51,7 +51,7 @@ export function TutorialModal({ tutorial, onClose }: TutorialModalProps) {
                 className={`tutorial-tab-btn ${activeTab === 'anatomy' ? 'active' : ''}`}
                 onClick={() => setActiveTab('anatomy')}
               >
-                🧬 Anatomie & Repères
+                <Anatomie size={14} /> Anatomie & Repères
               </button>
             </div>
           </div>
@@ -62,7 +62,6 @@ export function TutorialModal({ tutorial, onClose }: TutorialModalProps) {
           <div className="tutorial-short-section">
             {!isOnline ? (
               <div className="tutorial-offline-banner">
-                <span>📡</span>
                 <span>Mode hors-ligne : reconnecte-toi pour voir le short YouTube.</span>
               </div>
             ) : (

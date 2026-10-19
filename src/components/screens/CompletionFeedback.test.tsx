@@ -97,3 +97,48 @@ describe('quiz de fin de séance', () => {
     expect(screen.getByRole('button', { name: 'Même charge' })).toHaveAttribute('aria-pressed', 'true');
   });
 });
+
+describe('fin de séance : écarts et records', () => {
+  const charge = (exerciseId: string, load: number, reps: number, at: string) => ({
+    exerciseId,
+    setIndex: 0,
+    actualLoadKg: load,
+    actualRepetitions: reps,
+    completedAt: at,
+  });
+
+  /** La même séance, la fois d'avant : 80 kg × 10, soit 800 kg·rép. */
+  const precedente = () =>
+    session({
+      id: 'precedente',
+      completedAt: '2026-09-05T10:00:00.000Z',
+      loggedSets: [charge('presse-cuisses-inclinee', 80, 10, '2026-09-05T09:30:00.000Z')],
+    });
+
+  const courante = () =>
+    session({ loggedSets: [charge('presse-cuisses-inclinee', 90, 10, '2026-09-12T09:30:00.000Z')] });
+
+  it('compare le volume et la charge à la dernière séance du même jour', () => {
+    render(<CompletionFeedback session={courante()} history={[precedente()]} onFinish={vi.fn()} />);
+
+    const ecarts = [...document.querySelectorAll('.bilan-delta')].map((node) => node.textContent ?? '');
+    expect(ecarts.some((texte) => texte.includes('+100 kg·rép.'))).toBe(true);
+    expect(ecarts.some((texte) => texte.includes('+10 kg'))).toBe(true);
+  });
+
+  it('annonce le record battu, avec l’ancienne valeur', () => {
+    render(<CompletionFeedback session={courante()} history={[precedente()]} onFinish={vi.fn()} />);
+
+    const ligne = document.querySelector('.bilan-record');
+    expect(ligne?.textContent).toMatch(/Record battu/);
+    expect(ligne?.textContent).toMatch(/90 kg/);
+    expect(ligne?.textContent).toMatch(/avant 80 kg/);
+  });
+
+  it('n’affiche ni écart ni record à la première séance', () => {
+    render(<CompletionFeedback session={courante()} onFinish={vi.fn()} />);
+
+    expect(document.querySelector('.bilan-delta')).toBeNull();
+    expect(document.querySelector('.bilan-record')).toBeNull();
+  });
+});

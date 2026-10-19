@@ -31,6 +31,7 @@ import {
   Undo,
   Video,
 } from '../ui/Icons';
+import { NombreAnime } from '../ui/NombreAnime';
 import { PlateBadge } from '../ui/PlateBadge';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '../ui/Sheet';
 import { CompletionFeedback } from './CompletionFeedback';
@@ -418,7 +419,13 @@ export function WorkoutScreen({
   // hooks than expected »), ce qui cassait l'écran de bilan.
   if (isComplete)
     return (
-      <CompletionFeedback session={session} profileId={profile} onSessionChange={onSessionChange} onFinish={onFinish} />
+      <CompletionFeedback
+        session={session}
+        profileId={profile}
+        history={history}
+        onSessionChange={onSessionChange}
+        onFinish={onFinish}
+      />
     );
 
   return (
@@ -741,7 +748,14 @@ export function WorkoutScreen({
                   {chargeAffichee !== undefined && (
                     <div className="rest-next-prep">
                       <span className="rest-next-load">
-                        Charge prévue : <strong>{formatLoadKg(chargeAffichee)} kg</strong>
+                        Charge prévue :{' '}
+                        <strong>
+                          <NombreAnime
+                            valeur={chargeAffichee}
+                            decimals={Number.isInteger(chargeAffichee) ? 0 : 1}
+                            suffixe="kg"
+                          />
+                        </strong>
                       </span>
                       <PlateBadge totalLoadKg={chargeAffichee} exerciseId={exercise.id} />
                     </div>

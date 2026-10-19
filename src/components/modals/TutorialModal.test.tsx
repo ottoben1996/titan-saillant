@@ -10,7 +10,7 @@ describe('TutorialModal (YouTube Shorts In-App)', () => {
     render(<TutorialModal tutorial={tutorial} onClose={vi.fn()} />);
 
     expect(screen.getByText('Démo Short')).toBeDefined();
-    expect(screen.getByText('🧬 Anatomie & Repères')).toBeDefined();
+    expect(screen.getByText('Anatomie & Repères')).toBeDefined();
 
     const iframe = screen.getByTitle(/Short Démonstration/i) as HTMLIFrameElement;
     expect(iframe).toBeDefined();
@@ -24,7 +24,7 @@ describe('TutorialModal (YouTube Shorts In-App)', () => {
   it('allows switching between Démo Short and Anatomie & Repères tabs', () => {
     render(<TutorialModal tutorial={tutorial} onClose={vi.fn()} />);
 
-    const anatomyTab = screen.getByText('🧬 Anatomie & Repères');
+    const anatomyTab = screen.getByText('Anatomie & Repères');
     fireEvent.click(anatomyTab);
 
     expect(screen.getByText(/Talons bien vissés au plateau/i)).toBeDefined();

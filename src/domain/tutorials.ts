@@ -764,8 +764,43 @@ const pdfExerciseIds = [
   'cooldown-full-body-b',
   'cooldown-cardio-4',
 ] as const;
+
+// Les variantes PDF portent leurs vraies zones quand le mouvement est connu :
+// sans elles, leur volume ne se poserait sur aucune carte du suivi. Les
+// mouvements non cartographiés (étirements, retours au calme) gardent la
+// consigne générale — ils ne portent pas de charge.
+const pdfMuscles: Record<string, { primary: string[]; secondary?: string[] }> = {
+  'souleve-terre-roumain': { primary: ['Ischio-jambiers', 'Fessiers'], secondary: ['Lombaires', 'Grands dorsaux'] },
+  'developpe-couche-barre': { primary: ['Pectoraux'], secondary: ['Triceps', 'Épaules'] },
+  'tirage-horizontal-pdf': { primary: ['Grands dorsaux'], secondary: ['Biceps', 'Trapèzes'] },
+  'developpe-epaule-machine': { primary: ['Épaules'], secondary: ['Triceps'] },
+  'rameur-pdf': { primary: ['Grands dorsaux', 'Quadriceps'], secondary: ['Biceps', 'Fessiers'] },
+  'air-squat-pdf': { primary: ['Quadriceps', 'Fessiers'], secondary: ['Ischio-jambiers'] },
+  'pompes-pdf': { primary: ['Pectoraux'], secondary: ['Triceps', 'Épaules'] },
+  'kettlebell-swing-pdf': { primary: ['Fessiers', 'Ischio-jambiers'], secondary: ['Lombaires', 'Trapèzes'] },
+  'hip-thrust-pdf': { primary: ['Fessiers'], secondary: ['Ischio-jambiers'] },
+  'gainage-pont-pdf': { primary: ['Fessiers'], secondary: ['Ischio-jambiers', 'Abdominaux'] },
+  'gainage-planche-pdf': { primary: ['Abdominaux'], secondary: ['Épaules', 'Fessiers'] },
+  'gainage-planche-lower': { primary: ['Abdominaux'], secondary: ['Épaules', 'Fessiers'] },
+  'sit-up-pdf': { primary: ['Abdominaux'] },
+  'abdos-croises-pdf': { primary: ['Abdominaux'] },
+  'mountain-climber-pdf': { primary: ['Abdominaux'], secondary: ['Quadriceps', 'Épaules'] },
+  'leg-extension-iso-pdf': { primary: ['Quadriceps'] },
+  'leg-curl-iso-pdf': { primary: ['Ischio-jambiers'], secondary: ['Mollets'] },
+  'pec-fly-pdf': { primary: ['Pectoraux'], secondary: ['Épaules'] },
+  'tirage-vertical-pdf': { primary: ['Grands dorsaux'], secondary: ['Biceps', 'Trapèzes'] },
+  'leg-press-incline': { primary: ['Quadriceps', 'Fessiers'], secondary: ['Ischio-jambiers'] },
+  'leg-curl-pdf': { primary: ['Ischio-jambiers'], secondary: ['Mollets'] },
+  'chest-press-pdf': { primary: ['Pectoraux'], secondary: ['Triceps', 'Épaules'] },
+  'kick-back-pdf': { primary: ['Triceps'], secondary: ['Épaules'] },
+  'velo-elliptique': { primary: ['Quadriceps', 'Fessiers'], secondary: ['Mollets'] },
+  'marche-inclinee-legere': { primary: ['Quadriceps', 'Fessiers'], secondary: ['Mollets'] },
+  'marche-inclinee-forte': { primary: ['Quadriceps', 'Fessiers'], secondary: ['Mollets'] },
+};
+
 for (const exerciseId of pdfExerciseIds) {
   if (tutorials[exerciseId]) continue;
+  const zones = pdfMuscles[exerciseId];
   tutorials[exerciseId] = tutorial(
     exerciseId,
     exerciseId.replaceAll('-', ' '),
@@ -782,6 +817,10 @@ for (const exerciseId of pdfExerciseIds) {
       `Réduis ${exerciseId} si le souffle devient inhabituel.`,
     ],
     [`Arrête ${exerciseId} en cas de douleur vive, vertige ou essoufflement inhabituel.`],
-    { primaryMuscles: ['Mouvement général'], keyCue: `Contrôle et respiration sur ${exerciseId}` },
+    {
+      primaryMuscles: zones?.primary ?? ['Mouvement général'],
+      ...(zones?.secondary ? { secondaryMuscles: zones.secondary } : {}),
+      keyCue: `Contrôle et respiration sur ${exerciseId}`,
+    },
   );
 }

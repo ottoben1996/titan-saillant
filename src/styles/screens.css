@@ -821,6 +821,12 @@
   box-shadow: none;
 }
 
+/* La carte musculaire du relevé : même gabarit que la fiche d'exercice, mais
+   les écarts de ce contexte viennent du bloc, pas des marges du composant. */
+.muscle-volume-body .muscle-map-wrapper {
+  margin: var(--sp-6) 0 0;
+}
+
 .record-rank {
   display: grid;
   place-items: center;
@@ -894,6 +900,21 @@
   color: var(--accent-ink);
 }
 
+/* La coche se dessine une fois, au montage de l'écran de fin. Le tracé mesure
+   une vingtaine d'unités : un tiret de 20 couvre exactement la coche, et
+   l'offset la garde cachée avant de la tracer. */
+@keyframes trace-coche {
+  from {
+    stroke-dashoffset: 20;
+  }
+}
+
+.completion-icon svg path {
+  stroke-dasharray: 20;
+  stroke-dashoffset: 0;
+  animation: trace-coche var(--duree-matiere) var(--ease);
+}
+
 .completion-head h1 {
   margin: var(--sp-2) 0 0;
   font-size: clamp(1.25rem, 5.5vw, 1.5rem);
@@ -943,6 +964,43 @@
 
 .bilan-cell.accent strong {
   color: var(--accent);
+}
+
+/* L'écart contre la dernière fois : discret, sous le chiffre qu'il commente.
+   Pas de vert ni de rouge — c'est un repère, pas un score. */
+.bilan-delta {
+  color: var(--text-3);
+  font-size: var(--fs-1);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.4;
+}
+
+/* Le record battu : le seul moment où la fin de séance s'autorise l'accent. */
+.bilan-record {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  width: min(100%, 34rem);
+  margin: 0;
+  padding: var(--sp-4) var(--sp-6);
+  border: 1px solid rgb(var(--accent-rgb) / 0.3);
+  border-radius: var(--r-md);
+  background: rgb(var(--accent-rgb) / 0.08);
+  color: var(--accent);
+  font-size: var(--fs-2);
+  line-height: 1.45;
+}
+
+.bilan-record svg {
+  flex: none;
+}
+
+.bilan-record b {
+  font-variant-numeric: tabular-nums;
+}
+
+.bilan-record small {
+  color: var(--text-2);
 }
 
 /* 2. Ressenti. */
@@ -1678,5 +1736,11 @@
  * apparaître. Verdict posé par src/perf/fluidite.ts.
  */
 html[data-perf="bas"] .skeleton-line {
+  animation: none;
+}
+
+/* Même verdict pour la coche de fin de séance : sur un appareil bridé, elle
+   s'affiche déjà dessinée — le dessin est un bonus, pas une information. */
+html[data-perf="bas"] .completion-icon svg path {
   animation: none;
 }

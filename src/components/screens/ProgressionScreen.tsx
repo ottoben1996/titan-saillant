@@ -5,7 +5,9 @@ import { getProgram } from '../../domain/programs';
 import type { ProfileId, WorkoutSession } from '../../domain/types';
 import { type AdaptiveAdvice, getAdaptiveAdvice } from '../../workout/coaching';
 import { nextTargetWeek } from '../../workout/followup';
+import { muscleVolume, zoneIntensities } from '../../workout/muscleVolume';
 import {
+  addDays,
   formatLoadKg,
   formatMinutes,
   formatSignedInt,
@@ -19,7 +21,9 @@ import {
   weeklyComparison,
 } from '../../workout/summary';
 import { ArrowRight, Bolt, ChartLine, ChevronRight, TrendDown, TrendUp, Warning } from '../ui/Icons';
+import { MuscleMap } from '../ui/MuscleMap';
 import { type ProgressScreen, ProgressTabs, SegmentedControl, type SegmentedOption } from '../ui/SegmentedControl';
+import { useListeAnimee } from '../ui/useListeAnimee';
 import { profileLabels } from './HomeScreen';
 
 const DUO_OPTIONS: readonly SegmentedOption<ProfileId>[] = [
@@ -151,6 +155,8 @@ export function ProgressionScreen({
   onOpenFollowup,
   onSwitchDuoProfile,
 }: ProgressionScreenProps) {
+  const listeAnimee = useListeAnimee();
+  const listeZones = useListeAnimee();
   const view = useMemo(() => {
     const now = new Date();
     const completed = history.filter((item) => item.completedAt);
@@ -158,6 +164,9 @@ export function ProgressionScreen({
     const exerciseNames = new Map(
       program.days.flatMap((item) => item.exercises).map((exercise) => [exercise.id, exercise.name]),
     );
+    // Volume par zone sur sept jours glissants : la carte des fiches, en
+    // couleurs, alimentée par les séries réellement validées.
+    const zones = muscleVolume(history, addDays(now, -7), now);
     return {
       completed,
       totals: historyTotals(history),
@@ -168,6 +177,8 @@ export function ProgressionScreen({
         name: exerciseLabel(record.exerciseId, exerciseNames.get(record.exerciseId)),
       })),
       advice: getAdaptiveAdvice(completed),
+      zonesMuscles: zones,
+      intensitesMuscles: zoneIntensities(zones),
     };
   }, [history, profile]);
 
@@ -352,7 +363,7 @@ export function ProgressionScreen({
             {view.records.length === 0 ? (
               <p className="muted-copy">Renseigne une charge réelle pendant tes séries pour créer tes records.</p>
             ) : (
-              <div className="records-list">
+              <div className="records-list" ref={listeAnimee}>
                 {view.records.map((record, index) => (
                   <div className="record-row" key={record.exerciseId}>
                     <span className="record-rank">{index + 1}</span>
@@ -369,6 +380,39 @@ export function ProgressionScreen({
                     </span>
                   </div>
                 ))}
+              </div>
+            )}
+          </div>
+
+          <div className="progression-card">
+            <div className="card-heading">
+              <div>
+                <p className="eyebrow">VOLUME PAR ZONE</p>
+                <h2>Sept derniers jours</h2>
+              </div>
+              <span>
+                {view.zonesMuscles.length} zone{view.zonesMuscles.length > 1 ? 's' : ''}
+              </span>
+            </div>
+            {view.zonesMuscles.length === 0 ? (
+              <p className="muted-copy">Renseigne une charge réelle pendant tes séries pour voir où part le volume.</p>
+            ) : (
+              <div className="muscle-volume-body">
+                <MuscleMap intensite={view.intensitesMuscles} titre="Répartition musculaire" />
+                <div className="records-list" ref={listeZones}>
+                  {view.zonesMuscles.slice(0, 5).map((zone, index) => (
+                    <div className="record-row" key={zone.id}>
+                      <span className="record-rank">{index + 1}</span>
+                      <div className="record-main">
+                        <strong>{zone.label}</strong>
+                        <small>
+                          {zone.sets} série{zone.sets > 1 ? 's' : ''} sur la zone
+                        </small>
+                      </div>
+                      <span className="record-value">{formatVolume(zone.volumeKg)} kg·rép.</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>

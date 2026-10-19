@@ -259,6 +259,10 @@ html[data-perf="bas"] .topbar::before {
   .workout-heading h1 {
     transform: none;
   }
+
+  .completion-icon svg path {
+    animation: none;
+  }
 }
 
 /* ------------------------------------------------- le passage d'un écran -- */
