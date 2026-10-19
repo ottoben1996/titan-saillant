@@ -18,8 +18,14 @@ import {
   volumeTrendPoints,
   weeklyComparison,
 } from '../../workout/summary';
-import { ArrowLeft, ArrowRight, Bolt, ChartLine, ChevronRight, TrendDown, TrendUp, Warning } from '../ui/Icons';
+import { ArrowRight, Bolt, ChartLine, ChevronRight, TrendDown, TrendUp, Warning } from '../ui/Icons';
+import { type ProgressScreen, ProgressTabs, SegmentedControl, type SegmentedOption } from '../ui/SegmentedControl';
 import { profileLabels } from './HomeScreen';
+
+const DUO_OPTIONS: readonly SegmentedOption<ProfileId>[] = [
+  { value: 'ottman', label: profileLabels.ottman },
+  { value: 'laura', label: profileLabels.laura },
+];
 
 /* ------------------------------------------------------------------ graphe -- */
 
@@ -131,7 +137,8 @@ interface ProgressionScreenProps {
   profile: ProfileId;
   /** Points hebdomadaires : alimentent la carte du point du samedi. */
   measurements: readonly WeeklyMeasurement[];
-  onBack: () => void;
+  /** Bascule entre les trois vues sœurs de l'onglet Progrès. */
+  onNavigate: (screen: ProgressScreen) => void;
   onOpenFollowup: () => void;
   onSwitchDuoProfile?: (profile: ProfileId) => void;
 }
@@ -140,7 +147,7 @@ export function ProgressionScreen({
   history,
   profile,
   measurements,
-  onBack,
+  onNavigate,
   onOpenFollowup,
   onSwitchDuoProfile,
 }: ProgressionScreenProps) {
@@ -179,43 +186,22 @@ export function ProgressionScreen({
 
   return (
     <section className={`content progression-content progression-profile-${profile}`}>
-      <div className="page-heading">
-        <div>
-          <p className="eyebrow">PROGRESSION · TENDANCE</p>
-          <h1>{profileLabels[profile]}</h1>
-        </div>
-        <div className={`avatar avatar-${profile}`} aria-hidden="true">
-          {profileLabels[profile][0]}
-        </div>
-      </div>
+      <header className="large-title">
+        <h1>Progrès</h1>
+        <p className="sr-only">Données de {profileLabels[profile]}</p>
+      </header>
+      <ProgressTabs current="progression" onNavigate={onNavigate} />
       {onSwitchDuoProfile && (
-        <fieldset className="progression-duo-switcher" aria-label="Profil de progression">
-          <legend className="sr-only">Profil de progression</legend>
-          <button
-            type="button"
-            className={`duo-pill-btn ${profile === 'ottman' ? 'active' : ''}`}
-            aria-pressed={profile === 'ottman'}
-            onClick={() => onSwitchDuoProfile('ottman')}
-          >
-            Ottman
-          </button>
-          <button
-            type="button"
-            className={`duo-pill-btn ${profile === 'laura' ? 'active' : ''}`}
-            aria-pressed={profile === 'laura'}
-            onClick={() => onSwitchDuoProfile('laura')}
-          >
-            Laura
-          </button>
-        </fieldset>
+        <SegmentedControl
+          className="progression-duo-switcher"
+          label="Profil affiché"
+          options={DUO_OPTIONS}
+          value={profile}
+          onChange={(cible) => {
+            if (cible !== profile) onSwitchDuoProfile(cible);
+          }}
+        />
       )}
-      <button className="text-button progression-back" onClick={onBack} type="button">
-        <ArrowLeft size={16} /> Accueil
-      </button>
-      <p className="intro progression-intro">
-        Un aperçu de tes séances enregistrées sur cet appareil. Les données restent privées et séparées de l’autre
-        profil.
-      </p>
 
       {/* Point du samedi : l'entrée vers le suivi hebdomadaire, au même endroit
           que le reste des repères de progression. */}
@@ -247,9 +233,7 @@ export function ProgressionScreen({
           <ChartLine size={34} />
           <h2>Aucune donnée de progression</h2>
           <p>Termine une première séance pour voir apparaître tes repères et ta tendance de volume.</p>
-          <button className="primary-button empty-cta" onClick={onBack} type="button">
-            Retour à l’accueil
-          </button>
+          <p className="muted-copy">Lance une séance depuis l’onglet Aujourd’hui.</p>
         </div>
       ) : (
         <>

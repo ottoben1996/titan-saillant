@@ -10,7 +10,8 @@ import {
 import type { ProfileId } from '../../domain/types';
 import { debutDePause } from '../../storage/cyclePause';
 import { implausibleZones, nextTargetWeek, previousMeasurement, zoneDelta } from '../../workout/followup';
-import { ArrowLeft, ChartLine, Check, Minus, Plus, Repeat, Warning } from '../ui/Icons';
+import { ChartLine, Check, Minus, Plus, Repeat, Warning } from '../ui/Icons';
+import { type ProgressScreen, ProgressTabs } from '../ui/SegmentedControl';
 
 interface FollowupScreenProps {
   profileId: ProfileId;
@@ -18,7 +19,8 @@ interface FollowupScreenProps {
   sessionsThisWeek: number;
   onSave: (measurement: WeeklyMeasurement) => void;
   onOpenBilan: (measurement: WeeklyMeasurement) => void;
-  onBack: () => void;
+  /** Bascule entre les trois vues sœurs de l'onglet Progrès. */
+  onNavigate: (screen: ProgressScreen) => void;
 }
 
 const toNumber = (value: string): number | undefined => {
@@ -37,7 +39,7 @@ export function FollowupScreen({
   sessionsThisWeek,
   onSave,
   onOpenBilan,
-  onBack,
+  onNavigate,
 }: FollowupScreenProps) {
   const body = profileBody[profileId];
   /**
@@ -142,9 +144,10 @@ export function FollowupScreen({
 
   return (
     <section className="followup">
-      <button type="button" className="back-link" onClick={onBack}>
-        <ArrowLeft size={16} /> Retour
-      </button>
+      <header className="large-title">
+        <h1>Progrès</h1>
+      </header>
+      <ProgressTabs current="followup" onNavigate={onNavigate} />
 
       <p className="eyebrow">POINT DU SAMEDI</p>
       {enPause && (
@@ -153,9 +156,9 @@ export function FollowupScreen({
           n’est attendu : les courbes sont gelées, pas faussées, et la numérotation reprendra où elle s’est arrêtée.
         </p>
       )}
-      <h1>
+      <h2 className="followup-titre">
         Semaine {target.week} <em>du cycle {target.cycle}</em>
-      </h1>
+      </h2>
       <div className="cycle-track" role="img" aria-label={`Semaine ${target.week} sur ${cycleLengthWeeks}`}>
         {Array.from({ length: cycleLengthWeeks }, (_, index) => {
           const week = index + 1;

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import type { ProfileId } from '../../domain/types';
 import { listSessions } from '../../storage/sessionRepository';
 import { totalsForWeek } from '../../workout/summary';
-import { ArrowRight } from '../ui/Icons';
+import { ChevronRight } from '../ui/Icons';
 import { LogoMark } from '../ui/LogoMark';
 
 const PROFILES: ReadonlyArray<{ id: ProfileId; name: string; description: string }> = [
@@ -55,32 +55,30 @@ export function ProfileChooser({ onChoose }: ProfileChooserProps) {
   return (
     <main className="app-shell profile-screen">
       <section className="profile-card">
-        <div className="brand-lockup" aria-label="Coach Ottman et Laura">
+        {/* Le nom de l'application est écrit en texte : aucun aria-label sur un
+            conteneur sans rôle, que les lecteurs d'écran ignoreraient. */}
+        <div className="brand-lockup">
           <span className="brand-mark" aria-hidden="true">
-            <LogoMark size={34} />
+            <LogoMark size={44} />
           </span>
-          <span className="brand-wordmark">COACH</span>
+          <span className="sr-only">Coach Ottman et Laura</span>
         </div>
-        <p className="eyebrow">ESPACE PERSONNEL · HORS LIGNE</p>
         <h1>
-          Ta séance,
-          <br />
-          <em>sans friction.</em>
-          <span className="sr-only">Choisis ton profil</span>
+          Bienvenue
+          <span className="sr-only">, choisis ton profil</span>
         </h1>
-        <p className="intro">
-          Choisis ton espace personnel. Les programmes et l’historique restent séparés sur cet appareil.
-        </p>
+        <p className="intro">Choisis ton espace. Programmes et historique restent séparés sur cet appareil.</p>
         {profileLoad.status === 'loading' && (
-          <p role="status" aria-live="polite">
+          <p className="profile-load" role="status" aria-live="polite">
             Chargement des séances…
           </p>
         )}
         {profileLoad.status === 'error' && (
-          <div role="alert">
+          <div className="profile-load" role="alert">
             <p>Impossible de charger les séances.</p>
             <button
               type="button"
+              className="secondary-button"
               onClick={() => {
                 setProfileLoad({ status: 'loading' });
                 setRetryToken((token) => token + 1);
@@ -92,8 +90,15 @@ export function ProfileChooser({ onChoose }: ProfileChooserProps) {
         )}
         <div className="profile-actions">
           {PROFILES.map((profile) => (
-            <button className="profile-choice" type="button" key={profile.id} onClick={() => onChoose(profile.id)}>
-              <span className={`avatar avatar-${profile.id}`}>{profile.name[0]}</span>
+            <button
+              className={`profile-choice profile-choice-${profile.id}`}
+              type="button"
+              key={profile.id}
+              onClick={() => onChoose(profile.id)}
+            >
+              <span className={`avatar avatar-${profile.id}`} aria-hidden="true">
+                {profile.name[0]}
+              </span>
               <span>
                 <strong>{profile.name}</strong>
                 <small>{profile.description}</small>
@@ -101,13 +106,11 @@ export function ProfileChooser({ onChoose }: ProfileChooserProps) {
                   {profileLoad.status === 'ready' ? weekStatusLabel(profileLoad.counts[profile.id]) : '\u00A0'}
                 </small>
               </span>
-              <ArrowRight size={20} />
+              <ChevronRight size={20} aria-hidden="true" />
             </button>
           ))}
         </div>
-        <p className="privacy-note">
-          <span className="status-dot" /> Données locales · aucun compte requis
-        </p>
+        <p className="privacy-note">Données locales · aucun compte requis</p>
       </section>
     </main>
   );

@@ -19,7 +19,10 @@ export function LogoMark({ size = 32, className, ...props }: SVGProps<SVGSVGElem
     >
       <rect height="28" rx="14" stroke="currentColor" strokeWidth="2.5" width="28" x="5" y="6" />
       <rect height="28" rx="9" stroke="currentColor" strokeWidth="2.5" width="28" x="31" y="6" />
-      <path d="M31 9.4C27.4 11.7 25.2 15.5 25.2 20S27.4 28.3 31 30.6C34.6 28.3 36.8 24.5 36.8 20S34.6 11.7 31 9.4Z" fill="currentColor" />
+      <path
+        d="M31 9.4C27.4 11.7 25.2 15.5 25.2 20S27.4 28.3 31 30.6C34.6 28.3 36.8 24.5 36.8 20S34.6 11.7 31 9.4Z"
+        fill="currentColor"
+      />
     </svg>
   );
 }

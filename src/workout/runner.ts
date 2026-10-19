@@ -225,11 +225,13 @@ export function skipExercise(session: WorkoutSession, day: WorkoutDay): WorkoutS
   next.skippedExerciseIds = [...new Set([...(next.skippedExerciseIds ?? []), exerciceDuPas(day, session, courant)!])];
   next.activeTimer = undefined;
   const newSteps = getWorkoutSteps(day, next);
-  const newIndex = cible?.kind === 'exercise'
-    ? newSteps.findIndex(
-        (step) => step.kind === 'exercise' && step.exerciseIndex === cible.exerciseIndex && step.setIndex === cible.setIndex,
-      )
-    : -1;
+  const newIndex =
+    cible?.kind === 'exercise'
+      ? newSteps.findIndex(
+          (step) =>
+            step.kind === 'exercise' && step.exerciseIndex === cible.exerciseIndex && step.setIndex === cible.setIndex,
+        )
+      : -1;
   if (newIndex === -1) {
     next.currentStepIndex = newSteps.length;
     next.completedAt = new Date().toISOString();

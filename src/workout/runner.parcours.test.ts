@@ -11,7 +11,15 @@
  */
 import { describe, expect, it } from 'vitest';
 import { getProgram } from '../domain/programs';
-import { completeSet, createRunner, getNextStep, getWorkoutExercises, getWorkoutSteps, skipExercise, undoLastSet } from './runner';
+import {
+  completeSet,
+  createRunner,
+  getNextStep,
+  getWorkoutExercises,
+  getWorkoutSteps,
+  skipExercise,
+  undoLastSet,
+} from './runner';
 
 const premierJour = () => getProgram('ottman').days[0];
 
@@ -163,7 +171,7 @@ describe('regression: skipExercise in interleaved circuit', () => {
 
     // After skip, we should NOT see any more jumping-jack steps
     const remainingSteps = getWorkoutSteps(day, session).slice(session.currentStepIndex ?? 0);
-    const hasMoreJumpingJack = remainingSteps.some(step => {
+    const hasMoreJumpingJack = remainingSteps.some((step) => {
       if (step.kind !== 'exercise') return false;
       return exercises[step.exerciseIndex!].id === exerciseId;
     });
@@ -200,14 +208,15 @@ describe('regression: skipExercise in interleaved circuit', () => {
     session.currentSetIndex = steps[circuitStartIndex].setIndex!;
 
     const currentStep = getNextStep(session, day);
-    const otherExerciseId = exercises[currentStep.exerciseIndex!].id === 'jumping-jack' ? 'gainage-planche' : 'jumping-jack';
+    const otherExerciseId =
+      exercises[currentStep.exerciseIndex!].id === 'jumping-jack' ? 'gainage-planche' : 'jumping-jack';
 
     // Skip the first exercise immediately
     session = skipExercise(session, day);
 
     // The other exercise should still be present in remaining steps
     const remainingSteps = getWorkoutSteps(day, session).slice(session.currentStepIndex ?? 0);
-    const hasOtherExercise = remainingSteps.some(step => {
+    const hasOtherExercise = remainingSteps.some((step) => {
       if (step.kind !== 'exercise') return false;
       return exercises[step.exerciseIndex!].id === otherExerciseId;
     });

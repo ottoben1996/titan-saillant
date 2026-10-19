@@ -12,7 +12,6 @@ import { db } from '../../storage/db';
 import { SettingsScreen } from './SettingsScreen';
 
 const baseProps = {
-  onBack: vi.fn(),
   onSwitch: vi.fn(),
   onNotice: vi.fn(),
   onImported: vi.fn(),
@@ -47,18 +46,18 @@ describe('choix de la couleur', () => {
     const groupe = screen.getByRole('radiogroup', { name: /couleur de l'application/i });
 
     expect(within(groupe).getAllByRole('radio')).toHaveLength(5);
-    expect(within(groupe).getByRole('radio', { name: 'Vert' })).toHaveAttribute('aria-checked', 'true');
-    expect(within(groupe).getByRole('radio', { name: 'Turquoise' })).toHaveAttribute('aria-checked', 'false');
+    expect(within(groupe).getByRole('radio', { name: 'Lime' })).toHaveAttribute('aria-checked', 'true');
+    expect(within(groupe).getByRole('radio', { name: 'Menthe' })).toHaveAttribute('aria-checked', 'false');
   });
 
   it('remonte la couleur choisie', () => {
     const onAccentChange = afficher('ottman', 'vert');
     const groupe = screen.getByRole('radiogroup', { name: /couleur de l'application/i });
 
-    fireEvent.click(within(groupe).getByRole('radio', { name: 'Bleu' }));
+    fireEvent.click(within(groupe).getByRole('radio', { name: 'Azur' }));
     expect(onAccentChange).toHaveBeenCalledWith('bleu');
 
-    fireEvent.click(within(groupe).getByRole('radio', { name: 'Turquoise' }));
+    fireEvent.click(within(groupe).getByRole('radio', { name: 'Menthe' }));
     expect(onAccentChange).toHaveBeenCalledWith('turquoise');
   });
 
@@ -74,9 +73,31 @@ describe('choix de la couleur', () => {
   it('montre la pastille de chaque couleur, et pas une étiquette abstraite', () => {
     afficher('laura', 'rose');
     const groupe = screen.getByRole('radiogroup', { name: /couleur de l'application/i });
-    const pastille = within(groupe).getByRole('radio', { name: 'Bleu' }).querySelector('.accent-dot');
+    const pastille = within(groupe).getByRole('radio', { name: 'Azur' }).querySelector('.accent-dot');
 
     expect(pastille).not.toBeNull();
-    expect((pastille as HTMLElement).style.background).toBe('rgb(143, 199, 255)');
+    expect((pastille as HTMLElement).style.background).toBe('rgb(108, 196, 255)');
+  });
+});
+
+describe('rappel de sauvegarde', () => {
+  it('s’affiche en tête du profil et déclenche export ou report', () => {
+    const onExport = vi.fn();
+    const onLater = vi.fn();
+    render(
+      <SettingsScreen
+        {...baseProps}
+        profile="ottman"
+        accent="vert"
+        onAccentChange={vi.fn()}
+        sauvegarde={{ sessions: 12, onExport, onLater }}
+      />,
+    );
+    expect(screen.getByRole('heading', { level: 1, name: 'Profil' })).toBeInTheDocument();
+    expect(screen.getByText(/12 séances enregistrées · jamais sauvegardé/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /^Exporter$/ }));
+    expect(onExport).toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('button', { name: 'Plus tard' }));
+    expect(onLater).toHaveBeenCalled();
   });
 });

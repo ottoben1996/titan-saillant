@@ -9,65 +9,21 @@
 
 /* ============================================================== ACCUEIL === */
 
-/* Carte unique qui répond à « que faire maintenant ? » sans dupliquer le
-   bouton de la séance du jour. */
-.next-action-card {
-  display: grid;
-  gap: var(--sp-3);
-  padding: var(--sp-5);
-  border: 1px solid var(--line-strong);
-  border-radius: var(--r-lg);
-  background: var(--surface-1);
-}
-
-.next-action-card h2,
-.next-action-card p {
-  margin: 0;
-}
-
-.next-action-card h2 {
-  font-size: var(--text-xl);
-}
-
-.next-action-card p:not(.eyebrow) {
-  color: var(--text-2);
-}
-
-.next-action-card .primary-button {
-  justify-self: start;
-}
-
-/* Séance en cours : reprendre (action principale) ou supprimer (action
-   distincte, jamais imbriquée dans le bouton de reprise). */
-.resume-banner-wrap {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-4);
-}
-
-.resume-banner-wrap .resume-banner {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
 .resume-discard {
   flex: none;
   display: grid;
   place-items: center;
-  width: 48px;
-  min-width: 48px;
-  height: 48px;
-  min-height: 48px;
-  border: 1px solid var(--line-strong);
-  border-radius: var(--r-md, 10px);
-  background: var(--surface-1);
-  color: var(--text-2);
+  width: 52px;
+  height: 52px;
+  border: 0;
+  border-radius: var(--r-full);
+  background: var(--remplissage);
+  color: var(--text-1);
 }
 
 .resume-discard:hover,
 .resume-discard:focus-visible {
   color: #ff9c9c;
-  border-color: rgba(255, 120, 120, 0.45);
 }
 
 .history-delete {
@@ -130,399 +86,463 @@
   outline-offset: 2px;
 }
 
-/* Aucun espace mort au-dessus de l'action principale : l'en-tête est compact. */
+/* Titre large à la manière d'iOS : un seul par écran, le titre compact de la
+   barre du haut prend le relais au défilement. */
+.large-title {
+  display: grid;
+  gap: var(--sp-1);
+}
+
+.large-title h1 {
+  margin: 0;
+  font-size: var(--fs-titre);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.large-title p {
+  margin: 0;
+  color: var(--text-2);
+  font-size: var(--fs-4);
+}
+
+.section-title {
+  margin: 0 0 var(--sp-4) var(--sp-8);
+  color: var(--text-2);
+  font-size: var(--fs-2);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Contrôle segmenté : piste grise, pouce clair, 44 px de haut. */
+.segmented {
+  display: flex;
+  gap: var(--sp-1);
+  padding: var(--sp-1);
+  border-radius: var(--r-full);
+  background: var(--remplissage);
+}
+
+.segment {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 var(--sp-4);
+  border: 0;
+  border-radius: var(--r-full);
+  background: transparent;
+  color: var(--text-2);
+  font: inherit;
+  font-size: var(--fs-4);
+  font-weight: 590;
+  cursor: pointer;
+}
+
+.segment.actif {
+  background: rgb(255 255 255 / 0.14);
+  color: var(--text-1);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.25);
+}
+
+.segment:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------- Aujourd'hui */
 .home-content {
-  padding-top: var(--sp-9);
   display: flex;
   flex-direction: column;
-  gap: var(--sp-8);
+  gap: var(--sp-10);
+  padding-top: var(--sp-6);
 }
 
-.home-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--sp-8);
-}
-
-.home-head h1 {
-  margin: var(--sp-2) 0 0;
-  font-size: clamp(1.375rem, 5.5vw, 1.75rem);
-  line-height: 1.15;
-  letter-spacing: -0.02em;
-}
-
-.home-head > .avatar {
-  flex: none;
-  width: 2.75rem;
-  height: 2.75rem;
-  border-radius: var(--r-md);
-  font-size: var(--fs-6);
-}
-
-/* Carte de la séance du jour : l'action dominante, seule cible accentuée. */
-.today-card {
+/* Carte héros : la seule action dominante de l'écran. */
+.hero-card {
   display: grid;
-  gap: var(--sp-4);
-  padding: var(--sp-8) var(--sp-9);
-  border: 1px solid var(--line-strong);
-  border-radius: var(--r-lg);
-  background: var(--surface-1);
+  gap: var(--sp-8);
+  padding: var(--sp-10);
+  border-radius: var(--r-2xl);
+  background: radial-gradient(120% 90% at 100% 0%, rgb(var(--accent-rgb) / 0.18), transparent 60%), var(--carte-fond);
+  box-shadow: var(--carte-lisere);
 }
 
-.today-card.done {
-  border-color: var(--line);
-  background: var(--surface-0);
-}
-
-.today-card-head {
+.hero-head {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: var(--sp-6);
+  gap: var(--sp-8);
 }
 
-.today-card h2 {
-  margin: 0;
-  font-size: var(--fs-8);
-  line-height: 1.2;
+.hero-card h2 {
+  margin: var(--sp-2) 0 0;
+  font-size: var(--fs-10);
+  font-weight: 700;
+  line-height: 1.1;
   letter-spacing: -0.02em;
 }
 
-.today-card-sub {
+.hero-sub {
+  margin: var(--sp-3) 0 0;
+  color: var(--text-2);
+  font-size: var(--fs-4);
+  line-height: 1.4;
+}
+
+.hero-meta {
   margin: 0;
   color: var(--text-2);
-  font-size: var(--fs-3);
-  line-height: 1.45;
-}
-
-.today-card-foot {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--sp-6);
-  margin-top: var(--sp-2);
-}
-
-.today-meta {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--sp-3);
-  color: var(--text-2);
-  font-size: var(--fs-3);
+  font-family: var(--font-chiffres);
+  font-size: var(--fs-4);
   font-variant-numeric: tabular-nums;
 }
 
-.today-meta svg {
-  color: var(--text-3);
-}
-
-.today-cta {
-  min-height: 48px;
-  padding: var(--sp-6) var(--sp-9);
-}
-
-/* Le tableau complet vit dans une feuille : l'accueil garde seulement son
-   action compacte, sans perdre l'accès aux charges prescrites. */
-.program-load-trigger {
+.hero-actions {
   display: flex;
   align-items: center;
   gap: var(--sp-5);
-  width: 100%;
-  padding: var(--sp-6) var(--sp-7);
-  border: 1px solid var(--line);
-  border-radius: var(--r-lg);
-  background: var(--surface-1);
+}
+
+.hero-actions .primary-button {
+  flex: 1;
+}
+
+.hero-card .primary-button {
+  white-space: nowrap;
+}
+
+/* Anneau de la semaine, façon Activité. */
+.week-ring {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+}
+
+.week-ring svg,
+.week-ring b {
+  grid-area: 1 / 1;
+}
+
+.week-ring svg {
+  transform: rotate(-90deg);
+}
+
+.week-ring b {
+  font-family: var(--font-chiffres);
+  font-size: var(--fs-3);
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+.week-ring-fond,
+.week-ring-arc {
+  fill: none;
+  stroke-width: 6;
+}
+
+.week-ring-fond {
+  stroke: var(--remplissage);
+}
+
+.week-ring-arc {
+  stroke: var(--accent);
+  stroke-linecap: round;
+}
+
+/* Rail de la semaine : quatre pastilles, état écrit sous chaque nom. */
+.week-rail {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--sp-4);
+}
+
+.week-slot {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: var(--sp-3);
+  min-height: 96px;
+  padding: var(--sp-6) var(--sp-2);
+  border: 0;
+  border-radius: var(--r-xl);
+  background: var(--carte-fond);
+  box-shadow: var(--carte-lisere);
+  color: var(--text-1);
+  text-align: center;
+}
+
+.week-slot-state {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--r-full);
+  box-shadow: inset 0 0 0 2px var(--line-strong);
+}
+
+.week-slot.done .week-slot-state {
+  background: var(--accent);
+  color: var(--accent-ink);
+  box-shadow: none;
+}
+
+.week-slot.today .week-slot-state {
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
+
+.week-slot.today {
+  box-shadow:
+    var(--carte-lisere),
+    inset 0 0 0 1px rgb(var(--accent-rgb) / 0.5);
+}
+
+.week-slot-name {
+  font-size: var(--fs-3);
+  font-weight: 590;
+  line-height: 1.2;
+  /* Un nom de séance passe à la ligne plutôt que d'être tronqué. */
+  overflow-wrap: anywhere;
+}
+
+/* L'état tient sur sa ligne : sans `nowrap`, le `overflow-wrap: anywhere`
+   hérité coupait « Aujourd'hui » en « Aujourd' / hui » à 320 px. */
+.week-slot small {
+  color: var(--text-2);
+  font-size: var(--fs-1);
+  white-space: nowrap;
+}
+
+.week-slot.today small {
+  color: var(--accent);
+  font-weight: 590;
+}
+
+/* Deux repères sur la même période. */
+.home-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-5);
+}
+
+.home-metric {
+  display: grid;
+  gap: var(--sp-1);
+  padding: var(--sp-8);
+  border-radius: var(--r-2xl);
+}
+
+.home-metric > span {
+  color: var(--text-2);
+  font-size: var(--fs-3);
+  font-weight: 590;
+}
+
+.home-metric strong {
+  font-size: var(--fs-10);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.home-metric strong small {
+  color: var(--text-2);
+  font-size: var(--fs-3);
+  font-weight: 500;
+}
+
+.home-metric > small {
+  color: var(--text-3);
+  font-size: var(--fs-2);
+}
+
+/* ------------------------------------------------------- Forme du jour */
+.energy-sheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-6);
+}
+
+.energy-sheet-head .text-button {
+  min-height: 44px;
+}
+
+.energy-list {
+  display: grid;
+  margin: var(--sp-8) 0;
+  border-radius: var(--r-xl);
+  background: var(--carte-fond-2);
+  overflow: hidden;
+}
+
+.energy-sheet .energy-option {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-6);
+  min-height: 56px;
+  padding: var(--sp-5) var(--sp-8);
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: inset 0 -1px 0 var(--separateur);
   color: var(--text-1);
   text-align: left;
 }
 
-.program-load-trigger:hover {
-  border-color: rgb(var(--accent-rgb) / 0.45);
-  background: var(--surface-2);
+.energy-sheet .energy-option:last-child {
+  box-shadow: none;
 }
 
-.program-load-trigger-icon {
+.energy-sheet .energy-icon {
   display: grid;
-  flex: none;
   place-items: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: var(--r-md);
-  background: rgb(var(--accent-rgb) / 0.13);
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--r-full);
+  background: rgb(var(--accent-rgb) / 0.16);
   color: var(--accent);
 }
 
-.program-load-trigger > span:nth-child(2) {
+.energy-text {
   display: grid;
   flex: 1;
   gap: var(--sp-1);
+  min-width: 0;
 }
 
-.program-load-trigger small {
-  color: var(--text-3);
-  font-size: var(--fs-2);
+.energy-text small {
+  color: var(--text-2);
+  font-size: var(--fs-3);
 }
 
-.program-load-trigger > svg {
-  color: var(--text-3);
+.energy-check {
+  flex: none;
+  width: 18px;
+  color: var(--accent);
 }
 
-.program-load-sheet {
-  display: grid;
-  gap: var(--sp-6);
+.energy-sheet .energy-notice {
+  margin: 0 0 var(--sp-8);
+  color: var(--text-2);
+  font-size: var(--fs-3);
 }
 
-.program-load-sheet .program-load-head {
-  margin-top: var(--sp-2);
+.energy-sheet .primary-button {
+  white-space: nowrap;
 }
 
-.program-load-sheet .program-load-table-wrap {
-  max-height: 48dvh;
+/* ------------------------------------------------------------ Programme */
+.loads-content,
+.settings-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+  padding-top: var(--sp-6);
 }
 
-.program-load-sheet .program-load-note {
-  margin-top: calc(var(--sp-2) * -1);
+.settings-content .settings-section {
+  margin-top: var(--sp-4);
 }
 
 .program-load-card {
   display: grid;
-  gap: var(--sp-5);
-  padding: var(--sp-7);
-  border: 1px solid var(--line);
-  border-radius: var(--r-lg);
-  background: var(--surface-1);
-}
-
-.program-load-head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
   gap: var(--sp-6);
 }
 
-.program-load-head h2 {
-  margin: var(--sp-2) 0 0;
-  font-size: var(--fs-6);
+.program-load-head .section-title {
+  margin-bottom: var(--sp-1);
 }
 
-.program-load-head p:not(.eyebrow) {
-  max-width: 42rem;
-  margin: var(--sp-2) 0 0;
+.program-load-head p {
+  margin: 0 0 0 var(--sp-8);
   color: var(--text-2);
-  font-size: var(--fs-2);
-  line-height: 1.4;
-}
-
-.program-week-select {
-  display: grid;
-  flex: none;
-  gap: var(--sp-2);
-  color: var(--text-3);
-  font-size: var(--fs-2);
-}
-
-.program-week-select select {
-  min-height: 40px;
-  padding: 0 var(--sp-4);
-  border: 1px solid var(--line-strong);
-  border-radius: var(--r-md);
-  background: var(--surface-0);
-  color: var(--text-1);
-  font: inherit;
+  font-size: var(--fs-3);
 }
 
 .program-load-table-wrap {
   overflow-x: auto;
-  border: 1px solid var(--line);
-  border-radius: var(--r-md);
+  border-radius: var(--r-2xl);
+  background: var(--carte-fond);
+  box-shadow: var(--carte-lisere);
 }
 
 .program-load-table {
   width: 100%;
-  min-width: 680px;
+  min-width: 560px;
   border-collapse: collapse;
   font-size: var(--fs-2);
 }
 
 .program-load-table th,
 .program-load-table td {
-  padding: var(--sp-3) var(--sp-4);
-  border-bottom: 1px solid var(--line);
+  padding: var(--sp-4) var(--sp-5);
+  border-bottom: 1px solid var(--separateur);
   text-align: left;
   white-space: nowrap;
 }
 
+.program-load-table td {
+  font-family: var(--font-chiffres);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
 .program-load-table thead th {
-  color: var(--text-3);
-  font-size: var(--fs-2);
+  color: var(--text-2);
+  font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
-.program-load-table thead th:not(:first-child),
-.program-load-table td:not(:first-child) {
+.program-load-table thead th:not(:first-child) {
   text-align: center;
 }
 
-.program-load-table tbody tr:last-child th,
-.program-load-table tbody tr:last-child td {
+.program-load-table tbody tr:last-child > * {
   border-bottom: 0;
 }
 
 .program-load-table .active {
-  background: rgb(var(--accent-rgb) / 0.09);
+  background: rgb(var(--accent-rgb) / 0.1);
   color: var(--accent);
 }
 
 .program-load-table .program-load-day th {
-  padding-top: var(--sp-5);
+  padding-top: var(--sp-6);
   color: var(--text-2);
-  font-size: var(--fs-2);
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
 .program-load-note {
+  margin-left: var(--sp-8);
   color: var(--text-3);
   font-size: var(--fs-2);
-}
-
-/* Rail de la semaine : quatre créneaux, état explicite.
-   Deux colonnes et non trois : mesuré à 390 px, trois créneaux de 109 px
-   laissaient le quatrième seul sur une rangée à lui, étiré à 67 px parce que son
-   intitulé passait à la ligne. Deux par deux, chaque créneau garde sa place et
-   la hauteur est régulière. */
-.week-rail {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--sp-4);
-}
-
-.week-slot {
-  display: grid;
-  gap: var(--sp-2);
-  min-height: 56px;
-  padding: var(--sp-5) var(--sp-5);
-  border: 1px solid var(--line);
-  border-radius: var(--r-md);
-  background: var(--surface-1);
-  text-align: left;
-  transition:
-    border-color var(--t-mid) var(--ease),
-    background var(--t-mid) var(--ease);
-}
-
-.week-slot:hover {
-  background: var(--surface-2);
-}
-
-.week-slot-name {
-  color: var(--text-1);
-  font-size: var(--fs-3);
-  font-weight: 560;
-  /* Un nom de séance passe à la ligne plutôt que d'être tronqué : la colonne
-     fait cent dix pixels et « Full Body A » n'y tient pas toujours avec son
-     badge de durée. */
-  overflow-wrap: anywhere;
-}
-
-.week-slot-state {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--sp-2);
-  color: var(--text-3);
-  font-size: var(--fs-2);
-  letter-spacing: 0.02em;
-}
-
-/* État actif : le seul créneau accentué du rail. */
-.week-slot.today {
-  border-color: rgb(var(--accent-rgb) / 0.45);
-  background: rgb(var(--accent-rgb) / 0.07);
-}
-
-.week-slot.today .week-slot-state {
-  color: var(--accent);
-  font-weight: 590;
-}
-
-.week-slot.done .week-slot-state {
-  color: var(--text-2);
-}
-
-.week-slot.done .week-slot-name {
-  color: var(--text-2);
-}
-
-.week-slot.upcoming {
-  border-style: dashed;
-}
-
-/* Métriques compactes : deux cellules basses, pas des cartes identiques. */
-.home-metrics {
-  display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  gap: var(--sp-4);
-}
-
-.home-metric {
-  display: grid;
-  gap: var(--sp-3);
-  align-content: start;
-  padding: var(--sp-6) var(--sp-7);
-  border: 1px solid var(--line);
-  border-radius: var(--r-md);
-  background: var(--surface-1);
-}
-
-.home-metric > span {
-  color: var(--text-3);
-  font-size: var(--fs-2);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.home-metric strong {
-  font-size: var(--fs-9);
-  line-height: 1;
-  letter-spacing: -0.03em;
-  font-variant-numeric: tabular-nums;
-}
-
-.home-metric strong small {
-  color: var(--text-2);
-  font-size: var(--fs-2);
-  font-weight: 500;
-}
-
-.home-metric.accent {
-  border-color: rgb(var(--accent-rgb) / 0.28);
-}
-
-.home-metric.accent strong {
-  color: var(--accent);
-}
-
-.home-metric-foot {
-  color: var(--text-3);
-  font-size: var(--fs-2);
-}
-
-.home-content .coach-note {
-  margin-top: 0;
 }
 
 /* ============================================================ HISTORIQUE === */
 
+.history-content,
+.progression-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+  padding-top: var(--sp-6);
+}
+
 .history-weeks {
   display: grid;
-  gap: var(--sp-11);
+  gap: var(--sp-10);
 }
 
 .history-week {
   display: grid;
-  gap: var(--sp-5);
+  gap: var(--sp-4);
 }
 
 .week-heading {
@@ -530,12 +550,16 @@
   align-items: baseline;
   justify-content: space-between;
   gap: var(--sp-6);
+  padding: 0 var(--sp-8);
 }
 
 .week-heading h2 {
   margin: 0;
-  font-size: var(--fs-6);
-  letter-spacing: -0.01em;
+  color: var(--text-2);
+  font-size: var(--fs-2);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .week-heading span {
@@ -543,19 +567,28 @@
   font-size: var(--fs-2);
 }
 
-.history-row {
+/* Liste groupée : un seul conteneur, des filets entre les lignes. */
+.history-content .history-list {
+  gap: 0;
+  border-radius: var(--r-2xl);
+  background: var(--carte-fond);
+  box-shadow: var(--carte-lisere);
+  overflow: hidden;
+}
+
+.app-shell .history-row {
   display: flex;
   align-items: center;
   gap: var(--sp-4);
   min-height: 56px;
-  padding: var(--sp-6) var(--sp-6) var(--sp-6) var(--sp-7);
-  border: 1px solid var(--line);
-  border-radius: var(--r-md);
-  background: var(--surface-1);
+  padding: var(--sp-5) var(--sp-4) var(--sp-5) var(--sp-8);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: inset 0 -1px 0 var(--separateur);
 }
 
-.history-row.in-progress {
-  border-style: dashed;
+.app-shell .history-row:last-child {
+  box-shadow: none;
 }
 
 .history-row-main {
@@ -566,13 +599,10 @@
 }
 
 .history-row-main strong {
-  font-size: var(--fs-4);
-  font-weight: 560;
-  /* Le libellé de séance doit rester lisible en entier : il passe à la ligne
-     plutôt que d'être tronqué par le bouton de suppression.
-     Les trois lignes de troncature qui suivaient ont été retirées : le
-     commentaire annonçait depuis un moment un comportement que le code
-     démentait, et « Full Body A » sortait bel et bien en « Full Bod… ». */
+  font-size: var(--fs-5);
+  font-weight: 590;
+  /* Le libellé de séance reste lisible en entier : il passe à la ligne
+     plutôt que d'être tronqué par le bouton de suppression. */
   overflow-wrap: anywhere;
 }
 
@@ -608,9 +638,12 @@
   flex: none;
 }
 
-/* État vide : compact, avec une action explicite. */
+/* État vide : compact, sans action cachée sous la barre d'onglets. */
 .empty-state {
   padding: var(--sp-13) var(--sp-8);
+  border-radius: var(--r-2xl);
+  background: var(--carte-fond);
+  box-shadow: var(--carte-lisere);
 }
 
 .empty-state p {
@@ -620,36 +653,24 @@
   line-height: 1.5;
 }
 
-.empty-cta {
-  margin-top: var(--sp-10);
-  min-height: 48px;
-}
-
 /* ============================================================ PROGRESSION == */
 
 .progression-duo-switcher {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-3);
-  width: min(100%, 20rem);
-  margin: 0 0 var(--sp-6);
-  padding: var(--sp-2);
-  border: 1px solid #ffffff12;
-  border-radius: var(--r-full);
-  background: #00000050;
+  align-self: center;
+  width: min(100%, 16rem);
 }
 
-.progression-duo-switcher .duo-pill-btn {
-  min-height: 32px;
-  padding: var(--sp-2) var(--sp-5);
+.progression-content .followup-cta {
+  margin: 0;
 }
 
-/* Rangée d'indicateurs compacts : une ligne dense, quatre valeurs. */
-.metric-strip {
+/* Tuiles de repères, à la manière de Santé : deux par rangée. */
+.app-shell .metric-strip {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--sp-4);
-  margin-top: var(--sp-10);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-5);
+  background: none;
+  box-shadow: none;
 }
 
 .metric-cell {
@@ -657,40 +678,30 @@
   gap: var(--sp-2);
   align-content: start;
   min-width: 0;
-  padding: var(--sp-4) var(--sp-5);
-  border: 0;
-  border-left: 1px solid var(--line);
-  border-radius: 0;
-  background: transparent;
-}
-
-.metric-cell:first-child {
-  border-left: 0;
+  padding: var(--sp-7) var(--sp-8);
+  border-radius: var(--r-xl);
+  background: var(--carte-fond);
+  box-shadow: var(--carte-lisere);
 }
 
 .metric-cell > span {
-  color: var(--text-3);
-  font-size: var(--fs-2);
+  color: var(--text-2);
+  font-size: var(--fs-3);
+  font-weight: 590;
   line-height: 1.25;
 }
 
 .metric-cell strong {
-  font-size: var(--fs-8);
+  font-size: var(--fs-10);
+  font-weight: 650;
   line-height: 1.1;
-  letter-spacing: -0.03em;
-  font-variant-numeric: tabular-nums;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
 }
 
 .metric-cell small {
   color: var(--text-3);
   font-size: var(--fs-2);
-}
-
-.metric-cell.accent {
-  border-color: var(--line);
 }
 
 .metric-cell.accent strong {
@@ -701,11 +712,8 @@
 .comparison-card {
   display: grid;
   gap: var(--sp-7);
-  margin-top: var(--sp-8);
-  padding: var(--sp-8);
-  border: 1px solid var(--line);
-  border-radius: var(--r-lg);
-  background: var(--surface-1);
+  padding: var(--sp-9);
+  border-radius: var(--r-2xl);
 }
 
 .comparison-card h2 {
@@ -716,10 +724,9 @@
   display: inline-flex;
   align-items: center;
   gap: var(--sp-2);
-  padding: var(--sp-2) var(--sp-4);
-  border: 1px solid var(--line);
+  padding: var(--sp-2) var(--sp-5);
   border-radius: var(--r-full);
-  background: var(--surface-2);
+  background: var(--remplissage);
   color: var(--text-2);
   font-size: var(--fs-2);
   font-weight: 590;
@@ -728,8 +735,8 @@
 }
 
 .trend-chip.up {
+  background: rgb(var(--accent-rgb) / 0.16);
   color: var(--accent);
-  border-color: rgb(var(--accent-rgb) / 0.35);
 }
 
 .comparison-grid {
@@ -742,9 +749,9 @@
   display: grid;
   gap: var(--sp-2);
   min-width: 0;
-  padding: var(--sp-6) var(--sp-6);
-  border-radius: var(--r-md);
-  background: var(--surface-2);
+  padding: var(--sp-6);
+  border-radius: var(--r-xl);
+  background: var(--carte-fond-2);
 }
 
 .comparison-item > span {
@@ -753,7 +760,8 @@
 }
 
 .comparison-item strong {
-  font-size: var(--fs-6);
+  font-family: var(--font-chiffres);
+  font-size: var(--fs-7);
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
 }
@@ -794,8 +802,10 @@
 /* Records par mouvement. */
 .records-list {
   display: grid;
-  gap: var(--sp-3);
-  margin-top: var(--sp-7);
+  margin-top: var(--sp-6);
+  border-radius: var(--r-xl);
+  background: var(--carte-fond-2);
+  overflow: hidden;
 }
 
 .record-row {
@@ -803,10 +813,12 @@
   align-items: center;
   gap: var(--sp-5);
   min-height: 48px;
-  padding: var(--sp-4) var(--sp-6);
-  border: 1px solid var(--line);
-  border-radius: var(--r-md);
-  background: var(--surface-2);
+  padding: var(--sp-4) var(--sp-7);
+  box-shadow: inset 0 -1px 0 var(--separateur);
+}
+
+.record-row:last-child {
+  box-shadow: none;
 }
 
 .record-rank {
@@ -815,8 +827,8 @@
   flex: none;
   width: 1.5rem;
   height: 1.5rem;
-  border-radius: var(--r-sm);
-  background: var(--surface-0);
+  border-radius: var(--r-full);
+  background: var(--remplissage);
   color: var(--text-3);
   font-size: var(--fs-2);
   font-weight: 590;
@@ -971,16 +983,16 @@
 
 .settings-section {
   display: grid;
-  gap: var(--sp-5);
-  margin-top: var(--sp-11);
+  gap: var(--sp-3);
+  margin-top: var(--sp-10);
 }
 
 .settings-title {
-  margin: 0;
-  color: var(--text-3);
+  margin: 0 0 0 var(--sp-8);
+  color: var(--text-2);
   font-size: var(--fs-2);
-  font-weight: 800;
-  letter-spacing: 0.16em;
+  font-weight: 600;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
@@ -988,12 +1000,71 @@
   margin-top: 0;
 }
 
-.settings-section-intro {
-  max-width: 42rem;
-  margin: var(--sp-3) 0 0;
+/* En-tête du profil : avatar et nom sur une ligne, changement de profil sur la
+   suivante. À côté du nom, le bouton écrasait « Ottman » sur deux lignes à 390 px. */
+.profil-tete {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-7);
+  padding: var(--sp-8);
+  border-radius: var(--r-2xl);
+  background: var(--carte-fond);
+  box-shadow: var(--carte-lisere);
+}
+
+.profil-tete > button {
+  flex: 1 0 100%;
+}
+
+.profil-tete .avatar {
+  flex: none;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--r-full);
+  font-size: var(--fs-9);
+}
+
+.profil-tete > div {
+  display: grid;
+  flex: 1;
+  gap: var(--sp-1);
+  min-width: 0;
+}
+
+.profil-tete strong {
+  font-size: var(--fs-8);
+  font-weight: 650;
+}
+
+.profil-tete small {
   color: var(--text-2);
   font-size: var(--fs-3);
-  line-height: 1.45;
+}
+
+/* Ligne d'information, sans action : même anatomie qu'une ligne bouton de
+   la liste, titre au-dessus, détail dessous. */
+.settings-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-6);
+}
+
+.settings-list .settings-row {
+  padding: var(--sp-8);
+}
+
+.settings-row > :first-child {
+  display: grid;
+  flex: 1;
+  gap: var(--sp-2);
+  min-width: 0;
+}
+
+.error-log-actions {
+  display: flex;
+  flex: none;
+  gap: var(--sp-2);
 }
 
 .manual-loads-list {
@@ -1004,10 +1075,10 @@
 .manual-load-card {
   display: grid;
   gap: var(--sp-5);
-  padding: var(--sp-6);
-  border: 1px solid var(--line);
-  border-radius: var(--r-lg);
-  background: var(--surface-1);
+  padding: var(--sp-7) var(--sp-8);
+  border-radius: var(--r-2xl);
+  background: var(--carte-fond);
+  box-shadow: var(--carte-lisere);
 }
 
 .manual-load-card-head {
@@ -1017,9 +1088,18 @@
   gap: var(--sp-4);
 }
 
+/* Le texte cède la place, le bouton garde son mot entier : sans ces deux
+   règles, « Copier » se coupait en « Cop / ier » à 390 px. */
 .manual-load-card-head > div {
   display: grid;
+  flex: 1;
   gap: var(--sp-1);
+  min-width: 0;
+}
+
+.manual-load-card-head > button {
+  flex: none;
+  white-space: nowrap;
 }
 
 .manual-load-card-head small {
@@ -1027,10 +1107,19 @@
   font-size: var(--fs-2);
 }
 
+/* Huit semaines : deux rangées de quatre (S1-S4, S5-S8) sur téléphone, une
+   seule rangée dès que la largeur le permet. À cinq colonnes, chaque champ
+   faisait 60 px et coupait « 110 kg » en « 110 k ». */
 .manual-load-grid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: var(--sp-3);
+}
+
+@media (min-width: 701px) {
+  .manual-load-grid {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+  }
 }
 
 .manual-load-grid label {
@@ -1042,17 +1131,33 @@
   text-transform: uppercase;
 }
 
+/* 16 px : en dessous, Safari iOS zoome la page au focus du champ. */
 .manual-load-grid input {
   width: 100%;
   min-width: 0;
-  min-height: 42px;
-  padding: 0 var(--sp-3);
-  border: 1px solid var(--line-strong);
+  min-height: 44px;
+  padding: 0 var(--sp-2);
+  border: 0;
   border-radius: var(--r-md);
-  background: var(--surface-0);
+  background: var(--carte-fond-2);
   color: var(--text-1);
   font: inherit;
+  font-family: var(--font-chiffres);
+  font-size: var(--fs-6);
+  font-weight: 500;
   font-variant-numeric: tabular-nums;
+  text-align: center;
+  text-transform: none;
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+/* Le sélecteur de Chromium réserve sa largeur même invisible : il mangeait
+   le quart du champ. La saisie au clavier numérique suffit. */
+.manual-load-grid input::-webkit-inner-spin-button,
+.manual-load-grid input::-webkit-outer-spin-button {
+  margin: 0;
+  appearance: none;
 }
 
 .manual-load-grid input:focus {
@@ -1152,19 +1257,104 @@
   color: var(--accent);
 }
 
-/* Choix du profil : statut de la semaine, information secondaire. */
+/* Choix du profil : accueil sobre, deux grandes cartes de verre. */
+.profile-card {
+  display: grid;
+  justify-items: center;
+  gap: var(--sp-6);
+  text-align: center;
+}
+
+.profile-card .brand-mark {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  border-radius: var(--r-2xl);
+  background: var(--carte-fond);
+  box-shadow: var(--carte-lisere);
+  color: var(--accent);
+}
+
+.app-shell .profile-card h1 {
+  margin: var(--sp-4) 0 0;
+  font-size: var(--fs-titre);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.profile-card .intro {
+  margin: 0;
+  color: var(--text-2);
+  font-size: var(--fs-5);
+  line-height: 1.45;
+}
+
+.profile-load {
+  margin: 0;
+  color: var(--text-2);
+  font-size: var(--fs-4);
+}
+
+.profile-card .profile-actions {
+  width: 100%;
+  margin-top: var(--sp-8);
+  gap: var(--sp-6);
+}
+
+.app-shell .profile-choice {
+  min-height: 88px;
+  padding: var(--sp-8) var(--sp-9);
+  color: var(--text-1);
+}
+
+.profile-choice-ottman {
+  background: radial-gradient(90% 120% at 0% 50%, rgb(var(--accent-rgb) / 0.16), transparent 70%), var(--carte-fond);
+}
+
+.profile-choice-laura {
+  background: radial-gradient(90% 120% at 0% 50%, rgb(255 143 177 / 0.16), transparent 70%), var(--carte-fond);
+}
+
+.profile-choice .avatar {
+  flex: none;
+  width: 52px;
+  height: 52px;
+  border-radius: var(--r-full);
+  font-size: var(--fs-8);
+}
+
+.profile-choice strong {
+  font-size: var(--fs-7);
+  font-weight: 650;
+}
+
+.profile-choice > svg {
+  color: var(--text-3);
+}
+
 .profile-week {
   color: var(--text-3);
+}
+
+.privacy-note {
+  margin: var(--sp-6) 0 0;
+  color: var(--text-3);
+  font-size: var(--fs-3);
 }
 
 /* ======================================================== ÉCRANS ÉTROITS === */
 
 @media (max-width: 430px) {
+  /* Pastille de 66 px à 320 px : la marge passe sur le nom seul, l'état
+     (« Aujourd'hui », 62 px) prend toute la largeur. */
   .week-slot {
-    padding: var(--sp-4) var(--sp-4);
+    padding: var(--sp-4) 0;
   }
 
   .week-slot-name {
+    padding-inline: var(--sp-4);
     font-size: var(--fs-2);
   }
 
@@ -1300,48 +1490,47 @@
 }
 
 .accent-choices {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--sp-4);
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--sp-2);
+  padding: var(--sp-7) var(--sp-4);
+  border-radius: var(--r-2xl);
+  background: var(--carte-fond);
+  box-shadow: var(--carte-lisere);
 }
 
 .accent-choice {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--sp-4);
+  display: grid;
+  justify-items: center;
+  gap: var(--sp-3);
   min-height: 44px;
-  padding: var(--sp-4) var(--sp-7) var(--sp-4) var(--sp-5);
-  border: 1px solid var(--line);
-  border-radius: var(--r-full);
-  background: var(--surface-1);
+  padding: var(--sp-2);
+  border: 0;
+  border-radius: var(--r-lg);
+  background: none;
   color: var(--text-2);
-  font-size: var(--fs-3);
-  font-weight: 600;
+  font-size: var(--fs-1);
+  font-weight: 590;
 }
 
 .accent-choice.on {
-  border-color: var(--accent);
   color: var(--text-1);
-  box-shadow:
-    0 0 0 1px var(--accent),
-    0 0 14px rgb(var(--accent-rgb) / 0.25);
 }
 
 .accent-dot {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  border: 1px solid rgb(255 255 255 / 0.18);
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--r-full);
+  color: rgb(0 0 0 / 0.78);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.18);
 }
 
-.accent-choice.on .accent-dot::after {
-  content: "";
-  display: block;
-  width: 8px;
-  height: 8px;
-  margin: var(--sp-3) auto 0;
-  border-radius: 50%;
-  background: var(--surface-0);
+.accent-choice.on .accent-dot {
+  box-shadow:
+    0 0 0 2px var(--surface-0),
+    0 0 0 4px currentColor;
 }
 
 /* --- Rappel de sauvegarde -------------------------------------------------
@@ -1351,21 +1540,22 @@
   display: flex;
   flex-direction: column;
   gap: var(--sp-6);
-  padding: var(--sp-7);
-  border: 1px solid rgb(246 193 119 / 0.4);
-  border-radius: var(--r-lg);
-  background: rgb(246 193 119 / 0.08);
+  padding: var(--sp-8);
+  border-radius: var(--r-2xl);
+  background: linear-gradient(rgb(246 193 119 / 0.1), rgb(246 193 119 / 0.1)), var(--carte-fond);
+  box-shadow: inset 0 0 0 1px rgb(246 193 119 / 0.3);
 }
 
 .backup-card strong {
   display: block;
   margin: var(--sp-1) 0 var(--sp-2);
-  font-size: var(--fs-5);
+  font-size: var(--fs-6);
+  font-weight: 650;
 }
 
 .backup-card small {
   color: var(--text-2);
-  font-size: var(--fs-2);
+  font-size: var(--fs-3);
 }
 
 .backup-actions {
@@ -1383,45 +1573,43 @@
    l'application. Aucune couleur d'alerte — une semaine manquée n'est pas une
    faute, c'est une semaine manquée. */
 .streak-card {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-5);
-  padding: var(--sp-7);
-  border: 1px solid var(--line);
-  border-radius: var(--r-lg);
-  background: var(--surface-1);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--sp-1) var(--sp-6);
+  padding: var(--sp-7) var(--sp-8);
+  border-radius: var(--r-2xl);
+  background: var(--carte-fond);
+  box-shadow: var(--carte-lisere);
 }
 
-.streak-head strong {
-  display: block;
-  margin-top: var(--sp-1);
-  font-size: var(--fs-6);
+.streak-card strong {
+  font-size: var(--fs-5);
+  font-weight: 650;
+}
+
+.streak-card small {
+  grid-row: 2;
+  color: var(--text-2);
+  font-size: var(--fs-2);
 }
 
 .streak-weeks {
   display: flex;
-  gap: var(--sp-3);
+  grid-row: 1 / span 2;
+  grid-column: 2;
+  gap: var(--sp-2);
 }
 
 .streak-weeks i {
-  display: grid;
-  place-items: center;
-  width: 26px;
-  height: 26px;
-  border: 1px solid var(--line);
-  border-radius: var(--r-sm);
-  background: var(--surface-2);
-  color: var(--accent-ink);
+  width: 10px;
+  height: 10px;
+  border-radius: var(--r-full);
+  background: var(--remplissage);
 }
 
 .streak-weeks i.fait {
-  border-color: var(--accent);
   background: var(--accent);
-}
-
-.streak-card small {
-  color: var(--text-3);
-  font-size: var(--fs-1);
 }
 
 /* ---------------------------------------------------------------------------
@@ -1433,10 +1621,10 @@
 .skeleton-card {
   display: grid;
   gap: var(--sp-4);
-  padding: var(--sp-8);
-  border: 1px solid var(--line);
-  border-radius: var(--r-lg);
-  background: var(--surface-1);
+  padding: var(--sp-10);
+  border-radius: var(--r-2xl);
+  background: var(--carte-fond);
+  box-shadow: var(--carte-lisere);
 }
 
 .skeleton-line {

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { SessionTimerState } from '../../domain/types';
 import { type CountdownController, createCountdown } from '../../workout/timer';
 import { getTimerAnnouncement } from '../../workout/timerAnnouncements';
-import { Play, Repeat, X } from '../ui/Icons';
+import { Pause, Play, Repeat, X } from '../ui/Icons';
 import { formatDuration } from './RestTimer';
 
 interface ExerciseTimerProps {
@@ -178,47 +178,79 @@ export function ExerciseTimer({
     }
   };
 
+  // Anneau à la manière du minuteur d'iOS : il se vide avec le temps restant.
+  const rayon = 54;
+  const circonference = 2 * Math.PI * rayon;
+  const part = durationSeconds > 0 ? Math.min(1, Math.max(0, remaining / durationSeconds)) : 0;
+  const enCours = started && !paused && remaining > 0;
+
   return (
-    <div className={`exercise-timer ${remaining === 0 ? 'complete' : ''}`}>
+    <div className={`exercise-timer${remaining === 0 ? ' complete' : ''}`}>
       <span className="sr-only" role="status" aria-live="polite">
         {getTimerAnnouncement(remaining) ?? ''}
       </span>
-      <div>
-        <span className="eyebrow">COMPTEUR TEMPO</span>
-        <strong>{formatDuration(remaining)}</strong>
-        <small>
-          {remaining === 0
-            ? 'Temps terminé'
-            : suspended
-              ? 'En pause · écran masqué'
-              : !started
-                ? 'Prêt à démarrer'
-                : paused
-                  ? 'En pause'
-                  : 'En cours'}
-        </small>
+      <div className="tempo-anneau">
+        <svg viewBox="0 0 120 120" aria-hidden="true" focusable="false">
+          <circle className="tempo-anneau-fond" cx="60" cy="60" r={rayon} />
+          <circle
+            className="tempo-anneau-trace"
+            cx="60"
+            cy="60"
+            r={rayon}
+            strokeDasharray={circonference}
+            strokeDashoffset={circonference * (1 - part)}
+          />
+        </svg>
+        <div className="tempo-anneau-texte">
+          <span className="eyebrow">TEMPO</span>
+          <strong>{formatDuration(remaining)}</strong>
+          <small>
+            {remaining === 0
+              ? 'Temps terminé'
+              : suspended
+                ? 'En pause · écran masqué'
+                : !started
+                  ? 'Prêt à démarrer'
+                  : paused
+                    ? 'En pause'
+                    : 'En cours'}
+          </small>
+        </div>
       </div>
-      {/* Temps écoulé : « Passer » et « Démarrer » n'ont plus d'objet, on ne garde
-          qu'une action — et l'écran rend la place au bouton de validation. */}
+      {/* Deux boutons ronds côte à côte tant que le temps court. Écoulé, il ne
+          reste que « Recommencer », discret : « Valider la série » redevient la
+          seule action en avant. */}
       <div className={`timer-actions${remaining === 0 ? ' finished' : ''}`}>
         {remaining > 0 && (
           <button
             type="button"
             onClick={handleSkip}
             disabled={suspended}
-            className="skip-tempo-btn"
+            className="tempo-rond skip-tempo-btn"
             aria-label="Passer le tempo"
           >
-            <X size={15} /> Passer
+            <X size={22} />
+            <span>Passer</span>
           </button>
         )}
         {remaining > 0 && (
-          <button type="button" onClick={toggle} disabled={!running || suspended}>
-            <Play size={15} /> {!started ? 'Démarrer' : paused ? 'Reprendre' : 'Pause'}
+          <button
+            type="button"
+            className={`tempo-rond tempo-rond-principal${enCours ? ' en-cours' : ''}`}
+            onClick={toggle}
+            disabled={!running || suspended}
+          >
+            {enCours ? <Pause size={22} /> : <Play size={22} />}
+            <span>{!started ? 'Démarrer' : paused ? 'Reprendre' : 'Pause'}</span>
           </button>
         )}
-        <button type="button" onClick={() => setResetNonce((value) => value + 1)} disabled={suspended}>
-          <Repeat size={15} /> Recommencer
+        <button
+          type="button"
+          className="text-button tempo-recommencer"
+          onClick={() => setResetNonce((value) => value + 1)}
+          disabled={suspended}
+        >
+          <Repeat size={16} /> Recommencer
         </button>
       </div>
     </div>

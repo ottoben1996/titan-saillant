@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { type ComponentType, useState } from 'react';
 import type { WorkoutDay } from '../../domain/types';
-import { ArrowRight, Bolt, Clock, Feather, Leaf } from '../ui/Icons';
+import { Battery, Bolt, Check, Clock, type IconProps, Moon, Play } from '../ui/Icons';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '../ui/Sheet';
 
 export type EnergyLevel = 'high' | 'normal' | 'low';
 
@@ -11,74 +12,79 @@ interface EnergyCheckinModalProps {
   onSkip: () => void;
 }
 
+const OPTIONS: ReadonlyArray<{
+  level: EnergyLevel;
+  label: string;
+  detail: string;
+  Icon: ComponentType<IconProps>;
+}> = [
+  { level: 'high', label: 'Plein d’énergie', detail: 'Rythme soutenu, repos stricts du coach', Icon: Bolt },
+  { level: 'normal', label: 'Forme normale', detail: 'Temps de repos prescrits', Icon: Battery },
+  { level: 'low', label: 'Fatigue / récupération', detail: 'Repos allongés de 20 %', Icon: Moon },
+];
+
+/** Feuille du check-in d'énergie : un choix, une action. */
 export function EnergyCheckinModal({ day, profileName, onConfirm, onSkip }: EnergyCheckinModalProps) {
   const [selectedLevel, setSelectedLevel] = useState<EnergyLevel>('normal');
 
-  const handleStart = () => {
-    const multiplier = selectedLevel === 'low' ? 1.2 : 1.0;
-    onConfirm(selectedLevel, multiplier);
-  };
-
   return (
-    <div className="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="energy-checkin-title">
-      <div className="tutorial-modal energy-modal">
-        <p className="eyebrow">CHECK-IN D’ÉNERGIE · {profileName.toUpperCase()}</p>
-        <h2 id="energy-checkin-title">Comment te sens-tu aujourd’hui ?</h2>
-        <p id="energy-checkin-desc">
-          On adapte la séance à ta forme du jour pour que chaque répétition reste efficace et sans risque.
-        </p>
-
-        <div className="energy-choice-grid">
-          <button
-            type="button"
-            className={`energy-option ${selectedLevel === 'high' ? 'selected' : ''}`}
-            onClick={() => setSelectedLevel('high')}
-          >
-            <Bolt className="energy-icon" size={24} />
-            <strong>Plein d’énergie</strong>
-            <small>Rythme soutenu & repos stricts du coach</small>
+    // Pas de fermeture implicite (Échap, voile) : « Passer » est le seul moyen
+    // explicite de démarrer sans ajustement, comme avant.
+    <Sheet open onOpenChange={() => undefined}>
+      <SheetContent className="energy-sheet" showClose={false} aria-describedby="energy-checkin-desc">
+        <SheetHeader className="energy-sheet-head">
+          <SheetTitle id="energy-checkin-title">{'Comment te sens-tu aujourd’hui\u00A0?'}</SheetTitle>
+          <button type="button" className="text-button" onClick={onSkip} aria-label="Passer l’ajustement">
+            Passer
           </button>
+        </SheetHeader>
+        <SheetDescription id="energy-checkin-desc">
+          {day.name} · {profileName}. On adapte les repos à ta forme du jour.
+        </SheetDescription>
 
-          <button
-            type="button"
-            className={`energy-option ${selectedLevel === 'normal' ? 'selected' : ''}`}
-            onClick={() => setSelectedLevel('normal')}
-          >
-            <Feather className="energy-icon" size={24} />
-            <strong>Forme normale</strong>
-            <small>Temps de repos standards prescrits</small>
-          </button>
-
-          <button
-            type="button"
-            className={`energy-option ${selectedLevel === 'low' ? 'selected' : ''}`}
-            onClick={() => setSelectedLevel('low')}
-          >
-            <Leaf className="energy-icon" size={24} />
-            <strong>Fatigue / Récupération</strong>
-            <small>Repos allongés (+20%) pour garder un contrôle parfait</small>
-          </button>
+        <div className="energy-list" role="radiogroup" aria-label="Forme du jour">
+          {OPTIONS.map(({ level, label, detail, Icon }) => {
+            const choisi = selectedLevel === level;
+            return (
+              <button
+                key={level}
+                type="button"
+                role="radio"
+                aria-checked={choisi}
+                className={choisi ? 'energy-option selected' : 'energy-option'}
+                onClick={() => setSelectedLevel(level)}
+              >
+                <span className="energy-icon" aria-hidden="true">
+                  <Icon size={20} />
+                </span>
+                <span className="energy-text">
+                  <strong>{label}</strong>
+                  <small>{detail}</small>
+                </span>
+                <span className="energy-check" aria-hidden="true">
+                  {choisi ? <Check size={18} weight="bold" /> : null}
+                </span>
+              </button>
+            );
+          })}
         </div>
 
         {selectedLevel === 'low' && (
-          <div className="energy-notice">
-            <Clock size={16} />
-            <span>
-              Les temps de repos seront majorés de 20 % (par exemple, 120 s passent à 145 s) pour préserver ta
-              fraîcheur.
-            </span>
-          </div>
+          <p className="energy-notice">
+            <Clock size={16} aria-hidden="true" />
+            <span>Par exemple, 120 s de repos passent à 145 s pour préserver ta fraîcheur.</span>
+          </p>
         )}
 
-        <div className="exit-actions" style={{ marginTop: '1.25rem' }}>
-          <button type="button" className="primary-button full" onClick={handleStart}>
-            Démarrer {day.name} <ArrowRight size={18} />
-          </button>
-          <button type="button" className="secondary-button full" onClick={onSkip}>
-            Démarrer directement sans ajustement
-          </button>
-        </div>
-      </div>
-    </div>
+        <button
+          type="button"
+          className="primary-button full"
+          onClick={() => onConfirm(selectedLevel, selectedLevel === 'low' ? 1.2 : 1.0)}
+          aria-label={`Commencer ${day.name}`}
+        >
+          <Play size={18} weight="fill" /> Commencer
+        </button>
+      </SheetContent>
+    </Sheet>
   );
 }

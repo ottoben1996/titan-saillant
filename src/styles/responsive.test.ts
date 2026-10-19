@@ -16,15 +16,13 @@ describe('système responsive premium', () => {
   });
 
   it('ne remet pas la validation en position statique', () => {
-    expect(`${root}\n${mobile}\n${matiere}\n${workout}`).not.toMatch(
-      /\.action-bar[^{}]*\{[^}]*position:\s*static/,
-    );
+    expect(`${root}\n${mobile}\n${matiere}\n${workout}`).not.toMatch(/\.action-bar[^{}]*\{[^}]*position:\s*static/);
     expect(mobile).toMatch(/\.workout-content \.primary-button\.full\.action-bar\s*\{[^}]*position:\s*sticky/);
   });
 
   it('protège le fond de page contre un degrade derrière du texte', () => {
     const body = root.match(/body[\s\S]*?\{[^}]*\}/)?.[0] ?? '';
-    expect(body).toContain('background: #0b0f0e');
+    expect(body).toContain('background: var(--surface-0)');
     expect(body).not.toMatch(/background:\s*[^;]*(?:gradient|radial|linear)/i);
   });
 

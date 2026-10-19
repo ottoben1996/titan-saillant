@@ -1,14 +1,23 @@
 import { useEffect, useState } from 'react';
 import { getProgram } from '../../domain/programs';
-import type { ExercisePrescription, ManualDurationOverrides, ManualLoadOverrides, ProfileId } from '../../domain/types';
+import type {
+  ExercisePrescription,
+  ManualDurationOverrides,
+  ManualLoadOverrides,
+  ProfileId,
+  WorkoutPlan,
+} from '../../domain/types';
 import { formatLoadKg } from '../../workout/summary';
-import { ArrowLeft } from '../ui/Icons';
+import { ProgramLoadCard } from '../ProgramLoadCard';
 
 interface LoadsScreenProps {
   profile: ProfileId;
   manualLoads: ManualLoadOverrides;
   manualDurations: ManualDurationOverrides;
-  onBack: () => void;
+  /** Programme d'origine : les charges prescrites affichées en tête d'écran. */
+  prescribedProgram: WorkoutPlan;
+  programWeek: number;
+  onProgramWeekChange: (week: number) => void;
   onNotice: (notice: string) => void;
   onSave: (loads: ManualLoadOverrides) => Promise<void> | void;
   onSaveDurations: (durations: ManualDurationOverrides) => Promise<void> | void;
@@ -18,7 +27,9 @@ export function LoadsScreen({
   profile,
   manualLoads,
   manualDurations,
-  onBack,
+  prescribedProgram,
+  programWeek,
+  onProgramWeekChange,
   onNotice,
   onSave,
   onSaveDurations,
@@ -118,20 +129,18 @@ export function LoadsScreen({
   const prescribedDuration = (exercise: ExercisePrescription) => exercise.sets[0]?.durationSeconds ?? 0;
 
   return (
-    <section className="content">
-      <div className="page-heading">
-        <div>
-          <p className="eyebrow">RÉGLAGE DES EXERCICES</p>
-          <h1>Mes charges</h1>
-        </div>
-        <button className="text-button" onClick={onBack} type="button">
-          <ArrowLeft size={16} /> Retour
-        </button>
+    <section className="content loads-content">
+      <header className="large-title">
+        <h1>Programme</h1>
+      </header>
+      <ProgramLoadCard program={prescribedProgram} week={programWeek} onWeekChange={onProgramWeekChange} />
+      <div className="program-load-head">
+        <h2 className="section-title">Mes charges</h2>
+        <p>
+          Modifie ici les charges et les durées de chaque exercice, y compris les semaines S6 à S8. Les prescriptions
+          originales et ton historique restent conservés.
+        </p>
       </div>
-      <p className="settings-section-intro">
-        Modifie ici les charges et les durées de chaque exercice, y compris les semaines S6 à S8. Les prescriptions
-        originales et ton historique restent conservés.
-      </p>
       <div className="manual-load-card week-copy-card">
         <div className="manual-load-card-head">
           <div>

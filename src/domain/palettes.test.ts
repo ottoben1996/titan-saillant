@@ -2,13 +2,13 @@ import { describe, expect, it } from 'vitest';
 import { accentDe, accentIds, accentParDefaut, accents, contraste, estAccent } from './palettes';
 
 /** Fond sombre de l'application : la couleur doit ressortir dessus. */
-const FOND = '#101615';
+const FOND = '#08090B';
 
 describe('couleurs proposées', () => {
-  it('en propose cinq, vert, rose, bleu, ambre et turquoise', () => {
+  it('en propose cinq, lime, lilas, azur, ambre et menthe', () => {
     expect(accents).toHaveLength(5);
     expect(accentIds).toEqual(['vert', 'rose', 'bleu', 'ambre', 'turquoise']);
-    expect(accents.map((accent) => accent.label)).toEqual(['Vert', 'Rose', 'Bleu', 'Ambre', 'Turquoise']);
+    expect(accents.map((accent) => accent.label)).toEqual(['Lime', 'Lilas', 'Azur', 'Ambre', 'Menthe']);
   });
 
   it('chacune est unique', () => {
@@ -37,7 +37,7 @@ describe('couleurs proposées', () => {
     expect(accentDe('bleu', 'laura').id).toBe('bleu');
     // Une valeur abîmée dans le stockage ne doit pas casser l'affichage.
     expect(accentDe('fuchsia' as never, 'laura').id).toBe('rose');
-    expect(accentDe(undefined, 'ottman').accent).toBe('#B8F36B');
+    expect(accentDe(undefined, 'ottman').accent).toBe('#A8F04A');
   });
 
   it('reconnaît ses propres identifiants, et rien d’autre', () => {

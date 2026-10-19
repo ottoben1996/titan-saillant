@@ -3,10 +3,10 @@ import { equipmentAlternatives } from '../../domain/alternatives';
 import { getProgram } from '../../domain/programs';
 import { tutorials } from '../../domain/tutorials';
 import type { ProfileId, SessionTimerState, WorkoutDay, WorkoutSession } from '../../domain/types';
+import { getExerciseRecommendation } from '../../workout/coaching';
 import { calculatePlateDelta } from '../../workout/duoManager';
 import { etiquettePalier, paliersDeCharge } from '../../workout/loadSteps';
 import { computeProgressiveOverload, demandeAllegement } from '../../workout/progressionEngine';
-import { getExerciseRecommendation } from '../../workout/coaching';
 import { estReporte, getNextStep, getWorkoutExercises, getWorkoutSteps } from '../../workout/runner';
 import { parseSafeFloat, parseSafeInt } from '../../workout/sanitizer';
 import { formatLoadKg } from '../../workout/summary';
@@ -15,8 +15,24 @@ import { ImpossibleSheet } from '../modals/ImpossibleSheet';
 import { SessionPlanSheet } from '../modals/SessionPlanSheet';
 import { ExerciseTimer } from '../timers/ExerciseTimer';
 import { formatDuration, RestTimer } from '../timers/RestTimer';
-import { ArrowRight, Barbell, Bolt, Check, Clock, List, Repeat, Undo, Video } from '../ui/Icons';
+import {
+  ArrowRight,
+  Barbell,
+  Bolt,
+  Check,
+  ChevronDown,
+  ChevronRight,
+  Clock,
+  Ellipsis,
+  List,
+  Minus,
+  Plus,
+  Repeat,
+  Undo,
+  Video,
+} from '../ui/Icons';
 import { PlateBadge } from '../ui/PlateBadge';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '../ui/Sheet';
 import { CompletionFeedback } from './CompletionFeedback';
 
 function findGhostPerformance(
@@ -176,9 +192,10 @@ export function WorkoutScreen({
   const [loadDirty, setLoadDirty] = useState(false);
   const [durationDirty, setDurationDirty] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [advancedInputsOpen, setAdvancedInputsOpen] = useState(true);
-  const advancedInputsRef = useRef<HTMLDivElement>(null);
-  const advancedInputsWasOpenRef = useRef(advancedInputsOpen);
+  // Le chemin rapide d'abord : les paliers fins restent derrière « Réglages fins ».
+  const [advancedInputsOpen, setAdvancedInputsOpen] = useState(false);
+  /** Série tout juste validée, annulable quelques secondes depuis la pastille. */
+  const [annulable, setAnnulable] = useState<{ numero: number; id: number } | null>(null);
 
   const isComplete = step.kind === 'complete';
   const [elapsedSeconds, setElapsedSeconds] = useState(() =>
@@ -206,14 +223,8 @@ export function WorkoutScreen({
    */
   const reporte = estReporte(session, day);
 
-
   useEffect(() => {
-    if (advancedInputsOpen && !advancedInputsWasOpenRef.current) advancedInputsRef.current?.querySelector<HTMLInputElement>('input')?.focus();
-    advancedInputsWasOpenRef.current = advancedInputsOpen;
-  }, [advancedInputsOpen]);
-
-  useEffect(() => {
-    setAdvancedInputsOpen(true);
+    setAdvancedInputsOpen(false);
     setTempoSkipped(false);
     setReps(prescription?.repetitions?.toString() ?? '');
     const suggestedAltLoad = activeAlternative?.suggestedLoadKg?.(prescription?.loadKg);
@@ -232,6 +243,12 @@ export function WorkoutScreen({
     const interval = window.setInterval(update, 1000);
     return () => window.clearInterval(interval);
   }, [isComplete, session.startedAt]);
+
+  useEffect(() => {
+    if (!annulable) return;
+    const minuterie = window.setTimeout(() => setAnnulable(null), 5000);
+    return () => window.clearTimeout(minuterie);
+  }, [annulable]);
 
   const phaseLabel =
     exercise?.kind === 'warmup'
@@ -284,9 +301,10 @@ export function WorkoutScreen({
 
   const handleCompleteSet = async () => {
     if (isSubmittingRef.current || isSubmitting) return;
-    if (reps.trim() !== '' && parseSafeInt(reps, Number.NaN, 0, 200) !== parseSafeInt(reps, Number.NaN, 0, 200)) return;
-    if (load.trim() !== '' && parseSafeFloat(load, Number.NaN, 0, 600) !== parseSafeFloat(load, Number.NaN, 0, 600)) return;
-    if (duration.trim() !== '' && parseSafeInt(duration, Number.NaN, 0, 3600) !== parseSafeInt(duration, Number.NaN, 0, 3600)) return;
+    if (reps.trim() !== '' && Number.isNaN(parseSafeInt(reps, Number.NaN, 0, 200))) return;
+    if (load.trim() !== '' && Number.isNaN(parseSafeFloat(load, Number.NaN, 0, 600))) return;
+    if (duration.trim() !== '' && Number.isNaN(parseSafeInt(duration, Number.NaN, 0, 3600))) return;
+    const numeroValide = (step.setIndex ?? 0) + 1;
     isSubmittingRef.current = true;
     setIsSubmitting(true);
     triggerHaptic(45);
@@ -299,6 +317,7 @@ export function WorkoutScreen({
         durationSeconds: duration.trim() !== '' ? parseSafeInt(duration, undefined, 0, 3600) : undefined,
         loadKg: load.trim() !== '' ? parseSafeFloat(load, undefined, 0, 600) : undefined,
       });
+      setAnnulable({ numero: numeroValide, id: Date.now() });
     } finally {
       window.setTimeout(() => {
         isSubmittingRef.current = false;
@@ -307,12 +326,17 @@ export function WorkoutScreen({
     }
   };
 
-
   const completedInDay = session.loggedSets.length;
   const totalSets = steps.length;
   const progress = Math.round((completedInDay / totalSets) * 100);
   const nextStep = steps[(step.sequenceIndex ?? completedInDay) + 1];
   const nextExercise = nextStep?.exerciseIndex === undefined ? null : exercises[nextStep.exerciseIndex];
+  // Même mouvement à l'étape suivante (bosu ×3) : nommer l'exercice qu'on fait
+  // déjà se lisait comme une erreur. On annonce alors la série qui vient.
+  const nextLabel =
+    nextStep && nextStep.exerciseIndex === step.exerciseIndex && nextStep.setIndex !== undefined
+      ? `série ${nextStep.setIndex + 1}`
+      : (nextExercise?.name ?? 'fin de séance');
   const activeTimer = session.activeTimer;
   const matchingTimer =
     activeTimer && activeTimer.exerciseId === exercise?.id && activeTimer.setIndex === step.setIndex
@@ -335,7 +359,8 @@ export function WorkoutScreen({
     [exercise?.id, step.setIndex, history],
   );
   const recommendation = useMemo(
-    () => (exercise && !activeAlternative ? getExerciseRecommendation(exercise, history, { profileId: profile }) : null),
+    () =>
+      exercise && !activeAlternative ? getExerciseRecommendation(exercise, history, { profileId: profile }) : null,
     [exercise, history, profile, activeAlternative],
   );
   useEffect(() => {
@@ -366,6 +391,13 @@ export function WorkoutScreen({
   const [planOpen, setPlanOpen] = useState(false);
   /** Ouverte par « Je ne peux pas faire cet exercice » : les trois issues. */
   const [impossibleOpen, setImpossibleOpen] = useState(false);
+  /** Menu « Plus d'options » : les actions secondaires, hors de la trajectoire du pouce. */
+  const [menuOpen, setMenuOpen] = useState(false);
+  // Le menu se referme avant d'agir : l'action ouvre une autre feuille ou change d'écran.
+  const choisirOption = (action: () => void) => () => {
+    setMenuOpen(false);
+    action();
+  };
 
   const partnerProfile: ProfileId | null = profile ? (profile === 'ottman' ? 'laura' : 'ottman') : null;
   const partnerDelta = useMemo(() => {
@@ -392,44 +424,43 @@ export function WorkoutScreen({
   return (
     <section className="content workout-content">
       <div className="workout-heading">
-        <div>
-          {/* Le nom du créneau ne tient pas ici : à 390 px, « FULL BODY A ·
-              ÉCHAUFFEMENT » se coupait sur deux lignes et poussait le titre de
-              l'exercice sur deux autres. Le créneau est déjà dit sur l'accueil,
-              où il sert à choisir — ici c'est la phase qui compte. */}
+        {/* En-tête minimal : la phase, le nom entier, la progression, et un seul
+            bouton pour tout le reste. Les trois pastilles d'action passaient sur
+            deux lignes à 390 px, au-dessus de la prescription. */}
+        <div className="workout-heading-ligne">
           <p className="eyebrow">{phaseLabel}</p>
-          <h1>{activeAlternative ? activeAlternative.name : exercise?.name}</h1>
-          {activeAlternative && (
-            <div className="alternative-active-badge">
-              <span>Alternative active (original : {exercise?.name})</span>
-              {onRevertAlternative && (
-                <button type="button" className="revert-alt-btn" onClick={() => onRevertAlternative(exercise!.id)}>
-                  <Undo size={13} /> Revenir à la machine
-                </button>
-              )}
-            </div>
-          )}
-        </div>
-        <div className="workout-status">
           <span className="session-elapsed">
-            <Clock size={14} /> Total {formatDuration(elapsedSeconds)}
+            <Clock size={13} />
+            <span className="sr-only">Durée de la séance</span>
+            {formatDuration(elapsedSeconds)}
           </span>
           <button
             type="button"
-            className="progress-pill progress-pill-action"
-            onClick={() => setPlanOpen(true)}
-            aria-label={`Voir la liste des exercices de la séance (${completedInDay + 1} sur ${totalSets})`}
+            className="icon-button workout-menu-btn"
+            aria-label="Plus d’options"
+            onClick={() => setMenuOpen(true)}
           >
-            <List size={14} />
-            {completedInDay + 1} / {totalSets}
+            <Ellipsis size={22} />
           </button>
         </div>
+        <h1>{activeAlternative ? activeAlternative.name : exercise?.name}</h1>
+        {activeAlternative && (
+          <p className="alternative-active-badge">{`Alternative active · original\u00a0: ${exercise?.name ?? ''}`}</p>
+        )}
+        <button type="button" className="workout-progress" onClick={() => setPlanOpen(true)}>
+          <span className="workout-progress-texte">
+            Exercice {(step.exerciseIndex ?? exercises.length - 1) + 1} sur {exercises.length}
+            <span className="sr-only"> · voir la liste des exercices</span>
+          </span>
+          <span className="progress-track" aria-hidden="true">
+            <i style={{ width: `${progress}%` }} />
+          </span>
+        </button>
       </div>
 
       {/* Le profil ne se change plus pendant la séance : le sélecteur vivait à
           quelques pixels sous le titre de l'exercice, dans la trajectoire du
           pouce — un appui de travers changeait d'espace au milieu d'une série.
-          Il reste sur l'accueil (« Changer de profil ») et dans Réglages.
           Le repère « Vers Laura » demeure : c'est une consigne du coach, pas une
           commande, et il ne change rien à l'espace où l'on s'entraîne. */}
       {partnerDelta && partnerDelta.action !== 'keep' && (
@@ -442,58 +473,33 @@ export function WorkoutScreen({
         </div>
       )}
 
-      <div className="progress-track large">
-        <i style={{ width: `${progress}%` }} />
-      </div>
-
       {exercise && prescription && (
         <>
-          {/* FIGÉ EN HAUT : le temps est ce qu'on lit de loin, téléphone au sol.
-              Deux éléments figés seulement dans cet écran, celui-ci et la barre
-              de validation en bas ; tout le reste défile entre les deux. */}
+          {/* Le tempo défile avec la page. Figé en haut, son anneau et ses deux
+              boutons occupaient environ 330 px sur 844, en plus de la barre de
+              validation : la consigne passait dessous, à moitié cachée. Il est
+              en tête de colonne, donc visible dès l'arrivée sur la série. */}
           {prescription.durationSeconds && !resting ? (
-            <div className="tempo-band">
-              <ExerciseTimer
-                key={`${exercise.id}-${step.setIndex}`}
-                exerciseId={exercise.id}
-                setIndex={step.setIndex!}
-                durationSeconds={duration.trim() !== '' ? parseSafeInt(duration, prescription.durationSeconds, 0, 3600) : prescription.durationSeconds}
-                initialState={matchingTimer?.kind === 'tempo' ? matchingTimer : undefined}
-                suspended={timerSuspended}
-                onStateChange={onTimerStateChange}
-                onDone={() => {
-                  setTempoSkipped(true);
-                  onTimerDone('tempo');
-                }}
-                onSkip={() => setTempoSkipped(true)}
-                restartNonce={timerRestartNonce}
-              />
-            </div>
+            <ExerciseTimer
+              key={`${exercise.id}-${step.setIndex}`}
+              exerciseId={exercise.id}
+              setIndex={step.setIndex!}
+              durationSeconds={
+                duration.trim() !== ''
+                  ? parseSafeInt(duration, prescription.durationSeconds, 0, 3600)
+                  : prescription.durationSeconds
+              }
+              initialState={matchingTimer?.kind === 'tempo' ? matchingTimer : undefined}
+              suspended={timerSuspended}
+              onStateChange={onTimerStateChange}
+              onDone={() => {
+                setTempoSkipped(true);
+                onTimerDone('tempo');
+              }}
+              onSkip={() => setTempoSkipped(true)}
+              restartNonce={timerRestartNonce}
+            />
           ) : null}
-
-          {/* Rangée d'actions secondaires : toujours rendue, parce que « passer cet
-              exercice » doit exister surtout pour les huit mouvements sans
-              alternative — c'est là qu'une machine occupée bloquait la séance. */}
-          <div className="workout-actions">
-            {tutorials[exercise.id] && (
-              <button type="button" className="tutorial-link" onClick={() => onTutorial(exercise.id)}>
-                <Video size={18} /> Tutoriel
-              </button>
-            )}
-            {session.loggedSets.length > 0 && (
-              <button type="button" className="alternative-link" onClick={onUndoSet}>
-                <Undo size={18} /> Annuler la dernière série
-              </button>
-            )}
-            {/* Une entrée, trois issues — au lieu de trois pastilles voisines dont
-                deux menaient à des résultats opposés (décaler ou abandonner).
-                Mesuré à 390 px : les trois occupaient 144 px sur trois rangées. */}
-            {exercise?.kind !== 'cooldown' && (
-              <button type="button" className="alternative-link" onClick={() => setImpossibleOpen(true)}>
-                <Barbell size={18} /> Je ne peux pas faire cet exercice
-              </button>
-            )}
-          </div>
 
           <div className={`prescription-card compact${resting ? ' repose' : ''}`}>
             {/* Décision A du 6 octobre : pendant le repos, la carte de la série
@@ -539,51 +545,66 @@ export function WorkoutScreen({
               )}
             </div>
 
-
             {/* Calculateur de disques par côté avec tare automatique */}
             {prescription.loadKg !== undefined && prescription.loadKg >= 20 && !activeAlternative && (
               <PlateBadge totalLoadKg={currentLoadVal || prescription.loadKg} exerciseId={exercise.id} />
             )}
 
-            {recommendation && prescription.phase !== 'warmup' && !recommendationDismissed && (
-              <div className="coaching-recommendation" role="region" aria-label="Recommandation du coach">
-                <div className="coaching-recommendation-copy">
-                  <strong>
-                    {recommendation.action === 'increase'
-                      ? 'Progression possible'
-                      : recommendation.action === 'reduce'
-                        ? 'Priorité à la sécurité'
-                        : 'Prescription à conserver'}
-                  </strong>
-                  <span>{recommendation.reason}</span>
-                  <small>
-                    Confiance : {recommendation.confidence === 'high' ? 'élevée' : recommendation.confidence === 'medium' ? 'moyenne' : 'prudente'}
-                  </small>
+            {/* Rendue seulement quand elle propose un changement : « garder la
+                prescription » prenait 180 px pour ne rien proposer. */}
+            {recommendation &&
+              recommendation.action !== 'maintain' &&
+              prescription.phase !== 'warmup' &&
+              !recommendationDismissed && (
+                <div className="coaching-recommendation" role="region" aria-label="Recommandation du coach">
+                  <div className="coaching-recommendation-copy">
+                    <strong>
+                      {recommendation.action === 'increase'
+                        ? 'Progression possible'
+                        : recommendation.action === 'reduce'
+                          ? 'Priorité à la sécurité'
+                          : 'Prescription à conserver'}
+                    </strong>
+                    <span>{recommendation.reason}</span>
+                    <small>
+                      Confiance{'\u00a0'}:{' '}
+                      {recommendation.confidence === 'high'
+                        ? 'élevée'
+                        : recommendation.confidence === 'medium'
+                          ? 'moyenne'
+                          : 'prudente'}
+                    </small>
+                  </div>
+                  <div className="coaching-recommendation-actions">
+                    {recommendation.action === 'increase' &&
+                      (recommendation.suggestedLoadKg !== undefined ||
+                        recommendation.suggestedDurationSeconds !== undefined) && (
+                        <button
+                          type="button"
+                          className="coaching-apply-btn"
+                          onClick={() => {
+                            if (recommendation.suggestedLoadKg !== undefined && !loadDirty)
+                              setLoad(String(recommendation.suggestedLoadKg));
+                            if (recommendation.suggestedDurationSeconds !== undefined && !durationDirty) {
+                              setDuration(String(recommendation.suggestedDurationSeconds));
+                              setTimerRestartNonce((value) => value + 1);
+                              setTempoSkipped(false);
+                            }
+                          }}
+                        >
+                          Appliquer à cette séance
+                        </button>
+                      )}
+                    <button
+                      type="button"
+                      className="coaching-keep-btn"
+                      onClick={() => setRecommendationDismissed(true)}
+                    >
+                      Garder la prescription
+                    </button>
+                  </div>
                 </div>
-                <div className="coaching-recommendation-actions">
-                  {recommendation.action === 'increase' &&
-                    (recommendation.suggestedLoadKg !== undefined || recommendation.suggestedDurationSeconds !== undefined) && (
-                      <button
-                        type="button"
-                        className="coaching-apply-btn"
-                        onClick={() => {
-                          if (recommendation.suggestedLoadKg !== undefined && !loadDirty) setLoad(String(recommendation.suggestedLoadKg));
-                          if (recommendation.suggestedDurationSeconds !== undefined && !durationDirty) {
-                            setDuration(String(recommendation.suggestedDurationSeconds));
-                            setTimerRestartNonce((value) => value + 1);
-                            setTempoSkipped(false);
-                          }
-                        }}
-                      >
-                        Appliquer à cette séance
-                      </button>
-                    )}
-                  <button type="button" className="coaching-keep-btn" onClick={() => setRecommendationDismissed(true)}>
-                    Garder la prescription
-                  </button>
-                </div>
-              </div>
-            )}
+              )}
 
             {/* Surcharge progressive conseillée : par l'aisance, ou parce qu'elle a été demandée */}
             {progression && prescription.phase !== 'warmup' && !recommendation && (
@@ -734,8 +755,8 @@ export function WorkoutScreen({
                 <span>Ta performance</span>
                 <small>
                   {prescription.durationSeconds && !tempoReady
-                    ? 'Ajuste en 1 tap ou valide directement'
-                    : 'Ajuste en 1 tap ou tape la valeur'}
+                    ? 'Lance le chrono, ou valide directement'
+                    : 'Ajuste si besoin, puis valide'}
                 </small>
               </div>
 
@@ -745,7 +766,7 @@ export function WorkoutScreen({
                 <div className="ghost-perf-strip">
                   <Repeat size={14} className="ghost-icon" />
                   <span className="ghost-perf-text">
-                    Dernière fois : <strong>{ghostSummary}</strong>
+                    Dernière fois{'\u00a0'}: <strong>{ghostSummary}</strong>
                   </span>
                   {ghostDelta && (
                     <span className={`ghost-delta${ghostDelta.atParity ? ' at-parity' : ''}`}>{ghostDelta.label}</span>
@@ -753,26 +774,20 @@ export function WorkoutScreen({
                 </div>
               )}
 
-
-              <button
-                type="button"
-                className="advanced-inputs-toggle"
-                aria-expanded={advancedInputsOpen}
-                aria-controls="workout-advanced-inputs"
-                onClick={() => setAdvancedInputsOpen((open) => !open)}
-              >
-                {advancedInputsOpen ? 'Masquer les réglages détaillés' : 'Afficher les réglages détaillés'}
-              </button>
-
-              {advancedInputsOpen && (
-                <>
-                  <div id="workout-advanced-inputs" className="input-row-modern" ref={advancedInputsRef}>
+              {/* Chemin rapide : la valeur principale et la charge, chacune avec
+                  deux grands boutons ronds. Les paliers fins sont repliés. */}
+              <div className="stepper-rapide">
                 {prescription.durationSeconds ? (
                   <div className="stepper-group">
                     <span className="stepper-label">Durée (secondes)</span>
                     <div className="stepper-controls">
-                      <button type="button" className="step-btn" onClick={() => handleAdjustDuration(-5)}>
-                        -5s
+                      <button
+                        type="button"
+                        className="step-btn"
+                        aria-label="Retirer 5 secondes"
+                        onClick={() => handleAdjustDuration(-5)}
+                      >
+                        <Minus size={22} />
                       </button>
                       <input
                         aria-label="Durée (secondes)"
@@ -786,8 +801,13 @@ export function WorkoutScreen({
                           setTempoSkipped(false);
                         }}
                       />
-                      <button type="button" className="step-btn" onClick={() => handleAdjustDuration(+5)}>
-                        +5s
+                      <button
+                        type="button"
+                        className="step-btn"
+                        aria-label="Ajouter 5 secondes"
+                        onClick={() => handleAdjustDuration(+5)}
+                      >
+                        <Plus size={22} />
                       </button>
                     </div>
                   </div>
@@ -795,8 +815,13 @@ export function WorkoutScreen({
                   <div className="stepper-group">
                     <span className="stepper-label">Répétitions</span>
                     <div className="stepper-controls">
-                      <button type="button" className="step-btn" onClick={() => handleAdjustReps(-1)}>
-                        -1
+                      <button
+                        type="button"
+                        className="step-btn"
+                        aria-label="Retirer une répétition"
+                        onClick={() => handleAdjustReps(-1)}
+                      >
+                        <Minus size={22} />
                       </button>
                       <input
                         aria-label="Répétitions réalisées"
@@ -805,8 +830,13 @@ export function WorkoutScreen({
                         value={reps}
                         onChange={(e) => setReps(e.target.value)}
                       />
-                      <button type="button" className="step-btn" onClick={() => handleAdjustReps(+1)}>
-                        +1
+                      <button
+                        type="button"
+                        className="step-btn"
+                        aria-label="Ajouter une répétition"
+                        onClick={() => handleAdjustReps(+1)}
+                      >
+                        <Plus size={22} />
                       </button>
                     </div>
                   </div>
@@ -824,14 +854,6 @@ export function WorkoutScreen({
                       >
                         −{etiquettePalier(paliers.grand)}
                       </button>
-                      <button
-                        type="button"
-                        className="step-btn pas-fin"
-                        aria-label={`Diminuer la charge de ${etiquettePalier(paliers.fin)} kg`}
-                        onClick={() => handleAdjustLoad(-paliers.fin)}
-                      >
-                        −{etiquettePalier(paliers.fin)}
-                      </button>
                       <input
                         aria-label="Charge (kg)"
                         inputMode="decimal"
@@ -844,14 +866,6 @@ export function WorkoutScreen({
                       />
                       <button
                         type="button"
-                        className="step-btn pas-fin"
-                        aria-label={`Augmenter la charge de ${etiquettePalier(paliers.fin)} kg`}
-                        onClick={() => handleAdjustLoad(+paliers.fin)}
-                      >
-                        +{etiquettePalier(paliers.fin)}
-                      </button>
-                      <button
-                        type="button"
                         className="step-btn pas-grand"
                         aria-label={`Augmenter la charge de ${etiquettePalier(paliers.grand)} kg`}
                         onClick={() => handleAdjustLoad(+paliers.grand)}
@@ -861,18 +875,43 @@ export function WorkoutScreen({
                     </div>
                   </div>
                 )}
+              </div>
+
+              {prescription.loadKg !== undefined && (
+                <>
+                  <button
+                    type="button"
+                    className="reglages-fins-toggle"
+                    aria-expanded={advancedInputsOpen}
+                    aria-controls="workout-advanced-inputs"
+                    onClick={() => setAdvancedInputsOpen((open) => !open)}
+                  >
+                    Réglages fins
+                    <ChevronDown size={18} />
+                  </button>
+                  <div id="workout-advanced-inputs" className="reglages-fins" hidden={!advancedInputsOpen}>
+                    <span className="stepper-label">Palier fin</span>
+                    <div className="reglages-fins-pas">
+                      <button
+                        type="button"
+                        className="step-btn pas-fin"
+                        aria-label={`Diminuer la charge de ${etiquettePalier(paliers.fin)} kg`}
+                        onClick={() => handleAdjustLoad(-paliers.fin)}
+                      >
+                        −{etiquettePalier(paliers.fin)} kg
+                      </button>
+                      <button
+                        type="button"
+                        className="step-btn pas-fin"
+                        aria-label={`Augmenter la charge de ${etiquettePalier(paliers.fin)} kg`}
+                        onClick={() => handleAdjustLoad(+paliers.fin)}
+                      >
+                        +{etiquettePalier(paliers.fin)} kg
+                      </button>
+                    </div>
                   </div>
                 </>
               )}
-
-              <button
-                type="button"
-                className="primary-button full action-bar"
-                onClick={() => void handleCompleteSet()}
-                disabled={isSubmitting}
-              >
-                <Check size={20} weight="bold" /> {isSubmitting ? 'Enregistrement…' : 'Valider la série'}
-              </button>
             </div>
           )}
         </>
@@ -883,7 +922,39 @@ export function WorkoutScreen({
           de trop — c'est exactement là que la lecture décroche. */}
       {resting ? null : (
         <div className="next-hint">
-          <ArrowRight size={16} /> Ensuite : {nextExercise?.name ?? 'fin de séance'}
+          <ArrowRight size={16} /> Ensuite{'\u00a0'}: {nextLabel}
+        </div>
+      )}
+
+      {/* Le seul élément collé de l'écran : la barre de verre de validation.
+          Tant que le chrono du tempo n'est pas écoulé, c'est lui l'action
+          principale ; la validation reste possible, en second plan. */}
+      {exercise && prescription && !resting && (
+        <div className="barre-validation verre">
+          <button
+            type="button"
+            className={`primary-button full action-bar${prescription.durationSeconds && !tempoReady ? ' en-attente' : ''}`}
+            onClick={() => void handleCompleteSet()}
+            disabled={isSubmitting}
+          >
+            <Check size={20} weight="bold" /> {isSubmitting ? 'Enregistrement…' : 'Valider la série'}
+          </button>
+        </div>
+      )}
+
+      {annulable && (
+        <div className="serie-validee" key={annulable.id}>
+          <span role="status">Série {annulable.numero} validée</span>
+          <button
+            type="button"
+            aria-label={`Annuler la série ${annulable.numero}`}
+            onClick={() => {
+              setAnnulable(null);
+              onUndoSet();
+            }}
+          >
+            Annuler
+          </button>
         </div>
       )}
 
@@ -915,6 +986,54 @@ export function WorkoutScreen({
           onSessionChange?.({ ...session, loggedSets, updatedAt: new Date().toISOString() })
         }
       />
+
+      <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
+        <SheetContent className="action-sheet" onClose={() => setMenuOpen(false)}>
+          <SheetHeader>
+            <SheetTitle>{activeAlternative ? activeAlternative.name : (exercise?.name ?? 'Séance')}</SheetTitle>
+            <SheetDescription>Options de l’exercice en cours</SheetDescription>
+          </SheetHeader>
+          <div className="liste-groupee">
+            {exercise && tutorials[exercise.id] && (
+              <button type="button" className="liste-ligne" onClick={choisirOption(() => onTutorial(exercise.id))}>
+                <Video size={20} />
+                <span>Tutoriel</span>
+                <ChevronRight size={16} className="liste-chevron" />
+              </button>
+            )}
+            {exercise && exercise.kind !== 'cooldown' && (
+              <button type="button" className="liste-ligne" onClick={choisirOption(() => setImpossibleOpen(true))}>
+                <Barbell size={20} />
+                <span>Je ne peux pas faire cet exercice</span>
+                <ChevronRight size={16} className="liste-chevron" />
+              </button>
+            )}
+            {session.loggedSets.length > 0 && (
+              <button type="button" className="liste-ligne" onClick={choisirOption(onUndoSet)}>
+                <Undo size={20} />
+                <span>Annuler la dernière série</span>
+                <ChevronRight size={16} className="liste-chevron" />
+              </button>
+            )}
+            {exercise && activeAlternative && onRevertAlternative && (
+              <button
+                type="button"
+                className="liste-ligne"
+                onClick={choisirOption(() => onRevertAlternative(exercise.id))}
+              >
+                <Repeat size={20} />
+                <span>Revenir à la machine</span>
+                <ChevronRight size={16} className="liste-chevron" />
+              </button>
+            )}
+            <button type="button" className="liste-ligne" onClick={choisirOption(() => setPlanOpen(true))}>
+              <List size={20} />
+              <span>Voir le plan de séance</span>
+              <ChevronRight size={16} className="liste-chevron" />
+            </button>
+          </div>
+        </SheetContent>
+      </Sheet>
     </section>
   );
 }

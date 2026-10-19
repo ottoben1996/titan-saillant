@@ -12,7 +12,11 @@ const sessionFor = (): WorkoutSession => ({
   currentStepIndex:
     getWorkoutSteps(day).find((step) => {
       const exercise = step.exerciseIndex === undefined ? undefined : getWorkoutExercises(day)[step.exerciseIndex];
-      return step.kind === 'exercise' && exercise?.sets[step.setIndex ?? 0]?.phase !== 'warmup' && exercise?.sets[step.setIndex ?? 0]?.loadKg !== undefined;
+      return (
+        step.kind === 'exercise' &&
+        exercise?.sets[step.setIndex ?? 0]?.phase !== 'warmup' &&
+        exercise?.sets[step.setIndex ?? 0]?.loadKg !== undefined
+      );
     })?.sequenceIndex ?? 3,
   startedAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
@@ -64,17 +68,22 @@ function completedHistoryForCurrentExercise(): WorkoutSession[] {
 }
 
 describe('WorkoutScreen input ergonomics', () => {
-  it('forwards edited repetitions and load unchanged after dense controls are disclosed', async () => {
+  it('forwards edited repetitions and load from the quick path, fine steps folded', async () => {
     const { onCompleteSet } = renderWorkout();
 
+    // Chemin rapide : les deux champs sont visibles sans rien déplier.
     const reps = screen.getByRole('textbox', { name: 'Répétitions réalisées' });
     const load = screen.getByRole('textbox', { name: 'Charge (kg)' });
     fireEvent.change(reps, { target: { value: '11' } });
     fireEvent.change(load, { target: { value: '22.5' } });
-    fireEvent.click(screen.getByRole('button', { name: 'Masquer les réglages détaillés' }));
-    expect(screen.queryByRole('textbox', { name: 'Répétitions réalisées' })).toBeNull();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Afficher les réglages détaillés' }));
+    // Les paliers fins sont repliés : seul le gros palier est atteignable.
+    const reglages = screen.getByRole('button', { name: /réglages fins/i });
+    expect(reglages).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.getAllByRole('button', { name: /diminuer la charge de/i })).toHaveLength(1);
+    fireEvent.click(reglages);
+    expect(reglages).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getAllByRole('button', { name: /diminuer la charge de/i })).toHaveLength(2);
     expect(screen.getByRole('textbox', { name: 'Répétitions réalisées' })).toHaveValue('11');
     expect(screen.getByRole('textbox', { name: 'Charge (kg)' })).toHaveValue('22.5');
     fireEvent.click(screen.getByRole('button', { name: 'Valider la série' }));
@@ -82,6 +91,58 @@ describe('WorkoutScreen input ergonomics', () => {
     await waitFor(() => expect(onCompleteSet).toHaveBeenCalledWith({ repetitions: 11, loadKg: 22.5 }));
   });
 
+  it('offers the undo pill for a few seconds after validating', async () => {
+    const onUndoSet = vi.fn();
+    renderWorkout({ onUndoSet });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Valider la série' }));
+    const annuler = await screen.findByRole('button', { name: /annuler la série \d+/i });
+    expect(screen.getByText(/série \d+ validée/i)).toBeInTheDocument();
+    fireEvent.click(annuler);
+    expect(onUndoSet).toHaveBeenCalledTimes(1);
+    expect(screen.queryByRole('button', { name: /annuler la série \d+/i })).toBeNull();
+  });
+
+  it('keeps secondary actions in the « Plus d’options » sheet', () => {
+    renderWorkout();
+
+    expect(screen.queryByRole('button', { name: /je ne peux pas faire cet exercice/i })).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: /plus d.options/i }));
+    expect(screen.getByRole('button', { name: /je ne peux pas faire cet exercice/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /voir le plan de séance/i })).toBeInTheDocument();
+  });
+
+  it('announces the next set when the movement repeats, the next movement otherwise', () => {
+    const steps = getWorkoutSteps(day);
+    const exercises = getWorkoutExercises(day);
+    const repeated = steps.find(
+      (candidate, index) =>
+        candidate.kind === 'exercise' && steps[index + 1]?.exerciseIndex === candidate.exerciseIndex,
+    );
+    expect(repeated).toBeDefined();
+    const following = steps[repeated!.sequenceIndex! + 1]!;
+
+    const { unmount } = renderWorkout({ session: { ...sessionFor(), currentStepIndex: repeated!.sequenceIndex } });
+    expect(screen.getByText(/^Ensuite/)).toHaveTextContent(`Ensuite : série ${following.setIndex! + 1}`);
+    unmount();
+
+    const changing = steps.find(
+      (candidate, index) =>
+        candidate.kind === 'exercise' &&
+        steps[index + 1]?.exerciseIndex !== undefined &&
+        steps[index + 1]?.exerciseIndex !== candidate.exerciseIndex,
+    );
+    expect(changing).toBeDefined();
+    const nextName = exercises[steps[changing!.sequenceIndex! + 1]!.exerciseIndex!]!.name;
+    renderWorkout({ session: { ...sessionFor(), currentStepIndex: changing!.sequenceIndex } });
+    expect(screen.getByText(/^Ensuite/)).toHaveTextContent(`Ensuite : ${nextName}`);
+  });
+
+  it('hides the recommendation when it only keeps the prescription', () => {
+    renderWorkout();
+
+    expect(screen.queryByRole('region', { name: 'Recommandation du coach' })).toBeNull();
+  });
 
   it('shows a safe recommendation and applies only the current input', () => {
     renderWorkout({ history: completedHistoryForCurrentExercise() });
@@ -133,7 +194,9 @@ describe('WorkoutScreen input ergonomics', () => {
 
     renderWorkout({ session: timedSession, history });
 
-    expect(screen.getByText(`00:${String(timedExercise.sets[0].durationSeconds).padStart(2, '0')}`)).toBeInTheDocument();
+    expect(
+      screen.getByText(`00:${String(timedExercise.sets[0].durationSeconds).padStart(2, '0')}`),
+    ).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Appliquer à cette séance' }));
     const baseDuration = timedExercise.sets[0]!.durationSeconds!;
     const suggestedDuration = baseDuration + Math.max(15, Math.round(baseDuration * 0.1));

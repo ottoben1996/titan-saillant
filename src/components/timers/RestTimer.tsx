@@ -9,7 +9,7 @@ import {
 } from '../../workout/restPresets';
 import { type CountdownController, createCountdown } from '../../workout/timer';
 import { getTimerAnnouncement } from '../../workout/timerAnnouncements';
-import { Play, Timer, X } from '../ui/Icons';
+import { Pause, Play, Timer, X } from '../ui/Icons';
 
 export const formatDuration = (seconds: number) =>
   `${Math.floor(seconds / 60)
@@ -288,9 +288,7 @@ export function RestTimer({
           />
         </svg>
         <div className="rest-orbit-content">
-          <span style={{ color: isAlert ? 'var(--rest)' : 'var(--accent)', marginBottom: '0.2rem', display: 'flex' }}>
-            <Timer size={20} />
-          </span>
+          <Timer size={20} className="rest-orbit-icone" />
           <strong>{formatDuration(remaining)}</strong>
           <span>{paused ? 'en pause' : 'repos'}</span>
         </div>
@@ -301,7 +299,7 @@ export function RestTimer({
           <X size={18} /> Passer le repos
         </button>
         <button type="button" onClick={toggle} disabled={suspended} aria-label={paused ? 'Reprendre' : 'Pause'}>
-          <Play size={16} /> {paused ? 'Reprendre' : 'Pause'}
+          {paused ? <Play size={16} /> : <Pause size={16} />} {paused ? 'Reprendre' : 'Pause'}
         </button>
       </div>
       <div className="rest-presets" role="group" aria-label="Ajuster le repos">

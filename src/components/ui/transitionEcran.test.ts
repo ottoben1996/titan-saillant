@@ -13,7 +13,6 @@ import { sensDuChangement, useSensEcran } from './transitionEcran';
 describe('sens du passage', () => {
   it('fait venir un écran ouvert depuis la droite', () => {
     expect(sensDuChangement('home', 'workout')).toBe('pousse');
-    expect(sensDuChangement('progression', 'followup')).toBe('pousse');
     expect(sensDuChangement('followup', 'bilan')).toBe('pousse');
   });
 
@@ -23,8 +22,8 @@ describe('sens du passage', () => {
     expect(sensDuChangement('bilan', 'progression')).toBe('revient');
   });
 
-  it('commute net entre les quatre onglets', () => {
-    const onglets: Screen[] = ['home', 'history', 'progression', 'settings'];
+  it('commute net entre les onglets et les vues de Progrès', () => {
+    const onglets: Screen[] = ['home', 'loads', 'progression', 'history', 'followup', 'settings'];
     for (const avant of onglets) {
       for (const apres of onglets) {
         if (avant === apres) continue;

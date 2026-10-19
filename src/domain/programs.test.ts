@@ -130,10 +130,14 @@ describe('seed programs from PDFs', () => {
         for (const item of exercises) {
           const active = item.sets.filter((set) => set.phase !== 'warmup');
           expect(active.length, `${profile} S${week} ${item.id}`).toBeGreaterThan(0);
-          expect(active.some((set) =>
-            (typeof set.loadKg === 'number' && Number.isFinite(set.loadKg)) ||
-            (typeof set.durationSeconds === 'number' && Number.isFinite(set.durationSeconds)),
-          ), `${profile} S${week} ${item.id}`).toBe(true);
+          expect(
+            active.some(
+              (set) =>
+                (typeof set.loadKg === 'number' && Number.isFinite(set.loadKg)) ||
+                (typeof set.durationSeconds === 'number' && Number.isFinite(set.durationSeconds)),
+            ),
+            `${profile} S${week} ${item.id}`,
+          ).toBe(true);
         }
       }
     }

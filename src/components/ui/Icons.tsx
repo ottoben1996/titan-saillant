@@ -79,3 +79,24 @@ export const Video = (p: IconProps) => <Icon {...p}>m4 5 12 7-12 7V5Zm12 4 4-2v1
 export const Warning = (p: IconProps) => <Icon {...p}>m12 3 10 18H2L12 3Zm0 6v5m0 3h.01</Icon>;
 export const X = (p: IconProps) => <Icon {...p}>M6 6l12 12M18 6 6 18</Icon>;
 export const ChartLine = (p: IconProps) => <Icon {...p}>M4 19V5m0 14h16M7 15l3-4 3 2 5-7</Icon>;
+export const Battery = (p: IconProps) => (
+  <Icon {...p}>M4 8h13a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Zm17 3v2M6 11v2m3-2v2</Icon>
+);
+export const Calendar = (p: IconProps) => (
+  <Icon {...p}>M8 3v3m8-3v3M4 10h16M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z</Icon>
+);
+export const ChevronDown = (p: IconProps) => <Icon {...p}>m5 9 7 7 7-7</Icon>;
+export const ChevronLeft = (p: IconProps) => <Icon {...p}>m15 5-7 7 7 7</Icon>;
+/** Trois points du menu « Plus d'options » : le trait épais en fait des pastilles. */
+export const Ellipsis = (p: IconProps) => (
+  <Icon strokeWidth={3} {...p}>
+    M6 12h.01M12 12h.01M18 12h.01
+  </Icon>
+);
+export const Moon = (p: IconProps) => <Icon {...p}>M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z</Icon>;
+/** Deux anneaux concentriques : l'onglet « Aujourd'hui », comme le résumé d'Activité. */
+export const Rings = (p: IconProps) => (
+  <Icon {...p}>M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0ZM16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z</Icon>
+);
+/** Deux barres : le minuteur en cours se met en pause. */
+export const Pause = (p: IconProps) => <Icon {...p}>M8 5v14M16 5v14</Icon>;

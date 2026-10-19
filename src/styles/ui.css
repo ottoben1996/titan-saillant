@@ -295,9 +295,9 @@
   gap: var(--sp-6);
   min-height: 68px;
   padding: var(--sp-5) var(--sp-6);
-  border: 1px solid var(--line);
-  border-radius: var(--r-md);
-  background: var(--surface-1);
+  border: 0;
+  border-radius: var(--r-xl);
+  background: var(--carte-fond-2);
   color: inherit;
   font: inherit;
   text-align: left;
@@ -320,8 +320,8 @@
 
 .impossible-choice:hover,
 .impossible-choice:focus-visible {
-  border-color: rgb(var(--accent-rgb) / 0.6);
-  background: rgb(var(--accent-rgb) / 0.08);
+  background: rgb(var(--accent-rgb) / 0.12);
+  box-shadow: inset 0 0 0 1px rgb(var(--accent-rgb) / 0.5);
   outline: none;
 }
 
@@ -331,9 +331,10 @@
   align-items: center;
   gap: var(--sp-4);
   padding: var(--sp-4) var(--sp-5);
-  border: 1px solid var(--line);
-  border-radius: var(--r-md);
-  background: var(--surface-1);
+  min-height: 52px;
+  border: 0;
+  border-radius: var(--r-xl);
+  background: var(--carte-fond-2);
   width: 100%;
   text-align: left;
   font: inherit;
@@ -341,23 +342,21 @@
 }
 
 .session-plan-item.current {
-  border-color: rgb(var(--accent-rgb) / 0.5);
-  background: rgb(var(--accent-rgb) / 0.07);
+  background: rgb(var(--accent-rgb) / 0.1);
+  box-shadow: inset 0 0 0 1px rgb(var(--accent-rgb) / 0.5);
 }
 
 /* Un mouvement encore à faire se désigne : on peut y aller directement, c'est le
    chemin de retour sur un exercice mis de côté. */
 .session-plan-item.reachable {
   cursor: pointer;
-  transition:
-    border-color 120ms ease,
-    background 120ms ease;
+  transition: background var(--duree-matiere) var(--ressort);
 }
 
 .session-plan-item.reachable:hover,
 .session-plan-item.reachable:focus-visible {
-  border-color: rgb(var(--accent-rgb) / 0.7);
-  background: rgb(var(--accent-rgb) / 0.1);
+  background: rgb(var(--accent-rgb) / 0.12);
+  box-shadow: inset 0 0 0 1px rgb(var(--accent-rgb) / 0.7);
   outline: none;
 }
 
@@ -466,12 +465,8 @@
   width: 44px;
   height: 44px;
   color: var(--text-1);
-  background: var(--surface-2);
-  transition: background var(--t-fast, 0.15s) var(--ease, ease);
-}
-
-.sheet-close-btn:hover {
-  background: var(--line-strong);
+  background: var(--remplissage);
+  transition: background var(--t-fast) var(--ease);
 }
 
 .sheet-title {

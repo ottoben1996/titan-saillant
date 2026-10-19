@@ -126,22 +126,40 @@ describe('hiérarchie de l’accueil', () => {
     onDiscard: () => undefined,
   };
 
-  it('annonce le chargement et garde la séance du jour comme action dominante', () => {
+  it('annonce le chargement puis une seule action dominante', () => {
     const { rerender } = render(<HomeScreen {...baseProps} chargement />);
     expect(screen.getByRole('status')).toHaveTextContent('Chargement');
 
     rerender(<HomeScreen {...baseProps} />);
-    const todayCard = screen.getByRole('article');
-    expect(within(todayCard).getByRole('button', { name: /^Démarrer .+/i })).toHaveClass('primary-button');
-    expect(screen.getByText('Volume 7 jours')).toBeInTheDocument();
-    expect(screen.queryByText(/au total/)).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: 'Aujourd’hui' })).toBeInTheDocument();
+    const hero = screen.getByRole('article');
+    const cta = within(hero).getByRole('button', { name: /^Commencer .+, \d+ min$/i });
+    expect(cta).toHaveClass('primary-button');
+    expect(cta).toHaveTextContent(/^Commencer$/);
+    expect(screen.getAllByRole('button').filter((b) => b.classList.contains('primary-button'))).toHaveLength(1);
+    expect(screen.queryByText(/charges prescrites/i)).not.toBeInTheDocument();
+  });
+
+  it('propose de reprendre ou de supprimer la séance en cours', () => {
+    const onResume = vi.fn();
+    const onDiscard = vi.fn();
+    const active: WorkoutSession = {
+      ...completedSession(program.days[0].id, new Date().toISOString()),
+      completedAt: undefined,
+    };
+    render(<HomeScreen {...baseProps} activeSession={active} onResume={onResume} onDiscard={onDiscard} />);
+    fireEvent.click(screen.getByRole('button', { name: /^Reprendre/ }));
+    expect(onResume).toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('button', { name: 'Supprimer la séance' }));
+    expect(onDiscard).toHaveBeenCalled();
   });
 
   it('déclenche l’action correspondant à chaque état du rail', () => {
     const onStart = vi.fn();
     const onReviewSlot = vi.fn();
     const onPreviewSlot = vi.fn();
-    const history = [completedSession(program.days[0].id, '2026-10-12T09:00:00')];
+    // Une séance terminée maintenant tombe toujours dans la semaine en cours.
+    const history = [completedSession(program.days[0].id, new Date().toISOString())];
     render(
       <HomeScreen
         {...baseProps}
@@ -156,8 +174,8 @@ describe('hiérarchie de l’accueil', () => {
     fireEvent.click(within(rail).getByRole('button', { name: /Revoir Full Body A — Terminée/i }));
     expect(onReviewSlot).toHaveBeenCalledWith(program.days[0]);
 
-    const todayCard = screen.getByRole('article');
-    fireEvent.click(within(todayCard).getByRole('button', { name: /Démarrer Full Body B · \d+ min/i }));
+    const hero = screen.getByRole('article');
+    fireEvent.click(within(hero).getByRole('button', { name: /^Commencer Full Body B, \d+ min$/i }));
     expect(onStart).toHaveBeenCalledWith(program.days[1]);
 
     fireEvent.click(within(rail).getByRole('button', { name: /Prévisualiser Cardio circuit — À venir/i }));

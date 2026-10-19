@@ -32,7 +32,6 @@ export function TutorialModal({ tutorial, onClose }: TutorialModalProps) {
     };
   }, []);
 
-
   return (
     <Sheet open onOpenChange={(open) => !open && onClose()}>
       <SheetContent side="bottom" onClose={onClose} aria-describedby="tutorial-desc">

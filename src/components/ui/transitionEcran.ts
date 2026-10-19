@@ -15,19 +15,19 @@ export type Sens = 'pousse' | 'revient' | 'onglet';
 /**
  * Profondeur de navigation.
  *
- * Zéro : les quatre onglets, entre lesquels on ne va pas « plus loin ».
- * Un : un écran qu'on ouvre depuis un onglet. Deux : un écran qu'on ouvre
- * depuis un écran ouvert — le bilan, qui se lit depuis le point du samedi.
+ * Zéro : les quatre onglets et les trois vues sœurs de Progrès (tendances,
+ * historique, points), entre lesquelles on commute sans aller « plus loin ».
+ * Un : un écran qu'on ouvre depuis un onglet — la séance, le bilan.
  */
 const PROFONDEUR: Record<Screen, number> = {
   home: 0,
   history: 0,
   progression: 0,
+  followup: 0,
   settings: 0,
   loads: 0,
   workout: 1,
-  followup: 1,
-  bilan: 2,
+  bilan: 1,
 };
 
 export function sensDuChangement(avant: Screen, apres: Screen): Sens {

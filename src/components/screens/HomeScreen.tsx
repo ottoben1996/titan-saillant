@@ -1,19 +1,11 @@
 import { useMemo } from 'react';
 import type { WeeklyMeasurement } from '../../domain/measurements';
-import type { getProgram } from '../../domain/programs';
-import type { ProfileId, WorkoutDay, WorkoutSession } from '../../domain/types';
+import { PROGRAM_WEEKS } from '../../domain/programs';
+import type { ProfileId, WorkoutDay, WorkoutPlan, WorkoutSession } from '../../domain/types';
 import type { SerieAssiduite } from '../../workout/assiduite';
 import { getWorkoutExercises } from '../../workout/runner';
-import {
-  formatVolume,
-  startOfWeek,
-  volumeLastDays,
-  type WeekSlotState,
-  weeklyComparison,
-  weekSlots,
-} from '../../workout/summary';
-import { ProgramLoadCard } from '../ProgramLoadCard';
-import { ArrowRight, Bolt, Check, Clock, DownloadSimple, Play, Trash } from '../ui/Icons';
+import { formatVolume, type WeekSlotState, weeklyComparison, weekSlots, workoutDayLabel } from '../../workout/summary';
+import { Check, Play, Trash } from '../ui/Icons';
 
 export const profileLabels: Record<ProfileId, string> = { ottman: 'Ottman', laura: 'Laura' };
 
@@ -38,7 +30,7 @@ export type NextBestAction =
   | { kind: 'recovery'; label: string; description: string };
 
 export function getNextBestAction(options: {
-  program: ReturnType<typeof getProgram>;
+  program: WorkoutPlan;
   history: readonly WorkoutSession[];
   activeSession: WorkoutSession | null;
   measurements: readonly WeeklyMeasurement[];
@@ -94,9 +86,7 @@ export function estimatedMinutes(day: WorkoutDay) {
 
 interface HomeScreenProps {
   profile: ProfileId;
-  program: ReturnType<typeof getProgram>;
-  /** Programme d'origine affiché dans la feuille des charges prescrites. */
-  prescribedProgram?: ReturnType<typeof getProgram>;
+  program: WorkoutPlan;
   history: WorkoutSession[];
   measurements?: WeeklyMeasurement[];
   onOpenFollowup?: () => void;
@@ -112,21 +102,41 @@ interface HomeScreenProps {
   onDiscard: () => void;
   /** Série de semaines complètes, calculée par l'application. */
   serie?: SerieAssiduite;
+  /** Semaine de charges active, affichée dans le sous-titre. */
   programWeek?: number;
-  onProgramWeekChange?: (week: number) => void;
-  /** Présent seulement quand les données méritent d'être mises à l'abri. */
-  sauvegarde?: {
-    sessions: number;
-    joursDepuisExport?: number;
-    onExport: () => void;
-    onLater: () => void;
-  };
+}
+
+/** Anneau de la semaine : séances faites sur les créneaux prescrits. */
+function WeekRing({ done, total }: { done: number; total: number }) {
+  const rayon = 22;
+  const circonference = 2 * Math.PI * rayon;
+  const part = Math.min(1, done / total);
+  return (
+    <span
+      className="week-ring"
+      role="img"
+      aria-label={`${done} séance${done > 1 ? 's' : ''} sur ${total} cette semaine`}
+    >
+      <svg viewBox="0 0 56 56" width="56" height="56" aria-hidden="true">
+        <circle cx="28" cy="28" r={rayon} className="week-ring-fond" />
+        <circle
+          cx="28"
+          cy="28"
+          r={rayon}
+          className="week-ring-arc"
+          strokeDasharray={circonference}
+          strokeDashoffset={circonference * (1 - part)}
+        />
+      </svg>
+      <b aria-hidden="true">
+        {done}/{total}
+      </b>
+    </span>
+  );
 }
 
 export function HomeScreen({
-  profile,
   program,
-  prescribedProgram = program,
   history,
   measurements = [],
   onOpenFollowup = () => undefined,
@@ -138,125 +148,38 @@ export function HomeScreen({
   onPreviewSlot = () => undefined,
   onResume,
   onDiscard,
-  sauvegarde,
   serie,
   programWeek = 1,
-  onProgramWeekChange = () => undefined,
 }: HomeScreenProps) {
   const view = useMemo(() => {
     const now = new Date();
-    const slots = weekSlots(program.days, history, now);
     const comparison = weeklyComparison(history, now);
-    const isResuming = Boolean(activeSession && !activeSession.completedAt);
-    const todaySlot = slots.find((slot) => slot.state === 'today') ?? null;
     return {
-      weekStart: startOfWeek(now),
-      slots,
-      todaySlot,
-      isResuming,
+      now,
+      slots: weekSlots(program.days, history, now),
       weekSessions: comparison.current.sessions,
       weekVolume: comparison.current.volumeKg,
-      volume7Days: volumeLastDays(history, now),
     };
-  }, [program.days, history, activeSession]);
+  }, [program.days, history]);
 
-  const weekProgress = Math.min(100, (view.weekSessions / WEEKLY_TARGET) * 100);
-  const todaySlot = view.todaySlot;
   const nextAction = useMemo(
     () => getNextBestAction({ program, history, activeSession, measurements }),
     [program, history, activeSession, measurements],
   );
-  const weekStartLabel = view.weekStart.toLocaleDateString('fr-FR', {
-    day: 'numeric',
-    month: 'long',
-  });
+  const dateLabel = view.now.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+  const ring = <WeekRing done={view.weekSessions} total={WEEKLY_TARGET} />;
+  const seriesFaites = activeSession?.loggedSets.length ?? 0;
+  const pluriel = seriesFaites > 1 ? 's' : '';
 
   return (
     <section className="content home-content">
-      {/* En-tête compact : aucun espace mort avant l'action principale. */}
-      <header className="home-head">
-        <div>
-          <p className="eyebrow">SEMAINE DU {weekStartLabel.toUpperCase()}</p>
-          <h1>Bonjour {profileLabels[profile]}</h1>
-        </div>
-        <div className={`avatar avatar-${profile}`} aria-hidden="true">
-          {profileLabels[profile][0]}
-        </div>
+      <header className="large-title">
+        <h1>Aujourd’hui</h1>
+        <p>
+          {dateLabel.charAt(0).toUpperCase() + dateLabel.slice(1)} · Semaine {programWeek} sur {PROGRAM_WEEKS}
+        </p>
       </header>
 
-      {view.isResuming && (
-        <div className="resume-banner-wrap">
-          <button className="resume-banner" onClick={onResume} type="button">
-            <span className="resume-icon">
-              <Play size={18} weight="fill" />
-            </span>
-            <span>
-              <strong>Séance en cours</strong>
-              <small>
-                {activeSession?.loggedSets.length ?? 0} séries déjà validées — reprendre là où tu t’es arrêté
-              </small>
-            </span>
-            <ArrowRight size={20} />
-          </button>
-          <button type="button" className="resume-discard" onClick={onDiscard} aria-label="Supprimer la séance">
-            <Trash size={17} />
-          </button>
-        </div>
-      )}
-
-      {!chargement && !view.isResuming && nextAction.kind !== 'workout' && (
-        <article className="next-action-card" aria-labelledby="next-action-title">
-          <p className="eyebrow">À FAIRE MAINTENANT</p>
-          <h2 id="next-action-title">{nextAction.label}</h2>
-          <p>{nextAction.description}</p>
-          {nextAction.kind === 'measurement' && (
-            <button
-              className="primary-button"
-              type="button"
-              onClick={onOpenFollowup}
-              aria-label="Ouvrir le suivi hebdomadaire"
-            >
-              Faire le point
-            </button>
-          )}
-          {nextAction.kind === 'recovery' && (
-            <button
-              className="primary-button"
-              type="button"
-              onClick={onOpenProgression}
-              aria-label="Voir ma progression"
-            >
-              Voir ma progression
-            </button>
-          )}
-        </article>
-      )}
-
-      {/* Le suivi ne vit que dans ce téléphone : on propose de le mettre à l'abri. */}
-      {sauvegarde && (
-        <aside className="backup-card">
-          <div>
-            <p className="eyebrow">SAUVEGARDE</p>
-            <strong>Ton suivi n'existe que sur ce téléphone</strong>
-            <small>
-              {sauvegarde.sessions} séances enregistrées
-              {sauvegarde.joursDepuisExport !== undefined
-                ? ` · dernière sauvegarde il y a ${sauvegarde.joursDepuisExport} jours`
-                : ' · jamais sauvegardé'}
-            </small>
-          </div>
-          <div className="backup-actions">
-            <button type="button" className="primary-button" onClick={sauvegarde.onExport}>
-              <DownloadSimple size={16} /> Exporter
-            </button>
-            <button type="button" className="text-button" onClick={sauvegarde.onLater}>
-              Plus tard
-            </button>
-          </div>
-        </aside>
-      )}
-
-      {/* Action dominante : la séance du jour, ou l'état « semaine complète ». */}
       {/* Première lecture du stockage : une silhouette, pas une page vide.
           Le lecteur d'écran n'a rien à annoncer d'un dessin. */}
       {chargement && (
@@ -264,7 +187,6 @@ export function HomeScreen({
           Chargement de ton accueil…
         </div>
       )}
-
       {chargement && (
         <div className="skeleton-card" aria-hidden="true">
           <span className="skeleton-line short" />
@@ -274,143 +196,174 @@ export function HomeScreen({
         </div>
       )}
 
-      {!chargement && !view.isResuming && todaySlot && (
-        <article className="today-card">
-          <div className="today-card-head">
-            <p className="eyebrow">LA SÉANCE DU JOUR</p>
-            <span className="tag">
-              {todaySlot.day.exercises.length} mouvement
-              {todaySlot.day.exercises.length > 1 ? 's' : ''}
-            </span>
-          </div>
-          <h2>{todaySlot.day.name}</h2>
-          <p className="today-card-sub">{todaySlot.day.subtitle}</p>
-          <div className="today-card-foot">
-            <span className="today-meta">
-              <Clock size={16} /> ≈ {estimatedMinutes(todaySlot.day)} min
-            </span>
-            <button className="primary-button today-cta" onClick={() => onStart(todaySlot.day)} type="button">
-              <Play size={18} weight="fill" /> Démarrer {todaySlot.day.name} · {estimatedMinutes(todaySlot.day)} min
-            </button>
-          </div>
-        </article>
-      )}
-
-      {!view.isResuming && !todaySlot && (
-        <article className="today-card done" aria-labelledby="week-complete-title">
-          <p className="eyebrow">SEMAINE COMPLÈTE</p>
-          <h2 id="week-complete-title">Les {WEEKLY_TARGET} créneaux sont validés</h2>
-          <p className="today-card-sub">
-            Rien d’obligatoire aujourd’hui. Tu peux revoir ta progression ou refaire une séance si tu te sens frais.
-          </p>
-          <button className="primary-button" type="button" onClick={onOpenProgression}>
-            Revoir ma progression
-          </button>
-        </article>
-      )}
-
+      {/* Une seule carte, une seule action dominante : ce qu'il y a à faire maintenant. */}
       {!chargement && (
-        <ProgramLoadCard program={prescribedProgram} week={programWeek} onWeekChange={onProgramWeekChange} />
-      )}
-
-      {/* Série de semaines complètes : un repère de régularité, jamais un score. */}
-      {serie && serie.seancesFaites > 0 && (
-        <aside className="streak-card">
-          <div className="streak-head">
-            <p className="eyebrow">RÉGULARITÉ</p>
-            <strong>
-              {serie.semainesConsecutives > 0
-                ? `${serie.semainesConsecutives} semaine${serie.semainesConsecutives > 1 ? 's' : ''} d’affilée`
-                : 'Aucune semaine complète'}
-            </strong>
-          </div>
-          {/* Le détail semaine par semaine est déjà écrit juste au-dessus : ces
-              points le répètent visuellement, ils n'ajoutent rien à lire. */}
-          <div className="streak-weeks" aria-hidden="true">
-            {serie.semaines.map((semaine) => (
-              <i
-                key={semaine.decalage}
-                className={semaine.faite ? 'fait' : ''}
-                title={`${semaine.seances} séance${semaine.seances > 1 ? 's' : ''} sur ${semaine.prevues}`}
-              >
-                {semaine.faite ? <Check size={12} weight="bold" /> : null}
-              </i>
-            ))}
-          </div>
-          <small>
-            {serie.seancesFaites} séances sur les huit dernières semaines ·{' '}
-            {serie.semaines.find((semaine) => semaine.decalage === 0)?.prevues ?? WEEKLY_TARGET} séances valident une
-            semaine.
-          </small>
-        </aside>
-      )}
-
-      {!chargement && (
-        <nav className="week-rail" aria-label="Créneaux de la semaine en cours">
-          {view.slots.map((slot) => {
-            const actionLabel =
-              slot.state === 'done'
-                ? `Revoir ${slot.day.name}`
-                : slot.state === 'upcoming'
-                  ? `Prévisualiser ${slot.day.name}`
-                  : `Démarrer ${slot.day.name}`;
-            const handleSlot = () =>
-              slot.state === 'done'
-                ? onReviewSlot(slot.day)
-                : slot.state === 'upcoming'
-                  ? onPreviewSlot(slot.day)
-                  : onStart(slot.day);
-            return (
+        <article className="hero-card" aria-labelledby="hero-title">
+          {nextAction.kind === 'resume' && (
+            <>
+              <div className="hero-head">
+                <div>
+                  <p className="eyebrow">SÉANCE EN COURS</p>
+                  <h2 id="hero-title">{activeSession ? workoutDayLabel(activeSession.dayId) : nextAction.label}</h2>
+                  <p className="hero-sub">
+                    {`${seriesFaites} série${pluriel} déjà validée${pluriel}`} · {nextAction.description}
+                  </p>
+                </div>
+                {ring}
+              </div>
+              <div className="hero-actions">
+                <button
+                  className="primary-button"
+                  type="button"
+                  onClick={onResume}
+                  aria-label="Reprendre la séance en cours"
+                >
+                  <Play size={18} weight="fill" /> Reprendre
+                </button>
+                <button type="button" className="resume-discard" onClick={onDiscard} aria-label="Supprimer la séance">
+                  <Trash size={18} />
+                </button>
+              </div>
+            </>
+          )}
+          {nextAction.kind === 'workout' && (
+            <>
+              <div className="hero-head">
+                <div>
+                  <p className="eyebrow">SÉANCE DU JOUR</p>
+                  <h2 id="hero-title">{nextAction.day.name}</h2>
+                  <p className="hero-sub">{nextAction.description}</p>
+                </div>
+                {ring}
+              </div>
+              <p className="hero-meta">
+                {nextAction.day.exercises.length} mouvement{nextAction.day.exercises.length > 1 ? 's' : ''} · ≈{' '}
+                {estimatedMinutes(nextAction.day)} min
+              </p>
               <button
-                key={slot.day.id}
+                className="primary-button full"
                 type="button"
-                className={`week-slot ${slot.state}`}
-                onClick={handleSlot}
-                aria-label={`${actionLabel} — ${SLOT_STATES[slot.state]}`}
+                onClick={() => onStart(nextAction.day)}
+                aria-label={`Commencer ${nextAction.day.name}, ${estimatedMinutes(nextAction.day)} min`}
               >
-                <span className="week-slot-name">{slot.day.name}</span>
-                <span className="week-slot-state">
-                  {slot.state === 'done' && <Check size={13} weight="bold" />}
-                  {SLOT_STATES[slot.state]}
-                </span>
+                <Play size={18} weight="fill" /> Commencer
               </button>
-            );
-          })}
+            </>
+          )}
+          {nextAction.kind === 'measurement' && (
+            <>
+              <div className="hero-head">
+                <div>
+                  <p className="eyebrow">POINT HEBDOMADAIRE</p>
+                  <h2 id="hero-title">{nextAction.label}</h2>
+                  <p className="hero-sub">{nextAction.description}</p>
+                </div>
+                {ring}
+              </div>
+              <button
+                className="primary-button full"
+                type="button"
+                onClick={onOpenFollowup}
+                aria-label="Faire le point hebdomadaire"
+              >
+                Faire le point
+              </button>
+            </>
+          )}
+          {nextAction.kind === 'recovery' && (
+            <>
+              <div className="hero-head">
+                <div>
+                  <p className="eyebrow">SEMAINE COMPLÈTE</p>
+                  <h2 id="hero-title">{nextAction.label}</h2>
+                  <p className="hero-sub">{nextAction.description}</p>
+                </div>
+                {ring}
+              </div>
+              <button className="primary-button full" type="button" onClick={onOpenProgression}>
+                Voir mes progrès
+              </button>
+            </>
+          )}
+        </article>
+      )}
+
+      {!chargement && (
+        <nav className="home-section" aria-label="Créneaux de la semaine en cours">
+          <h2 className="section-title">Cette semaine</h2>
+          <div className="week-rail">
+            {view.slots.map((slot) => {
+              const actionLabel =
+                slot.state === 'done'
+                  ? `Revoir ${slot.day.name}`
+                  : slot.state === 'upcoming'
+                    ? `Prévisualiser ${slot.day.name}`
+                    : `Commencer ${slot.day.name}`;
+              const handleSlot = () =>
+                slot.state === 'done'
+                  ? onReviewSlot(slot.day)
+                  : slot.state === 'upcoming'
+                    ? onPreviewSlot(slot.day)
+                    : onStart(slot.day);
+              return (
+                <button
+                  key={slot.day.id}
+                  type="button"
+                  className={`week-slot ${slot.state}`}
+                  onClick={handleSlot}
+                  aria-label={`${actionLabel} — ${SLOT_STATES[slot.state]}`}
+                >
+                  <span className="week-slot-state" aria-hidden="true">
+                    {slot.state === 'done' ? <Check size={14} weight="bold" /> : null}
+                  </span>
+                  <span className="week-slot-name">{slot.day.name}</span>
+                  <small>{SLOT_STATES[slot.state]}</small>
+                </button>
+              );
+            })}
+          </div>
         </nav>
       )}
 
-      {/* Métriques compactes : pas de cartes identiques de grande hauteur. */}
+      {/* Deux repères sur la même période, pour qu'ils se lisent ensemble. */}
       {!chargement && (
         <div className="home-metrics">
           <div className="home-metric">
-            <span>Séances cette semaine</span>
+            <span>Séances</span>
             <strong>
               {view.weekSessions}
               <small> / {WEEKLY_TARGET}</small>
             </strong>
-            <div className="progress-track">
-              <i style={{ width: `${weekProgress}%` }} />
-            </div>
+            <small>cette semaine</small>
           </div>
-          <div className="home-metric accent">
-            <span>Volume 7 jours</span>
+          <div className="home-metric">
+            <span>Volume</span>
             <strong>
-              {formatVolume(view.volume7Days)}
+              {formatVolume(view.weekVolume)}
               <small> kg·rép.</small>
             </strong>
+            <small>cette semaine</small>
           </div>
         </div>
       )}
 
-      <div className="coach-note">
-        <div className="coach-symbol">
-          <Bolt size={20} />
-        </div>
-        <div>
-          <strong>Le conseil du coach</strong>
-          <p>La qualité de chaque répétition compte plus que la vitesse. Respire, contrôle, progresse.</p>
-        </div>
-      </div>
+      {/* Série de semaines complètes : un repère de régularité, jamais un score. */}
+      {!chargement && serie && serie.seancesFaites > 0 && (
+        <aside className="streak-card" aria-label="Régularité">
+          <strong>
+            {serie.semainesConsecutives > 0
+              ? `${serie.semainesConsecutives} semaine${serie.semainesConsecutives > 1 ? 's' : ''} d’affilée`
+              : 'Aucune semaine complète'}
+          </strong>
+          <small>{serie.seancesFaites} séances sur 8 semaines</small>
+          {/* Le détail est déjà écrit : ces points le répètent visuellement. */}
+          <div className="streak-weeks" aria-hidden="true">
+            {serie.semaines.map((semaine) => (
+              <i key={semaine.decalage} className={semaine.faite ? 'fait' : ''} />
+            ))}
+          </div>
+        </aside>
+      )}
     </section>
   );
 }

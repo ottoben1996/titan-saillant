@@ -119,7 +119,14 @@ describe('adaptive coaching', () => {
     });
 
     it('recommends duration rather than load for timed exercises', () => {
-      const recommendation = getExerciseRecommendation(timedExercise, [exposure('timed-1', timedExercise), exposure('timed-2', timedExercise, { completedAt: '2026-09-09T09:00:00.000Z' })], options);
+      const recommendation = getExerciseRecommendation(
+        timedExercise,
+        [
+          exposure('timed-1', timedExercise),
+          exposure('timed-2', timedExercise, { completedAt: '2026-09-09T09:00:00.000Z' }),
+        ],
+        options,
+      );
       expect(recommendation?.suggestedLoadKg).toBeUndefined();
       expect(recommendation?.suggestedDurationSeconds).toBeGreaterThan(30);
       expect(recommendation?.suggestedDurationSeconds).toBeLessThanOrEqual(90);
@@ -145,13 +152,16 @@ describe('adaptive coaching', () => {
     });
 
     it('rejects an otherwise complete exposure containing an out-of-range set index', () => {
-      const loggedSets = [...completeSets(strengthExercise), {
-        exerciseId: strengthExercise.id,
-        setIndex: 99,
-        actualRepetitions: 10,
-        actualLoadKg: 110,
-        completedAt: '2026-09-08T09:00:00.000Z',
-      }];
+      const loggedSets = [
+        ...completeSets(strengthExercise),
+        {
+          exerciseId: strengthExercise.id,
+          setIndex: 99,
+          actualRepetitions: 10,
+          actualLoadKg: 110,
+          completedAt: '2026-09-08T09:00:00.000Z',
+        },
+      ];
       const recommendation = getExerciseRecommendation(
         strengthExercise,
         [exposure('out-of-range', strengthExercise, { loggedSets })],

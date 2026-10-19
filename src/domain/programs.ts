@@ -76,8 +76,9 @@ const strength = (
     };
     const lastWeeklyLoad = weeklyLoadKg?.findLast((value) => typeof value === 'number' && Number.isFinite(value));
     const resolvedWeeklyLoadKg = weeklyLoadKg
-      ? (Array.from({ length: PROGRAM_WEEKS }, (_, index) =>
-          overrideAt(index) ?? weeklyLoadKg[index] ?? lastWeeklyLoad,
+      ? (Array.from(
+          { length: PROGRAM_WEEKS },
+          (_, index) => overrideAt(index) ?? weeklyLoadKg[index] ?? lastWeeklyLoad,
         ) as number[])
       : undefined;
     const lastSetLoads = weeklySetLoadsKg?.at(-1);
@@ -127,7 +128,9 @@ const timed = (
     kind: 'timed',
     sets: Array.from({ length: setsCount }, () => ({
       durationSeconds:
-        typeof manualDurations?.[id]?.[week - 1] === 'number' && Number.isFinite(manualDurations[id][week - 1]) && manualDurations[id][week - 1]! >= 0
+        typeof manualDurations?.[id]?.[week - 1] === 'number' &&
+        Number.isFinite(manualDurations[id][week - 1]) &&
+        manualDurations[id][week - 1]! >= 0
           ? manualDurations[id][week - 1]!
           : durationSeconds,
       loadLabel: 'PDC',

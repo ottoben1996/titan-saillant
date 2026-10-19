@@ -13,6 +13,9 @@ describe('choix du profil', () => {
   });
 
   it('annonce le chargement puis permet de relancer après une erreur', async () => {
+    // Séance datée de maintenant : le compteur porte sur la semaine en cours,
+    // une date figée sortait de la semaine dès le lundi suivant.
+    const maintenant = new Date().toISOString();
     vi.mocked(listSessions)
       .mockRejectedValueOnce(new Error('lecture impossible'))
       .mockImplementation(async (profileId) =>
@@ -22,9 +25,9 @@ describe('choix du profil', () => {
                 id: 'session-1',
                 profileId: 'ottman',
                 dayId: 'full-body-a',
-                startedAt: '2026-10-17T10:00:00.000Z',
-                updatedAt: '2026-10-17T10:00:00.000Z',
-                completedAt: '2026-10-17T10:30:00.000Z',
+                startedAt: maintenant,
+                updatedAt: maintenant,
+                completedAt: maintenant,
                 currentExerciseIndex: 0,
                 currentSetIndex: 0,
                 loggedSets: [],

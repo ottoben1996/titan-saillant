@@ -13,7 +13,6 @@
   display: flex;
   flex-direction: column;
   gap: var(--sp-7);
-  padding-top: var(--sp-4);
 }
 
 .back-link {
@@ -21,22 +20,24 @@
   align-items: center;
   gap: var(--sp-3);
   align-self: flex-start;
-  padding: var(--sp-4) var(--sp-5);
-  border-radius: var(--r-md);
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--text-2);
-  font-size: var(--fs-2);
-  font-weight: 700;
+  min-height: 44px;
+  padding: var(--sp-4) var(--sp-8);
+  border-radius: var(--r-full);
+  background: var(--remplissage);
+  color: var(--text-1);
+  font-size: var(--fs-4);
+  font-weight: 600;
 }
 
-.followup h1 {
+.followup-titre {
   margin: 0;
-  font-size: clamp(1.6rem, 8vw, 2.2rem);
-  line-height: 1.05;
-  letter-spacing: -0.04em;
+  font-size: var(--fs-10);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
 }
 
-.followup h1 em {
+.followup-titre em {
   color: var(--accent);
   font-style: normal;
 }
@@ -69,13 +70,12 @@
   justify-content: center;
   gap: var(--sp-4);
   min-height: 48px;
-  padding: var(--sp-6);
-  border-radius: var(--r-lg);
-  border: 1px solid rgb(var(--accent-rgb) / 0.35);
-  background: rgb(var(--accent-rgb) / 0.12);
+  padding: var(--sp-5) var(--sp-8);
+  border-radius: var(--r-full);
+  background: var(--remplissage);
   color: var(--accent);
-  font-weight: 700;
-  font-size: var(--fs-3);
+  font-weight: 650;
+  font-size: var(--fs-4);
 }
 
 .report-button:disabled {
@@ -85,18 +85,23 @@
 .followup-card {
   display: flex;
   flex-direction: column;
-  border: 1px solid var(--line);
-  border-radius: var(--r-lg);
-  background: var(--surface-1);
-  padding: var(--sp-2) var(--sp-7);
+  border-radius: var(--r-2xl);
+  background: var(--carte-fond);
+  box-shadow: var(--carte-lisere);
+  padding: var(--sp-1) var(--sp-8);
 }
 
+/* Le libellé réclame 5,5rem avant de céder : en dessous, il passe seul sur sa
+   ligne et le pas de saisie descend dessous. À 320 px, la ligne unique ne lui
+   laissait que 28 px et coupait « Poids » lettre par lettre. */
 .followup-field {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: var(--sp-5);
-  padding: var(--sp-5) 0;
-  border-bottom: 1px solid var(--line);
+  gap: var(--sp-3) var(--sp-5);
+  min-height: 56px;
+  padding: var(--sp-4) 0;
+  border-bottom: 1px solid var(--separateur);
 }
 
 .followup-field:last-child {
@@ -108,7 +113,7 @@
 }
 
 .followup-label {
-  flex: 1;
+  flex: 1 1 5.5rem;
   min-width: 0;
 }
 
@@ -139,21 +144,22 @@
   /* 44 px : la cible tactile recommandée pour un pouce, mesurée par audit. */
   width: 44px;
   height: 44px;
-  border-radius: var(--r-md);
-  background: var(--surface-2);
-  color: var(--text-2);
+  border-radius: var(--r-full);
+  background: var(--remplissage);
+  color: var(--text-1);
 }
 
 .followup-stepper input {
   width: 64px;
   height: 44px;
   padding: var(--sp-4) var(--sp-3);
-  border: 1px solid var(--line);
+  border: 0;
   border-radius: var(--r-md);
-  background: var(--surface-0);
+  background: var(--carte-fond-2);
   color: var(--text-1);
-  font-size: var(--fs-6);
-  font-weight: 700;
+  font-family: var(--font-chiffres);
+  font-size: var(--fs-7);
+  font-weight: 650;
   font-variant-numeric: tabular-nums;
   text-align: center;
 }
@@ -165,6 +171,7 @@
 
 .followup-delta {
   min-width: 46px;
+  margin-left: auto;
   text-align: right;
   font-size: var(--fs-2);
   font-weight: 700;
@@ -183,12 +190,11 @@
 .followup-warning {
   display: flex;
   gap: var(--sp-4);
-  padding: var(--sp-5) var(--sp-6);
-  border-radius: var(--r-lg);
-  border: 1px solid rgb(243 189 107 / 0.32);
-  background: rgb(243 189 107 / 0.1);
+  padding: var(--sp-6) var(--sp-8);
+  border-radius: var(--r-xl);
+  background: rgb(243 189 107 / 0.12);
   color: #f0d6a8;
-  font-size: var(--fs-2);
+  font-size: var(--fs-3);
   line-height: 1.45;
 }
 
@@ -222,26 +228,33 @@
 
 .followup-history-title {
   margin: var(--sp-5) 0 0;
-  font-size: var(--fs-3);
+  font-size: var(--fs-2);
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: var(--text-3);
+  letter-spacing: 0.06em;
+  color: var(--text-2);
 }
 
 .followup-history {
   display: flex;
   flex-direction: column;
-  gap: var(--sp-4);
+  border-radius: var(--r-2xl);
+  background: var(--carte-fond);
+  box-shadow: var(--carte-lisere);
+  overflow: hidden;
 }
 
 .followup-row {
   display: flex;
   align-items: center;
   gap: var(--sp-6);
-  padding: var(--sp-5) var(--sp-6);
-  border-radius: var(--r-lg);
-  background: var(--surface-1);
-  border: 1px solid var(--line);
+  min-height: 48px;
+  padding: var(--sp-5) var(--sp-8);
+  border-bottom: 1px solid var(--separateur);
+}
+
+.followup-row:last-child {
+  border-bottom: 0;
 }
 
 .followup-week {
@@ -273,22 +286,23 @@
   align-items: center;
   gap: var(--sp-6);
   width: 100%;
-  margin: var(--sp-9) 0 var(--sp-3);
-  padding: var(--sp-7);
-  border-radius: var(--r-lg);
-  border: 1px solid rgb(var(--accent-rgb) / 0.28);
-  background: rgb(var(--accent-rgb) / 0.08);
+  min-height: 64px;
+  padding: var(--sp-7) var(--sp-8);
+  border-radius: var(--r-2xl);
+  background: var(--carte-fond);
+  box-shadow: var(--carte-lisere);
+  color: var(--text-1);
   text-align: left;
 }
 
 .followup-cta-icon {
   display: grid;
   place-items: center;
-  width: 40px;
-  height: 40px;
-  border-radius: var(--r-md);
-  background: var(--accent);
-  color: var(--accent-ink);
+  width: 36px;
+  height: 36px;
+  border-radius: var(--r-full);
+  background: rgb(var(--accent-rgb) / 0.18);
+  color: var(--accent);
 }
 
 .followup-cta-text {
@@ -325,21 +339,23 @@
   justify-content: space-between;
   gap: var(--sp-5);
   margin-bottom: var(--sp-7);
-  padding: var(--sp-5) var(--sp-6);
-  border-radius: var(--r-lg);
-  border: 1px solid var(--line);
-  background: rgb(16 22 21 / 0.92);
-  /*
-   * Pas de flou : la barre est opaque à 92 %, donc seuls 8 % du flou étaient
-   * visibles — pour une re-peinture de l'arrière-plan à chaque image de
-   * défilement, sur l'écran le plus long de l'application (le bilan, un document
-   * de plusieurs pages).
-   */
+  padding: var(--sp-4) var(--sp-4) var(--sp-4) var(--sp-6);
+  border-radius: var(--r-full);
+  background: var(--carte-fond);
+  box-shadow: var(--carte-lisere);
+}
+
+.bilan-bar-titre {
+  min-width: 0;
+  font-size: var(--fs-4);
+  font-weight: 600;
+  color: var(--text-2);
 }
 
 .bilan-bar .primary-button {
-  padding: var(--sp-5) var(--sp-7);
-  font-size: var(--fs-3);
+  min-height: 44px;
+  padding: var(--sp-4) var(--sp-8);
+  font-size: var(--fs-4);
 }
 
 .bilan-doc {

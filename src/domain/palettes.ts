@@ -16,19 +16,19 @@ export interface Accent {
 }
 
 /**
- * Les couleurs proposées dans les réglages.
+ * Les couleurs proposées dans les réglages, inspirées des anneaux d'activité.
  *
- * Chaque paire couleur / encre est mesurée : le contraste dépasse 10:1, très
- * au-dessus du seuil AAA de 7:1, et la couleur ressort à plus de 10:1 sur le
- * fond sombre de l'application. Choisir une couleur ne peut donc jamais rendre
- * un texte illisible.
+ * Chaque paire couleur / encre est mesurée : le contraste dépasse 9:1, au-dessus
+ * du seuil AAA de 7:1, et la couleur ressort à plus de 10:1 sur le fond sombre
+ * de l'application. Choisir une couleur ne peut donc jamais rendre un texte
+ * illisible.
  */
 export const accents: readonly Accent[] = Object.freeze([
-  { id: 'vert', label: 'Vert', accent: '#B8F36B', ink: '#0E1710', accent2: '#97C758', accent3: '#2B3923' },
-  { id: 'rose', label: 'Rose', accent: '#E3C0F7', ink: '#1A1024', accent2: '#BA9DCB', accent3: '#323139' },
-  { id: 'bleu', label: 'Bleu', accent: '#8FC7FF', ink: '#0A1622', accent2: '#75A3D1', accent3: '#24323A' },
-  { id: 'ambre', label: 'Ambre', accent: '#F6C177', ink: '#1F1305', accent2: '#CA9E62', accent3: '#353125' },
-  { id: 'turquoise', label: 'Turquoise', accent: '#7FE3D2', ink: '#04211D', accent2: '#68BAAC', accent3: '#223733' },
+  { id: 'vert', label: 'Lime', accent: '#A8F04A', ink: '#0E1A05', accent2: '#86C23A', accent3: '#26361A' },
+  { id: 'rose', label: 'Lilas', accent: '#D7B8FF', ink: '#1A1029', accent2: '#AC93CC', accent3: '#2E2640' },
+  { id: 'bleu', label: 'Azur', accent: '#6CC4FF', ink: '#04192B', accent2: '#579DCC', accent3: '#1A2E40' },
+  { id: 'ambre', label: 'Ambre', accent: '#FFB547', ink: '#261603', accent2: '#CC9139', accent3: '#3A2C16' },
+  { id: 'turquoise', label: 'Menthe', accent: '#5CE6D2', ink: '#03221E', accent2: '#4AB8A8', accent3: '#163632' },
 ]);
 
 /** Couleur de départ, tant que personne n'a choisi : le vert d'Ottman, le rose de Laura. */

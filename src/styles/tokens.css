@@ -39,10 +39,10 @@
 }
 
 :root {
-  /* Surfaces */
-  --surface-0: #0b0f0e;
-  --surface-1: #121715;
-  --surface-2: #18201d;
+  /* Surfaces : noir profond façon iOS, trois paliers. */
+  --surface-0: #08090b;
+  --surface-1: #15171a;
+  --surface-2: #1e2125;
   /* Mesures de lecture et réserves de chrome, bornées pour rester stables
      entre téléphone, tablette et grand écran. */
   --measure-reading: 68ch;
@@ -50,63 +50,70 @@
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   /* Invariants: --measure-wide stays <= 72rem, --fs-12 is the title cap,
      and --sp-14 is the spacing cap. Keep these bounds when extending tokens. */
-  --line: rgba(255, 255, 255, 0.09);
-  --line-strong: rgba(255, 255, 255, 0.16);
+  --line: rgb(255 255 255 / 0.08);
+  --line-strong: rgb(255 255 255 / 0.15);
+  --separateur: rgb(255 255 255 / 0.09);
+  --remplissage: rgb(118 118 128 / 0.24);
 
-  /* Texte */
-  --text-1: #f1f5f2;
-  --text-2: #a9b7ae;
-  --text-3: #78877e;
+  /* Texte : --text-3 tient 5:1 sur la carte la plus claire. */
+  --text-1: #f5f5f7;
+  --text-2: #aeaeb5;
+  --text-3: #98989f;
 
-  /* Accents — l'accent suit le profil actif (voir [data-profile] plus bas).
+  /* Accents — `data-accent` sur <html> choisit la teinte (voir plus bas).
      Les canaux séparés permettent les voiles translucides sans coder la teinte
      en dur dans chaque composant. */
-  --accent: #b8f36b;
-  --accent-rgb: 184 243 107;
-  --accent-ink: #0e1710;
-  --accent-2: #5fbf97;
-  --accent-3: #243129;
-  --rest: #f3bd6b;
-  --danger: #e79292;
-  --profile-laura: #e3c0f7;
+  --accent: #a8f04a;
+  --accent-rgb: 168 240 74;
+  --accent-ink: #0e1a05;
+  --accent-2: #86c23a;
+  --accent-3: #26361a;
+  --rest: #ffb547;
+  --rest-rgb: 255 181 71;
+  --danger: #ff8a80;
 
-  /* Laura : lilas pastel, même structure, teinte plus douce */
-  --accent-laura: #e3c0f7;
-  --accent-laura-rgb: 227 192 247;
-  --accent-laura-ink: #1a1024;
-  --accent-laura-2: #a98bc4;
-  --accent-laura-3: #2a2434;
+  /* Lilas de Laura : sert au choix du profil, avant toute couleur choisie. */
+  --accent-laura: #d7b8ff;
+  --accent-laura-rgb: 215 184 255;
+  --accent-laura-ink: #1a1029;
 
-  /* Rayons */
-  --r-sm: 6px;
-  --r-md: 10px;
-  --r-lg: 14px;
+  /* Matières.
+     Carte : verre simulé, opaque — aucun flou, le texte garde son contraste.
+     Verre : flou réel, réservé aux barres et aux feuilles. */
+  --carte-fond: linear-gradient(180deg, rgb(255 255 255 / 0.07), rgb(255 255 255 / 0.04)), var(--surface-1);
+  --carte-fond-2: rgb(255 255 255 / 0.06);
+  --carte-lisere:
+    inset 0 0 0 1px rgb(255 255 255 / 0.07), inset 0 1px 0 rgb(255 255 255 / 0.06), 0 8px 24px rgb(0 0 0 / 0.28);
+  --verre-teinte: rgb(30 32 36 / 0.62);
+  --verre-epais-teinte: rgb(34 36 40 / 0.86);
+  --verre-flou: blur(24px) saturate(180%);
+  --verre-ombre: inset 0 0 0 1px rgb(255 255 255 / 0.09), 0 10px 30px rgb(0 0 0 / 0.4);
 
-  /* Mouvement */
+  /* Mouvement court, pour les états (couleur, fond) */
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
   --t-fast: 120ms;
   --t-mid: 180ms;
-  --t-slow: 240ms;
 
-  /* Élévation unique, réservée aux surfaces flottantes */
-  --elevation: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 8px 24px rgba(0, 0, 0, 0.35);
-
-  /* Typographie : Inter auto-hébergée (voir les @font-face ci-dessus) */
-  font-family: "Inter Variable", Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
-}
-/* Spatial glass surfaces: opaque fallbacks precede translucency. */
-:root {
-  --surface-glass-1: rgba(255, 255, 255, 0.055);
-  --surface-glass-2: rgba(255, 255, 255, 0.09);
-  --surface-glass-3: rgba(18, 21, 29, 0.92);
-  --surface-pill: rgba(20, 24, 33, 0.94);
+  /* Typographie : la police du système d'abord, Inter auto-hébergée ensuite. */
+  --font-ui: -apple-system, BlinkMacSystemFont, "Inter Variable", "Segoe UI", system-ui, sans-serif;
+  --font-chiffres: ui-rounded, -apple-system, "Inter Variable", system-ui, sans-serif;
+  font-family: var(--font-ui);
+  color-scheme: dark;
 }
 
 /* ---------------------------------------------------------------- base ---- */
+/* Sur iOS, le rem suit la taille de texte choisie dans les réglages. */
+@supports (font: -apple-system-body) {
+  html {
+    /* biome-ignore lint/a11y/useGenericFontNames: mot-clé système iOS (Dynamic Type), pas une famille de police. */
+    font: -apple-system-body;
+  }
+}
+
 body {
   background: var(--surface-0);
   color: var(--text-1);
-  font-family: "Inter Variable", Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-family: var(--font-ui);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-tap-highlight-color: transparent;
@@ -139,7 +146,6 @@ body {
 
 /* ------------------------------------------------ hiérarchie typographique - */
 .profile-card h1,
-.hero-row h1,
 .completion-screen h1 {
   font-size: clamp(1.75rem, 7vw, 2.5rem);
   line-height: 1.1;
@@ -156,11 +162,6 @@ body {
 .workout-content .workout-heading h1 {
   font-size: clamp(1.25rem, 5.5vw, 1.875rem);
   line-height: 1.15;
-  letter-spacing: -0.01em;
-}
-
-.section-heading h2 {
-  font-size: var(--fs-7);
   letter-spacing: -0.01em;
 }
 
@@ -185,127 +186,11 @@ body {
   font-size: clamp(2rem, 9vw, 2.5rem);
 }
 
-.rest-orbit strong {
-  font-size: var(--fs-12);
-  letter-spacing: -0.02em;
-  font-variant-numeric: tabular-nums;
-}
-
-.workout-content .rest-orbit strong {
-  font-size: var(--fs-11);
-}
-
-/* Indicateurs : compacts, lisibles, sans surdimensionnement */
-.metric-card strong {
-  font-size: var(--fs-9);
-  letter-spacing: -0.02em;
-  font-variant-numeric: tabular-nums;
-}
-
-.day-number {
-  font-size: var(--fs-7);
-  color: var(--text-3);
-  letter-spacing: 0;
-  font-variant-numeric: tabular-nums;
-}
-
 /* Chronos et charges : largeur stable pendant le décompte */
 .session-elapsed,
-.rest-orbit strong,
 .exercise-timer strong,
-.progress-pill,
-.history-date,
-.prescription-main b,
-.plate-badge,
-.mustapha-progress + * {
+.prescription-main b {
   font-variant-numeric: tabular-nums;
-}
-
-/* ------------------------------------------------------- surfaces etcartes - */
-.workout-card,
-.metric-card,
-.prescription-card,
-.log-card,
-.rest-card,
-.history-item,
-.settings-profile,
-.settings-list button,
-.profile-choice,
-.coach-note,
-.resume-banner {
-  border: 1px solid var(--line);
-  box-shadow: none;
-}
-
-.workout-card,
-.metric-card,
-.prescription-card,
-.log-card,
-.rest-card {
-  border-radius: var(--r-lg);
-}
-
-.history-item,
-.settings-profile,
-.settings-list button,
-.profile-choice,
-.coach-note,
-.resume-banner {
-  border-radius: var(--r-lg);
-}
-
-/* Une seule carte accentuée par écran : la métrique de volume */
-.metric-card.accent {
-  background: var(--accent);
-  color: var(--accent-ink);
-  border-color: transparent;
-}
-
-.metric-card.accent span,
-.metric-card.accent small {
-  color: rgba(14, 23, 16, 0.72);
-}
-
-/* Tint par index : sans signification, on neutralise */
-.card-1,
-.card-2 {
-  background: var(--surface-1);
-}
-
-.workout-card:hover,
-.profile-choice:hover {
-  background: var(--surface-2);
-  transform: none;
-}
-
-/* Pastilles et étiquettes : neutres, l'accent reste l'action */
-.tag,
-.chip-row span {
-  background: var(--surface-2);
-  color: var(--text-2);
-  border: 1px solid var(--line);
-}
-
-.text-button,
-.tutorial-link {
-  color: var(--accent);
-  font-weight: 590;
-}
-
-.alternative-link {
-  background: var(--surface-2);
-  color: var(--text-2);
-  border: 1px solid var(--line);
-  font-weight: 510;
-}
-
-.alternative-link:hover {
-  color: var(--text-1);
-  border-color: var(--line-strong);
-}
-
-.alternative-link svg {
-  color: var(--text-3);
 }
 
 /* Alertes de tempo et de repos : une seule couleur d'alerte */
@@ -327,31 +212,16 @@ body {
   background: #55606a;
 }
 
-/* Boutons : rayons et transitions homogènes */
-.primary-button,
-.round-action,
-.tutorial-link,
-.icon-button,
+/* Boutons de la séance : rayon moyen ; le reste est en pilule. */
 .timer-actions button,
-.rest-actions button,
-.settings-list button,
-.input-row input {
+.rest-actions button {
   border-radius: var(--r-md);
 }
 
-.round-action,
-.icon-button {
-  border-radius: var(--r-pill, 999px);
-}
-
 .primary-button,
-.round-action,
-.tutorial-link,
 .icon-button,
 .text-button,
-.profile-choice,
-.workout-card,
-.history-item {
+.profile-choice {
   transition:
     background var(--t-mid) var(--ease),
     border-color var(--t-mid) var(--ease),
@@ -369,17 +239,6 @@ body {
   background: color-mix(in srgb, var(--accent) 86%, white);
 }
 
-.round-action:hover {
-  transform: none;
-}
-
-/* ------------------------------------ discipline d'accent et de densité ---- */
-/* Une seule couleur d'action par écran : le titre de marque et les libellés
-   secondaires restent neutres, l'accent est réservé à l'action et à l'état actif. */
-.topbar-brand {
-  color: var(--text-2);
-}
-
 .eyebrow {
   color: var(--text-3);
 }
@@ -388,54 +247,15 @@ body {
   box-shadow: none;
 }
 
-/* Le badge « en ligne » reste masqué : seule la perte de connexion s'affiche. */
-.connection-pill.online {
-  display: none;
-}
-
-.connection-pill.offline {
-  display: inline-flex;
-  color: var(--rest);
-  background: rgba(243, 189, 107, 0.12);
-}
-
-.connection-pill.offline .connection-dot {
-  background: var(--rest);
-  box-shadow: none;
-}
-
 .status-dot {
   background: var(--text-3);
   box-shadow: none;
-}
-
-/* La métrique mise en avant n'est plus un aplat saturé : elle reste une surface,
-   seule sa valeur porte l'accent. */
-.metric-card.accent {
-  background: var(--surface-1);
-  border-color: rgb(var(--accent-rgb) / 0.28);
-  color: var(--text-1);
-}
-
-.metric-card.accent strong {
-  color: var(--accent);
-}
-
-.metric-card.accent span,
-.metric-card.accent small {
-  color: var(--text-2);
 }
 
 /* Barre de progression : discrète, plus de rail lumineux décoratif */
 .progress-track {
   height: 3px;
   background: rgba(255, 255, 255, 0.07);
-}
-
-/* Cible tactile minimale de l'action de lancement */
-.round-action {
-  min-width: 44px;
-  min-height: 44px;
 }
 
 .toggle-row .toggle-pill {
@@ -448,8 +268,8 @@ body {
   height: 24px;
   padding: var(--sp-1);
   border-radius: var(--r-2xl);
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid var(--line);
+  background: var(--remplissage);
+  border: 0;
   transition:
     background var(--t-mid) var(--ease),
     border-color var(--t-mid) var(--ease);
@@ -477,46 +297,10 @@ body {
   transform: translateX(18px);
 }
 
-.last-session-strip {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3, 12px);
-  margin-top: var(--sp-8);
-  padding: var(--sp-6) var(--sp-7);
-  background: var(--surface-1);
-  border: 1px solid var(--line);
-  border-left: 2px solid var(--accent);
-  border-radius: var(--r-lg);
-}
-
-.last-session-strip strong {
-  display: block;
-  margin-top: var(--sp-1);
-  font-size: var(--fs-5);
-  font-weight: 590;
-}
-
-.last-session-strip small {
-  display: block;
-  margin-top: var(--sp-1);
-  color: var(--text-2);
-  font-size: var(--fs-2);
-}
-
-
-/* Bandeau duo : information secondaire, traitée comme telle */
-.duo-switcher-bar {
-  max-width: 20rem;
-}
-
 .duo-pill-btn {
   padding: var(--sp-3) var(--sp-5);
   font-size: var(--fs-2);
   min-height: 32px;
-}
-
-.duo-pill-badge {
-  font-size: var(--fs-1);
 }
 
 .chip-tempo {
@@ -528,26 +312,9 @@ body {
   font-weight: 590;
 }
 
-.tutorial-arrow {
-  color: var(--accent);
-}
-
-.best-item svg:last-child {
-  color: var(--text-3);
-}
-
-/* ------------------------------------------- suppression des décorations --- */
-.exercise-visual {
-  background: var(--surface-1);
-  border: 1px solid var(--line);
-  border-radius: var(--r-lg);
-  color: var(--text-3);
-}
-
 .tutorial-cover {
-  background: var(--surface-2);
-  border: 1px solid var(--line);
-  border-radius: var(--r-lg);
+  background: var(--carte-fond-2);
+  border-radius: var(--r-xl);
   color: var(--accent);
 }
 
@@ -556,12 +323,12 @@ body {
   flex: none;
   width: min(100%, 72rem);
   margin: 0 auto var(--sp-6);
-  padding: var(--sp-6) var(--sp-7);
-  border: 1px solid rgba(231, 146, 146, 0.35);
-  border-left: 2px solid var(--danger);
-  border-radius: var(--r-lg);
-  background: rgba(231, 146, 146, 0.1);
-  color: #f3d6d6;
+  padding: var(--sp-7) var(--sp-9);
+  border: 0;
+  border-radius: var(--r-2xl);
+  background: rgb(255 138 128 / 0.12);
+  box-shadow: inset 0 0 0 1px rgb(255 138 128 / 0.3);
+  color: var(--text-1);
   font-size: var(--fs-3);
   line-height: 1.45;
 }
@@ -582,10 +349,11 @@ body {
 .error-panel {
   width: min(100%, 34rem);
   padding: var(--sp-11);
-  background: var(--surface-1);
-  border: 1px solid var(--line);
-  border-left: 2px solid var(--danger);
-  border-radius: var(--r-lg);
+  border-radius: var(--r-2xl);
+  background: var(--carte-fond);
+  box-shadow:
+    var(--carte-lisere),
+    inset 3px 0 0 var(--danger);
 }
 
 .error-panel h1 {
@@ -610,7 +378,7 @@ body {
   overflow-wrap: anywhere;
 }
 
-/* Mise à jour disponible : discrète, jamais au milieu d'une séance */
+/* Mise à jour disponible : carte discrète, jamais au milieu d'une séance */
 .update-banner {
   display: flex;
   align-items: center;
@@ -618,10 +386,10 @@ body {
   gap: var(--sp-6);
   width: min(100%, 72rem);
   margin: 0 auto var(--sp-6);
-  padding: var(--sp-5) var(--sp-6);
-  border: 1px solid var(--line);
-  border-radius: var(--r-lg);
-  background: var(--surface-2);
+  padding: var(--sp-5) var(--sp-5) var(--sp-5) var(--sp-9);
+  border-radius: var(--r-2xl);
+  background: var(--carte-fond);
+  box-shadow: var(--carte-lisere);
   color: var(--text-2);
   font-size: var(--fs-3);
 }
@@ -629,37 +397,20 @@ body {
 .update-banner button {
   flex: none;
   min-height: 44px;
-  padding: 0 var(--sp-8);
+  padding: 0 var(--sp-9);
   border: 0;
-  border-radius: var(--r-md);
+  border-radius: var(--r-full);
   background: var(--accent);
   color: var(--accent-ink);
   font: inherit;
-  font-weight: 590;
+  font-weight: 650;
   cursor: pointer;
 }
 
-.toast {
-  background: var(--accent);
-  color: var(--accent-ink);
-  box-shadow: var(--elevation);
-}
-
-.modal-backdrop {
-  background: rgba(0, 0, 0, 0.68);
-}
-
-.tutorial-modal {
-  background: var(--surface-1);
-  border: 1px solid var(--line);
-  border-radius: var(--r-lg);
-}
-
 .safety-callout {
-  background: rgba(243, 189, 107, 0.1);
-  color: #e7cfa9;
-  border: 1px solid rgba(243, 189, 107, 0.22);
-  border-radius: var(--r-md);
+  background: rgb(var(--rest-rgb) / 0.1);
+  color: var(--text-1);
+  box-shadow: inset 0 0 0 1px rgb(var(--rest-rgb) / 0.22);
 }
 
 .settings-list .danger-row,
@@ -675,57 +426,47 @@ body {
   color: var(--text-1);
 }
 
-/* Profil actif : Laura remplace l'accent lime par son lilas pastel.
-   Un seul attribut sur <html> suffit — aucun composant ne connaît le profil. */
-:root[data-profile="laura"] {
-  --accent: var(--accent-laura);
-  --accent-rgb: var(--accent-laura-rgb);
-  --accent-ink: var(--accent-laura-ink);
-  --accent-2: var(--accent-laura-2);
-  --accent-3: var(--accent-laura-3);
-}
-
-/* Couleur choisie dans les réglages, une par profil.
-   Ce bloc vient APRÈS celui du profil : à spécificité égale, il gagne. Les cinq
-   paires couleur / encre sont mesurées à plus de 10:1 de contraste (seuil AAA : 7:1). */
+/* Couleur choisie dans les réglages, une par profil. App pose toujours
+   `data-accent` quand un profil est actif : ces blocs suffisent.
+   Valeurs miroir de src/domain/palettes.ts (contrastes vérifiés par son test). */
 :root[data-accent="vert"] {
-  --accent: #b8f36b;
-  --accent-rgb: 184 243 107;
-  --accent-ink: #0e1710;
-  --accent-2: #97c758;
-  --accent-3: #2b3923;
+  --accent: #a8f04a;
+  --accent-rgb: 168 240 74;
+  --accent-ink: #0e1a05;
+  --accent-2: #86c23a;
+  --accent-3: #26361a;
 }
 
 :root[data-accent="rose"] {
-  --accent: #e3c0f7;
-  --accent-rgb: 227 192 247;
-  --accent-ink: #1a1024;
-  --accent-2: #ba9dcb;
-  --accent-3: #323139;
+  --accent: #d7b8ff;
+  --accent-rgb: 215 184 255;
+  --accent-ink: #1a1029;
+  --accent-2: #ac93cc;
+  --accent-3: #2e2640;
 }
 
 :root[data-accent="bleu"] {
-  --accent: #8fc7ff;
-  --accent-rgb: 143 199 255;
-  --accent-ink: #0a1622;
-  --accent-2: #75a3d1;
-  --accent-3: #24323a;
+  --accent: #6cc4ff;
+  --accent-rgb: 108 196 255;
+  --accent-ink: #04192b;
+  --accent-2: #579dcc;
+  --accent-3: #1a2e40;
 }
 
 :root[data-accent="ambre"] {
-  --accent: #f6c177;
-  --accent-rgb: 246 193 119;
-  --accent-ink: #1f1305;
-  --accent-2: #ca9e62;
-  --accent-3: #353125;
+  --accent: #ffb547;
+  --accent-rgb: 255 181 71;
+  --accent-ink: #261603;
+  --accent-2: #cc9139;
+  --accent-3: #3a2c16;
 }
 
 :root[data-accent="turquoise"] {
-  --accent: #7fe3d2;
-  --accent-rgb: 127 227 210;
-  --accent-ink: #04211d;
-  --accent-2: #68baac;
-  --accent-3: #223733;
+  --accent: #5ce6d2;
+  --accent-rgb: 92 230 210;
+  --accent-ink: #03221e;
+  --accent-2: #4ab8a8;
+  --accent-3: #163632;
 }
 
 /* ---------------------------------------------------------------------------
@@ -788,11 +529,15 @@ body {
   --fs-tempo: clamp(4.5rem, 24vw, 7rem);
   --fs-tempo-unite: 0.42em;
 
-  /* Rayons : prolonge les trois qui existaient déjà. */
+  /* Rayons, proches de ceux d'iOS : cartes à 28, tuiles à 22. */
   --r-xs: 4px;
-  --r-xl: 20px;
-  --r-2xl: 24px;
-  --r-full: 99px;
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-xl: 22px;
+  --r-2xl: 28px;
+  --r-full: 999px;
+  --fs-titre: 2.125rem;
 
   /* Bornes contractuelles du système : aucun titre ne dépasse 2.5rem et
      aucun espacement ne dépasse 48px sans passer par une fonction fluide. */

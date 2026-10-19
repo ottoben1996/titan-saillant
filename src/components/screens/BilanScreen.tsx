@@ -22,7 +22,7 @@ import {
 } from '../../workout/followup';
 import { progressionForce } from '../../workout/progressionForce';
 import { sessionVolume, workoutDayLabel } from '../../workout/summary';
-import { ArrowLeft, DownloadSimple } from '../ui/Icons';
+import { DownloadSimple } from '../ui/Icons';
 import { NombreAnime } from '../ui/NombreAnime';
 
 interface BilanScreenProps {
@@ -163,7 +163,12 @@ const libelleForme = (forme: 'better' | 'same' | 'worse' | undefined) =>
 const libelleConsigne = (consigne: LoadConsigne) =>
   consigne === 'increase' ? 'charger plus' : consigne === 'decrease' ? 'alléger' : 'même charge';
 
-export function BilanScreen({ profileId, measurements, current, sessions, onBack }: BilanScreenProps) {
+/**
+ * `onBack` reste dans le contrat de l'écran, mais le retour est porté par la
+ * barre du haut (chevron) : un second bouton Retour dans la page doublait la
+ * navigation.
+ */
+export function BilanScreen({ profileId, measurements, current, sessions }: BilanScreenProps) {
   const body = profileBody[profileId];
   const ordered = useMemo(
     () => [...measurements].sort((a, b) => (a.cycle === b.cycle ? a.week - b.week : a.cycle - b.cycle)),
@@ -295,11 +300,9 @@ export function BilanScreen({ profileId, measurements, current, sessions, onBack
   return (
     <div className="bilan">
       <div className="bilan-bar">
-        <button type="button" className="back-link" onClick={onBack}>
-          <ArrowLeft size={16} /> Retour
-        </button>
+        <span className="bilan-bar-titre">Bilan de la semaine {current.week}</span>
         <button type="button" className="primary-button" onClick={() => window.print()}>
-          <DownloadSimple size={16} /> Imprimer / Enregistrer en PDF
+          <DownloadSimple size={16} /> Exporter en PDF
         </button>
       </div>
 

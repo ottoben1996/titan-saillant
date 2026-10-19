@@ -1,6 +1,24 @@
 import { useEffect, useRef, useState } from 'react';
+import { BottomNav, type Screen } from './components/layout/BottomNav';
+import { TopBar } from './components/layout/TopBar';
+import { AlternativeModal } from './components/modals/AlternativeModal';
+import { EnergyCheckinModal, type EnergyLevel } from './components/modals/EnergyCheckinModal';
+import { ExitWorkoutDialog } from './components/modals/ExitWorkoutDialog';
+import { TutorialModal } from './components/modals/TutorialModal';
 import { BilanScreen } from './components/screens/BilanScreen';
 import { FollowupScreen } from './components/screens/FollowupScreen';
+import { HistoryScreen } from './components/screens/HistoryScreen';
+import { HomeScreen, profileLabels } from './components/screens/HomeScreen';
+import { LoadsScreen } from './components/screens/LoadsScreen';
+import { ProfileChooser } from './components/screens/ProfileChooser';
+import { ProgressionScreen } from './components/screens/ProgressionScreen';
+import { SettingsScreen } from './components/screens/SettingsScreen';
+import { WorkoutScreen } from './components/screens/WorkoutScreen';
+import { ConfirmDialog } from './components/ui/ConfirmDialog';
+import { Check } from './components/ui/Icons';
+import { useSensEcran } from './components/ui/transitionEcran';
+import { useEnTeteReplie } from './components/ui/useEnTeteReplie';
+import { useRetourAuBord } from './components/ui/useRetourAuBord';
 import { equipmentAlternatives } from './domain/alternatives';
 import type { WeeklyMeasurement } from './domain/measurements';
 import type { AccentId } from './domain/palettes';
@@ -18,9 +36,9 @@ import { enregistrerAccent, lireAccent } from './storage/accentPreference';
 import { telechargerSauvegarde } from './storage/backupFile';
 import { etatSauvegarde, reporterSauvegarde } from './storage/backupReminder';
 import {
-  STORAGE_UNAVAILABLE_MESSAGE,
   readLocalStorage,
   removeLocalStorage,
+  STORAGE_UNAVAILABLE_MESSAGE,
   withStorageGuard,
   writeLocalStorage,
 } from './storage/guard';
@@ -44,26 +62,6 @@ import {
 } from './workout/runner';
 import { totalsForWeek } from './workout/summary';
 import { restoreRemainingSeconds } from './workout/timer';
-
-
-import { BottomNav, type Screen } from './components/layout/BottomNav';
-import { TopBar } from './components/layout/TopBar';
-import { AlternativeModal } from './components/modals/AlternativeModal';
-import { EnergyCheckinModal, type EnergyLevel } from './components/modals/EnergyCheckinModal';
-import { ExitWorkoutDialog } from './components/modals/ExitWorkoutDialog';
-import { TutorialModal } from './components/modals/TutorialModal';
-import { HistoryScreen } from './components/screens/HistoryScreen';
-import { HomeScreen } from './components/screens/HomeScreen';
-import { LoadsScreen } from './components/screens/LoadsScreen';
-import { ProfileChooser } from './components/screens/ProfileChooser';
-import { ProgressionScreen } from './components/screens/ProgressionScreen';
-import { SettingsScreen } from './components/screens/SettingsScreen';
-import { WorkoutScreen } from './components/screens/WorkoutScreen';
-import { ConfirmDialog } from './components/ui/ConfirmDialog';
-import { Check } from './components/ui/Icons';
-import { useSensEcran } from './components/ui/transitionEcran';
-import { useEnTeteReplie } from './components/ui/useEnTeteReplie';
-import { useRetourAuBord } from './components/ui/useRetourAuBord';
 
 const profileKey = 'coach-active-profile';
 type BeforeInstallPromptEvent = Event & {
@@ -205,14 +203,14 @@ export default function App() {
 
   /** Ce qu'un lecteur d'écran annonce quand on change d'écran. */
   const libellesEcran: Record<Screen, string> = {
-    home: 'Accueil',
+    home: 'Aujourd’hui',
     workout: 'Séance en cours',
-    history: 'Historique des séances',
-    progression: 'Progression',
-    followup: 'Point du samedi',
+    history: 'Historique',
+    progression: 'Tendances',
+    followup: 'Points du samedi',
     bilan: 'Bilan de la semaine',
-    settings: 'Réglages',
-    loads: 'Mes charges',
+    settings: 'Profil',
+    loads: 'Programme',
   };
   const libelleEcran = `${profile === 'laura' ? 'Espace de Laura' : profile === 'ottman' ? 'Espace d\u2019Ottman' : 'Choix du profil'}, ${libellesEcran[screen] ?? ''}`;
 
@@ -486,7 +484,11 @@ export default function App() {
   const switchDuoProfile = async (target: ProfileId, fallbackScreen: Screen = 'home') => {
     if (target === profile) return;
     if (session) {
-      await withStorageGuard(saveSession({ ...session, updatedAt: new Date().toISOString() }), onStorageFailure, undefined);
+      await withStorageGuard(
+        saveSession({ ...session, updatedAt: new Date().toISOString() }),
+        onStorageFailure,
+        undefined,
+      );
     }
     writeLocalStorage(profileKey, target, onStorageFailure);
     setProfile(target);
@@ -533,7 +535,10 @@ export default function App() {
   // venir un écran ouvert depuis la droite. Le geste de retour au bord, lui,
   // agit exactement comme le bouton de la barre du haut.
   const sensEcran = useSensEcran(screen);
-  const retourBord = useRetourAuBord({ actif: screen !== 'home', onRetour: handleTopbarBack });
+  const retourBord = useRetourAuBord({
+    actif: screen === 'workout' || screen === 'bilan',
+    onRetour: handleTopbarBack,
+  });
 
   if (!profile) return <ProfileChooser onChoose={chooseProfile} />;
 
@@ -615,7 +620,12 @@ export default function App() {
 
   const resumeWorkout = () => {
     if (!session) return;
-    const sessionProgram = getProgram(profile, session.programWeek ?? programWeek, effectiveManualLoads, manualDurations);
+    const sessionProgram = getProgram(
+      profile,
+      session.programWeek ?? programWeek,
+      effectiveManualLoads,
+      manualDurations,
+    );
     const day = sessionProgram.days.find((item) => item.id === session.dayId);
     if (!day) return;
     const restoredTimer = session.activeTimer
@@ -869,8 +879,6 @@ export default function App() {
     window.setTimeout(() => setNotice(''), 3000);
   };
 
-
-
   const handleTimerStateChange = (state: SessionTimerState | null) => {
     if (!session) return;
     const previousRemaining = session.activeTimer?.remainingSeconds ?? 0;
@@ -1007,28 +1015,21 @@ export default function App() {
       }
       return setExitPromptOpen(true);
     }
-    if (screen === 'home') {
-      // Confirmation dans l'application : le dialogue natif du navigateur sort du
-      // design system et bloque la page sur mobile.
-      setConfirmSwitchOpen(true);
-      return;
-    }
-    setScreen('home');
+    if (screen === 'bilan') setScreen('followup');
   }
 
   const topbarLabel =
     tutorialId || alternativeId
       ? 'Retour à la séance'
       : screen === 'workout'
-        ? // Sur l'écran de fin, la séance n'est plus « en cours » : la flèche ne
+        ? // Sur l'écran de fin, la séance n'est plus « en cours » : la croix ne
           // quitte rien, elle rentre à l'accueil. Garder « Quitter la séance »
           // laissait croire qu'un appui restait dangereux à la fin.
           session?.completedAt
           ? 'Retour à l’accueil'
           : 'Quitter la séance'
-        : screen === 'home'
-          ? 'Changer de profil'
-          : 'Retour à l’accueil';
+        : 'Retour aux points du samedi';
+  const modeBarre = screen === 'workout' ? 'fermer' : screen === 'bilan' ? 'retour' : 'onglet';
 
   const currentExerciseForAlternative =
     alternativeId && selectedDay && session
@@ -1049,11 +1050,13 @@ export default function App() {
         {libelleEcran}
       </p>
       <TopBar
+        mode={modeBarre}
         onBack={handleTopbarBack}
         backLabel={topbarLabel}
         isOnline={isOnline}
         titre={libellesEcran[screen]}
-        onOpenSettings={() => setScreen('settings')}
+        initiale={profile === 'laura' ? 'L' : 'O'}
+        onChangerProfil={() => setConfirmSwitchOpen(true)}
       />
 
       {updateReady && screen !== 'workout' && (
@@ -1086,7 +1089,6 @@ export default function App() {
         <HomeScreen
           profile={profile}
           program={program}
-          prescribedProgram={getProgram(profile, programWeek)}
           history={history}
           measurements={measurements}
           onOpenFollowup={() => setScreen('followup')}
@@ -1100,17 +1102,6 @@ export default function App() {
           onDiscard={() => setAbandonOpen(true)}
           serie={serieAssiduite(history, program, new Date())}
           programWeek={programWeek}
-          onProgramWeekChange={changeProgramWeek}
-          sauvegarde={
-            rappelSauvegarde.proposer
-              ? {
-                  sessions: history.filter((item) => item.completedAt).length,
-                  joursDepuisExport: rappelSauvegarde.joursDepuisExport,
-                  onExport: () => void exporterSauvegarde(),
-                  onLater: reporterSauvegardePlusTard,
-                }
-              : undefined
-          }
         />
       )}
 
@@ -1145,7 +1136,7 @@ export default function App() {
       {screen === 'history' && (
         <HistoryScreen
           history={history}
-          onBack={() => setScreen('home')}
+          onNavigate={setScreen}
           onDelete={(sessionId) => setSessionToDelete(sessionId)}
         />
       )}
@@ -1155,7 +1146,7 @@ export default function App() {
           history={history}
           profile={profile}
           measurements={measurements}
-          onBack={() => setScreen('home')}
+          onNavigate={setScreen}
           onOpenFollowup={() => setScreen('followup')}
           onSwitchDuoProfile={(target) => switchDuoProfile(target, 'progression')}
         />
@@ -1173,7 +1164,7 @@ export default function App() {
             setBilanTarget(measurement);
             setScreen('bilan');
           }}
-          onBack={() => setScreen('progression')}
+          onNavigate={setScreen}
         />
       )}
       {screen === 'bilan' && profile && bilanTarget && (
@@ -1191,7 +1182,16 @@ export default function App() {
           profile={profile}
           accent={accent}
           onAccentChange={changerAccent}
-          onBack={() => setScreen('home')}
+          sauvegarde={
+            rappelSauvegarde.proposer
+              ? {
+                  sessions: history.filter((item) => item.completedAt).length,
+                  joursDepuisExport: rappelSauvegarde.joursDepuisExport,
+                  onExport: () => void exporterSauvegarde(),
+                  onLater: reporterSauvegardePlusTard,
+                }
+              : undefined
+          }
           onSwitch={leaveProfile}
           onNotice={setNotice}
           onImported={() => void rechargerApresImport(profile)}
@@ -1210,7 +1210,9 @@ export default function App() {
           profile={profile}
           manualLoads={manualLoadsProfile === profile ? manualLoads : {}}
           manualDurations={manualDurations}
-          onBack={() => setScreen('home')}
+          prescribedProgram={getProgram(profile, programWeek)}
+          programWeek={programWeek}
+          onProgramWeekChange={changeProgramWeek}
           onNotice={setNotice}
           onSave={saveManualLoads}
           onSaveDurations={saveManualDurations}
@@ -1218,7 +1220,9 @@ export default function App() {
       )}
 
       {/* Le bilan est un document : aucune navigation ne doit apparaître dessus. */}
-      {screen !== 'workout' && screen !== 'bilan' && <BottomNav currentScreen={screen} onNavigate={setScreen} />}
+      {screen !== 'workout' && screen !== 'bilan' && (
+        <BottomNav currentScreen={screen} onNavigate={setScreen} badges={{ settings: rappelSauvegarde.proposer }} />
+      )}
 
       {tutorialId && tutorials[tutorialId] && (
         <TutorialModal tutorial={tutorials[tutorialId]} onClose={() => setTutorialId(null)} />
@@ -1288,7 +1292,7 @@ export default function App() {
       {pendingDay && (
         <EnergyCheckinModal
           day={pendingDay}
-          profileName={profile}
+          profileName={profileLabels[profile]}
           onConfirm={confirmWorkoutStart}
           onSkip={() => confirmWorkoutStart('normal', 1.0)}
         />

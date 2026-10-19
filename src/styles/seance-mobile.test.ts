@@ -50,7 +50,9 @@ describe('écran de séance au téléphone', () => {
   it('ne réserve plus de place au bas de la colonne de séance', () => {
     // 130 px + sp-11 faisaient 154 px de vide mesuré sous le dernier bloc.
     expect(matiere).not.toMatch(/\.workout-content\s*\{[^}]*padding-bottom:\s*calc\([^)]*130px/);
-    expect(matiere).toMatch(/\.workout-content\s*\{[^}]*padding-bottom:\s*calc\(5rem \+ env\(safe-area-inset-bottom, 0px\)\)/);
+    expect(matiere).toMatch(
+      /\.workout-content\s*\{[^}]*padding-bottom:\s*calc\(5rem \+ env\(safe-area-inset-bottom, 0px\)\)/,
+    );
   });
 
   it('range les trois réponses d’une question sur une seule rangée', () => {

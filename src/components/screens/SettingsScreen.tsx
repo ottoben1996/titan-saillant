@@ -8,7 +8,7 @@ import { journalEnTexte, lireErreurs, viderErreurs } from '../../storage/journal
 import { type EtatPersistance, etatPersistance, libellePersistance } from '../../storage/persistance';
 import { deleteProfileData, listSessions } from '../../storage/sessionRepository';
 import { isSoundEnabled, playTimerChime, setSoundEnabled } from '../../workout/alerts';
-import { ArrowLeft, ArrowRight, DownloadSimple, Timer, Trash, Warning } from '../ui/Icons';
+import { ArrowRight, Check, DownloadSimple, Timer, Trash, Warning } from '../ui/Icons';
 import { profileLabels } from './HomeScreen';
 
 const ERASE_WORD = 'SUPPRIMER';
@@ -18,12 +18,21 @@ interface SessionCounts {
   completed: number;
 }
 
+/** Rappel de sauvegarde affiché en tête du Profil. */
+export interface RappelSauvegarde {
+  sessions: number;
+  joursDepuisExport?: number;
+  onExport: () => void;
+  onLater: () => void;
+}
+
 interface SettingsScreenProps {
   profile: ProfileId;
   /** Couleur choisie par ce profil, appliquée immédiatement. */
   accent: AccentId;
   onAccentChange: (accent: AccentId) => void;
-  onBack: () => void;
+  /** Rappel de sauvegarde : présent seulement quand les données méritent d'être mises à l'abri. */
+  sauvegarde?: RappelSauvegarde;
   onSwitch: () => void;
   onNotice: (notice: string) => void;
   onImported: () => void;
@@ -63,7 +72,7 @@ export function SettingsScreen({
   accent,
   onAccentChange,
   profile,
-  onBack,
+  sauvegarde,
   onSwitch,
   onNotice,
   onImported,
@@ -192,19 +201,15 @@ export function SettingsScreen({
   const statusLabel = (ok: boolean, ready: string, pending: string) => (ok ? ready : pending);
 
   return (
-    <section className="content">
-      <div className="page-heading">
-        <div>
-          <p className="eyebrow">ESPACE PERSONNEL</p>
-          <h1>Réglages</h1>
-        </div>
-        <button className="text-button" onClick={onBack} type="button">
-          <ArrowLeft size={16} /> Retour
-        </button>
-      </div>
+    <section className="content settings-content">
+      <header className="large-title">
+        <h1>Profil</h1>
+      </header>
 
-      <div className="settings-profile">
-        <div className={`avatar avatar-${profile}`}>{profileLabels[profile][0]}</div>
+      <div className="profil-tete">
+        <div className={`avatar avatar-${profile}`} aria-hidden="true">
+          {profileLabels[profile][0]}
+        </div>
         <div>
           <strong>{profileLabels[profile]}</strong>
           <small>
@@ -212,10 +217,34 @@ export function SettingsScreen({
             {counts ? ` · ${describeSessions(counts)}` : ''}
           </small>
         </div>
-        <button className="text-button" onClick={onSwitch} type="button">
-          Changer
+        <button className="secondary-button" onClick={onSwitch} type="button">
+          Changer de profil
         </button>
       </div>
+
+      {/* Le suivi ne vit que dans ce téléphone : on propose de le mettre à l'abri. */}
+      {sauvegarde && (
+        <aside className="backup-card">
+          <div>
+            <p className="eyebrow">SAUVEGARDE</p>
+            <strong>Ton suivi n'existe que sur ce téléphone</strong>
+            <small>
+              {sauvegarde.sessions} séances enregistrées
+              {sauvegarde.joursDepuisExport !== undefined
+                ? ` · dernière sauvegarde il y a ${sauvegarde.joursDepuisExport} jours`
+                : ' · jamais sauvegardé'}
+            </small>
+          </div>
+          <div className="backup-actions">
+            <button type="button" className="primary-button" onClick={sauvegarde.onExport}>
+              <DownloadSimple size={16} /> Exporter
+            </button>
+            <button type="button" className="text-button" onClick={sauvegarde.onLater}>
+              Plus tard
+            </button>
+          </div>
+        </aside>
+      )}
 
       {/* -------------------------------------------------- cycle en pause --- */}
       <section className="settings-section">
@@ -278,7 +307,7 @@ export function SettingsScreen({
 
       {/* --------------------------------------------------- ma couleur ------ */}
       <section className="settings-section">
-        <h2 className="settings-title">Ma couleur</h2>
+        <h2 className="settings-title">Apparence</h2>
         {/* Clin d'œil : la couleur de Laura n'a pas été choisie par quelqu'un d'autre. */}
         {profile === 'laura' && <p className="accent-teaser">Parce qu'Ottman te connaît pas, choisis par toi-même.</p>}
         <div className="accent-choices" role="radiogroup" aria-label="Couleur de l'application">
@@ -291,7 +320,9 @@ export function SettingsScreen({
               className={`accent-choice${accent === item.id ? ' on' : ''}`}
               onClick={() => onAccentChange(item.id)}
             >
-              <span className="accent-dot" style={{ background: item.accent }} aria-hidden="true" />
+              <span className="accent-dot" style={{ background: item.accent }} aria-hidden="true">
+                {accent === item.id ? <Check size={18} weight="bold" /> : null}
+              </span>
               {item.label}
             </button>
           ))}

@@ -8,12 +8,14 @@ import {
   summarizeSession,
   workoutDayLabel,
 } from '../../workout/summary';
-import { ArrowLeft, Check, Clock, Repeat, Trash } from '../ui/Icons';
+import { Check, Clock, Repeat, Trash } from '../ui/Icons';
+import { type ProgressScreen, ProgressTabs } from '../ui/SegmentedControl';
 import { useListeAnimee } from '../ui/useListeAnimee';
 
 interface HistoryScreenProps {
   history: WorkoutSession[];
-  onBack: () => void;
+  /** Bascule entre les trois vues sœurs de l'onglet Progrès. */
+  onNavigate: (screen: ProgressScreen) => void;
   /** Retire définitivement une séance de l'historique. */
   onDelete: (sessionId: string) => void;
 }
@@ -27,32 +29,25 @@ function sessionDateLabel(item: WorkoutSession): string {
   });
 }
 
-export function HistoryScreen({ history, onBack, onDelete }: HistoryScreenProps) {
+export function HistoryScreen({ history, onNavigate, onDelete }: HistoryScreenProps) {
   const groups = useMemo(() => groupSessionsByWeek(history), [history]);
   // Une ligne supprimée qui disparaît d'un coup laisse un doute : on laisse la
   // liste se replacer sous le doigt.
   const listeAnimee = useListeAnimee();
 
   return (
-    <section className="content">
-      <div className="page-heading">
-        <div>
-          <p className="eyebrow">TON PARCOURS</p>
-          <h1>Historique</h1>
-        </div>
-        <button className="text-button" onClick={onBack} type="button">
-          <ArrowLeft size={16} /> Accueil
-        </button>
-      </div>
+    <section className="content history-content">
+      <header className="large-title">
+        <h1>Progrès</h1>
+      </header>
+      <ProgressTabs current="history" onNavigate={onNavigate} />
 
       {history.length === 0 ? (
         <div className="empty-state">
           <Repeat size={34} />
           <h2>Aucune séance enregistrée</h2>
           <p>Ta première séance apparaîtra ici, avec sa durée, tes séries validées et ton ressenti.</p>
-          <button className="primary-button empty-cta" onClick={onBack} type="button">
-            Choisir ma séance
-          </button>
+          <p className="muted-copy">Lance une séance depuis l’onglet Aujourd’hui.</p>
         </div>
       ) : (
         <div className="history-weeks">
@@ -105,7 +100,9 @@ export function HistoryScreen({ history, onBack, onDelete }: HistoryScreenProps)
                       >
                         <Trash size={16} />
                       </button>
-                      <span className="sr-only">{done ? 'Séance terminée' : interrupted ? 'Séance interrompue' : 'Séance en cours'}</span>
+                      <span className="sr-only">
+                        {done ? 'Séance terminée' : interrupted ? 'Séance interrompue' : 'Séance en cours'}
+                      </span>
                     </article>
                   );
                 })}
