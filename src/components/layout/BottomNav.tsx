@@ -10,7 +10,9 @@ export type Screen =
   /** Suivi hebdomadaire : saisie du samedi et historique des semaines. */
   | 'followup'
   /** Bilan imprimable d'une semaine, destiné au coach. */
-  | 'bilan';
+  | 'bilan'
+  /** Revue imprimable des huit dernières semaines. */
+  | 'block';
 
 interface BottomNavProps {
   currentScreen: Screen;
@@ -25,6 +27,7 @@ export function navigationParent(screen: Screen): Screen {
     case 'history':
     case 'followup':
     case 'bilan':
+    case 'block':
       return 'progression';
     default:
       return screen;

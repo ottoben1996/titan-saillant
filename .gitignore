@@ -4,6 +4,9 @@ coverage/
 .wrangler/
 .tmp/
 .agents/
+test-results/
+playwright-report/
+blob-report/
 
 # Sources de travail volumineuses (livres PDF et extractions texte)
 *.pdf

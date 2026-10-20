@@ -19,6 +19,7 @@ import {
   ArrowRight,
   Barbell,
   Bolt,
+  ChartLine,
   Check,
   ChevronDown,
   ChevronRight,
@@ -130,6 +131,8 @@ interface WorkoutScreenProps {
   onTimerDone: (kind?: 'rest' | 'tempo', manuel?: boolean) => void;
   onCompleteSet: (values: { repetitions?: number; durationSeconds?: number; loadKg?: number }) => Promise<void>;
   onTutorial: (id: string) => void;
+  /** Ouvre la fiche de progression du mouvement en cours. */
+  onOpenExercise: (id: string) => void;
   onAlternative: (id: string) => void;
   /** Passe l'exercice en cours sans rien enregistrer (machine occupée, pas d'alternative). */
   onSkipExercise: () => void;
@@ -163,6 +166,7 @@ export function WorkoutScreen({
   onTimerDone,
   onCompleteSet,
   onTutorial,
+  onOpenExercise,
   onAlternative,
   onSkipExercise,
   onUndoSet,
@@ -1012,6 +1016,13 @@ export function WorkoutScreen({
               <button type="button" className="liste-ligne" onClick={choisirOption(() => onTutorial(exercise.id))}>
                 <Video size={20} />
                 <span>Tutoriel</span>
+                <ChevronRight size={16} className="liste-chevron" />
+              </button>
+            )}
+            {exercise && (
+              <button type="button" className="liste-ligne" onClick={choisirOption(() => onOpenExercise(exercise.id))}>
+                <ChartLine size={20} />
+                <span>Fiche du mouvement</span>
                 <ChevronRight size={16} className="liste-chevron" />
               </button>
             )}

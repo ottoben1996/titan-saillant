@@ -553,6 +553,27 @@
   font-size: var(--fs-2);
 }
 
+/* Le point du samedi et la semaine de charges sont deux calendriers : quand ils
+   divergent, on propose de les recoller, sans jamais le faire dans le dos. */
+.calendar-sync {
+  display: grid;
+  gap: var(--sp-4);
+  padding: var(--sp-6);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+}
+
+.calendar-sync strong {
+  font-size: var(--fs-3);
+}
+
+.calendar-sync p {
+  margin: var(--sp-2) 0 0;
+  color: var(--text-2);
+  font-size: var(--fs-2);
+}
+
 .followup-coach {
   display: grid;
   gap: var(--sp-3);
@@ -689,6 +710,134 @@
   color: #55655c;
 }
 
+/* --------------------------------------------------------- revue de bloc -- */
+
+.zone-heatmap-wrap {
+  margin: var(--sp-5) 0 0;
+}
+
+.zone-heatmap {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.bilan-doc .zone-heatmap th,
+.bilan-doc .zone-heatmap td {
+  padding: var(--sp-2) var(--sp-1);
+  border-bottom: 0;
+  text-align: center;
+}
+
+.bilan-doc .zone-heatmap thead th {
+  font-size: var(--fs-1);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.bilan-doc .zone-heatmap thead th:first-child {
+  width: 26%;
+  text-align: left;
+}
+
+.bilan-doc .zone-heatmap tbody th {
+  width: 26%;
+  color: #24312a;
+  font-size: var(--fs-1);
+  font-weight: 600;
+  letter-spacing: 0;
+  text-align: left;
+  text-transform: none;
+  white-space: normal;
+}
+
+.bilan-doc .zone-heatmap .zone-heat-total {
+  width: 14%;
+  color: #24312a;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  text-align: right;
+}
+
+.zone-heat-cell {
+  display: block;
+  height: 18px;
+  border-radius: var(--r-xs);
+  background: #24312a;
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+.zone-heat-zero .zone-heat-cell {
+  background: #eef2ef;
+}
+
+.zone-heat-legend {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-top: var(--sp-3);
+  color: #55655c;
+  font-size: var(--fs-1);
+}
+
+.zone-heat-legend i {
+  width: 18px;
+  height: 8px;
+  border-radius: var(--r-xs);
+  background: #24312a;
+}
+
+.zone-heat-legend span {
+  margin: 0 var(--sp-2);
+}
+
+.block-signal {
+  color: #8a5c0a;
+  font-weight: 600;
+}
+
+.block-empty {
+  margin-top: var(--sp-8);
+  padding: var(--sp-8);
+  border: 1px dashed #d8e0db;
+  border-radius: var(--r-md);
+  color: #55655c;
+}
+
+.block-empty p {
+  margin: 0;
+  color: #24312a;
+  font-size: var(--fs-4);
+  font-weight: 600;
+}
+
+.block-empty small {
+  display: block;
+  margin-top: var(--sp-2);
+  font-size: var(--fs-2);
+}
+
+.block-doc .bilan-read {
+  margin-top: var(--sp-8);
+}
+
+.block-doc .bilan-read b {
+  display: block;
+  margin-bottom: var(--sp-2);
+  color: #3f7a3a;
+  font-size: var(--fs-1);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.block-doc .bilan-read.alert b {
+  color: #8a5c0a;
+}
+
+.block-doc .bilan-read p + p {
+  margin-top: var(--sp-3);
+}
+
 /* Impression : seul le document doit sortir, sur fond blanc, sans habillage. */
 @media print {
   /* Le fond sombre de l'application est porté par ses conteneurs, pas seulement
@@ -734,7 +883,8 @@
   .bilan-chart,
   .bilan-doc .bilan-muscle-map,
   .bilan-read,
-  .bilan-charges {
+  .bilan-charges,
+  .zone-heatmap-wrap {
     break-inside: avoid;
   }
 
@@ -834,6 +984,19 @@
 
   .bilan-head h2 {
     font-size: var(--fs-7);
+  }
+
+  .bilan-doc .zone-heatmap thead th:first-child,
+  .bilan-doc .zone-heatmap tbody th {
+    width: 27%;
+  }
+
+  .bilan-doc .zone-heatmap .zone-heat-total {
+    width: 13%;
+  }
+
+  .zone-heat-cell {
+    height: 16px;
   }
 }
 

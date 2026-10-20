@@ -1744,3 +1744,207 @@ html[data-perf="bas"] .skeleton-line {
 html[data-perf="bas"] .completion-icon svg path {
   animation: none;
 }
+
+/* -------------------------------------------------------- fiche mouvement -- */
+
+/* Le record est une entrée, pas une ligne décorative : le reset de bouton doit
+   rester invisible, et la cible garde ses 48 px. */
+.record-row-action {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.record-row-action:active {
+  background: rgb(255 255 255 / 0.04);
+}
+
+.record-chevron {
+  flex: none;
+  color: var(--text-3);
+}
+
+.exercise-sheet {
+  /* La fiche est dense : le verre de 86 % laissait lire la page derrière les
+     chiffres. Une surface pleine garde le document lisible, sans changer le
+     reste des feuilles. */
+  background: var(--surface-1);
+}
+
+.exercise-sheet .sheet-title {
+  margin-bottom: var(--sp-1);
+}
+
+.exercise-sheet .sheet-description {
+  margin-bottom: 0;
+}
+
+.exercise-delta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin: var(--sp-4) 0 0;
+  color: var(--text-2);
+  font-size: var(--fs-2);
+  font-weight: 600;
+}
+
+.exercise-delta.up {
+  color: var(--accent);
+}
+
+.exercise-delta.down {
+  color: var(--rest);
+}
+
+.exercise-kpis {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sp-4);
+  margin-top: var(--sp-6);
+}
+
+.exercise-kpis > div {
+  padding: var(--sp-5);
+  border-radius: var(--r-md);
+  background: var(--carte-fond-2);
+}
+
+.exercise-kpis span {
+  display: block;
+  color: var(--text-3);
+  font-size: var(--fs-1);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.exercise-kpis b {
+  display: block;
+  margin-top: var(--sp-1);
+  font-size: var(--fs-7);
+  font-variant-numeric: tabular-nums;
+}
+
+.exercise-kpis small {
+  color: var(--text-3);
+  font-size: var(--fs-1);
+}
+
+.exercise-sheet-heading {
+  margin: var(--sp-8) 0 var(--sp-2);
+  color: var(--text-3);
+  font-size: var(--fs-2);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.exercise-chart-wrap {
+  margin-top: var(--sp-4);
+}
+
+.exercise-chart {
+  display: block;
+  width: 100%;
+  height: 160px;
+}
+
+.exercise-signal {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  margin: var(--sp-4) 0 0;
+  padding: var(--sp-4) var(--sp-5);
+  border-radius: var(--r-md);
+  background: color-mix(in srgb, var(--rest) 12%, transparent);
+  color: var(--text-2);
+  font-size: var(--fs-2);
+}
+
+.exercise-passages {
+  display: grid;
+  margin-top: var(--sp-3);
+  border-radius: var(--r-md);
+  background: var(--carte-fond-2);
+  overflow: hidden;
+}
+
+.exercise-passage {
+  display: grid;
+  grid-template-columns: 3.5rem 1fr;
+  gap: var(--sp-1) var(--sp-5);
+  align-items: baseline;
+  padding: var(--sp-4) var(--sp-5);
+  box-shadow: inset 0 -1px 0 var(--separateur);
+}
+
+.exercise-passage:last-child {
+  box-shadow: none;
+}
+
+.exercise-passage-date {
+  grid-row: span 2;
+  color: var(--text-3);
+  font-size: var(--fs-1);
+}
+
+.exercise-passage-load {
+  font-size: var(--fs-3);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.exercise-passage-meta {
+  color: var(--text-3);
+  font-size: var(--fs-1);
+  font-variant-numeric: tabular-nums;
+}
+
+.exercise-empty {
+  display: grid;
+  justify-items: start;
+  gap: var(--sp-3);
+  margin-top: var(--sp-6);
+  padding: var(--sp-6);
+  border-radius: var(--r-md);
+  background: var(--carte-fond-2);
+  color: var(--text-2);
+}
+
+.exercise-empty p {
+  margin: 0;
+  font-weight: 600;
+}
+
+.exercise-empty small {
+  color: var(--text-3);
+}
+
+.exercise-alternative {
+  margin-top: var(--sp-7);
+  padding: var(--sp-5) var(--sp-6);
+  border-left: 3px solid var(--line-strong);
+  border-radius: 0 var(--r-md) var(--r-md) 0;
+  background: var(--surface-2);
+}
+
+.exercise-alternative strong {
+  font-size: var(--fs-3);
+}
+
+.exercise-alternative p {
+  margin: var(--sp-2) 0 0;
+  color: var(--text-2);
+  font-size: var(--fs-2);
+}
+
+.exercise-sheet .secondary-button {
+  margin-top: var(--sp-7);
+}
+
+.block-review-cta {
+  margin-top: var(--sp-8);
+}

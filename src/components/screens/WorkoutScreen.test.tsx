@@ -35,6 +35,7 @@ function renderWorkout(overrides: Partial<React.ComponentProps<typeof WorkoutScr
     onTimerDone: () => undefined,
     onCompleteSet,
     onTutorial: () => undefined,
+    onOpenExercise: () => undefined,
     onAlternative: () => undefined,
     onSkipExercise: () => undefined,
     onUndoSet: () => undefined,

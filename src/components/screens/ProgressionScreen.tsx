@@ -144,6 +144,10 @@ interface ProgressionScreenProps {
   /** Bascule entre les trois vues sœurs de l'onglet Progrès. */
   onNavigate: (screen: ProgressScreen) => void;
   onOpenFollowup: () => void;
+  /** Ouvre la fiche d'un mouvement depuis les records. */
+  onOpenExercise: (exerciseId: string) => void;
+  /** Ouvre la revue imprimable des huit dernières semaines. */
+  onOpenBlock: () => void;
   onSwitchDuoProfile?: (profile: ProfileId) => void;
 }
 
@@ -153,6 +157,8 @@ export function ProgressionScreen({
   measurements,
   onNavigate,
   onOpenFollowup,
+  onOpenExercise,
+  onOpenBlock,
   onSwitchDuoProfile,
 }: ProgressionScreenProps) {
   const listeAnimee = useListeAnimee();
@@ -365,20 +371,27 @@ export function ProgressionScreen({
             ) : (
               <div className="records-list" ref={listeAnimee}>
                 {view.records.map((record, index) => (
-                  <div className="record-row" key={record.exerciseId}>
+                  <button
+                    type="button"
+                    className="record-row record-row-action"
+                    key={record.exerciseId}
+                    onClick={() => onOpenExercise(record.exerciseId)}
+                    aria-label={`Voir la fiche de ${record.name}`}
+                  >
                     <span className="record-rank">{index + 1}</span>
-                    <div className="record-main">
+                    <span className="record-main">
                       <strong>{record.name}</strong>
                       <small>
                         {record.loadKg > 0
                           ? `${formatLoadKg(record.loadKg)} kg × ${record.repetitions} rép.`
                           : `${record.repetitions} s tenues`}
                       </small>
-                    </div>
+                    </span>
                     <span className="record-value">
                       {record.loadKg > 0 ? `${formatLoadKg(record.loadKg)} kg` : '—'}
                     </span>
-                  </div>
+                    <ChevronRight size={16} className="record-chevron" />
+                  </button>
                 ))}
               </div>
             )}
@@ -416,6 +429,17 @@ export function ProgressionScreen({
               </div>
             )}
           </div>
+
+          <button type="button" className="followup-cta block-review-cta" onClick={onOpenBlock}>
+            <span className="followup-cta-icon">
+              <ChartLine size={18} />
+            </span>
+            <span className="followup-cta-text">
+              <strong>Revue des 8 dernières semaines</strong>
+              <small>Volume par zone, meilleures charges et progression — document imprimable</small>
+            </span>
+            <ChevronRight size={18} />
+          </button>
 
           <div className="coach-note">
             <div className="coach-symbol">

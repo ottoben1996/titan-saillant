@@ -7,9 +7,11 @@ import { Sheet, SheetContent, SheetTitle } from '../ui/Sheet';
 interface TutorialModalProps {
   tutorial: Tutorial;
   onClose: () => void;
+  /** Le bouton du bas nomme ce qu'il retrouve : séance, fiche ou écran. */
+  backLabel?: string;
 }
 
-export function TutorialModal({ tutorial, onClose }: TutorialModalProps) {
+export function TutorialModal({ tutorial, onClose, backLabel = 'Retour à la séance' }: TutorialModalProps) {
   const [isOnline, setIsOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine : true);
 
   const hasShort = Boolean(tutorial.youtubeShortId);
@@ -160,7 +162,7 @@ export function TutorialModal({ tutorial, onClose }: TutorialModalProps) {
           onClick={onClose}
           style={{ marginTop: '1rem' }}
         >
-          <ArrowLeft size={18} /> Retour à la séance
+          <ArrowLeft size={18} /> {backLabel}
         </button>
       </SheetContent>
     </Sheet>

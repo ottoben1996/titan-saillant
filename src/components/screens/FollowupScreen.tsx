@@ -22,6 +22,10 @@ interface FollowupScreenProps {
   onOpenBilan: (measurement: WeeklyMeasurement) => void;
   /** Bascule entre les trois vues sœurs de l'onglet Progrès. */
   onNavigate: (screen: ProgressScreen) => void;
+  /** Semaine de charges active, pour signaler un décalage avec le point. */
+  programWeek: number;
+  /** Aligne la semaine de charges sur la semaine du point. */
+  onAlignProgramWeek: (week: number) => void;
 }
 
 const toNumber = (value: string): number | undefined => {
@@ -41,6 +45,8 @@ export function FollowupScreen({
   onSave,
   onOpenBilan,
   onNavigate,
+  programWeek,
+  onAlignProgramWeek,
 }: FollowupScreenProps) {
   const listeAnimee = useListeAnimee();
   const body = profileBody[profileId];
@@ -275,6 +281,24 @@ export function FollowupScreen({
         <p className="followup-saved" role="status">
           Point enregistré. Le bilan de la semaine est prêt.
         </p>
+      )}
+
+      {semaineEnregistree && semaineEnregistree.week !== programWeek && (
+        <div className="calendar-sync">
+          <div>
+            <strong>Un seul calendrier</strong>
+            <p>
+              Ton point est en semaine {semaineEnregistree.week}, tes charges en semaine {programWeek}.
+            </p>
+          </div>
+          <button
+            type="button"
+            className="secondary-button full"
+            onClick={() => onAlignProgramWeek(semaineEnregistree.week)}
+          >
+            Aligner les charges sur la semaine {semaineEnregistree.week}
+          </button>
+        </div>
       )}
 
       {bilan && (

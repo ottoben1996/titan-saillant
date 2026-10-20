@@ -1,7 +1,16 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.5.13/schema.json",
   "files": {
-    "includes": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.css", "tools/**/*.mjs", "vite.config.ts", "package.json"]
+    "includes": [
+      "src/**/*.ts",
+      "src/**/*.tsx",
+      "src/**/*.css",
+      "e2e/**/*.ts",
+      "playwright.config.ts",
+      "tools/**/*.mjs",
+      "vite.config.ts",
+      "package.json"
+    ]
   },
   "vcs": {
     "enabled": true,

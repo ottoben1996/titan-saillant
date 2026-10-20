@@ -26,6 +26,9 @@ export default defineConfig(({ command }) => ({
   test: {
     globals: true,
     environment: 'jsdom',
+    // Les specs Playwright vivent dans e2e/ et se lancent par `npm run e2e` :
+    // Vitest ne doit pas tenter de les importer dans jsdom.
+    include: ['src/**/*.test.{ts,tsx}'],
     // L'environnement de navigateur simulé coûtait 70 % du temps de la suite :
     // un par fichier. Ce banc le partage par groupe de tests.
     pool: 'vmThreads',

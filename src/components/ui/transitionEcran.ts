@@ -28,6 +28,7 @@ const PROFONDEUR: Record<Screen, number> = {
   loads: 0,
   workout: 1,
   bilan: 1,
+  block: 1,
 };
 
 export function sensDuChangement(avant: Screen, apres: Screen): Sens {

@@ -3,9 +3,11 @@ import { BottomNav, type Screen } from './components/layout/BottomNav';
 import { TopBar } from './components/layout/TopBar';
 import { AlternativeModal } from './components/modals/AlternativeModal';
 import { EnergyCheckinModal, type EnergyLevel } from './components/modals/EnergyCheckinModal';
+import { ExerciseSheet } from './components/modals/ExerciseSheet';
 import { ExitWorkoutDialog } from './components/modals/ExitWorkoutDialog';
 import { TutorialModal } from './components/modals/TutorialModal';
 import { BilanScreen } from './components/screens/BilanScreen';
+import { BlockReviewScreen } from './components/screens/BlockReviewScreen';
 import { FollowupScreen } from './components/screens/FollowupScreen';
 import { HistoryScreen } from './components/screens/HistoryScreen';
 import { HomeScreen, profileLabels } from './components/screens/HomeScreen';
@@ -168,6 +170,8 @@ export default function App() {
 
   const [tutorialId, setTutorialId] = useState<string | null>(null);
   const [alternativeId, setAlternativeId] = useState<string | null>(null);
+  /** Fiche de progression ouverte : un mouvement, son historique, sa courbe. */
+  const [exerciseSheetId, setExerciseSheetId] = useState<string | null>(null);
   const [restSeconds, setRestSeconds] = useState(0);
   const [isResting, setIsResting] = useState(false);
   const [notice, setNotice] = useState('');
@@ -209,6 +213,7 @@ export default function App() {
     progression: 'Tendances',
     followup: 'Points du samedi',
     bilan: 'Bilan de la semaine',
+    block: 'Revue de bloc',
     settings: 'Profil',
     loads: 'Programme',
   };
@@ -419,6 +424,7 @@ export default function App() {
     setProfile(next);
     setScreen('home');
     setSession(null);
+    setExerciseSheetId(null);
     // Demande faite ici, depuis un geste : hors geste, le navigateur refuse sans
     // le dire. Sans cette demande, l'origine reste évictable, et les mois
     // d'entraînement ne tiennent qu'à la clémence du navigateur.
@@ -479,6 +485,7 @@ export default function App() {
     setProfile(null);
     setSession(null);
     setHistory([]);
+    setExerciseSheetId(null);
   };
 
   const switchDuoProfile = async (target: ProfileId, fallbackScreen: Screen = 'home') => {
@@ -505,6 +512,7 @@ export default function App() {
     setManualLoadsProfile(target);
     setManualDurations(targetDurations);
     setHistory(targetHistory);
+    setExerciseSheetId(null);
     if (active) {
       const restoredTimer = active.activeTimer
         ? { ...active.activeTimer, remainingSeconds: restoreRemainingSeconds(active.activeTimer) }
@@ -526,6 +534,7 @@ export default function App() {
       setSession(null);
       setSelectedDay(null);
       setScreen(fallbackScreen);
+      setExerciseSheetId(null);
       setNotice(`Session ${target === 'ottman' ? 'Ottman' : 'Laura'} : choisis ta seance.`);
       window.setTimeout(() => setNotice(''), 3000);
     }
@@ -536,7 +545,7 @@ export default function App() {
   // agit exactement comme le bouton de la barre du haut.
   const sensEcran = useSensEcran(screen);
   const retourBord = useRetourAuBord({
-    actif: screen === 'workout' || screen === 'bilan',
+    actif: screen === 'workout' || screen === 'bilan' || screen === 'block',
     onRetour: handleTopbarBack,
   });
 
@@ -1002,8 +1011,11 @@ export default function App() {
   // Déclaration hissée, et non constante : les hooks qui suivent l'appellent,
   // et ils doivent être appelés avant le retour anticipé du choix de profil.
   function handleTopbarBack() {
+    // Le dernier panneau ouvert se ferme le premier : la technique s'ouvre
+    // par-dessus la fiche, et la refermer doit rendre la fiche, pas la séance.
     if (tutorialId) return setTutorialId(null);
     if (alternativeId) return setAlternativeId(null);
+    if (exerciseSheetId) return setExerciseSheetId(null);
     if (screen === 'workout') {
       // L'écran de fin de séance porte le MÊME `screen` que la séance : sans
       // cette distinction, la flèche de retour y ouvrait la boîte « Annuler la
@@ -1016,20 +1028,27 @@ export default function App() {
       return setExitPromptOpen(true);
     }
     if (screen === 'bilan') setScreen('followup');
+    if (screen === 'block') setScreen('progression');
   }
 
   const topbarLabel =
     tutorialId || alternativeId
-      ? 'Retour à la séance'
-      : screen === 'workout'
-        ? // Sur l'écran de fin, la séance n'est plus « en cours » : la croix ne
-          // quitte rien, elle rentre à l'accueil. Garder « Quitter la séance »
-          // laissait croire qu'un appui restait dangereux à la fin.
-          session?.completedAt
-          ? 'Retour à l’accueil'
-          : 'Quitter la séance'
-        : 'Retour aux points du samedi';
-  const modeBarre = screen === 'workout' ? 'fermer' : screen === 'bilan' ? 'retour' : 'onglet';
+      ? exerciseSheetId
+        ? 'Retour à la fiche'
+        : 'Retour à la séance'
+      : exerciseSheetId
+        ? 'Fermer la fiche'
+        : screen === 'workout'
+          ? // Sur l'écran de fin, la séance n'est plus « en cours » : la croix ne
+            // quitte rien, elle rentre à l'accueil. Garder « Quitter la séance »
+            // laissait croire qu'un appui restait dangereux à la fin.
+            session?.completedAt
+            ? 'Retour à l’accueil'
+            : 'Quitter la séance'
+          : screen === 'block'
+            ? 'Retour aux progrès'
+            : 'Retour aux points du samedi';
+  const modeBarre = screen === 'workout' ? 'fermer' : screen === 'bilan' || screen === 'block' ? 'retour' : 'onglet';
 
   const currentExerciseForAlternative =
     alternativeId && selectedDay && session
@@ -1116,12 +1135,13 @@ export default function App() {
           /* Seuls les panneaux ouverts dans l'application suspendent le chrono.
              Le passage en arrière-plan, lui, ne l'arrête plus : le temps réel
              continue de s'écouler (voir ExerciseTimer et RestTimer). */
-          timerSuspended={Boolean(tutorialId || alternativeId)}
-          modalOpen={Boolean(tutorialId || alternativeId)}
+          timerSuspended={Boolean(tutorialId || alternativeId || exerciseSheetId)}
+          modalOpen={Boolean(tutorialId || alternativeId || exerciseSheetId)}
           onTimerStateChange={handleTimerStateChange}
           onTimerDone={notifyTimerDone}
           onCompleteSet={finishSet}
           onTutorial={setTutorialId}
+          onOpenExercise={setExerciseSheetId}
           onAlternative={setAlternativeId}
           onSkipExercise={() => void passerExercice()}
           onDeferExercise={() => void reporterExercice()}
@@ -1148,6 +1168,8 @@ export default function App() {
           measurements={measurements}
           onNavigate={setScreen}
           onOpenFollowup={() => setScreen('followup')}
+          onOpenExercise={setExerciseSheetId}
+          onOpenBlock={() => setScreen('block')}
           onSwitchDuoProfile={(target) => switchDuoProfile(target, 'progression')}
         />
       )}
@@ -1165,6 +1187,8 @@ export default function App() {
             setScreen('bilan');
           }}
           onNavigate={setScreen}
+          programWeek={programWeek}
+          onAlignProgramWeek={changeProgramWeek}
         />
       )}
       {screen === 'bilan' && profile && bilanTarget && (
@@ -1175,6 +1199,9 @@ export default function App() {
           sessions={history}
           onBack={() => setScreen('followup')}
         />
+      )}
+      {screen === 'block' && profile && (
+        <BlockReviewScreen profileId={profile} history={history} measurements={measurements} />
       )}
 
       {screen === 'settings' && (
@@ -1219,13 +1246,27 @@ export default function App() {
         />
       )}
 
-      {/* Le bilan est un document : aucune navigation ne doit apparaître dessus. */}
-      {screen !== 'workout' && screen !== 'bilan' && (
+      {/* Le bilan et la revue de bloc sont des documents : aucune navigation ne doit apparaître dessus. */}
+      {screen !== 'workout' && screen !== 'bilan' && screen !== 'block' && (
         <BottomNav currentScreen={screen} onNavigate={setScreen} badges={{ settings: rappelSauvegarde.proposer }} />
       )}
 
+      {exerciseSheetId && (
+        <ExerciseSheet
+          exerciseId={exerciseSheetId}
+          history={history}
+          program={program}
+          onClose={() => setExerciseSheetId(null)}
+          onTutorial={setTutorialId}
+        />
+      )}
+
       {tutorialId && tutorials[tutorialId] && (
-        <TutorialModal tutorial={tutorials[tutorialId]} onClose={() => setTutorialId(null)} />
+        <TutorialModal
+          tutorial={tutorials[tutorialId]}
+          onClose={() => setTutorialId(null)}
+          backLabel={exerciseSheetId ? 'Retour à la fiche' : undefined}
+        />
       )}
 
       {alternativeId && selectedDay && session && equipmentAlternatives[alternativeId] && (
