@@ -6,6 +6,21 @@ describe('programmes issus des PDF', () => {
     expect(getProgram(profile).days.map((day) => day.id)).toEqual(['full-body-a', 'full-body-b', 'cardio', 'cardio-4']);
   });
 
+  it('reprend les noms des séances du PDF, spécialité comprise', () => {
+    expect(getProgram('ottman').days.map((day) => day.name)).toEqual([
+      'Full body — Spé upper',
+      'Cardio / Renfo',
+      'Full body — Spé lower',
+      'Endurance fondamentale',
+    ]);
+    expect(getProgram('laura').days.map((day) => day.name)).toEqual([
+      'Full body — Spé cuisse',
+      'Cardio / Renfo',
+      'Full body — Spé fessier',
+      'Endurance fondamentale',
+    ]);
+  });
+
   it('conserve les échauffements communs du PDF', () => {
     const warmup = getProgram('ottman').warmup;
     expect(warmup.map((item) => item.id)).toEqual(['coiffe-rotateurs', 'bosu', 'velo']);

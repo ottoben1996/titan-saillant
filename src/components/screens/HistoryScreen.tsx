@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import type { WorkoutSession } from '../../domain/types';
+import type { WorkoutPlan, WorkoutSession } from '../../domain/types';
 import {
   formatMinutes,
   groupSessionsByWeek,
@@ -14,6 +14,8 @@ import { useListeAnimee } from '../ui/useListeAnimee';
 
 interface HistoryScreenProps {
   history: WorkoutSession[];
+  /** Programme du profil actif : il porte les noms réels des séances. */
+  program: WorkoutPlan;
   /** Bascule entre les trois vues sœurs de l'onglet Progrès. */
   onNavigate: (screen: ProgressScreen) => void;
   /** Retire définitivement une séance de l'historique. */
@@ -29,7 +31,7 @@ function sessionDateLabel(item: WorkoutSession): string {
   });
 }
 
-export function HistoryScreen({ history, onNavigate, onDelete }: HistoryScreenProps) {
+export function HistoryScreen({ history, program, onNavigate, onDelete }: HistoryScreenProps) {
   const groups = useMemo(() => groupSessionsByWeek(history), [history]);
   // Une ligne supprimée qui disparaît d'un coup laisse un doute : on laisse la
   // liste se replacer sous le doigt.
@@ -67,7 +69,7 @@ export function HistoryScreen({ history, onNavigate, onDelete }: HistoryScreenPr
                   return (
                     <article className={`history-row${done || interrupted ? '' : ' in-progress'}`} key={item.id}>
                       <div className="history-row-main">
-                        <strong>{workoutDayLabel(item.dayId)}</strong>
+                        <strong>{workoutDayLabel(item.dayId, program)}</strong>
                         <small>{sessionDateLabel(item)}</small>
                       </div>
                       <div className="history-row-meta">
@@ -96,7 +98,7 @@ export function HistoryScreen({ history, onNavigate, onDelete }: HistoryScreenPr
                         type="button"
                         className="history-delete"
                         onClick={() => onDelete(item.id)}
-                        aria-label={`Supprimer la séance ${workoutDayLabel(item.dayId)} du ${sessionDateLabel(item)}`}
+                        aria-label={`Supprimer la séance ${workoutDayLabel(item.dayId, program)} du ${sessionDateLabel(item)}`}
                       >
                         <Trash size={16} />
                       </button>

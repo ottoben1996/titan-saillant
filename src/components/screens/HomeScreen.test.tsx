@@ -154,31 +154,23 @@ describe('hiérarchie de l’accueil', () => {
     expect(onDiscard).toHaveBeenCalled();
   });
 
-  it('déclenche l’action correspondant à chaque état du rail', () => {
+  it('permet de lancer n’importe quelle séance, sans suivre l’ordre du programme', () => {
     const onStart = vi.fn();
-    const onReviewSlot = vi.fn();
-    const onPreviewSlot = vi.fn();
     // Une séance terminée maintenant tombe toujours dans la semaine en cours.
     const history = [completedSession(program.days[0].id, new Date().toISOString())];
-    render(
-      <HomeScreen
-        {...baseProps}
-        history={history}
-        onStart={onStart}
-        onReviewSlot={onReviewSlot}
-        onPreviewSlot={onPreviewSlot}
-      />,
-    );
+    render(<HomeScreen {...baseProps} history={history} onStart={onStart} />);
 
-    const rail = screen.getByRole('navigation', { name: /créneaux de la semaine/i });
-    fireEvent.click(within(rail).getByRole('button', { name: /Revoir Full Body A — Terminée/i }));
-    expect(onReviewSlot).toHaveBeenCalledWith(program.days[0]);
+    const liste = screen.getByRole('navigation', { name: /séances du programme/i });
+    expect(within(liste).getAllByRole('button')).toHaveLength(4);
 
-    const hero = screen.getByRole('article');
-    fireEvent.click(within(hero).getByRole('button', { name: /^Commencer Full Body B, \d+ min$/i }));
-    expect(onStart).toHaveBeenCalledWith(program.days[1]);
+    fireEvent.click(within(liste).getByRole('button', { name: /Refaire Full body — Spé upper/i }));
+    expect(onStart).toHaveBeenCalledWith(program.days[0]);
 
-    fireEvent.click(within(rail).getByRole('button', { name: /Prévisualiser Cardio circuit — À venir/i }));
-    expect(onPreviewSlot).toHaveBeenCalledWith(program.days[2]);
+    // La séance suivante n'attend pas son tour : elle se lance directement.
+    fireEvent.click(within(liste).getByRole('button', { name: /Commencer Full body — Spé lower/i }));
+    expect(onStart).toHaveBeenCalledWith(program.days[2]);
+
+    fireEvent.click(within(liste).getByRole('button', { name: /Commencer Endurance fondamentale/i }));
+    expect(onStart).toHaveBeenCalledWith(program.days[3]);
   });
 });

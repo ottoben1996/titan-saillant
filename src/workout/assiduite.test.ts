@@ -5,7 +5,7 @@ import { serieAssiduite } from './assiduite';
 
 const JOUR = 86_400_000;
 const maintenant = new Date(2026, 8, 12, 9, 0, 0); // samedi 12 septembre 2026
-const programme = getProgram('ottman'); // quatre jours : Full Body A, B, Cardio et Rameur + marche
+const programme = getProgram('ottman'); // quatre jours : les deux full body, cardio/renfo et endurance
 
 /** Séance terminée à tant de jours en arrière. */
 const seance = (jours: number, id: string): WorkoutSession =>

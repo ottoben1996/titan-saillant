@@ -22,8 +22,8 @@ export const EXERCISE_LABELS: Record<string, string> = {
   'mountain-climber': 'Mountain climber',
   'sit-to-stand': 'Assis-debout',
   crunches: 'Crunches',
-  'cooldown-full-body-a': 'Retour au calme — Full Body A',
-  'cooldown-full-body-b': 'Retour au calme — Full Body B',
+  'cooldown-full-body-a': 'Retour au calme — Séance 1',
+  'cooldown-full-body-b': 'Retour au calme — Séance 2',
   'cooldown-cardio': 'Retour au calme — Cardio',
 };
 

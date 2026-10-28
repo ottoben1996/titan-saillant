@@ -626,7 +626,7 @@ export function BilanScreen({ profileId, measurements, current, sessions }: Bila
               <tbody>
                 {seancesSemaine.map((seance) => (
                   <tr key={seance.id}>
-                    <td>{workoutDayLabel(seance.dayId)}</td>
+                    <td>{workoutDayLabel(seance.dayId, program)}</td>
                     <td className="num">
                       {typeof seance.perceivedExertion === 'number' ? `${seance.perceivedExertion}/10` : '—'}
                     </td>
@@ -653,7 +653,10 @@ export function BilanScreen({ profileId, measurements, current, sessions }: Bila
                     : ''}
               {ressenti.consignes.length > 0
                 ? ` Consignes données : ${ressenti.consignes
-                    .map((item) => `${workoutDayLabel(item.dayId).toLowerCase()} — ${libelleConsigne(item.consigne)}`)
+                    .map(
+                      (item) =>
+                        `${workoutDayLabel(item.dayId, program).toLowerCase()} — ${libelleConsigne(item.consigne)}`,
+                    )
                     .join(', ')}.`
                 : ''}
             </p>
@@ -667,7 +670,7 @@ export function BilanScreen({ profileId, measurements, current, sessions }: Bila
               <p className="bilan-note">
                 Notes :{' '}
                 {ressenti.notes
-                  .map((item) => `${workoutDayLabel(item.dayId).toLowerCase()} — « ${item.notes} »`)
+                  .map((item) => `${workoutDayLabel(item.dayId, program).toLowerCase()} — « ${item.notes} »`)
                   .join(' · ')}
               </p>
             )}

@@ -68,12 +68,12 @@ export function CompletionFeedback({
   const [notes, setNotes] = useState(() => session.notes ?? '');
   const [saving, setSaving] = useState(false);
 
-  const exercises = useMemo(() => {
-    if (!profileId) return [];
-    const program = getProgram(profileId);
-    const day = program.days.find((item) => item.id === session.dayId);
-    return day?.exercises ?? [];
-  }, [session.dayId, profileId]);
+  const program = useMemo(() => (profileId ? getProgram(profileId) : undefined), [profileId]);
+
+  const exercises = useMemo(
+    () => program?.days.find((item) => item.id === session.dayId)?.exercises ?? [],
+    [program, session.dayId],
+  );
 
   const summary = useMemo(() => summarizeSession(session), [session]);
 
@@ -124,7 +124,7 @@ export function CompletionFeedback({
         </div>
         <div>
           <p className="eyebrow">SÉANCE TERMINÉE</p>
-          <h1>Bilan de {workoutDayLabel(summary.dayId)}</h1>
+          <h1>Bilan de {workoutDayLabel(summary.dayId, program)}</h1>
         </div>
       </div>
 

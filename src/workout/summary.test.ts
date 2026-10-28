@@ -12,6 +12,7 @@ describe('formatLoadKg', () => {
   });
 });
 
+import { getProgram } from '../domain/programs';
 import type { WorkoutDay, WorkoutSession } from '../domain/types';
 import {
   addDays,
@@ -435,10 +436,16 @@ describe('records battus et séance précédente', () => {
 });
 
 describe('libellés et formatage', () => {
-  it('traduit les identifiants de créneau', () => {
-    expect(workoutDayLabel('full-body-a')).toBe('Full Body A');
-    expect(workoutDayLabel('cardio')).toBe('Cardio');
+  it('traduit les identifiants de créneau avec le nom du programme', () => {
+    const program = getProgram('ottman');
+    expect(workoutDayLabel('full-body-a', program)).toBe('Full body — Spé upper');
+    expect(workoutDayLabel('cardio', program)).toBe('Full body — Spé lower');
     expect(workoutDayLabel('autre-jour')).toBe('autre jour');
+  });
+
+  it('suit la spécialité du profil, pas un libellé figé', () => {
+    expect(workoutDayLabel('full-body-a', getProgram('laura'))).toBe('Full body — Spé cuisse');
+    expect(workoutDayLabel('cardio', getProgram('laura'))).toBe('Full body — Spé fessier');
   });
 
   it('formate les durées en minutes lisibles', () => {

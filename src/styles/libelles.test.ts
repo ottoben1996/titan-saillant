@@ -23,7 +23,7 @@ const feuilles = ['src/styles/screens.css', 'src/styles/followup.css', 'src/styl
 
 /** Sélecteurs qui portent un libellé lisible, jamais un nombre ni un badge. */
 const LIBELLES =
-  /\.(history-row-main strong|week-slot-name|record-main strong|rest-next-name|sheet-exercise-name|alternative-name)/;
+  /\.(history-row-main strong|session-choice-name|record-main strong|rest-next-name|sheet-exercise-name|alternative-name)/;
 
 /** Découpe en blocs `sélecteur { … }`, sans descendre dans les imbrications. */
 function blocs(contenu: string): { selecteur: string; corps: string }[] {

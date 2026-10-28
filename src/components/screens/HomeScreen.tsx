@@ -5,15 +5,21 @@ import type { ProfileId, WorkoutDay, WorkoutPlan, WorkoutSession } from '../../d
 import type { SerieAssiduite } from '../../workout/assiduite';
 import { getWorkoutExercises } from '../../workout/runner';
 import { type WeekSlotState, weeklyComparison, weekSlots, workoutDayLabel } from '../../workout/summary';
-import { Check, Play, Trash } from '../ui/Icons';
+import { Play, Repeat, Trash } from '../ui/Icons';
 import { NombreAnime } from '../ui/NombreAnime';
 
 export const profileLabels: Record<ProfileId, string> = { ottman: 'Ottman', laura: 'Laura' };
 
 const SLOT_STATES: Record<WeekSlotState, string> = {
   done: 'Terminée',
-  today: 'Aujourd’hui',
-  upcoming: 'À venir',
+  today: 'Suggérée',
+  upcoming: 'Libre',
+};
+
+const SLOT_ACTIONS: Record<WeekSlotState, string> = {
+  done: 'Refaire',
+  today: 'Commencer',
+  upcoming: 'Commencer',
 };
 
 /** Le volume hebdomadaire cible : chaque profil a 4 créneaux prescrits. */
@@ -96,8 +102,6 @@ interface HomeScreenProps {
   chargement?: boolean;
   activeSession: WorkoutSession | null;
   onStart: (day: WorkoutDay) => void;
-  onReviewSlot?: (day: WorkoutDay) => void;
-  onPreviewSlot?: (day: WorkoutDay) => void;
   onResume: () => void;
   /** Supprime la séance en cours (lancée par erreur). */
   onDiscard: () => void;
@@ -145,8 +149,6 @@ export function HomeScreen({
   chargement = false,
   activeSession,
   onStart,
-  onReviewSlot = onOpenProgression,
-  onPreviewSlot = () => undefined,
   onResume,
   onDiscard,
   serie,
@@ -205,7 +207,9 @@ export function HomeScreen({
               <div className="hero-head">
                 <div>
                   <p className="eyebrow">SÉANCE EN COURS</p>
-                  <h2 id="hero-title">{activeSession ? workoutDayLabel(activeSession.dayId) : nextAction.label}</h2>
+                  <h2 id="hero-title">
+                    {activeSession ? workoutDayLabel(activeSession.dayId, program) : nextAction.label}
+                  </h2>
                   <p className="hero-sub">
                     {`${seriesFaites} série${pluriel} déjà validée${pluriel}`} · {nextAction.description}
                   </p>
@@ -290,38 +294,36 @@ export function HomeScreen({
       )}
 
       {!chargement && (
-        <nav className="home-section" aria-label="Créneaux de la semaine en cours">
-          <h2 className="section-title">Cette semaine</h2>
-          <div className="week-rail">
-            {view.slots.map((slot) => {
-              const actionLabel =
-                slot.state === 'done'
-                  ? `Revoir ${slot.day.name}`
-                  : slot.state === 'upcoming'
-                    ? `Prévisualiser ${slot.day.name}`
-                    : `Commencer ${slot.day.name}`;
-              const handleSlot = () =>
-                slot.state === 'done'
-                  ? onReviewSlot(slot.day)
-                  : slot.state === 'upcoming'
-                    ? onPreviewSlot(slot.day)
-                    : onStart(slot.day);
-              return (
-                <button
-                  key={slot.day.id}
-                  type="button"
-                  className={`week-slot ${slot.state}`}
-                  onClick={handleSlot}
-                  aria-label={`${actionLabel} — ${SLOT_STATES[slot.state]}`}
-                >
-                  <span className="week-slot-state" aria-hidden="true">
-                    {slot.state === 'done' ? <Check size={14} weight="bold" /> : null}
-                  </span>
-                  <span className="week-slot-name">{slot.day.name}</span>
-                  <small>{SLOT_STATES[slot.state]}</small>
-                </button>
-              );
-            })}
+        <nav className="home-section" aria-label="Séances du programme">
+          <div className="session-pick-head">
+            <h2 className="section-title">Séances</h2>
+            <p>Choisis celle que tu veux, dans l’ordre que tu veux.</p>
+          </div>
+          <div className="session-choices">
+            {view.slots.map((slot, index) => (
+              <button
+                key={slot.day.id}
+                type="button"
+                className={`session-choice ${slot.state}`}
+                onClick={() => onStart(slot.day)}
+                aria-label={`${SLOT_ACTIONS[slot.state]} ${slot.day.name} — ${SLOT_STATES[slot.state]}, ${estimatedMinutes(slot.day)} min`}
+              >
+                <span className="session-choice-number" aria-hidden="true">
+                  {index + 1}
+                </span>
+                <span className="session-choice-body">
+                  <strong className="session-choice-name">{slot.day.name}</strong>
+                  <small>
+                    {slot.day.exercises.length} mouvement{slot.day.exercises.length > 1 ? 's' : ''} · ≈{' '}
+                    {estimatedMinutes(slot.day)} min
+                    <span className={`session-choice-state ${slot.state}`}> · {SLOT_STATES[slot.state]}</span>
+                  </small>
+                </span>
+                <span className="session-choice-go" aria-hidden="true">
+                  {slot.state === 'done' ? <Repeat size={16} /> : <Play size={16} weight="fill" />}
+                </span>
+              </button>
+            ))}
           </div>
         </nav>
       )}

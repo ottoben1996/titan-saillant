@@ -1115,8 +1115,6 @@ export default function App() {
           chargement={!historiqueCharge}
           activeSession={session}
           onStart={handleInitiateStart}
-          onReviewSlot={() => setScreen('progression')}
-          onPreviewSlot={() => setNotice('Aperçu disponible après le chargement des détails de la séance.')}
           onResume={resumeWorkout}
           onDiscard={() => setAbandonOpen(true)}
           serie={serieAssiduite(history, program, new Date())}
@@ -1156,6 +1154,7 @@ export default function App() {
       {screen === 'history' && (
         <HistoryScreen
           history={history}
+          program={program}
           onNavigate={setScreen}
           onDelete={(sessionId) => setSessionToDelete(sessionId)}
         />

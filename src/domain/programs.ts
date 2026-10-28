@@ -201,8 +201,8 @@ function plan(
       ];
   const dayA: WorkoutDay = Object.freeze({
     id: 'full-body-a',
-    name: 'Full Body A',
-    subtitle: laura ? 'Full body · spé cuisse' : 'Full body · spé upper',
+    name: laura ? 'Full body — Spé cuisse' : 'Full body — Spé upper',
+    subtitle: 'Séance 1 · Force',
     exercises: Object.freeze([...upperOrThigh, timed('rameur-pdf', 'Rameur', 600, 1, 60, activeWeek, manualDurations)]),
     warmup,
     cooldown: cooldownFastWalk,
@@ -259,8 +259,8 @@ function plan(
   ]);
   const dayB: WorkoutDay = Object.freeze({
     id: 'full-body-b',
-    name: 'Full Body B',
-    subtitle: 'Cardio / renfo · circuits PDF',
+    name: 'Cardio / Renfo',
+    subtitle: 'Séance 2 · Circuits cardio et renforcement',
     exercises: dayBExercises,
     warmup,
     cooldown: Object.freeze({
@@ -361,8 +361,8 @@ function plan(
       ];
   const dayC: WorkoutDay = Object.freeze({
     id: 'cardio',
-    name: 'Cardio circuit',
-    subtitle: laura ? 'Full body · spé fessier' : 'Full body · spé lower',
+    name: laura ? 'Full body — Spé fessier' : 'Full body — Spé lower',
+    subtitle: 'Séance 3 · Force et gainage',
     exercises: Object.freeze([
       ...lower,
       timed(
@@ -390,7 +390,7 @@ function plan(
   const dayD: WorkoutDay = Object.freeze({
     id: 'cardio-4',
     name: 'Endurance fondamentale',
-    subtitle: 'Cardio continu',
+    subtitle: 'Séance 4 · Cardio continu',
     exercises: Object.freeze([
       timed('velo-elliptique', 'Vélo elliptique', 900, 1, 120, activeWeek, manualDurations, 'Allure modérée'),
       timed(

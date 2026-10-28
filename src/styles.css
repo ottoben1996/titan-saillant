@@ -2383,7 +2383,7 @@ input:focus-visible {
 }
 
 .app-shell
-  :where(.metric-cell strong, .record-value, .week-slot-state, .home-metric strong, .prescription-main strong) {
+  :where(.metric-cell strong, .record-value, .session-choice-number, .home-metric strong, .prescription-main strong) {
   font-family: var(--font-chiffres);
   font-variant-numeric: tabular-nums;
 }

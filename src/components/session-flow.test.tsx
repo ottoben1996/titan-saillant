@@ -42,7 +42,7 @@ const FAKED_TIMERS = ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterva
 /** Capture du vrai setImmediate AVANT l'installation des faux chronos. */
 const realSetImmediate = (globalThis as { setImmediate?: (callback: () => void) => void }).setImmediate;
 
-/** Nombre total d'étapes prescrites pour « Full Body A » (échauffement + travail + retour au calme). */
+/** Nombre total d'étapes prescrites pour « Full body — Spé upper » (échauffement + travail + retour au calme). */
 const FULL_BODY_A_STEPS = 21;
 /** Repère de l'en-tête de séance : « Exercice N sur M ». */
 const exerciceSur = (numero: number) => new RegExp(`^exercice ${numero} sur \\d+$`, 'i');
@@ -86,7 +86,7 @@ async function openAsOttman() {
 
 /** Depuis l'accueil : bouton « Commencer » puis validation du check-in d'énergie. */
 async function startDayFromHome(dayName: string) {
-  fireEvent.click(screen.getByRole('button', { name: /^commencer .+, \d+ min$/i }));
+  fireEvent.click(within(screen.getByRole('article')).getByRole('button', { name: /^commencer .+, \d+ min$/i }));
   await flush();
   fireEvent.click(
     within(screen.getByRole('dialog')).getByRole('button', { name: new RegExp(`^commencer ${dayName}$`, 'i') }),
@@ -202,7 +202,7 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
     expect(screen.getByRole('heading', { level: 1, name: 'Aujourd’hui' })).toBeInTheDocument();
     expect(screen.getByText(/espace d’ottman/i)).toBeInTheDocument();
 
-    await startDayFromHome('Full Body A');
+    await startDayFromHome('Full body — Spé upper');
 
     // --- 1re série : échauffement, compteur de séries, exercice, suite annoncée.
     expect(screen.getByRole('heading', { level: 1, name: 'Coiffe des rotateurs' })).toBeInTheDocument();
@@ -264,7 +264,7 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
     await completeRemainingSets();
 
     expect(screen.getByText('SÉANCE TERMINÉE')).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /bilan de full body a/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /bilan de full body — spé upper/i })).toBeInTheDocument();
     expect(within(bilanCell(/séries validées/i)).getByText(String(FULL_BODY_A_STEPS))).toBeInTheDocument();
     expect(bilanCell(/meilleure charge/i).textContent).toMatch(/kg/);
     expect(bilanCell(/durée/i).textContent).not.toBe('—');
@@ -275,7 +275,7 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
     const { unmount } = render(<App />);
     fireEvent.click(screen.getByRole('button', { name: /ottman/i }));
     await flush();
-    await startDayFromHome('Full Body A');
+    await startDayFromHome('Full body — Spé upper');
 
     await validateSet(); // coiffe des rotateurs
     await validateSet(); // bosu, série 1
@@ -302,7 +302,7 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
 
   it('[3] pause et reprise : continuer ou mettre en pause, puis reprise au bon exercice', async () => {
     await openAsOttman();
-    await startDayFromHome('Full Body A');
+    await startDayFromHome('Full body — Spé upper');
     await validateSet(); // 1 série validée → exercice suivant, série 1
 
     // --- La sortie de séance propose de continuer OU de mettre en pause.
@@ -329,7 +329,7 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
     expect(screen.getByText(/séance mise en pause/i)).toBeInTheDocument();
 
     // --- L'accueil propose de reprendre, avec le nombre de séries déjà validées.
-    const resumeCard = screen.getByRole('article', { name: /full body a/i });
+    const resumeCard = screen.getByRole('article', { name: /full body — spé upper/i });
     expect(resumeCard).toHaveTextContent(/1 série déjà validée/);
     expect(resumeCard).toHaveTextContent(/continue là où tu t’es arrêté/i);
     const resumeButton = within(resumeCard).getByRole('button', { name: /reprendre la séance en cours/i });
@@ -359,7 +359,7 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
 
     await openHistory();
     expect(screen.getByRole('heading', { name: /aucune séance enregistrée/i })).toBeInTheDocument();
-    expect(screen.queryByText('Full Body A')).toBeNull();
+    expect(screen.queryByText('Full body — Spé upper')).toBeNull();
     expect(screen.queryByText('Séance terminée')).toBeNull();
 
     // --- Bascule vers Ottman via l'avatar de la barre : sa séance apparaît.
@@ -374,7 +374,7 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
     await flush();
     await openHistory();
 
-    expect(screen.getByText('Full Body A')).toBeInTheDocument();
+    expect(screen.getByText('Full body — Spé upper')).toBeInTheDocument();
     expect(screen.getByText('Séance terminée')).toBeInTheDocument();
     expect(screen.getByText(new RegExp(`${FULL_BODY_A_STEPS} séries`))).toBeInTheDocument();
 
@@ -403,12 +403,12 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
 
   it('[5] séance terminée : bilan factuel (durée, séries, volume) puis enregistrement dans l’historique', async () => {
     await openAsOttman();
-    await startDayFromHome('Full Body A');
+    await startDayFromHome('Full body — Spé upper');
     await completeRemainingSets();
 
     // --- 1. Bilan factuel.
     expect(screen.getByText('SÉANCE TERMINÉE')).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /bilan de full body a/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /bilan de full body — spé upper/i })).toBeInTheDocument();
     expect(within(bilanCell(/séries validées/i)).getByText(String(FULL_BODY_A_STEPS))).toBeInTheDocument();
     expect(bilanCell(/durée/i)).toHaveTextContent(/min/);
     expect(bilanCell(/meilleure charge/i)).toHaveTextContent('65 kg');
@@ -427,11 +427,11 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
 
     expect(screen.getByRole('heading', { level: 1, name: 'Aujourd’hui' })).toBeInTheDocument();
     expect(screen.getByText(/bilan enregistré/i)).toBeInTheDocument();
-    // Le créneau du jour est validé dans le rail de la semaine.
-    expect(screen.getByRole('button', { name: /full body a — terminée/i })).toBeInTheDocument();
+    // Le créneau terminé reste visible dans la liste des séances.
+    expect(screen.getByRole('button', { name: /full body — spé upper — terminée/i })).toBeInTheDocument();
 
     await openHistory();
-    expect(screen.getByText('Full Body A')).toBeInTheDocument();
+    expect(screen.getByText('Full body — Spé upper')).toBeInTheDocument();
     expect(screen.getByText(/RPE 8\/10/)).toBeInTheDocument();
     expect(screen.getByText(new RegExp(`${FULL_BODY_A_STEPS} séries`))).toBeInTheDocument();
 
@@ -445,9 +445,9 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
     expect(saved[0].loadConsigne).toBe('increase');
   });
 
-  it('[6] une séance en cours bloque le démarrage d’un autre créneau : le rail prévisualise sans lancer la séance', async () => {
+  it('[6] une autre séance peut être choisie même quand une séance est en pause', async () => {
     await openAsOttman();
-    await startDayFromHome('Full Body A');
+    await startDayFromHome('Full body — Spé upper');
     await validateSet(); // une série validée → la séance A existe en base
 
     // Mise en pause de la séance A : elle reste « en cours » dans le dépôt.
@@ -456,21 +456,27 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
     fireEvent.click(screen.getByRole('button', { name: /mettre en pause/i }));
     await flush();
 
-    // Un autre créneau est une prévisualisation : il ne contourne pas la séance en cours.
-    fireEvent.click(screen.getByRole('button', { name: /prévisualiser full body b — à venir/i }));
+    // Le choix est libre : la séance 2 se lance sans attendre la fin de la 1.
+    fireEvent.click(screen.getByRole('button', { name: /Commencer Cardio \/ Renfo/i }));
     await flush();
-    expect(screen.getByText(/aperçu disponible après le chargement des détails de la séance/i)).toBeInTheDocument();
-    expect(screen.queryByRole('dialog')).toBeNull();
+    fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: /^Commencer Cardio \/ Renfo$/i }));
+    await flush();
 
-    const inProgress = (await listSessions('ottman')).filter((item) => !item.completedAt);
-    expect(inProgress).toHaveLength(1);
-    expect(inProgress[0].dayId).toBe('full-body-a');
-    expect(inProgress[0].loggedSets).toHaveLength(1);
+    expect(screen.getByRole('heading', { level: 1, name: 'Coiffe des rotateurs' })).toBeInTheDocument();
+
+    // Une seule séance reste active : la précédente est clôturée, sans perdre
+    // la série déjà validée.
+    const sessions = await listSessions('ottman');
+    const active = sessions.filter((item) => !item.completedAt && !item.abandonedAt);
+    expect(active).toHaveLength(1);
+    expect(active[0].dayId).toBe('full-body-b');
+    expect(sessions.find((item) => item.dayId === 'full-body-a')?.abandonedAt).toBeTruthy();
+    expect(sessions.find((item) => item.dayId === 'full-body-a')?.loggedSets).toHaveLength(1);
   });
 
   it('[6b] les champs de saisie portent un nom accessible (accessibilité corrigée)', async () => {
     await openAsOttman();
-    await startDayFromHome('Full Body A');
+    await startDayFromHome('Full body — Spé upper');
 
     // Le libellé « Répétitions » est un simple <span> (WorkoutScreen.tsx:625) posé
     // à côté du champ : ni <label>, ni aria-label, ni aria-labelledby. Le champ
@@ -486,7 +492,7 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
 
   it('[7] annuler une séance en cours : le dialogue de sortie propose l’annulation, puis rien n’est conservé', async () => {
     await openAsOttman();
-    await startDayFromHome('Full Body A');
+    await startDayFromHome('Full body — Spé upper');
     await validateSet();
     expect(await listSessions('ottman')).toHaveLength(1);
 
@@ -512,7 +518,7 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
 
   it('[8] mettre en pause conserve la séance, et l’accueil permet de la supprimer', async () => {
     await openAsOttman();
-    await startDayFromHome('Full Body A');
+    await startDayFromHome('Full body — Spé upper');
     await validateSet();
 
     fireEvent.click(screen.getByRole('button', { name: /quitter la séance/i }));
@@ -537,10 +543,10 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
 
   it('[9] liste des exercices : consultable à tout moment, dans l’ordre de la séance', async () => {
     await openAsOttman();
-    await startDayFromHome('Full Body A');
+    await startDayFromHome('Full body — Spé upper');
 
     const jour = getProgram('ottman').days.find((item) => item.id === 'full-body-a');
-    if (!jour) throw new Error('Séance « Full Body A » introuvable');
+    if (!jour) throw new Error('Séance « Full body — Spé upper » introuvable');
     const plan = getWorkoutExercises(jour);
 
     fireEvent.click(screen.getByRole('button', { name: /voir la liste des exercices/i }));
@@ -571,10 +577,10 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
 
   it('[10] machine occupée : l’exercice part à plus tard, et la liste y ramène', async () => {
     await openAsOttman();
-    await startDayFromHome('Full Body A');
+    await startDayFromHome('Full body — Spé upper');
 
     const jour = getProgram('ottman').days.find((item) => item.id === 'full-body-a');
-    if (!jour) throw new Error('Séance « Full Body A » introuvable');
+    if (!jour) throw new Error('Séance « Full body — Spé upper » introuvable');
     const premier = getWorkoutExercises(jour)[0];
     const titre = () => screen.getByRole('heading', { level: 1 }).textContent ?? '';
 

@@ -1,4 +1,4 @@
-import type { WorkoutDay, WorkoutDayId, WorkoutSession } from '../domain/types';
+import type { WorkoutDay, WorkoutPlan, WorkoutSession } from '../domain/types';
 
 /* ============================================================================
    Bilan, semaines et volumes — logique pure et testable
@@ -9,16 +9,17 @@ import type { WorkoutDay, WorkoutDayId, WorkoutSession } from '../domain/types';
 
 const DAY_MS = 86_400_000;
 
-const DAY_LABELS: Record<WorkoutDayId, string> = {
-  'full-body-a': 'Full Body A',
-  'full-body-b': 'Full Body B',
-  cardio: 'Cardio',
-  'cardio-4': 'Rameur + marche',
-};
-
-/** Libellé français d'un créneau, sans dépendre du programme chargé. */
-export function workoutDayLabel(dayId: string): string {
-  return DAY_LABELS[dayId as WorkoutDayId] ?? dayId.replace(/-/g, ' ');
+/**
+ * Libellé français d'un créneau.
+ *
+ * Le nom appartient au programme : « full-body-a » ne désigne pas la même
+ * spécialité pour Ottman et pour Laura. Sans programme sous la main, on
+ * retombe sur l'identifiant lisible.
+ */
+export function workoutDayLabel(dayId: string, program?: Pick<WorkoutPlan, 'days'>): string {
+  const day = program?.days.find((item) => item.id === dayId);
+  if (day) return day.name;
+  return dayId.replace(/-/g, ' ');
 }
 
 /* ------------------------------------------------------------- calendrier -- */
@@ -209,11 +210,11 @@ export interface WeekSlot {
 }
 
 /**
- * Les 3 créneaux prescrits de la semaine en cours, chacun avec un état explicite
+ * Les créneaux prescrits de la semaine en cours, chacun avec un état explicite
  * calculé depuis l'historique :
  *   - `done`     : une séance terminée cette semaine porte ce créneau ;
- *   - `today`    : premier créneau non validé — c'est la séance à faire maintenant ;
- *   - `upcoming` : créneaux suivants, pas encore atteints.
+ *   - `today`    : première séance non validée — celle qui est suggérée ;
+ *   - `upcoming` : les autres créneaux, libres d'accès.
  */
 export function weekSlots(
   days: readonly WorkoutDay[],
