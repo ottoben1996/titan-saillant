@@ -402,3 +402,12 @@ html[data-perf="bas"] .topbar::before {
     transition: none;
   }
 }
+
+/* Feuilles et modales : même matière que le reste depuis la refonte. Le verre a
+   disparu, le rayon passe de 28 à 16 et le filet remplace l'ombre portée. */
+.sheet-content {
+  border-top: 1px solid var(--line);
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+  box-shadow: none;
+  background: var(--surface-1);
+}

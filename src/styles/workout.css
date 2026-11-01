@@ -440,7 +440,6 @@
   font-weight: 500;
 }
 
-
 .workout-content .timer-actions .skip-tempo-btn {
   grid-column: 1;
   grid-row: 1;
@@ -625,7 +624,8 @@
 .serie-validee {
   position: fixed;
   left: 50%;
-  bottom: calc(6.5rem + env(safe-area-inset-bottom, 0px));
+  top: calc(env(safe-area-inset-top, 0px) + var(--sp-14));
+  bottom: auto;
   z-index: 30;
   display: flex;
   align-items: center;
@@ -728,7 +728,6 @@
     animation: none;
   }
 }
-
 
 /* Le tempo suit le langage des autres minuteurs : anneau centré, commandes
    alignées, et l'accent réservé au démarrage. */
