@@ -37,6 +37,14 @@ import { PlateBadge } from '../ui/PlateBadge';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '../ui/Sheet';
 import { CompletionFeedback } from './CompletionFeedback';
 
+/** Libellés des circuits du programme, écrits une fois plutôt que dérivés d'un identifiant. */
+const CIRCUITS: Record<string, string> = {
+  'renfo-lower': 'Renfo bas',
+  'renfo-upper': 'Renfo haut',
+  'abdo-posture': 'Abdos posture',
+  'abdo-cardio': 'Abdos cardio',
+};
+
 function findGhostPerformance(
   history: WorkoutSession[],
   exerciseId: string,
@@ -257,14 +265,12 @@ export function WorkoutScreen({
 
   const phaseLabel =
     exercise?.kind === 'warmup'
-      ? 'ÉCHAUFFEMENT'
+      ? 'Échauffement'
       : exercise?.kind === 'cooldown'
-        ? 'RETOUR AU CALME'
+        ? 'Retour au calme'
         : prescription?.phase === 'warmup'
-          ? 'SÉRIE D’ÉCHAUFFEMENT'
-          : exercise?.circuitId
-            ? exercise.circuitId.replace('-', ' ').toUpperCase()
-            : 'SÉRIE DE TRAVAIL';
+          ? 'Série d’échauffement'
+          : ((exercise?.circuitId ? CIRCUITS[exercise.circuitId] : undefined) ?? 'Série de travail');
 
   // Haptique légère à chaque ajustement
   const triggerHaptic = (ms = 25) => {
@@ -534,8 +540,8 @@ export function WorkoutScreen({
               </p>
             )}
             <span className="eyebrow">
-              {phaseLabel} · SÉRIE {step.setIndex! + 1}
-              {reporte && <span className="report-chip">REPRISE</span>}
+              {phaseLabel} · série {step.setIndex! + 1}
+              {reporte && <span className="report-chip">Reprise</span>}
             </span>
             <div className="prescription-main">
               {prescription.durationSeconds ? (
@@ -729,7 +735,7 @@ export function WorkoutScreen({
               {exercise && prescription && (
                 <div className="rest-next-preview-card" role="group" aria-label="À préparer pendant ton repos">
                   <div className="rest-next-header">
-                    <span className="rest-next-badge">PROCHAINE SÉRIE</span>
+                    <span className="rest-next-badge">Prochaine série</span>
                     <span className="rest-next-series">Série {(step.setIndex ?? 0) + 1}</span>
                   </div>
                   <div className="rest-next-name">{exercise.name}</div>

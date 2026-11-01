@@ -206,7 +206,7 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
 
     // --- 1re série : échauffement, compteur de séries, exercice, suite annoncée.
     expect(screen.getByRole('heading', { level: 1, name: 'Coiffe des rotateurs' })).toBeInTheDocument();
-    expect(screen.getByText('ÉCHAUFFEMENT · SÉRIE 1')).toBeInTheDocument();
+    expect(screen.getByText('Échauffement · série 1')).toBeInTheDocument();
     expect(screen.getByText(exerciceSur(1))).toBeInTheDocument();
     expect(screen.getByText(/ensuite\s: équilibre sur bosu/i)).toBeInTheDocument();
 
@@ -215,16 +215,16 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
     // --- Série d'échauffement validée : on passe à l'exercice suivant, série 1.
     expect(screen.getByRole('heading', { level: 1, name: 'Équilibre sur bosu' })).toBeInTheDocument();
     expect(screen.getByText(exerciceSur(2))).toBeInTheDocument();
-    expect(screen.getByText('ÉCHAUFFEMENT · SÉRIE 1')).toBeInTheDocument();
+    expect(screen.getByText('Échauffement · série 1')).toBeInTheDocument();
     expect(screen.getByText('TEMPO')).toBeInTheDocument();
 
     await validateSet();
     // --- Numéro de série qui progresse réellement à l'écran.
-    expect(screen.getByText('ÉCHAUFFEMENT · SÉRIE 2')).toBeInTheDocument();
+    expect(screen.getByText('Échauffement · série 2')).toBeInTheDocument();
     expect(screen.getByText(exerciceSur(2))).toBeInTheDocument();
 
     await validateSet();
-    expect(screen.getByText('ÉCHAUFFEMENT · SÉRIE 3')).toBeInTheDocument();
+    expect(screen.getByText('Échauffement · série 3')).toBeInTheDocument();
     await validateSet();
     expect(screen.getByRole('heading', { level: 1, name: 'Vélo' })).toBeInTheDocument();
     expect(screen.getByText(exerciceSur(3))).toBeInTheDocument();
@@ -234,13 +234,13 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
 
     // --- Première séance du PDF : soulevé de terre roumain.
     expect(screen.getByRole('heading', { level: 1, name: 'Soulevé de terre roumain' })).toBeInTheDocument();
-    expect(screen.getByText('SÉRIE D’ÉCHAUFFEMENT · SÉRIE 1')).toBeInTheDocument();
+    expect(screen.getByText('Série d’échauffement · série 1')).toBeInTheDocument();
     await validateSet();
     expect(screen.getByText('01:00')).toBeInTheDocument();
     await skipRest();
 
     // --- Série de travail à 40 kg.
-    expect(screen.getByText('SÉRIE DE TRAVAIL · SÉRIE 2')).toBeInTheDocument();
+    expect(screen.getByText('Série de travail · série 2')).toBeInTheDocument();
     expect(screen.getByText('Charge (kg)')).toBeInTheDocument();
     const loadInput = screen.getByDisplayValue('40');
     expect(loadInput).toHaveValue('40');
@@ -258,7 +258,7 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
     expect(restBlockVisible()).toBe(true);
     expect(screen.getByText('01:45')).toBeInTheDocument();
     await skipRest();
-    expect(screen.getByText('SÉRIE DE TRAVAIL · SÉRIE 3')).toBeInTheDocument();
+    expect(screen.getByText('Série de travail · série 3')).toBeInTheDocument();
 
     // --- Jusqu'à la fin de séance.
     await completeRemainingSets();
@@ -279,7 +279,7 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
 
     await validateSet(); // coiffe des rotateurs
     await validateSet(); // bosu, série 1
-    expect(screen.getByText('ÉCHAUFFEMENT · SÉRIE 2')).toBeInTheDocument();
+    expect(screen.getByText('Échauffement · série 2')).toBeInTheDocument();
     expect(screen.getByText(exerciceSur(2))).toBeInTheDocument();
 
     // Démonte puis remonte l'application (comme une fermeture / réouverture).
@@ -290,7 +290,7 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
     // Pas de sélecteur de profil : le profil est mémorisé, la séance en cours est restaurée.
     expect(screen.queryByRole('heading', { name: /choisis ton profil/i })).toBeNull();
     expect(screen.getByRole('heading', { level: 1, name: 'Équilibre sur bosu' })).toBeInTheDocument();
-    expect(screen.getByText('ÉCHAUFFEMENT · SÉRIE 2')).toBeInTheDocument();
+    expect(screen.getByText('Échauffement · série 2')).toBeInTheDocument();
     expect(screen.getByText(exerciceSur(2))).toBeInTheDocument();
 
     // Les séries déjà validées sont bien persistées.
@@ -340,7 +340,7 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
     fireEvent.click(resumeButton);
     await flush();
     expect(screen.getByRole('heading', { level: 1, name: 'Équilibre sur bosu' })).toBeInTheDocument();
-    expect(screen.getByText('ÉCHAUFFEMENT · SÉRIE 1')).toBeInTheDocument();
+    expect(screen.getByText('Échauffement · série 1')).toBeInTheDocument();
     expect(screen.getByText(exerciceSur(2))).toBeInTheDocument();
   });
 
@@ -612,6 +612,6 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
     expect(screen.queryByRole('dialog')).toBeNull();
     expect(titre()).toBe(premier.name);
     // On est bien revenu dessus, et pas sur une séance déjà faite.
-    expect(screen.getByText('REPRISE')).toBeInTheDocument();
+    expect(screen.getByText('Reprise')).toBeInTheDocument();
   });
 });

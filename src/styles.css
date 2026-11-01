@@ -420,13 +420,21 @@ input:focus-visible {
 }
 
 .prescription-card,
-.log-card,
 .rest-card {
   margin-top: var(--sp-8);
   padding: var(--sp-10);
-  border-radius: var(--r-2xl);
-  background: #ffffff0a;
-  box-shadow: inset 0 1px #ffffff13;
+  border-radius: var(--r-lg);
+  background: var(--carte-fond);
+  box-shadow: var(--carte-lisere);
+}
+
+/* « Ta performance » n'est pas une carte : c'est la suite de la prescription,
+   séparée par un filet. Deux cartes empilées pour une même série faisaient deux
+   objets à lire au lieu d'un. */
+.log-card {
+  margin-top: var(--sp-6);
+  padding-top: var(--sp-6);
+  border-top: 1px solid var(--line);
 }
 
 .prescription-main {
@@ -448,7 +456,9 @@ input:focus-visible {
 
 .prescription-main b {
   margin-left: auto;
-  color: var(--accent);
+  /* La charge se lit dans la même encre que le reste : le vert ne désigne plus
+     que l'action. */
+  color: var(--text-1);
   font-size: var(--fs-8);
 }
 
@@ -498,9 +508,11 @@ input:focus-visible {
   display: flex;
   align-items: center;
   gap: var(--sp-3);
-  margin: var(--sp-11) 0;
-  color: #768a7e;
-  font-size: var(--fs-2);
+  /* Collé juste au-dessus de la barre de validation : pendant l'effort, ce qui
+     vient ensuite se lit à l'endroit où le pouce arrive. */
+  margin: auto 0 var(--sp-2);
+  color: var(--text-3);
+  font-size: var(--fs-3);
 }
 
 .rest-card {
@@ -860,11 +872,16 @@ input:focus-visible {
   margin: 0;
 }
 
-.prescription-card.compact,
+.prescription-card.compact {
+  margin: 0;
+  padding: var(--sp-6) var(--sp-8);
+  border-radius: var(--r-lg);
+}
+
 .log-card.compact {
   margin: 0;
   padding: var(--sp-6) var(--sp-8);
-  border-radius: var(--r-xl);
+  border-radius: 0;
 }
 
 .prescription-card.compact {
@@ -1428,8 +1445,8 @@ input:focus-visible {
   height: 2.75rem;
   padding: 0 var(--sp-4);
   border-radius: var(--r-md);
-  background: #ffffff12;
-  color: var(--accent);
+  background: var(--surface-2);
+  color: var(--text-1);
   font-size: var(--fs-4);
   font-weight: 600;
   transition:
@@ -1449,23 +1466,25 @@ input:focus-visible {
    en contour : la lecture se fait à la forme, plus au caractère. Les deux gardent
    les 44 px de cible tactile. */
 
+/* Le gros palier reste plein, le fin reste en contour : la forme se lit avant
+   le chiffre, et confondre « +5 » et « +1,25 » se paie sur la série suivante.
+   Le remplissage est neutre — le vert ne sert plus qu'à la validation. */
 .step-btn.pas-grand {
-  background: var(--accent);
-  border: 1px solid var(--accent);
-  color: var(--accent-ink);
+  background: var(--surface-2);
+  border: 1px solid var(--surface-2);
+  color: var(--text-1);
   font-weight: 600;
 }
 
 .step-btn.pas-fin {
   background: transparent;
-  border: 1px solid rgb(var(--accent-rgb) / 0.45);
-  color: var(--accent);
-  font-weight: 700;
+  border: 1px solid var(--line);
+  color: var(--text-2);
+  font-weight: 600;
 }
 
 .step-btn.pas-grand:active {
-  /* Le gros palier garde son fond : l'encre dessus ne supporte pas un fond translucide. */
-  background: var(--accent);
+  background: var(--surface-2);
   transform: scale(0.94);
 }
 
@@ -2179,10 +2198,9 @@ input:focus-visible {
 
 .rest-next-badge {
   font-size: var(--fs-2);
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  color: var(--accent);
-  background: rgb(var(--accent-rgb) / 0.15);
+  font-weight: 500;
+  color: var(--text-2);
+  background: var(--surface-2);
   padding: var(--sp-1) var(--sp-4);
   border-radius: var(--r-xs);
 }
@@ -2354,9 +2372,6 @@ input:focus-visible {
     .metric-strip,
     .comparison-card,
     .progression-card,
-    .prescription-card,
-    .log-card,
-    .rest-card,
     .settings-list,
     .history-row
   ) {

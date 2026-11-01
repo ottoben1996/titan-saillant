@@ -167,9 +167,12 @@
 }
 
 /* --- Carte de saisie : le chemin rapide d'abord --------------------------- */
+/* « Ta performance » n'est plus une carte : elle prolonge la prescription sous
+   un filet. Sans rayon, le filet reste une ligne droite et non un arc. */
 .workout-content .log-card.compact {
   margin: 0;
-  padding: var(--sp-8);
+  padding: var(--sp-6) 0 0;
+  border-radius: 0;
 }
 
 /* Le titre garde sa ligne ; la consigne passe dessous si elle ne tient pas.
@@ -261,7 +264,7 @@
   height: 56px;
   min-height: 56px;
   padding: 0;
-  border-radius: var(--r-full);
+  border-radius: var(--r-md);
   font-size: var(--fs-4);
   font-variant-numeric: tabular-nums;
 }
@@ -521,7 +524,7 @@
   justify-content: center;
   min-height: 52px;
   border: 0;
-  border-radius: var(--r-full);
+  border-radius: var(--r-md);
   background: var(--remplissage);
   color: var(--text-1);
   font-weight: 650;
@@ -557,7 +560,7 @@
   gap: var(--sp-3);
   padding: var(--sp-8);
   border: 0;
-  border-radius: var(--r-2xl);
+  border-radius: var(--r-lg);
   background: var(--carte-fond);
   box-shadow: var(--carte-lisere);
 }
@@ -592,11 +595,13 @@
    « Série N validée ». */
 .workout-content .barre-validation {
   position: sticky;
-  bottom: calc(var(--sp-3) - 5rem - env(safe-area-inset-bottom, 0px));
+  bottom: calc(-5rem - env(safe-area-inset-bottom, 0px));
   z-index: 12;
-  margin: auto 0 calc(-5rem - env(safe-area-inset-bottom, 0px));
-  padding: var(--sp-5);
-  border-radius: var(--r-2xl);
+  margin: 0 calc(-1 * var(--sp-8)) calc(-5rem - env(safe-area-inset-bottom, 0px));
+  padding: var(--sp-4) var(--sp-8) calc(var(--sp-4) + var(--safe-bottom));
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+  background: var(--surface-0);
 }
 
 .workout-content .barre-validation .primary-button.full.action-bar {

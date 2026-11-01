@@ -69,10 +69,12 @@ describe('paliers de charge', () => {
     const grand = bloc(feuille, '.step-btn.pas-grand {');
     const fin = bloc(feuille, '.step-btn.pas-fin {');
 
-    // Le gros palier est plein, le fin est en contour : la forme se lit avant le chiffre.
-    expect(grand).toContain('background: var(--accent)');
+    // Le gros palier est plein, le fin est en contour : la forme se lit avant le
+    // chiffre. Le remplissage est neutre depuis la refonte : l'accent ne sert
+    // plus qu'à la validation, mais la distinction de forme reste.
+    expect(grand).toContain('background: var(--surface-2)');
     expect(fin).toContain('background: transparent');
-    expect(fin).not.toContain('background: var(--accent)');
+    expect(fin).not.toContain('background: var(--surface-2)');
   });
 
   it('conserve les 44 px de cible tactile sur les deux', () => {
