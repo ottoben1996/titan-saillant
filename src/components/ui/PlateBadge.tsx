@@ -31,9 +31,10 @@ function roundKg(value: number): number {
 }
 
 /** 40 -> "40" ; 2.5 -> "2,5" ; 1.25 -> "1,25" (format FR, séparateur virgule). */
+const KG_FR = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2 });
+
 function formatKg(value: number): string {
-  const rounded = roundKg(value);
-  return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(2).replace(/0$/, '').replace('.', ',');
+  return KG_FR.format(roundKg(value));
 }
 
 /**

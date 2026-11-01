@@ -343,8 +343,11 @@
   gap: var(--sp-6);
   margin: 0;
   padding: var(--sp-8) var(--sp-6);
+  /* Le chiffre et son libellé forment un bloc centré, sinon le libellé part à
+     gauche sous les premiers chiffres. */
+  text-align: center;
   border: 0;
-  border-radius: var(--r-2xl);
+  border-radius: var(--r-lg);
   background: var(--carte-fond);
   box-shadow: var(--carte-lisere);
 }
@@ -493,6 +496,7 @@
 .workout-content .rest-orbit-svg-container {
   width: var(--anneau-repos);
   height: var(--anneau-repos);
+  margin-inline: auto;
 }
 
 .rest-orbit-icone {

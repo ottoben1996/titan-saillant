@@ -1740,7 +1740,10 @@ input:focus-visible {
   background: transparent;
   border: 1px solid transparent;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition:
+    background var(--t-fast) var(--ease),
+    color var(--t-fast) var(--ease),
+    border-color var(--t-fast) var(--ease);
 }
 
 .tutorial-tab-btn.active {
@@ -2122,7 +2125,10 @@ input:focus-visible {
   font-size: var(--fs-2);
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s;
+  transition:
+    background var(--t-fast) var(--ease),
+    color var(--t-fast) var(--ease),
+    border-color var(--t-fast) var(--ease);
 }
 
 .duo-pill-btn.active {

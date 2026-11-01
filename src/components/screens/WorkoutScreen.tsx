@@ -92,10 +92,11 @@ function findGhostPerformance(
   return null;
 }
 
+const NOMBRE_FR = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 });
+
 /** Formate un nombre en français : `20` → « 20 », `2.5` → « 2,5 ». */
 function formatFrenchNumber(value: number): string {
-  const rounded = Math.round(value * 100) / 100;
-  return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1).replace('.', ',');
+  return NOMBRE_FR.format(Math.round(value * 100) / 100);
 }
 
 /** Résumé lisible d'une performance passée : « 20 kg × 10 », « 45 s », « 12 répétitions ». */
@@ -501,8 +502,12 @@ export function WorkoutScreen({
               key={`${exercise.id}-${step.setIndex}`}
               exerciseId={exercise.id}
               setIndex={step.setIndex!}
+              /* Tant que la personne n'a pas touché au champ, le chrono prend la
+                 prescription. Sans ça, il héritait de la durée de l'exercice
+                 précédent : le vélo de 180 s démarrait à 20 s, et sa propre
+                 publication d'état réinjectait ces 20 s comme point de départ. */
               durationSeconds={
-                duration.trim() !== ''
+                durationDirty && duration.trim() !== ''
                   ? parseSafeInt(duration, prescription.durationSeconds, 0, 3600)
                   : prescription.durationSeconds
               }
@@ -604,6 +609,9 @@ export function WorkoutScreen({
                               setLoad(String(recommendation.suggestedLoadKg));
                             if (recommendation.suggestedDurationSeconds !== undefined && !durationDirty) {
                               setDuration(String(recommendation.suggestedDurationSeconds));
+                              // La durée conseillée remplace la prescription : le
+                              // chrono la prend, sinon il garderait l'ancienne.
+                              setDurationDirty(true);
                               setTimerRestartNonce((value) => value + 1);
                               setTempoSkipped(false);
                             }

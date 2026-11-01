@@ -45,12 +45,14 @@ function VolumeTrendChart({ points, dataKey }: { points: TrendPoint[]; dataKey: 
     x: padding.left + (points.length === 1 ? innerWidth / 2 : (index / (points.length - 1)) * innerWidth),
     y: padding.top + innerHeight - (point[dataKey] / max) * innerHeight,
   }));
-  const line = coords
-    .map((point, index) => `${index === 0 ? 'M' : 'L'} ${point.x.toFixed(1)} ${point.y.toFixed(1)}`)
-    .join(' ');
-  const area = `${line} L ${coords.at(-1)?.x.toFixed(1) ?? padding.left} ${height - padding.bottom} L ${
-    coords[0]?.x.toFixed(1) ?? padding.left
-  } ${height - padding.bottom} Z`;
+  // Coordonnées de tracé SVG : un séparateur décimal local (« 12,5 ») casserait
+  // le chemin. Ce ne sont pas des nombres affichés à la personne.
+  // ai-design-check-ignore-next-line locale-number-format -- coordonnée SVG
+  const px = (valeur: number) => valeur.toFixed(1);
+  const line = coords.map((point, index) => `${index === 0 ? 'M' : 'L'} ${px(point.x)} ${px(point.y)}`).join(' ');
+  const area = `${line} L ${px(coords.at(-1)?.x ?? padding.left)} ${height - padding.bottom} L ${px(
+    coords[0]?.x ?? padding.left,
+  )} ${height - padding.bottom} Z`;
   const last = coords.at(-1);
 
   return (
