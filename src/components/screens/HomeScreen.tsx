@@ -187,7 +187,8 @@ export function HomeScreen({
       <header className="large-title">
         <h1>Aujourd’hui</h1>
         <p>
-          {dateLabel.charAt(0).toUpperCase() + dateLabel.slice(1)} · Semaine {programWeek} sur {PROGRAM_WEEKS}
+          {dateLabel.charAt(0).toLocaleUpperCase('fr-FR') + dateLabel.slice(1)} · Semaine {programWeek} sur{' '}
+          {PROGRAM_WEEKS}
         </p>
       </header>
 

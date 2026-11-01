@@ -280,7 +280,7 @@ export function ProgressionScreen({
           <div className="comparison-card">
             <div className="card-heading">
               <div>
-                <p className="eyebrow">SEMAINE EN COURS VS PRÉCÉDENTE</p>
+                <p className="eyebrow">Semaine en cours vs précédente</p>
                 <h2>Comparaison</h2>
               </div>
               <span className={`trend-chip ${volumeTrendClass}`}>
@@ -339,7 +339,7 @@ export function ProgressionScreen({
           <div className="progression-card">
             <div className="card-heading">
               <div>
-                <p className="eyebrow">TENDANCE</p>
+                <p className="eyebrow">Tendance</p>
                 <h2>{hasVolume ? 'Volume par séance' : 'Séries validées par séance'}</h2>
               </div>
               <span>{hasVolume ? 'kg·rép.' : 'séries'}</span>
@@ -359,7 +359,7 @@ export function ProgressionScreen({
           <div className="progression-card">
             <div className="card-heading">
               <div>
-                <p className="eyebrow">RECORDS</p>
+                <p className="eyebrow">Records</p>
                 <h2>Meilleure charge par mouvement</h2>
               </div>
               <span>
@@ -400,7 +400,7 @@ export function ProgressionScreen({
           <div className="progression-card">
             <div className="card-heading">
               <div>
-                <p className="eyebrow">VOLUME PAR ZONE</p>
+                <p className="eyebrow">Volume par zone</p>
                 <h2>Sept derniers jours</h2>
               </div>
               <span>

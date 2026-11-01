@@ -49,7 +49,7 @@ describe('ExerciseTimer (Compteur Tempo)', () => {
       />,
     );
 
-    expect(screen.getByText('TEMPO')).toBeInTheDocument();
+    expect(screen.getByText('Tempo')).toBeInTheDocument();
     expect(screen.getByText('00:40')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /passer/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /démarrer/i })).toBeInTheDocument();

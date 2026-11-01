@@ -46,7 +46,7 @@ export class AppErrorBoundary extends Component<Props, State> {
     return (
       <main className="app-shell error-shell">
         <section className="error-panel" role="alert">
-          <p className="eyebrow">ERREUR D’AFFICHAGE</p>
+          <p className="eyebrow">Erreur d’affichage</p>
           <h1>L’écran n’a pas pu s’afficher.</h1>
           <p className="intro">
             Ta séance et ton historique sont enregistrés sur cet appareil, rien n’est perdu. Recharge l’application pour

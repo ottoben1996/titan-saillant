@@ -525,6 +525,11 @@ body {
      (elle laisse environ 247 px de marge sous elle). */
   --fs-repos: 2.5rem;
 
+  /* Anneau du repos : 232 px de diamètre, trait de 6 px. Dessiné à l'échelle 1
+     dans le SVG, donc aucune interpolation sur le trait. */
+  --anneau-repos: 232px;
+  --anneau-repos-trait: 6px;
+
   /* Le chiffre du compteur tempo, figé en haut de la séance. Mesuré à 390 px :
      à 148 px, « 40s » faisait 331 px de large dans une zone de 331 et sortait de
      140 px. 24 vw donnent 94 px ici : « 40s » tient en 210 px, et le pire cas

@@ -47,8 +47,10 @@ describe('chiffre du repos', () => {
   it('fait suivre le cercle qui l’entoure', () => {
     const regle = bloc(seance, '.workout-content .rest-orbit-svg-container {');
 
-    expect(regle).toContain('width: 128px');
-    expect(regle).toContain('height: 128px');
+    // 232 px de diamètre pour un chiffre de 62 px : le cercle se lit à un mètre,
+    // et le trait du SVG reste à 6 px réels puisqu'il est dessiné à l'échelle 1.
+    expect(regle).toContain('width: var(--anneau-repos)');
+    expect(regle).toContain('height: var(--anneau-repos)');
   });
 
   it('garde une taille tenable sur les écrans bas', () => {

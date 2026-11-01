@@ -25,7 +25,7 @@ const motsBasDuCorps = ['quadriceps', 'fessier', 'cuisse', 'ischio', 'mollet', '
 export function estMouvementBasDuCorps(exerciseId: string): boolean {
   const muscles = tutorials[exerciseId]?.muscles ?? [];
   return muscles.some((muscle) => {
-    const nom = muscle.toLowerCase();
+    const nom = muscle.toLocaleLowerCase('fr-FR');
     return motsBasDuCorps.some((mot) => nom.includes(mot));
   });
 }

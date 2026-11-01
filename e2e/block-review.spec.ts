@@ -20,13 +20,13 @@ test('ouvre une fiche de mouvement et la revue des huit semaines', async ({ page
   await expect(page.getByRole('heading', { level: 1, name: 'Progrès' })).toBeVisible();
 
   await page.getByRole('button', { name: /Voir la fiche de Développé couché barre/i }).click();
-  await expect(page.getByText('FICHE MOUVEMENT')).toBeVisible();
+  await expect(page.getByText('Fiche mouvement')).toBeVisible();
   await expect(page.getByText('70 kg').first()).toBeVisible();
   await expect(page.getByRole('img', { name: /Charge la plus lourde à chaque passage/i })).toBeVisible();
   await page.getByRole('button', { name: 'Voir la technique' }).click();
-  await expect(page.getByText('TUTORIEL & ANATOMIE')).toBeVisible();
+  await expect(page.getByText('Tutoriel & anatomie')).toBeVisible();
   await page.getByRole('button', { name: 'Retour à la fiche' }).click();
-  await expect(page.getByText('FICHE MOUVEMENT')).toBeVisible();
+  await expect(page.getByText('Fiche mouvement')).toBeVisible();
   await page.getByRole('button', { name: 'Fermer' }).click();
 
   await page.getByRole('button', { name: /Revue des 8 dernières semaines/i }).click();

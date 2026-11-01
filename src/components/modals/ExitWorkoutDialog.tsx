@@ -15,7 +15,7 @@ export function ExitWorkoutDialog({ onCancel, onPause, onAbandon }: ExitWorkoutD
       aria-describedby="exit-workout-description"
     >
       <div className="tutorial-modal exit-dialog">
-        <p className="eyebrow">SÉANCE EN COURS</p>
+        <p className="eyebrow">Séance en cours</p>
         <h2 id="exit-workout-title">Quitter la séance ?</h2>
         <p id="exit-workout-description">
           En pause, la séance est gardée : tu la reprends depuis l’accueil, au même mouvement. L’annuler supprime les

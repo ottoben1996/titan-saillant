@@ -103,7 +103,7 @@ export function TutorialModal({ tutorial, onClose, backLabel = 'Retour à la sé
           </>
         )}
 
-        <p className="eyebrow">TUTORIEL & ANATOMIE</p>
+        <p className="eyebrow">Tutoriel & anatomie</p>
         <SheetTitle id="tutorial-title">{tutorial.title}</SheetTitle>
         <div className="chip-row">
           {tutorial.muscles.map((muscle) => (

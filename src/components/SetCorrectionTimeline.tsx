@@ -56,7 +56,7 @@ export function SetCorrectionTimeline({ sets, exercises, onChange }: SetCorrecti
     <section className="set-correction-timeline" aria-labelledby="set-correction-title">
       <div className="set-correction-heading">
         <div>
-          <p className="eyebrow">CARNET DE LA SÉANCE</p>
+          <p className="eyebrow">Carnet de la séance</p>
           <h2 id="set-correction-title">Séries enregistrées</h2>
         </div>
         <span>

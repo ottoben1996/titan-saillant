@@ -9,7 +9,7 @@ import {
 } from '../../workout/restPresets';
 import { type CountdownController, createCountdown } from '../../workout/timer';
 import { getTimerAnnouncement } from '../../workout/timerAnnouncements';
-import { Pause, Play, Timer, X } from '../ui/Icons';
+import { Pause, Play, X } from '../ui/Icons';
 
 export const formatDuration = (seconds: number) =>
   `${Math.floor(seconds / 60)
@@ -264,7 +264,9 @@ export function RestTimer({
   };
 
   const progressTotal = totalDuration > 0 ? totalDuration : seconds > 0 ? seconds : 60;
-  const radius = 52;
+  // Le cercle est dessiné à sa taille d'affichage : 232 unités pour 232 px, donc
+  // un trait de 6 unités fait exactement 6 px, sans mise à l'échelle floue.
+  const radius = 110;
   const circumference = 2 * Math.PI * radius;
   const progressRatio = restProgressRatio({ remainingSeconds: remaining, totalSeconds: progressTotal });
   const strokeDashoffset = circumference * (1 - progressRatio);
@@ -276,21 +278,20 @@ export function RestTimer({
         {getTimerAnnouncement(remaining) ?? ''}
       </span>
       <div className={`rest-orbit-svg-container ${isAlert ? 'rest-circle-alert' : ''}`}>
-        <svg className="rest-circle-svg" viewBox="0 0 120 120" aria-hidden="true">
-          <circle className="rest-circle-bg" cx="60" cy="60" r={radius} />
+        <svg className="rest-circle-svg" viewBox="0 0 232 232" aria-hidden="true">
+          <circle className="rest-circle-bg" cx="116" cy="116" r={radius} />
           <circle
             className="rest-circle-progress"
-            cx="60"
-            cy="60"
+            cx="116"
+            cy="116"
             r={radius}
             strokeDasharray={circumference}
             strokeDashoffset={strokeDashoffset}
           />
         </svg>
         <div className="rest-orbit-content">
-          <Timer size={20} className="rest-orbit-icone" />
           <strong>{formatDuration(remaining)}</strong>
-          <span>{paused ? 'en pause' : 'repos'}</span>
+          <span>{paused ? 'en pause' : 'avant la série suivante'}</span>
         </div>
       </div>
       <p>Récupère vraiment. La prochaine série sera plus solide.</p>

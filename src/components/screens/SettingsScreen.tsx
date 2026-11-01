@@ -180,7 +180,7 @@ export function SettingsScreen({
 
   const persistanceAffichee = libellePersistance(persistance);
 
-  const eraseConfirmed = eraseWord.trim().toUpperCase() === ERASE_WORD;
+  const eraseConfirmed = eraseWord.trim().toLocaleUpperCase('fr-FR') === ERASE_WORD;
 
   const erase = async () => {
     if (!eraseConfirmed || erasing) return;
@@ -226,7 +226,7 @@ export function SettingsScreen({
       {sauvegarde && (
         <aside className="backup-card">
           <div>
-            <p className="eyebrow">SAUVEGARDE</p>
+            <p className="eyebrow">Sauvegarde</p>
             <strong>Ton suivi n'existe que sur ce téléphone</strong>
             <small>
               {sauvegarde.sessions} séances enregistrées
@@ -491,7 +491,7 @@ export function SettingsScreen({
         <div className="device-diagnostic">
           <div className="card-heading">
             <div>
-              <p className="eyebrow">PRÊT POUR LA SALLE</p>
+              <p className="eyebrow">Prêt pour la salle</p>
               <h3>État de l’application</h3>
             </div>
             <span>{isOnline ? 'Connecté' : 'Hors ligne'}</span>

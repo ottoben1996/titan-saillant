@@ -253,7 +253,7 @@ export function weeklyCheckinSummary(
     .map((session) => session.perceivedExertion)
     .filter((value): value is number => typeof value === 'number' && Number.isFinite(value));
 
-  const douleurs = terminees.filter((session) => session.pain && session.pain.toLowerCase() !== 'aucune');
+  const douleurs = terminees.filter((session) => session.pain && session.pain.toLocaleLowerCase('fr-FR') !== 'aucune');
   const formes = terminees
     .map((session) => formFromEnergy(session.energy))
     .filter((value): value is 'better' | 'same' | 'worse' => value !== undefined);

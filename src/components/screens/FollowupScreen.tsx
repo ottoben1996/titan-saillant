@@ -157,7 +157,7 @@ export function FollowupScreen({
       </header>
       <ProgressTabs current="followup" onNavigate={onNavigate} />
 
-      <p className="eyebrow">POINT DU SAMEDI</p>
+      <p className="eyebrow">Point du samedi</p>
       {enPause && (
         <p className="cycle-pause">
           Cycle en pause depuis le {enPause.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })}. Aucun point

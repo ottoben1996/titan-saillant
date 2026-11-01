@@ -15,8 +15,8 @@ test('démarre une séance et ouvre la fiche du mouvement', async ({ page }) => 
   await page.getByRole('button', { name: 'Plus d’options' }).click();
   await page.getByRole('button', { name: 'Fiche du mouvement' }).click();
 
-  await expect(page.getByText('FICHE MOUVEMENT')).toBeVisible();
+  await expect(page.getByText('Fiche mouvement')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Voir la technique' })).toBeVisible();
   await page.getByRole('button', { name: 'Fermer' }).click();
-  await expect(page.getByText('FICHE MOUVEMENT')).toBeHidden();
+  await expect(page.getByText('Fiche mouvement')).toBeHidden();
 });

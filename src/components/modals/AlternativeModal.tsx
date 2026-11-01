@@ -24,7 +24,7 @@ export function AlternativeModal({
   return (
     <Sheet open onOpenChange={(open) => !open && onClose()}>
       <SheetContent side="bottom" onClose={onClose} aria-describedby="alternative-desc">
-        <p className="eyebrow">ALTERNATIVE DE MATÉRIEL</p>
+        <p className="eyebrow">Alternative de matériel</p>
         <SheetTitle id="alternative-title">{alternative.name}</SheetTitle>
         <p className="alternative-for">
           À la place de <strong>{exerciseName}</strong>

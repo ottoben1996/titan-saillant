@@ -489,10 +489,10 @@
   text-align: center;
 }
 
-/* Le cercle suit le chiffre (--fs-repos) : 128 px pour un chiffre de 40 px. */
+/* Le cercle porte le seul chiffre qu'on lit à un mètre : 232 px, comme la maquette. */
 .workout-content .rest-orbit-svg-container {
-  width: 128px;
-  height: 128px;
+  width: var(--anneau-repos);
+  height: var(--anneau-repos);
 }
 
 .rest-orbit-icone {
@@ -548,7 +548,7 @@
   min-height: 44px;
   padding: var(--sp-4) var(--sp-2);
   border: 0;
-  border-radius: var(--r-full);
+  border-radius: var(--r-md);
   background: var(--remplissage);
   color: var(--text-1);
   font-size: var(--fs-3);

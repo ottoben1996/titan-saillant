@@ -90,7 +90,7 @@ export function computeProgressiveOverload(
 
       // Si RPE était <= 7 ou feedback positif
       const comfortable = session.perceivedExertion === undefined || session.perceivedExertion <= 7;
-      const noPain = !session.pain || session.pain.toLowerCase() === 'aucune';
+      const noPain = !session.pain || session.pain.toLocaleLowerCase('fr-FR') === 'aucune';
 
       // L'athlète peut demander explicitement à charger plus : sa demande tient
       // lieu d'aisance ressentie, à condition que les séries soient allées au

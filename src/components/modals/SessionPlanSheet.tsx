@@ -31,9 +31,9 @@ interface SessionPlanSheetProps {
 }
 
 function phaseLabelFor(exercise: ExercisePrescription): string {
-  if (exercise.kind === 'warmup') return 'ÉCHAUFFEMENT';
-  if (exercise.kind === 'cooldown') return 'RETOUR AU CALME';
-  return 'TRAVAIL';
+  if (exercise.kind === 'warmup') return 'Échauffement';
+  if (exercise.kind === 'cooldown') return 'Retour au calme';
+  return 'Travail';
 }
 
 /** « 3 séries × 10 rép. · 40 kg » — la charge affichée est celle de travail. */
@@ -62,7 +62,7 @@ export function SessionPlanSheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="session-plan-sheet">
         <SheetHeader>
-          <p className="eyebrow">SÉANCE EN COURS</p>
+          <p className="eyebrow">Séance en cours</p>
           <SheetTitle>Exercices de la séance</SheetTitle>
           <SheetDescription>
             {dayName} · {exercises.length} mouvement{exercises.length > 1 ? 's' : ''} dans l’ordre. Appuie sur un
@@ -79,7 +79,7 @@ export function SessionPlanSheet({
             // Un exercice reporté s'annonce comme tel : « À VENIR » ne dit pas
             // qu'il a déjà été mis de côté une fois.
             const isReporte = (deferredIds ?? []).includes(exercise.id) && !isDone;
-            const state = isCurrent ? 'EN COURS' : isDone ? 'TERMINÉ' : isReporte ? 'PLUS TARD' : 'À VENIR';
+            const state = isCurrent ? 'En cours' : isDone ? 'Terminé' : isReporte ? 'Plus tard' : 'À venir';
             // Un mouvement terminé n'a plus rien à faire : on ne le rend pas
             // cliquable plutôt que de promettre un saut sans effet.
             const joignable = !isDone && onJumpToExercise !== undefined;

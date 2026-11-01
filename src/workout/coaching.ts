@@ -16,7 +16,7 @@ export function getAdaptiveAdvice(history: readonly WorkoutSession[]): AdaptiveA
     .sort((a, b) => (b.completedAt ?? b.updatedAt).localeCompare(a.completedAt ?? a.updatedAt))[0];
   if (!latest) return null;
 
-  const pain = latest.pain?.trim().toLowerCase();
+  const pain = latest.pain?.trim().toLocaleLowerCase('fr-FR');
   if (pain && pain !== 'aucune') {
     return {
       recommendation: 'reduce',
@@ -75,7 +75,7 @@ export interface ExerciseRecommendationOptions {
 }
 
 const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value);
-const painFree = (pain?: string) => !pain?.trim() || pain.trim().toLowerCase() === 'aucune';
+const painFree = (pain?: string) => !pain?.trim() || pain.trim().toLocaleLowerCase('fr-FR') === 'aucune';
 const dateOf = (session: WorkoutSession) => session.completedAt ?? session.updatedAt;
 
 export function getExerciseRecommendation(

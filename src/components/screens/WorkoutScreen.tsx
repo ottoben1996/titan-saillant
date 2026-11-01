@@ -527,7 +527,7 @@ export function WorkoutScreen({
               <p className="repose-line">
                 <span>
                   Série {step.setIndex! + 1} validée
-                  {reporte && <span className="report-chip">REPRISE</span>}
+                  {reporte && <span className="report-chip">Reprise</span>}
                 </span>
                 <strong>
                   {prescription.durationSeconds

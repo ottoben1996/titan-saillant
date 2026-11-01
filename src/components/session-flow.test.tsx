@@ -216,7 +216,7 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
     expect(screen.getByRole('heading', { level: 1, name: 'Équilibre sur bosu' })).toBeInTheDocument();
     expect(screen.getByText(exerciceSur(2))).toBeInTheDocument();
     expect(screen.getByText('Échauffement · série 1')).toBeInTheDocument();
-    expect(screen.getByText('TEMPO')).toBeInTheDocument();
+    expect(screen.getByText('Tempo')).toBeInTheDocument();
 
     await validateSet();
     // --- Numéro de série qui progresse réellement à l'écran.
@@ -263,7 +263,7 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
     // --- Jusqu'à la fin de séance.
     await completeRemainingSets();
 
-    expect(screen.getByText('SÉANCE TERMINÉE')).toBeInTheDocument();
+    expect(screen.getByText('Séance terminée')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /bilan de full body — spé upper/i })).toBeInTheDocument();
     expect(within(bilanCell(/séries validées/i)).getByText(String(FULL_BODY_A_STEPS))).toBeInTheDocument();
     expect(bilanCell(/meilleure charge/i).textContent).toMatch(/kg/);
@@ -407,7 +407,7 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
     await completeRemainingSets();
 
     // --- 1. Bilan factuel.
-    expect(screen.getByText('SÉANCE TERMINÉE')).toBeInTheDocument();
+    expect(screen.getByText('Séance terminée')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /bilan de full body — spé upper/i })).toBeInTheDocument();
     expect(within(bilanCell(/séries validées/i)).getByText(String(FULL_BODY_A_STEPS))).toBeInTheDocument();
     expect(bilanCell(/durée/i)).toHaveTextContent(/min/);
@@ -559,9 +559,9 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
     expect(within(feuille).getByText(plan[plan.length - 1].name)).toBeInTheDocument();
 
     // Un seul mouvement en cours, les suivants annoncés comme à venir.
-    expect(within(feuille).getAllByText(/· EN COURS/)).toHaveLength(1);
-    expect(within(feuille).getAllByText(/· À VENIR/).length).toBeGreaterThan(0);
-    expect(within(lignes[0]).getByText(/· EN COURS/)).toBeInTheDocument();
+    expect(within(feuille).getAllByText(/· En cours/)).toHaveLength(1);
+    expect(within(feuille).getAllByText(/· À venir/).length).toBeGreaterThan(0);
+    expect(within(lignes[0]).getByText(/· En cours/)).toBeInTheDocument();
 
     // Elle se ferme et reste accessible en cours de séance.
     fireEvent.keyDown(document, { key: 'Escape' });
@@ -572,7 +572,7 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
     fireEvent.click(screen.getByRole('button', { name: /voir la liste des exercices/i }));
     await flush();
     const feuille2 = screen.getByRole('dialog');
-    expect(within(feuille2).getByText(/· EN COURS/)).toBeInTheDocument();
+    expect(within(feuille2).getByText(/· En cours/)).toBeInTheDocument();
   });
 
   it('[10] machine occupée : l’exercice part à plus tard, et la liste y ramène', async () => {
@@ -603,7 +603,7 @@ describe('Parcours complet d’une séance (intégration, interface pilotée)', 
     fireEvent.click(screen.getByRole('button', { name: /voir la liste des exercices/i }));
     await flush();
     const feuille = screen.getByRole('dialog');
-    expect(within(feuille).getByText(/· PLUS TARD/)).toBeInTheDocument();
+    expect(within(feuille).getByText(/· Plus tard/)).toBeInTheDocument();
 
     // Un appui dessus, et on y est — sans attendre que l'ordre le ramène.
     fireEvent.click(within(feuille).getByRole('button', { name: `Aller à ${premier.name}` }));

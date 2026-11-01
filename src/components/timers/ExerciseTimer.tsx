@@ -202,7 +202,7 @@ export function ExerciseTimer({
           />
         </svg>
         <div className="tempo-anneau-texte">
-          <span className="eyebrow">TEMPO</span>
+          <span className="eyebrow">Tempo</span>
           <strong>{formatDuration(remaining)}</strong>
           <small>
             {remaining === 0

@@ -123,7 +123,7 @@ export function CompletionFeedback({
           <Check size={30} weight="bold" />
         </div>
         <div>
-          <p className="eyebrow">SÉANCE TERMINÉE</p>
+          <p className="eyebrow">Séance terminée</p>
           <h1>Bilan de {workoutDayLabel(summary.dayId, program)}</h1>
         </div>
       </div>
@@ -205,7 +205,7 @@ export function CompletionFeedback({
       )}
       <div className="feedback-card">
         <div className="feedback-heading">
-          <p className="eyebrow">TON RESSENTI</p>
+          <p className="eyebrow">Ton ressenti</p>
           <p className="muted-copy">
             Quatre réponses rapides. Elles partent dans ton bilan du samedi et ajustent la prochaine séance.
           </p>

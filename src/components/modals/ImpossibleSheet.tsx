@@ -44,7 +44,7 @@ export function ImpossibleSheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="impossible-sheet">
         <SheetHeader>
-          <p className="eyebrow">CE QUI SE PASSE</p>
+          <p className="eyebrow">Ce qui se passe</p>
           <SheetTitle>Je ne peux pas faire cet exercice</SheetTitle>
           <SheetDescription>{exerciseName} · choisis ce qui t’arrive, la séance s’adapte toute seule.</SheetDescription>
         </SheetHeader>

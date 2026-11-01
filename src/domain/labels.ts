@@ -28,5 +28,9 @@ export const EXERCISE_LABELS: Record<string, string> = {
 };
 
 export function exerciseLabel(id: string, fallback?: string): string {
-  return EXERCISE_LABELS[id] ?? fallback ?? id.replace(/-/g, ' ').replace(/^\p{L}/u, (letter) => letter.toUpperCase());
+  return (
+    EXERCISE_LABELS[id] ??
+    fallback ??
+    id.replace(/-/g, ' ').replace(/^\p{L}/u, (letter) => letter.toLocaleUpperCase('fr-FR'))
+  );
 }

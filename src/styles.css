@@ -2064,14 +2064,14 @@ input:focus-visible {
 
 .rest-circle-bg {
   fill: none;
-  stroke: #ffffff10;
-  stroke-width: 8;
+  stroke: var(--surface-2);
+  stroke-width: var(--anneau-repos-trait);
 }
 
 .rest-circle-progress {
   fill: none;
   stroke: var(--accent);
-  stroke-width: 8;
+  stroke-width: var(--anneau-repos-trait);
   stroke-linecap: round;
   transition:
     stroke-dashoffset 1s linear,
@@ -2092,11 +2092,12 @@ input:focus-visible {
 }
 
 .rest-orbit-content strong {
-  font-size: var(--fs-repos);
+  /* 62 px : le seul chiffre lu debout, à un mètre de l'écran. */
+  font-size: calc(var(--fs-repos) * 1.55);
   line-height: 1;
-  color: #fff;
+  color: var(--text-1);
   font-weight: 600;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.04em;
 }
 
 .rest-orbit-content span {

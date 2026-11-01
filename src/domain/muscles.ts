@@ -39,7 +39,7 @@ export const MUSCLE_LABELS: Record<MuscleId, string> = {
 
 // Normalise les chaînes de muscles françaises ou anglaises vers MuscleId
 export function normalizeMuscle(name: string): MuscleId | null {
-  const n = name.toLowerCase().trim();
+  const n = name.toLocaleLowerCase('fr-FR').trim();
   if (n.includes('pect') || n.includes('chest') || n.includes('pec')) return 'chest';
   if (n.includes('épaul') || n.includes('delto') || n.includes('shoulder')) return 'shoulders';
   if (n.includes('bicep')) return 'biceps';

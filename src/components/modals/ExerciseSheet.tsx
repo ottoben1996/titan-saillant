@@ -129,7 +129,7 @@ export function ExerciseSheet({ exerciseId, history, program, onClose, onTutoria
   return (
     <Sheet open onOpenChange={(open) => !open && onClose()}>
       <SheetContent side="bottom" onClose={onClose} className="exercise-sheet" aria-describedby="exercise-sheet-desc">
-        <p className="eyebrow">FICHE MOUVEMENT</p>
+        <p className="eyebrow">Fiche mouvement</p>
         <SheetTitle>{name}</SheetTitle>
         <SheetDescription id="exercise-sheet-desc">{serieLabel(prescription)}</SheetDescription>
 

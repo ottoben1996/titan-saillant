@@ -571,7 +571,7 @@ export function BilanScreen({ profileId, measurements, current, sessions }: Bila
             <p className="bilan-note">
               Charge la plus lourde réellement validée à chaque passage, séries d'échauffement exclues.
               {stagnations.length > 0
-                ? ` Sans progression depuis trois passages : ${stagnations.map((item) => item.nom.toLowerCase()).join(', ')}.`
+                ? ` Sans progression depuis trois passages : ${stagnations.map((item) => item.nom.toLocaleLowerCase('fr-FR')).join(', ')}.`
                 : ''}
             </p>
           </>
@@ -632,7 +632,7 @@ export function BilanScreen({ profileId, measurements, current, sessions }: Bila
                     </td>
                     <td className="num">{libelleForme(formFromEnergy(seance.energy))}</td>
                     <td className="note">
-                      {seance.pain && seance.pain.toLowerCase() !== 'aucune'
+                      {seance.pain && seance.pain.toLocaleLowerCase('fr-FR') !== 'aucune'
                         ? `${seance.pain}${seance.painLocation ? ` (${seance.painLocation})` : ''}`
                         : '—'}
                     </td>
@@ -655,7 +655,7 @@ export function BilanScreen({ profileId, measurements, current, sessions }: Bila
                 ? ` Consignes données : ${ressenti.consignes
                     .map(
                       (item) =>
-                        `${workoutDayLabel(item.dayId, program).toLowerCase()} — ${libelleConsigne(item.consigne)}`,
+                        `${workoutDayLabel(item.dayId, program).toLocaleLowerCase('fr-FR')} — ${libelleConsigne(item.consigne)}`,
                     )
                     .join(', ')}.`
                 : ''}
@@ -670,7 +670,9 @@ export function BilanScreen({ profileId, measurements, current, sessions }: Bila
               <p className="bilan-note">
                 Notes :{' '}
                 {ressenti.notes
-                  .map((item) => `${workoutDayLabel(item.dayId, program).toLowerCase()} — « ${item.notes} »`)
+                  .map(
+                    (item) => `${workoutDayLabel(item.dayId, program).toLocaleLowerCase('fr-FR')} — « ${item.notes} »`,
+                  )
                   .join(' · ')}
               </p>
             )}
