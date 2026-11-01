@@ -27,17 +27,8 @@ body {
   background: var(--surface-0);
 }
 
-/* Fond ambiant : une lueur de l'accent posée sur le noir, fixe, jamais animée. */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background:
-    radial-gradient(60rem 40rem at 0% 0%, rgb(var(--accent-rgb) / 0.16), transparent 60%),
-    radial-gradient(40rem 32rem at 100% 30%, rgb(var(--accent-rgb) / 0.07), transparent 65%), var(--surface-0);
-}
+/* Fond : un seul noir. La lueur d'accent qui teintait les coins a été retirée
+   avec la refonte : elle salissait le contraste des cartes et n'aidait à rien. */
 
 button,
 input {
@@ -58,7 +49,9 @@ input:focus-visible {
 
 .app-shell {
   min-height: 100dvh;
-  padding: 0 var(--sp-8) var(--sp-14);
+  /* La barre d'onglets est fixée au bas de l'écran : le contenu doit pouvoir
+     défiler sous elle sans que la dernière ligne reste cachée. */
+  padding: 0 var(--sp-8) calc(var(--sp-14) * 2 + var(--safe-bottom));
 }
 
 .content {
@@ -85,18 +78,20 @@ input:focus-visible {
   min-width: 44px;
 }
 
-/* Avatar du profil : rond, couleur d'accent, ouvre le changement de profil. */
+/* Avatar du profil : rond, neutre. Il ouvrait le changement de profil en vert,
+   ce qui faisait un deuxième objet d'accent sur l'accueil. */
 .topbar-avatar {
   display: grid;
   place-items: center;
   width: 44px;
   height: 44px;
   border-radius: var(--r-full);
-  background: var(--accent);
-  color: var(--accent-ink);
-  font-family: var(--font-chiffres);
-  font-size: var(--fs-6);
-  font-weight: 700;
+  background: var(--surface-2);
+  color: var(--text-1);
+  font-family: var(--font-ui);
+  font-size: var(--fs-4);
+  font-weight: 600;
+  box-shadow: inset 0 0 0 1px var(--line);
 }
 
 .exit-actions {
@@ -155,10 +150,9 @@ input:focus-visible {
 
 .eyebrow {
   margin: 0;
-  color: #9ab2a4;
-  font-size: var(--fs-2);
-  letter-spacing: 0.18em;
-  font-weight: 800;
+  color: var(--text-3);
+  font-size: var(--fs-3);
+  font-weight: 500;
 }
 
 .intro {
@@ -219,7 +213,7 @@ input:focus-visible {
   height: 3.15rem;
   border-radius: var(--r-xl);
   color: var(--accent-ink);
-  font-weight: 900;
+  font-weight: 600;
 }
 
 .avatar-ottman {
@@ -343,19 +337,23 @@ input:focus-visible {
   line-height: 1.5;
 }
 
-/* Barre d'onglets : capsule de verre flottante, quatre onglets sur une ligne. */
+/* Barre d'onglets : une bande posée au bas de l'écran, séparée par un filet.
+   La capsule flottante en verre a été retirée : elle flottait au-dessus du
+   contenu, masquait la dernière ligne et coûtait un flou plein écran. */
 .bottom-nav {
   position: fixed;
   z-index: 5;
-  left: 50%;
-  bottom: calc(var(--sp-4) + env(safe-area-inset-bottom));
-  transform: translateX(-50%);
+  left: 0;
+  right: 0;
+  bottom: 0;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--sp-1);
-  width: min(calc(100% - 2rem), 26rem);
-  padding: var(--sp-3);
-  border-radius: var(--r-full);
+  gap: 0;
+  width: 100%;
+  padding: var(--sp-2) var(--sp-4) calc(var(--sp-2) + var(--safe-bottom));
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+  background: var(--surface-0);
 }
 
 .bottom-nav button {
@@ -363,24 +361,24 @@ input:focus-visible {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--sp-1);
+  gap: var(--sp-2);
   min-width: 0;
   min-height: 52px;
-  padding: var(--sp-2) var(--sp-1);
-  border-radius: var(--r-full);
+  padding: var(--sp-1);
+  border-radius: var(--r-md);
   background: transparent;
-  color: var(--text-2);
-  font-size: var(--fs-1);
-  font-weight: 590;
+  color: var(--text-3);
+  font-size: var(--fs-2);
+  font-weight: 500;
 }
 
 .bottom-nav-icone {
   position: relative;
   display: grid;
   place-items: center;
-  width: 52px;
-  height: 28px;
-  border-radius: var(--r-full);
+  width: var(--sp-11);
+  height: var(--sp-11);
+  border-radius: var(--r-sm);
 }
 
 .bottom-nav-libelle {
@@ -391,13 +389,11 @@ input:focus-visible {
   letter-spacing: 0.01em;
 }
 
+/* L'onglet courant se distingue par le contraste, pas par l'accent : le vert
+   reste sur l'action. */
 .bottom-nav button.active {
-  color: var(--accent);
-  font-weight: 650;
-}
-
-.bottom-nav button.active .bottom-nav-icone {
-  background: rgb(var(--accent-rgb) / 0.16);
+  color: var(--text-1);
+  font-weight: 600;
 }
 
 .bottom-nav-pastille {
@@ -472,7 +468,7 @@ input:focus-visible {
 }
 
 .log-card-heading span {
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .log-card-heading small {
@@ -487,11 +483,11 @@ input:focus-visible {
   gap: var(--sp-4);
   min-height: 52px;
   padding: var(--sp-6) var(--sp-11);
-  border-radius: var(--r-full);
+  border-radius: var(--r-md);
   background: var(--accent);
   color: var(--accent-ink);
   font-size: var(--fs-6);
-  font-weight: 650;
+  font-weight: 600;
 }
 
 .primary-button.full {
@@ -714,8 +710,6 @@ input:focus-visible {
   margin: var(--sp-11) 0 var(--sp-3);
   font-size: var(--fs-3);
   color: var(--accent);
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
 }
 
 .tutorial-modal p,
@@ -950,8 +944,6 @@ input:focus-visible {
 .alternative-detail span {
   color: #8fa296;
   font-size: var(--fs-2);
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
 }
 
 .alternative-detail strong {
@@ -1086,7 +1078,7 @@ input:focus-visible {
 .week-strip button.active {
   background: var(--accent);
   color: var(--accent-ink);
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .toggle-row {
@@ -1231,7 +1223,7 @@ input:focus-visible {
   background: var(--accent);
   color: var(--accent-ink);
   font-size: var(--fs-8);
-  font-weight: 900;
+  font-weight: 600;
 }
 
 .adaptive-advice.safety .adaptive-icon {
@@ -1280,7 +1272,7 @@ input:focus-visible {
   min-height: 52px;
   padding: var(--sp-6) var(--sp-11);
   border: 0;
-  border-radius: var(--r-full);
+  border-radius: var(--r-md);
   background: var(--remplissage);
   color: var(--text-1);
   font-size: var(--fs-6);
@@ -1419,8 +1411,6 @@ input:focus-visible {
 .stepper-label {
   font-size: var(--fs-2);
   color: #8da094;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
   font-weight: 700;
 }
 
@@ -1441,7 +1431,7 @@ input:focus-visible {
   background: #ffffff12;
   color: var(--accent);
   font-size: var(--fs-4);
-  font-weight: 800;
+  font-weight: 600;
   transition:
     background 0.2s,
     transform 0.15s;
@@ -1463,7 +1453,7 @@ input:focus-visible {
   background: var(--accent);
   border: 1px solid var(--accent);
   color: var(--accent-ink);
-  font-weight: 900;
+  font-weight: 600;
 }
 
 .step-btn.pas-fin {
@@ -1490,7 +1480,7 @@ input:focus-visible {
   height: 2.75rem;
   text-align: center;
   font-size: var(--fs-9);
-  font-weight: 800;
+  font-weight: 600;
   border: 1px solid #ffffff18;
   border-radius: var(--r-md);
   background: #090e0c;
@@ -1513,8 +1503,6 @@ input:focus-visible {
 .plate-badge-label {
   font-size: var(--fs-2);
   color: #8ea397;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
   font-weight: 700;
 }
 
@@ -1555,7 +1543,7 @@ input:focus-visible {
   padding: 0 var(--sp-3);
   border-radius: var(--r-full);
   font-size: var(--fs-2);
-  font-weight: 900;
+  font-weight: 600;
   letter-spacing: -0.02em;
   border: 2px solid transparent;
   box-shadow:
@@ -1631,7 +1619,7 @@ input:focus-visible {
   min-height: 44px;
   padding: var(--sp-3) var(--sp-4);
   border-radius: var(--r-md);
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .coaching-apply-btn {
@@ -1683,7 +1671,7 @@ input:focus-visible {
   background: var(--accent);
   color: var(--accent-ink);
   font-size: var(--fs-2);
-  font-weight: 900;
+  font-weight: 600;
 }
 
 .prog-apply-btn {
@@ -1692,7 +1680,7 @@ input:focus-visible {
   background: var(--accent);
   color: var(--accent-ink);
   font-size: var(--fs-2);
-  font-weight: 800;
+  font-weight: 600;
 }
 
 /* Check-in d'énergie pré-séance : la feuille est stylée dans screens.css. */
@@ -1902,7 +1890,7 @@ input:focus-visible {
   font-size: var(--fs-2);
   color: #7b9184;
   letter-spacing: 0.08em;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .muscle-svg {
@@ -1961,7 +1949,7 @@ input:focus-visible {
 
 .ghost-perf-strip strong {
   color: #e6f6ee;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 /* Radix Mobile Bottom Sheet */
@@ -2088,15 +2076,13 @@ input:focus-visible {
   font-size: var(--fs-repos);
   line-height: 1;
   color: #fff;
-  font-weight: 900;
+  font-weight: 600;
   letter-spacing: -0.03em;
 }
 
 .rest-orbit-content span {
   font-size: var(--fs-2);
   color: #8da195;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
   margin-top: var(--sp-2);
 }
 
@@ -2193,7 +2179,7 @@ input:focus-visible {
 
 .rest-next-badge {
   font-size: var(--fs-2);
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: 0.06em;
   color: var(--accent);
   background: rgb(var(--accent-rgb) / 0.15);
@@ -2282,9 +2268,8 @@ input:focus-visible {
 
 .warmup-ramp-badge {
   font-size: var(--fs-2);
-  font-weight: 800;
+  font-weight: 600;
   color: #facc15;
-  text-transform: uppercase;
 }
 
 .warmup-ramp-info strong {
@@ -2372,14 +2357,13 @@ input:focus-visible {
     .prescription-card,
     .log-card,
     .rest-card,
-    .home-metric,
     .settings-list,
     .history-row
   ) {
   background: var(--carte-fond);
   border: 0;
   box-shadow: var(--carte-lisere);
-  border-radius: var(--r-2xl);
+  border-radius: var(--r-lg);
 }
 
 .app-shell

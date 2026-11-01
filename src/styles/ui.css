@@ -54,8 +54,6 @@
 .plate-badge-label {
   font-size: var(--fs-3);
   color: var(--text-2);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
   font-weight: 700;
 }
 
@@ -67,7 +65,7 @@
 
 .plate-badge-total strong {
   color: var(--text-1);
-  font-weight: 800;
+  font-weight: 600;
 }
 
 /* Le chiffre à lire en priorité : gros, contrasté, tabulaire. */
@@ -81,7 +79,7 @@
 .plate-side-value {
   font-size: var(--fs-11);
   line-height: 1;
-  font-weight: 900;
+  font-weight: 600;
   letter-spacing: -0.02em;
   color: var(--text-1);
 }
@@ -89,8 +87,6 @@
 .plate-side-unit {
   font-size: var(--fs-3);
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
   color: var(--text-2);
 }
 
@@ -123,7 +119,7 @@
   gap: var(--sp-1);
   border-radius: var(--r-md);
   font-size: var(--fs-4);
-  font-weight: 900;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
   box-shadow: none;
 }
@@ -170,7 +166,7 @@
 
 .plate-badge-warning strong {
   color: var(--rest);
-  font-weight: 800;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 
@@ -213,7 +209,7 @@
 
 .figure-label {
   font-size: var(--fs-2);
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: 0.08em;
   color: var(--text-2);
 }

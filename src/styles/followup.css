@@ -230,8 +230,6 @@
   margin: var(--sp-5) 0 0;
   font-size: var(--fs-2);
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
   color: var(--text-2);
 }
 
@@ -261,7 +259,7 @@
   min-width: 58px;
   color: var(--accent);
   font-size: var(--fs-2);
-  font-weight: 800;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 
@@ -386,8 +384,6 @@
 .bilan-head p {
   margin: var(--sp-2) 0 0;
   font-size: var(--fs-1);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
   color: #55655c;
 }
 
@@ -420,8 +416,6 @@
 .bilan-kpis span {
   display: block;
   font-size: var(--fs-1);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
   color: #55655c;
 }
 
@@ -442,8 +436,6 @@
 .bilan-doc h3 {
   margin: var(--sp-10) 0 var(--sp-4);
   font-size: var(--fs-2);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
   color: #55655c;
 }
 
@@ -469,8 +461,6 @@
   border-bottom: 1px solid #d8e0db;
   font-size: var(--fs-1);
   font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
   color: #55655c;
   text-align: left;
 }
@@ -518,8 +508,6 @@
   display: block;
   margin-bottom: var(--sp-2);
   font-size: var(--fs-1);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
   color: #6b4a78;
 }
 
@@ -650,8 +638,6 @@
 .bilan-chart h4 span {
   font-size: var(--fs-1);
   color: #55655c;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
 .bilan-chart svg {
@@ -826,8 +812,6 @@
   margin-bottom: var(--sp-2);
   color: #3f7a3a;
   font-size: var(--fs-1);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
 .block-doc .bilan-read.alert b {

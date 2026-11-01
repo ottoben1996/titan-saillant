@@ -71,6 +71,8 @@
   --rest: #ffb547;
   --rest-rgb: 255 181 71;
   --danger: #ff8a80;
+  /* Hausse mesurée, jamais utilisée pour décorer : 10:1 sur --surface-0. */
+  --success: #5ecf85;
 
   /* Lilas de Laura : sert au choix du profil, avant toute couleur choisie. */
   --accent-laura: #d7b8ff;
@@ -80,14 +82,15 @@
   /* Matières.
      Carte : verre simulé, opaque — aucun flou, le texte garde son contraste.
      Verre : flou réel, réservé aux barres et aux feuilles. */
-  --carte-fond: linear-gradient(180deg, rgb(255 255 255 / 0.07), rgb(255 255 255 / 0.04)), var(--surface-1);
+  --carte-fond: var(--surface-1);
   --carte-fond-2: rgb(255 255 255 / 0.06);
-  --carte-lisere:
-    inset 0 0 0 1px rgb(255 255 255 / 0.07), inset 0 1px 0 rgb(255 255 255 / 0.06), 0 8px 24px rgb(0 0 0 / 0.28);
-  --verre-teinte: rgb(30 32 36 / 0.62);
-  --verre-epais-teinte: rgb(34 36 40 / 0.86);
-  --verre-flou: blur(24px) saturate(180%);
-  --verre-ombre: inset 0 0 0 1px rgb(255 255 255 / 0.09), 0 10px 30px rgb(0 0 0 / 0.4);
+  --carte-lisere: inset 0 0 0 1px var(--line);
+  /* Le verre n'est plus flouté : les barres prennent un fond opaque et un
+     filet. Moins de repaintes, et le contenu qui défile ne transparaît plus. */
+  --verre-teinte: var(--surface-0);
+  --verre-epais-teinte: var(--surface-1);
+  --verre-flou: none;
+  --verre-ombre: inset 0 -1px 0 var(--line);
 
   /* Mouvement court, pour les états (couleur, fond) */
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);

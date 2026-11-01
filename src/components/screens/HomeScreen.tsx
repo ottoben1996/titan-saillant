@@ -30,6 +30,8 @@ const FORFAIT_ETAPE_SECONDES = 120;
 /** Marge hors séance : installation, transitions, réglage des machines. */
 const MARGE_HORS_SEANCE_MINUTES = 12;
 
+const POURCENTAGE = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 });
+
 export type NextBestAction =
   | { kind: 'resume'; label: string; description: string }
   | { kind: 'workout'; label: string; description: string; day: WorkoutDay }
@@ -111,32 +113,25 @@ interface HomeScreenProps {
   programWeek?: number;
 }
 
-/** Anneau de la semaine : séances faites sur les créneaux prescrits. */
-function WeekRing({ done, total }: { done: number; total: number }) {
-  const rayon = 22;
-  const circonference = 2 * Math.PI * rayon;
-  const part = Math.min(1, done / total);
+/**
+ * Quatre segments plutôt qu'un anneau : à 390 px, « 1 sur 4 » se lit d'un coup
+ * d'œil, alors qu'un arc de 56 px demandait de compter les dents. L'anneau reste
+ * sur le repos et le tempo, où il porte un temps qui s'écoule.
+ */
+const SEGMENTS = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'] as const;
+
+function WeekBars({ done, total }: { done: number; total: number }) {
+  const faits = Math.min(done, total);
   return (
-    <span
-      className="week-ring"
+    <div
+      className="week-bars"
       role="img"
       aria-label={`${done} séance${done > 1 ? 's' : ''} sur ${total} cette semaine`}
     >
-      <svg viewBox="0 0 56 56" width="56" height="56" aria-hidden="true">
-        <circle cx="28" cy="28" r={rayon} className="week-ring-fond" />
-        <circle
-          cx="28"
-          cy="28"
-          r={rayon}
-          className="week-ring-arc"
-          strokeDasharray={circonference}
-          strokeDashoffset={circonference * (1 - part)}
-        />
-      </svg>
-      <b aria-hidden="true">
-        {done}/{total}
-      </b>
-    </span>
+      {SEGMENTS.slice(0, total).map((jour, index) => (
+        <i key={jour} className={index < faits ? 'fait' : undefined} />
+      ))}
+    </div>
   );
 }
 
@@ -162,6 +157,8 @@ export function HomeScreen({
       slots: weekSlots(program.days, history, now),
       weekSessions: comparison.current.sessions,
       weekVolume: comparison.current.volumeKg,
+      volumeDeltaPct: comparison.volumeDeltaPct,
+      sessionsDelta: comparison.sessionsDelta,
     };
   }, [program.days, history]);
 
@@ -170,9 +167,20 @@ export function HomeScreen({
     [program, history, activeSession, measurements],
   );
   const dateLabel = view.now.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
-  const ring = <WeekRing done={view.weekSessions} total={WEEKLY_TARGET} />;
+  const week = <WeekBars done={view.weekSessions} total={WEEKLY_TARGET} />;
   const seriesFaites = activeSession?.loggedSets.length ?? 0;
   const pluriel = seriesFaites > 1 ? 's' : '';
+
+  // Chaque chiffre porte sa comparaison : sans elle, « 4 860 kg·rép. » ne dit
+  // rien de la semaine d'avant, et « 1 séance » ne dit pas si c'est mieux.
+  const volumeDelta =
+    view.volumeDeltaPct === null
+      ? 'première semaine mesurée'
+      : `${view.volumeDeltaPct > 0 ? '+' : ''}${POURCENTAGE.format(view.volumeDeltaPct)}\u202F% sur 7 jours`;
+  const sessionsDelta =
+    view.sessionsDelta === 0
+      ? 'comme la semaine dernière'
+      : `${view.sessionsDelta > 0 ? '+' : ''}${view.sessionsDelta} sur 7 jours`;
 
   return (
     <section className="content home-content">
@@ -204,17 +212,18 @@ export function HomeScreen({
         <article className="hero-card" aria-labelledby="hero-title">
           {nextAction.kind === 'resume' && (
             <>
-              <div className="hero-head">
-                <div>
-                  <p className="eyebrow">SÉANCE EN COURS</p>
-                  <h2 id="hero-title">
-                    {activeSession ? workoutDayLabel(activeSession.dayId, program) : nextAction.label}
-                  </h2>
-                  <p className="hero-sub">
-                    {`${seriesFaites} série${pluriel} déjà validée${pluriel}`} · {nextAction.description}
-                  </p>
-                </div>
-                {ring}
+              <p className="eyebrow">Séance en cours</p>
+              <h2 id="hero-title">
+                {activeSession ? workoutDayLabel(activeSession.dayId, program) : nextAction.label}
+              </h2>
+              <p className="hero-sub">
+                {`${seriesFaites} série${pluriel} déjà validée${pluriel} · ${nextAction.description}`}
+              </p>
+              <div className="hero-week">
+                {week}
+                <span>
+                  {view.weekSessions} sur {WEEKLY_TARGET}
+                </span>
               </div>
               <div className="hero-actions">
                 <button
@@ -233,18 +242,19 @@ export function HomeScreen({
           )}
           {nextAction.kind === 'workout' && (
             <>
-              <div className="hero-head">
-                <div>
-                  <p className="eyebrow">SÉANCE DU JOUR</p>
-                  <h2 id="hero-title">{nextAction.day.name}</h2>
-                  <p className="hero-sub">{nextAction.description}</p>
-                </div>
-                {ring}
-              </div>
+              <p className="eyebrow">Séance du jour</p>
+              <h2 id="hero-title">{nextAction.day.name}</h2>
+              <p className="hero-sub">{nextAction.description}</p>
               <p className="hero-meta">
                 {nextAction.day.exercises.length} mouvement{nextAction.day.exercises.length > 1 ? 's' : ''} · ≈{' '}
                 {estimatedMinutes(nextAction.day)} min
               </p>
+              <div className="hero-week">
+                {week}
+                <span>
+                  {view.weekSessions} sur {WEEKLY_TARGET}
+                </span>
+              </div>
               <button
                 className="primary-button full"
                 type="button"
@@ -257,13 +267,14 @@ export function HomeScreen({
           )}
           {nextAction.kind === 'measurement' && (
             <>
-              <div className="hero-head">
-                <div>
-                  <p className="eyebrow">POINT HEBDOMADAIRE</p>
-                  <h2 id="hero-title">{nextAction.label}</h2>
-                  <p className="hero-sub">{nextAction.description}</p>
-                </div>
-                {ring}
+              <p className="eyebrow">Point hebdomadaire</p>
+              <h2 id="hero-title">{nextAction.label}</h2>
+              <p className="hero-sub">{nextAction.description}</p>
+              <div className="hero-week">
+                {week}
+                <span>
+                  {view.weekSessions} sur {WEEKLY_TARGET}
+                </span>
               </div>
               <button
                 className="primary-button full"
@@ -277,13 +288,14 @@ export function HomeScreen({
           )}
           {nextAction.kind === 'recovery' && (
             <>
-              <div className="hero-head">
-                <div>
-                  <p className="eyebrow">SEMAINE COMPLÈTE</p>
-                  <h2 id="hero-title">{nextAction.label}</h2>
-                  <p className="hero-sub">{nextAction.description}</p>
-                </div>
-                {ring}
+              <p className="eyebrow">Semaine complète</p>
+              <h2 id="hero-title">{nextAction.label}</h2>
+              <p className="hero-sub">{nextAction.description}</p>
+              <div className="hero-week">
+                {week}
+                <span>
+                  {view.weekSessions} sur {WEEKLY_TARGET}
+                </span>
               </div>
               <button className="primary-button full" type="button" onClick={onOpenProgression}>
                 Voir mes progrès
@@ -296,7 +308,7 @@ export function HomeScreen({
       {!chargement && (
         <nav className="home-section" aria-label="Séances du programme">
           <div className="session-pick-head">
-            <h2 className="section-title">Séances</h2>
+            <h2 className="section-title">Cette semaine</h2>
             <p>Choisis celle que tu veux, dans l’ordre que tu veux.</p>
           </div>
           <div className="session-choices">
@@ -309,18 +321,18 @@ export function HomeScreen({
                 aria-label={`${SLOT_ACTIONS[slot.state]} ${slot.day.name} — ${SLOT_STATES[slot.state]}, ${estimatedMinutes(slot.day)} min`}
               >
                 <span className="session-choice-number" aria-hidden="true">
-                  {index + 1}
+                  {String(index + 1).padStart(2, '0')}
                 </span>
                 <span className="session-choice-body">
                   <strong className="session-choice-name">{slot.day.name}</strong>
                   <small>
                     {slot.day.exercises.length} mouvement{slot.day.exercises.length > 1 ? 's' : ''} · ≈{' '}
                     {estimatedMinutes(slot.day)} min
-                    <span className={`session-choice-state ${slot.state}`}> · {SLOT_STATES[slot.state]}</span>
                   </small>
                 </span>
-                <span className="session-choice-go" aria-hidden="true">
-                  {slot.state === 'done' ? <Repeat size={16} /> : <Play size={16} weight="fill" />}
+                <span className={`session-choice-state ${slot.state}`} aria-hidden="true">
+                  {slot.state === 'done' ? <Repeat size={15} /> : null}
+                  {SLOT_STATES[slot.state]}
                 </span>
               </button>
             ))}
@@ -328,7 +340,7 @@ export function HomeScreen({
         </nav>
       )}
 
-      {/* Deux repères sur la même période, pour qu'ils se lisent ensemble. */}
+      {/* Deux repères sur la même période, chacun avec sa comparaison. */}
       {!chargement && (
         <div className="home-metrics">
           <div className="home-metric">
@@ -337,7 +349,7 @@ export function HomeScreen({
               <NombreAnime valeur={view.weekSessions} decimals={0} />
               <small> / {WEEKLY_TARGET}</small>
             </strong>
-            <small>cette semaine</small>
+            <small className="home-metric-delta">{sessionsDelta}</small>
           </div>
           <div className="home-metric">
             <span>Volume</span>
@@ -345,7 +357,13 @@ export function HomeScreen({
               <NombreAnime valeur={view.weekVolume} decimals={0} />
               <small> kg·rép.</small>
             </strong>
-            <small>cette semaine</small>
+            <small
+              className={
+                view.volumeDeltaPct !== null && view.volumeDeltaPct > 0 ? 'home-metric-delta up' : 'home-metric-delta'
+              }
+            >
+              {volumeDelta}
+            </small>
           </div>
         </div>
       )}
