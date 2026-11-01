@@ -63,9 +63,11 @@ export function ProfileChooser({ onChoose }: ProfileChooserProps) {
           </span>
           <span className="sr-only">Coach Ottman et Laura</span>
         </div>
+        {/* Le texte reste sur une seule ligne : un retour à la ligne avant le
+            span glisse une espace, et le lecteur d'écran annonce
+            « Bienvenue , choisis ton profil ». */}
         <h1>
-          Bienvenue
-          <span className="sr-only">, choisis ton profil</span>
+          Bienvenue<span className="sr-only">, choisis ton profil</span>
         </h1>
         <p className="intro">Choisis ton espace. Programmes et historique restent séparés sur cet appareil.</p>
         {profileLoad.status === 'loading' && (
