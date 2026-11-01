@@ -1,0 +1,1954 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Maquette — Coach Ottman &amp; Laura</title>
+    <style>
+      @font-face {
+        font-family: 'Inter';
+        src: url('../../../public/fonts/inter-latin-var.woff2') format('woff2');
+        font-weight: 100 900;
+        font-style: normal;
+        font-display: swap;
+      }
+
+      :root {
+        --paper: #eff1ec;
+        --paper-2: #e6e8e1;
+        --ink: #111310;
+        --ink-2: #4d5148;
+        --ink-3: #767b6f;
+        --rule: #d5d8cf;
+        --mark: #639900;
+        --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        -webkit-text-size-adjust: 100%;
+      }
+
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font-family: var(--font);
+        font-size: 16px;
+        line-height: 1.5;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .board {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 72px 48px 96px;
+      }
+
+      /* ---------- En-tête de planche ---------- */
+
+      .kicker {
+        margin: 0 0 14px;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--ink-3);
+      }
+
+      h1.board-title {
+        margin: 0;
+        font-size: 44px;
+        line-height: 1.08;
+        letter-spacing: -0.025em;
+        font-weight: 600;
+      }
+
+      .lede {
+        max-width: 620px;
+        margin: 18px 0 0;
+        font-size: 17px;
+        line-height: 1.55;
+        color: var(--ink-2);
+      }
+
+      .board-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px 28px;
+        margin: 28px 0 0;
+        padding: 18px 0 0;
+        border-top: 1px solid var(--rule);
+        list-style: none;
+        font-size: 13px;
+        color: var(--ink-3);
+      }
+
+      .board-meta b {
+        color: var(--ink);
+        font-weight: 600;
+      }
+
+      /* ---------- Principes ---------- */
+
+      .section-head {
+        margin: 88px 0 28px;
+        padding-top: 18px;
+        border-top: 1px solid var(--rule);
+      }
+
+      .section-head h2 {
+        margin: 0;
+        font-size: 17px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
+
+      .section-head p {
+        margin: 6px 0 0;
+        font-size: 14px;
+        color: var(--ink-3);
+        max-width: 560px;
+      }
+
+      .principles {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 32px;
+      }
+
+      .principle {
+        border-top: 1px solid var(--rule);
+        padding-top: 16px;
+      }
+
+      .principle span {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--ink-3);
+        font-variant-numeric: tabular-nums;
+      }
+
+      .principle h3 {
+        margin: 8px 0 6px;
+        font-size: 16px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
+
+      .principle p {
+        margin: 0;
+        font-size: 14px;
+        line-height: 1.55;
+        color: var(--ink-2);
+      }
+
+      /* ---------- Jetons ---------- */
+
+      .tokens {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 32px;
+        align-items: start;
+      }
+
+      .swatches {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px 10px;
+      }
+
+      .swatch {
+        min-width: 0;
+      }
+
+      .swatch i {
+        display: block;
+        height: 48px;
+        border-radius: 8px;
+        border: 1px solid rgba(17, 19, 16, 0.12);
+      }
+
+      .swatch b,
+      .swatch small {
+        display: block;
+        font-size: 12px;
+        font-weight: 500;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .swatch b {
+        margin-top: 8px;
+        color: var(--ink);
+      }
+
+      .swatch small {
+        color: var(--ink-3);
+      }
+
+      .type-strip {
+        display: grid;
+        gap: 10px;
+      }
+
+      .type-row {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 16px;
+        border-bottom: 1px solid var(--rule);
+        padding-bottom: 8px;
+      }
+
+      .type-row span {
+        font-size: 12px;
+        color: var(--ink-3);
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+      }
+
+      /* ---------- Planches ---------- */
+
+      .screens {
+        display: grid;
+        grid-template-columns: repeat(2, 390px);
+        gap: 64px 48px;
+        justify-content: center;
+      }
+
+      .screens > figure:last-child:nth-child(odd) {
+        grid-column: 1 / -1;
+        justify-self: center;
+      }
+
+      figure {
+        margin: 0;
+      }
+
+      figcaption {
+        display: block;
+        min-height: 76px;
+        margin-bottom: 20px;
+        padding-top: 14px;
+        border-top: 1px solid var(--rule);
+      }
+
+      figcaption b {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--ink-3);
+        font-variant-numeric: tabular-nums;
+      }
+
+      figcaption h3 {
+        display: inline;
+        margin: 0 0 0 10px;
+        font-size: 16px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
+
+      figcaption p {
+        margin: 6px 0 0;
+        font-size: 13px;
+        line-height: 1.5;
+        color: var(--ink-2);
+        max-width: 360px;
+      }
+
+      .phone {
+        width: 390px;
+        height: 844px;
+        border-radius: 46px;
+        background: #000;
+        overflow: hidden;
+        position: relative;
+        box-shadow:
+          0 0 0 1px #b9bdb2,
+          0 0 0 9px #14160f,
+          0 0 0 10px #2a2d26,
+          0 34px 60px -26px rgba(20, 24, 14, 0.45);
+      }
+
+      /* ---------- Écran ---------- */
+
+      .screen {
+        --bg: #08090b;
+        --s1: #15171a;
+        --s2: #1e2125;
+        --line: #262a2f;
+        --line-2: #363b42;
+        --t1: #f5f5f7;
+        --t2: #aeaeb5;
+        --t3: #8e9097;
+        --accent: #a8f04a;
+        --ink: #0c1206;
+        --success: #5ecf85;
+        --danger: #ff8a80;
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        background: var(--bg);
+        color: var(--t1);
+        font-family: var(--font);
+        font-size: 16px;
+        line-height: 1.45;
+        letter-spacing: -0.005em;
+        font-variant-numeric: tabular-nums;
+        overflow: hidden;
+      }
+
+      .screen :where(p, h1, h2, h3, ul, output) {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .status {
+        flex: none;
+        height: 44px;
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        padding: 0 26px 8px;
+        font-size: 15px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
+
+      .status svg {
+        display: block;
+      }
+
+      .topbar {
+        flex: none;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 16px 0 20px;
+      }
+
+      .brand {
+        font-size: 15px;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+      }
+
+      .who {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        height: 44px;
+        padding: 0 4px 0 10px;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--t2);
+      }
+
+      .body {
+        flex: 1;
+        min-height: 0;
+        padding: 4px 20px 0;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* Typo */
+
+      .label {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--t3);
+        letter-spacing: 0;
+      }
+
+      .page-title {
+        font-size: 28px;
+        line-height: 1.15;
+        letter-spacing: -0.02em;
+        font-weight: 600;
+      }
+
+      .sub {
+        margin-top: 6px;
+        font-size: 13px;
+        color: var(--t3);
+      }
+
+      /* Carte héro */
+
+      .hero {
+        margin-top: 14px;
+        background: var(--s1);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 16px;
+      }
+
+      .hero h2 {
+        margin: 6px 0 0;
+        font-size: 22px;
+        line-height: 1.2;
+        letter-spacing: -0.02em;
+        font-weight: 600;
+      }
+
+      .hero-meta {
+        margin-top: 6px;
+        font-size: 13px;
+        color: var(--t2);
+      }
+
+      .hero-meta i {
+        font-style: normal;
+        color: var(--t3);
+        padding: 0 6px;
+      }
+
+      .week {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 12px 0 14px;
+      }
+
+      .week i {
+        flex: 1;
+        height: 4px;
+        border-radius: 2px;
+        background: var(--s2);
+      }
+
+      .week i.on {
+        background: var(--t1);
+      }
+
+      .week span {
+        font-size: 12px;
+        color: var(--t3);
+        white-space: nowrap;
+      }
+
+      /* Boutons */
+
+      .btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        height: 52px;
+        padding: 0 16px;
+        border: 0;
+        border-radius: 12px;
+        font-family: var(--font);
+        font-size: 16px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
+
+      .btn-primary {
+        background: var(--accent);
+        color: var(--ink);
+      }
+
+      .btn-quiet {
+        background: transparent;
+        color: var(--t2);
+        height: 44px;
+        font-size: 15px;
+        font-weight: 500;
+      }
+
+      .icon-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: transparent;
+        color: var(--t2);
+      }
+
+      /* Liste de séances */
+
+      .section {
+        margin-top: 16px;
+      }
+
+      .section-title {
+        font-size: 15px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
+
+      .section-note {
+        margin-top: 2px;
+        font-size: 13px;
+        color: var(--t3);
+      }
+
+      .rows {
+        margin-top: 8px;
+        border-top: 1px solid var(--line);
+      }
+
+      .row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        height: 52px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .row-num {
+        width: 18px;
+        font-size: 12px;
+        color: var(--t3);
+      }
+
+      .row-main {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .row-name {
+        display: block;
+        font-size: 16px;
+        font-weight: 500;
+        letter-spacing: -0.01em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .row-meta {
+        display: block;
+        font-size: 13px;
+        color: var(--t3);
+      }
+
+      .flag {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--t3);
+        white-space: nowrap;
+      }
+
+      .flag.today {
+        color: var(--accent);
+      }
+
+      /* Métriques */
+
+      .stats {
+        display: grid;
+        grid-template-columns: 1fr 1px 1fr;
+        gap: 0 16px;
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid var(--line);
+      }
+
+      .stats hr {
+        border: 0;
+        border-left: 1px solid var(--line);
+        margin: 0;
+        height: 100%;
+      }
+
+      .stat-v {
+        margin-top: 4px;
+        font-size: 24px;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        line-height: 1.1;
+      }
+
+      .stat-v span {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--t3);
+        letter-spacing: 0;
+      }
+
+      .stat-d {
+        margin-top: 4px;
+        font-size: 12px;
+        color: var(--t3);
+      }
+
+      .stat-d.up {
+        color: var(--success);
+      }
+
+      /* Navigation */
+
+      .nav {
+        flex: none;
+        height: 64px;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        border-top: 1px solid var(--line);
+        background: var(--bg);
+      }
+
+      .nav button {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        border: 0;
+        background: transparent;
+        color: var(--t3);
+        font-family: var(--font);
+        font-size: 12px;
+        font-weight: 500;
+      }
+
+      .nav button.on {
+        color: var(--t1);
+      }
+
+      .home-indicator {
+        flex: none;
+        height: 34px;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding-top: 9px;
+      }
+
+      .home-indicator i {
+        width: 134px;
+        height: 5px;
+        border-radius: 3px;
+        background: rgba(245, 245, 247, 0.32);
+      }
+
+      /* Séance */
+
+      .workout-head {
+        flex: none;
+        height: 52px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 0 16px;
+      }
+
+      .workout-head .title {
+        font-size: 13px;
+        color: var(--t3);
+        text-align: center;
+      }
+
+      .steps {
+        display: flex;
+        gap: 4px;
+        padding: 0 20px;
+      }
+
+      .steps i {
+        flex: 1;
+        height: 3px;
+        border-radius: 2px;
+        background: var(--line);
+      }
+
+      .steps i.on {
+        background: var(--t1);
+      }
+
+      .steps-meta {
+        display: flex;
+        justify-content: space-between;
+        padding: 0 20px;
+        margin-top: 8px;
+        font-size: 12px;
+        color: var(--t3);
+      }
+
+      .exercise {
+        margin-top: 22px;
+      }
+
+      .exercise h1 {
+        margin-top: 2px;
+        font-size: 26px;
+        line-height: 1.2;
+        letter-spacing: -0.02em;
+        font-weight: 600;
+      }
+
+      .exercise .sub {
+        margin-top: 4px;
+        font-size: 14px;
+        color: var(--t2);
+      }
+
+      .prescription {
+        margin-top: 20px;
+        padding: 16px 18px;
+        background: var(--s1);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+      }
+
+      .presc-row {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 16px;
+      }
+
+      .presc-row .right {
+        text-align: right;
+      }
+
+      .presc-foot {
+        margin-top: 14px;
+        padding-top: 12px;
+        border-top: 1px solid var(--line);
+        font-size: 12px;
+        color: var(--t3);
+      }
+
+      .big-value {
+        margin-top: 4px;
+        font-size: 44px;
+        line-height: 1;
+        letter-spacing: -0.03em;
+        font-weight: 600;
+      }
+
+      .big-value span {
+        font-size: 15px;
+        font-weight: 500;
+        color: var(--t2);
+        letter-spacing: 0;
+      }
+
+      .mid-value {
+        margin-top: 6px;
+        font-size: 22px;
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+        font-weight: 600;
+      }
+
+      .mid-value span {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--t2);
+        letter-spacing: 0;
+      }
+
+      .tiny {
+        margin-top: 4px;
+        font-size: 12px;
+        color: var(--t3);
+      }
+
+      .perform {
+        margin-top: 22px;
+        padding-top: 18px;
+        border-top: 1px solid var(--line);
+      }
+
+      .perform-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .perform-head span:last-child {
+        font-size: 12px;
+        color: var(--t3);
+      }
+
+      .stepper {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 12px;
+      }
+
+      .stepper button {
+        flex: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 56px;
+        height: 56px;
+        border: 1px solid var(--line-2);
+        border-radius: 12px;
+        background: transparent;
+        color: var(--t1);
+      }
+
+      .stepper output {
+        flex: 1;
+        text-align: center;
+        font-size: 40px;
+        line-height: 1;
+        letter-spacing: -0.03em;
+        font-weight: 600;
+      }
+
+      .last {
+        margin-top: 8px;
+        text-align: center;
+        font-size: 12px;
+        color: var(--t3);
+      }
+
+      .next {
+        margin-top: auto;
+        padding-top: 14px;
+        border-top: 1px solid var(--line);
+      }
+
+      .next-name {
+        margin-top: 2px;
+        font-size: 15px;
+        font-weight: 500;
+        letter-spacing: -0.01em;
+      }
+
+      .next-meta {
+        margin-top: 1px;
+        font-size: 13px;
+        color: var(--t3);
+      }
+
+      .bottom {
+        flex: none;
+        padding: 12px 20px 10px;
+        border-top: 1px solid var(--line);
+        background: var(--bg);
+      }
+
+      .bottom .btn-quiet {
+        margin-top: 4px;
+      }
+
+      /* Repos */
+
+      .rest-head {
+        flex: none;
+        height: 52px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 16px;
+      }
+
+      .ring {
+        position: relative;
+        align-self: center;
+        margin-top: 18px;
+        width: 232px;
+        height: 232px;
+      }
+
+      .ring svg {
+        display: block;
+        transform: rotate(-90deg);
+      }
+
+      .ring-center {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+      }
+
+      .ring-value {
+        font-size: 62px;
+        line-height: 1;
+        letter-spacing: -0.04em;
+        font-weight: 600;
+      }
+
+      .ring-label {
+        font-size: 12px;
+        color: var(--t3);
+      }
+
+      .next-set {
+        margin-top: 34px;
+        padding-top: 18px;
+        border-top: 1px solid var(--line);
+      }
+
+      .next-set h2 {
+        margin-top: 4px;
+        font-size: 20px;
+        line-height: 1.25;
+        letter-spacing: -0.02em;
+        font-weight: 600;
+      }
+
+      .next-set p + p {
+        margin-top: 2px;
+        font-size: 14px;
+        color: var(--t2);
+      }
+
+      .plates {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 10px;
+        font-size: 13px;
+        color: var(--t3);
+      }
+
+      .adjust {
+        display: flex;
+        gap: 8px;
+        margin-top: auto;
+        padding-bottom: 8px;
+      }
+
+      .adjust button {
+        flex: 1;
+        height: 44px;
+        border: 1px solid var(--line-2);
+        border-radius: 12px;
+        background: transparent;
+        color: var(--t1);
+        font-family: var(--font);
+        font-size: 15px;
+        font-weight: 500;
+      }
+
+      .adjust button.wide {
+        flex: 1.6;
+        border-color: transparent;
+        color: var(--t2);
+      }
+
+      /* Bilan */
+
+      .summary-top {
+        margin-top: 10px;
+      }
+
+      .duration {
+        margin-top: 20px;
+        font-size: 52px;
+        line-height: 1;
+        letter-spacing: -0.035em;
+        font-weight: 600;
+      }
+
+      .duration span {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--t3);
+        letter-spacing: 0;
+      }
+
+      .summary-rows {
+        margin-top: 18px;
+        border-top: 1px solid var(--line);
+      }
+
+      .summary-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        height: 58px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .summary-row span:first-child {
+        font-size: 14px;
+        color: var(--t2);
+      }
+
+      .summary-row b {
+        font-size: 18px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
+
+      .summary-row b small {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--t3);
+        letter-spacing: 0;
+      }
+
+      .moves {
+        margin-top: 8px;
+        border-top: 1px solid var(--line);
+      }
+
+      .move {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        height: 40px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .move:last-child {
+        border-bottom: 0;
+      }
+
+      .move span {
+        font-size: 14px;
+        color: var(--t2);
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+
+      .move b {
+        font-size: 14px;
+        font-weight: 600;
+        white-space: nowrap;
+      }
+
+      .move b small {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--t3);
+      }
+
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        height: 22px;
+        padding: 0 8px;
+        border-radius: 999px;
+        background: rgba(168, 240, 74, 0.14);
+        color: var(--accent);
+        font-size: 12px;
+        font-weight: 500;
+      }
+
+      .delta {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        margin-top: 12px;
+        font-size: 13px;
+        line-height: 1.45;
+        color: var(--t2);
+      }
+
+      .delta i {
+        flex: none;
+        margin-top: 7px;
+        width: 6px;
+        height: 6px;
+        border-radius: 3px;
+        background: var(--success);
+      }
+
+      /* ---------- Tableau des corrections ---------- */
+
+      .changes {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+      }
+
+      .changes th {
+        text-align: left;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--ink-3);
+        padding: 0 16px 10px 0;
+        border-bottom: 1px solid var(--rule);
+      }
+
+      .changes td {
+        padding: 14px 16px 14px 0;
+        border-bottom: 1px solid var(--rule);
+        vertical-align: top;
+        color: var(--ink-2);
+        line-height: 1.5;
+      }
+
+      .changes td:first-child {
+        color: var(--ink);
+        font-weight: 500;
+        white-space: nowrap;
+      }
+
+      .changes code {
+        font-family: ui-monospace, 'Cascadia Mono', Menlo, monospace;
+        font-size: 12px;
+        color: var(--ink-2);
+      }
+
+      .questions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 32px;
+      }
+
+      .question {
+        border-top: 1px solid var(--rule);
+        padding-top: 16px;
+      }
+
+      .question b {
+        display: block;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--ink-3);
+      }
+
+      .question p {
+        margin: 8px 0 0;
+        font-size: 15px;
+        line-height: 1.55;
+        color: var(--ink-2);
+        max-width: 340px;
+      }
+
+      .question p strong {
+        color: var(--ink);
+        font-weight: 600;
+      }
+
+      @media (max-width: 860px) {
+        .board {
+          padding: 40px 16px 64px;
+        }
+
+        h1.board-title {
+          font-size: 32px;
+        }
+
+        .tokens,
+        .screens {
+          grid-template-columns: 1fr;
+        }
+
+        .screens {
+          justify-items: center;
+        }
+
+        .phone {
+          zoom: 0.88;
+        }
+
+        .changes thead {
+          position: absolute;
+          left: -9999px;
+        }
+
+        .changes tr {
+          display: block;
+          padding: 16px 0;
+          border-bottom: 1px solid var(--rule);
+        }
+
+        .changes td {
+          display: block;
+          padding: 0;
+          border: 0;
+        }
+
+        .changes td:first-child {
+          margin-bottom: 8px;
+        }
+
+        .changes td:nth-child(2),
+        .changes td:nth-child(3) {
+          margin-bottom: 6px;
+        }
+
+        .changes td:nth-child(2)::before,
+        .changes td:nth-child(3)::before {
+          display: block;
+          font-size: 12px;
+          color: var(--ink-3);
+          margin-bottom: 2px;
+        }
+
+        .changes td:nth-child(2)::before {
+          content: 'Aujourd’hui';
+        }
+
+        .changes td:nth-child(3)::before {
+          content: 'Maquette';
+        }
+      }
+
+      footer {
+        margin-top: 88px;
+        padding-top: 18px;
+        border-top: 1px solid var(--rule);
+        display: flex;
+        justify-content: space-between;
+        gap: 24px;
+        flex-wrap: wrap;
+        font-size: 12px;
+        color: var(--ink-3);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="board">
+      <header>
+        <p class="kicker">Maquette · direction 2</p>
+        <h1 class="board-title">Coach Ottman &amp; Laura</h1>
+        <p class="lede">
+          Une surface mate, une seule couleur d’action, le chiffre comme interface. Cinq écrans couvrent l’essentiel de
+          l’usage réel : ouvrir l’application, lancer, compter, valider, relire.
+        </p>
+        <ul class="board-meta">
+          <li>1er novembre 2026</li>
+          <li>390 × 844 · thème sombre</li>
+          <li><b>0 constat</b> ai-design-check</li>
+          <li>Jetons existants de <code>tokens.css</code></li>
+        </ul>
+      </header>
+
+      <div class="section-head">
+        <h2>Ce que la maquette change</h2>
+        <p>Trois décisions seulement, appliquées partout. Le reste — contenu, parcours, vocabulaire — ne bouge pas.</p>
+      </div>
+
+      <div class="principles">
+        <div class="principle">
+          <span>01</span>
+          <h3>Une action, une couleur</h3>
+          <p>
+            Le vert ne sert plus qu’au bouton principal. Les lignes de séance, les icônes et les états redeviennent
+            neutres : l’œil trouve le bouton sans qu’on le lui montre cinq fois.
+          </p>
+        </div>
+        <div class="principle">
+          <span>02</span>
+          <h3>Des surfaces, pas du verre</h3>
+          <p>
+            Plus de dégradé, plus de halo, plus de flou. Un fond, deux niveaux de carte, des filets d’un pixel. Ce qui
+            reste coûte moins cher à peindre et se lit mieux en salle.
+          </p>
+        </div>
+        <div class="principle">
+          <span>03</span>
+          <h3>Le chiffre est l’interface</h3>
+          <p>
+            Charge, répétitions, repos, tempo : grands, tabulaires, alignés. Les libellés passent en bas de casse à
+            13 px. On ne met plus en capitales ce qu’on veut faire lire.
+          </p>
+        </div>
+      </div>
+
+      <div class="section-head">
+        <h2>Jetons</h2>
+        <p>Les couleurs de l’application, sans ajout. L’échelle typographique tient en cinq rôles.</p>
+      </div>
+
+      <div class="tokens">
+        <div class="swatches">
+          <div class="swatch"><i style="background: #08090b"></i><b>#08090b</b><small>fond</small></div>
+          <div class="swatch"><i style="background: #15171a"></i><b>#15171a</b><small>carte</small></div>
+          <div class="swatch"><i style="background: #1e2125"></i><b>#1e2125</b><small>posé</small></div>
+          <div class="swatch"><i style="background: #262a2f"></i><b>#262a2f</b><small>filet</small></div>
+          <div class="swatch"><i style="background: #f5f5f7"></i><b>#f5f5f7</b><small>texte</small></div>
+          <div class="swatch"><i style="background: #aeaeb5"></i><b>#aeaeb5</b><small>secondaire</small></div>
+          <div class="swatch"><i style="background: #a8f04a"></i><b>#a8f04a</b><small>action</small></div>
+          <div class="swatch"><i style="background: #5ecf85"></i><b>#5ecf85</b><small>hausse</small></div>
+        </div>
+        <div class="type-strip">
+          <div class="type-row">
+            <span style="font-size: 28px; font-weight: 600; letter-spacing: -0.02em; color: #111310">Aujourd’hui</span>
+            <span>28 · 600 · titre</span>
+          </div>
+          <div class="type-row">
+            <span style="font-size: 22px; font-weight: 600; letter-spacing: -0.02em; color: #111310"
+              >Full body — Spé upper</span
+            >
+            <span>22 · 600 · carte</span>
+          </div>
+          <div class="type-row">
+            <span style="font-size: 16px; font-weight: 500; color: #111310">Développé couché barre</span>
+            <span>16 · 500 · ligne</span>
+          </div>
+          <div class="type-row">
+            <span style="font-size: 13px; color: #4d5148">5 mouvements · 66 min</span>
+            <span>13 · 400 · méta</span>
+          </div>
+          <div class="type-row">
+            <span style="font-size: 12px; color: #767b6f">1 séance sur 4 cette semaine</span>
+            <span>12 · 500 · légende</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-head">
+        <h2>Les cinq écrans</h2>
+        <p>
+          Rendus à taille réelle. Le contenu vient du programme réel d’Ottman : full body force, développé couché 65 kg,
+          repos de 1 min 45.
+        </p>
+      </div>
+
+      <div class="screens">
+        <!-- 01 ACCUEIL -->
+        <figure>
+          <figcaption>
+            <b>01</b>
+            <h3>Accueil</h3>
+            <p>
+              Le héro porte une seule action. Les quatre séances deviennent une liste à filets, plus une carte par ligne.
+            </p>
+          </figcaption>
+          <div class="phone">
+            <div class="screen">
+              <div class="status">
+                <span>9:41</span>
+                <svg width="54" height="12" viewBox="0 0 54 12" fill="currentColor" aria-hidden="true">
+                  <rect x="0" y="7" width="3" height="5" rx="1" />
+                  <rect x="5" y="5" width="3" height="7" rx="1" />
+                  <rect x="10" y="3" width="3" height="9" rx="1" />
+                  <rect x="15" y="1" width="3" height="11" rx="1" />
+                  <path d="M26 4.2a8 8 0 0 1 9.6 0l-1.3 1.6a6 6 0 0 0-7 0Z" />
+                  <circle cx="30.8" cy="8.6" r="1.6" />
+                  <rect x="40" y="2" width="12" height="8" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.2" />
+                  <rect x="41.4" y="3.4" width="7" height="5.2" rx="1.2" />
+                  <rect x="52.8" y="4.4" width="1.2" height="3.2" rx="0.6" />
+                </svg>
+              </div>
+
+              <div class="topbar">
+                <span class="brand">Coach</span>
+                <span class="who">
+                  Ottman
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                </span>
+              </div>
+
+              <div class="body">
+                <h1 class="page-title">Aujourd’hui</h1>
+                <p class="sub">Dimanche 1er novembre · Semaine 1 sur 8</p>
+
+                <section class="hero">
+                  <p class="label">Séance du jour</p>
+                  <h2>Full body — Spé upper</h2>
+                  <p class="hero-meta">5 mouvements<i>·</i>Force<i>·</i>≈ 66 min</p>
+                  <div class="week" aria-hidden="true">
+                    <i class="on"></i><i></i><i></i><i></i>
+                    <span>1 sur 4</span>
+                  </div>
+                  <button class="btn btn-primary" type="button">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                      <path d="M8 5.2v13.6a1 1 0 0 0 1.52.85l10.7-6.8a1 1 0 0 0 0-1.7L9.52 4.35A1 1 0 0 0 8 5.2Z" />
+                    </svg>
+                    Commencer la séance
+                  </button>
+                </section>
+
+                <section class="section">
+                  <p class="section-title">Cette semaine</p>
+                  <ul class="rows">
+                    <li class="row">
+                      <span class="row-num">01</span>
+                      <span class="row-main">
+                        <span class="row-name">Full body — Spé upper</span>
+                        <span class="row-meta">5 mouvements · 66 min</span>
+                      </span>
+                      <span class="flag today">Suggérée</span>
+                    </li>
+                    <li class="row">
+                      <span class="row-num">02</span>
+                      <span class="row-main">
+                        <span class="row-name">Cardio / Renfo</span>
+                        <span class="row-meta">8 mouvements · 76 min</span>
+                      </span>
+                      <span class="flag">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                          <path d="m5 12.5 4.2 4.2L19 6.8" />
+                        </svg>
+                        Terminée
+                      </span>
+                    </li>
+                    <li class="row">
+                      <span class="row-num">03</span>
+                      <span class="row-main">
+                        <span class="row-name">Full body — Spé lower</span>
+                        <span class="row-meta">7 mouvements · 68 min</span>
+                      </span>
+                      <span class="flag">Libre</span>
+                    </li>
+                    <li class="row">
+                      <span class="row-num">04</span>
+                      <span class="row-main">
+                        <span class="row-name">Endurance fondamentale</span>
+                        <span class="row-meta">3 mouvements · 73 min</span>
+                      </span>
+                      <span class="flag">Libre</span>
+                    </li>
+                  </ul>
+                </section>
+
+                <div class="stats">
+                  <div>
+                    <p class="label">Séances</p>
+                    <p class="stat-v">1<span> / 4</span></p>
+                    <p class="stat-d">même rythme que la semaine dernière</p>
+                  </div>
+                  <hr />
+                  <div>
+                    <p class="label">Volume</p>
+                    <p class="stat-v">4 860<span> kg·rép.</span></p>
+                    <p class="stat-d up">+ 12 % sur 7 jours</p>
+                  </div>
+                </div>
+              </div>
+
+              <nav class="nav">
+                <button class="on" type="button">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="8.2" />
+                    <circle cx="12" cy="12" r="2.4" fill="currentColor" stroke="none" />
+                  </svg>
+                  Aujourd’hui
+                </button>
+                <button type="button">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <rect x="3.5" y="5" width="17" height="15.5" rx="3" />
+                    <path d="M3.5 10h17M8 3.5V7M16 3.5V7" />
+                  </svg>
+                  Programme
+                </button>
+                <button type="button">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M3.5 17.5 9 11l3.6 3.4 7.9-8.4" />
+                    <path d="M15.4 6h5.1v5.1" />
+                  </svg>
+                  Progrès
+                </button>
+                <button type="button">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" aria-hidden="true">
+                    <circle cx="12" cy="8.4" r="3.9" />
+                    <path d="M4.6 20.2a7.6 7.6 0 0 1 14.8 0" />
+                  </svg>
+                  Profil
+                </button>
+              </nav>
+              <div class="home-indicator"><i></i></div>
+            </div>
+          </div>
+        </figure>
+
+        <!-- 02 SÉANCE -->
+        <figure>
+          <figcaption>
+            <b>02</b>
+            <h3>Séance</h3>
+            <p>
+              La prescription occupe la place du titre. Le stepper de répétitions reste atteignable au pouce, le reste
+              respire.
+            </p>
+          </figcaption>
+          <div class="phone">
+            <div class="screen">
+              <div class="status">
+                <span>9:41</span>
+                <svg width="54" height="12" viewBox="0 0 54 12" fill="currentColor" aria-hidden="true">
+                  <rect x="0" y="7" width="3" height="5" rx="1" />
+                  <rect x="5" y="5" width="3" height="7" rx="1" />
+                  <rect x="10" y="3" width="3" height="9" rx="1" />
+                  <rect x="15" y="1" width="3" height="11" rx="1" />
+                  <path d="M26 4.2a8 8 0 0 1 9.6 0l-1.3 1.6a6 6 0 0 0-7 0Z" />
+                  <circle cx="30.8" cy="8.6" r="1.6" />
+                  <rect x="40" y="2" width="12" height="8" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.2" />
+                  <rect x="41.4" y="3.4" width="7" height="5.2" rx="1.2" />
+                  <rect x="52.8" y="4.4" width="1.2" height="3.2" rx="0.6" />
+                </svg>
+              </div>
+
+              <div class="workout-head">
+                <button class="icon-btn" type="button" aria-label="Quitter la séance">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+                    <path d="M6 6l12 12M18 6 6 18" />
+                  </svg>
+                </button>
+                <span class="title">Séance 1 · Force</span>
+                <button class="icon-btn" type="button" aria-label="Plus d’options">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <circle cx="6" cy="12" r="1.6" />
+                    <circle cx="12" cy="12" r="1.6" />
+                    <circle cx="18" cy="12" r="1.6" />
+                  </svg>
+                </button>
+              </div>
+
+              <div class="steps" aria-hidden="true">
+                <i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i>
+              </div>
+              <div class="steps-meta">
+                <span>Mouvement 3 sur 9</span>
+                <span>00:24:10</span>
+              </div>
+
+              <div class="body">
+                <div class="exercise">
+                  <p class="label">Force</p>
+                  <h1>Développé couché barre</h1>
+                  <p class="sub">Série 2 sur 3 · repos 1 min 45</p>
+                </div>
+
+                <div class="prescription">
+                  <div class="presc-row">
+                    <div>
+                      <p class="label">Prescription</p>
+                      <p class="big-value">8 <span>répétitions</span></p>
+                    </div>
+                    <div class="right">
+                      <p class="label">Charge</p>
+                      <p class="mid-value">65 <span>kg</span></p>
+                    </div>
+                  </div>
+                  <p class="presc-foot">Barre 20 kg · 20 + 2,5 par côté</p>
+                </div>
+
+                <div class="perform">
+                  <div class="perform-head">
+                    <span class="label">Ta performance</span>
+                    <span>Ajuste, puis valide</span>
+                  </div>
+                  <div class="stepper">
+                    <button type="button" aria-label="Retirer une répétition">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+                        <path d="M5 12h14" />
+                      </svg>
+                    </button>
+                    <output aria-label="Répétitions réalisées">8</output>
+                    <button type="button" aria-label="Ajouter une répétition">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+                        <path d="M12 5v14M5 12h14" />
+                      </svg>
+                    </button>
+                  </div>
+                  <p class="last">La dernière fois · 8 × 62,5 kg, il y a 7 jours</p>
+                </div>
+
+                <div class="next">
+                  <p class="label">Ensuite</p>
+                  <p class="next-name">Développé épaule machine</p>
+                  <p class="next-meta">3 séries · 12 × 40 kg · repos 1 min 45</p>
+                </div>
+              </div>
+
+              <div class="bottom">
+                <button class="btn btn-primary" type="button">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="m5 12.5 4.2 4.2L19 6.8" />
+                  </svg>
+                  Valider la série
+                </button>
+                <button class="btn btn-quiet" type="button">Passer cette série</button>
+              </div>
+            </div>
+          </div>
+        </figure>
+
+        <!-- 03 REPOS -->
+        <figure>
+          <figcaption>
+            <b>03</b>
+            <h3>Repos</h3>
+            <p>
+              Un seul chiffre, lisible à un mètre. Le suivant est déjà annoncé avec sa charge, ses disques et son
+              nombre de séries.
+            </p>
+          </figcaption>
+          <div class="phone">
+            <div class="screen">
+              <div class="status">
+                <span>9:41</span>
+                <svg width="54" height="12" viewBox="0 0 54 12" fill="currentColor" aria-hidden="true">
+                  <rect x="0" y="7" width="3" height="5" rx="1" />
+                  <rect x="5" y="5" width="3" height="7" rx="1" />
+                  <rect x="10" y="3" width="3" height="9" rx="1" />
+                  <rect x="15" y="1" width="3" height="11" rx="1" />
+                  <path d="M26 4.2a8 8 0 0 1 9.6 0l-1.3 1.6a6 6 0 0 0-7 0Z" />
+                  <circle cx="30.8" cy="8.6" r="1.6" />
+                  <rect x="40" y="2" width="12" height="8" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.2" />
+                  <rect x="41.4" y="3.4" width="7" height="5.2" rx="1.2" />
+                  <rect x="52.8" y="4.4" width="1.2" height="3.2" rx="0.6" />
+                </svg>
+              </div>
+
+              <div class="rest-head">
+                <button class="icon-btn" type="button" aria-label="Quitter la séance">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+                    <path d="M6 6l12 12M18 6 6 18" />
+                  </svg>
+                </button>
+                <span class="title" style="font-size: 13px; color: #8e9097">Repos</span>
+                <span style="width: 44px"></span>
+              </div>
+
+              <div class="body">
+                <div class="ring">
+                  <svg width="232" height="232" viewBox="0 0 232 232" aria-hidden="true">
+                    <circle cx="116" cy="116" r="110" fill="none" stroke="#1e2125" stroke-width="6" />
+                    <circle
+                      cx="116"
+                      cy="116"
+                      r="110"
+                      fill="none"
+                      stroke="#a8f04a"
+                      stroke-width="6"
+                      stroke-linecap="round"
+                      stroke-dasharray="691"
+                      stroke-dashoffset="262"
+                    />
+                  </svg>
+                  <div class="ring-center">
+                    <span class="ring-value">1:45</span>
+                    <span class="ring-label">avant la série suivante</span>
+                  </div>
+                </div>
+
+                <div class="next-set">
+                  <p class="label">Ensuite</p>
+                  <h2>Développé couché barre</h2>
+                  <p>Série 3 sur 3 · 8 répétitions · 67,5 kg</p>
+                  <p class="plates">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" aria-hidden="true">
+                      <path d="M3 9v6M21 9v6M6.5 6.5v11M17.5 6.5v11M6.5 12h11" />
+                    </svg>
+                    Barre 20 kg · 20 + 2,5 + 1,25 par côté
+                  </p>
+                  <p class="plates" style="margin-top: 18px">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M18 8.5a6 6 0 1 0-12 0c0 5-2 6.5-2 6.5h16s-2-1.5-2-6.5" />
+                      <path d="M10.2 19a2 2 0 0 0 3.6 0" />
+                    </svg>
+                    Sonnerie et vibration à zéro
+                  </p>
+                </div>
+
+                <div class="adjust">
+                  <button type="button">− 15 s</button>
+                  <button type="button">+ 15 s</button>
+                  <button class="wide" type="button">Passer le repos</button>
+                </div>
+              </div>
+              <div class="home-indicator"><i></i></div>
+            </div>
+          </div>
+        </figure>
+
+        <!-- 04 TEMPO -->
+        <figure>
+          <figcaption>
+            <b>04</b>
+            <h3>Tempo</h3>
+            <p>
+              Même anatomie que le repos, l’anneau en blanc : l’effort se lit d’un coup d’œil, la consigne reste
+              courte.
+            </p>
+          </figcaption>
+          <div class="phone">
+            <div class="screen">
+              <div class="status">
+                <span>9:41</span>
+                <svg width="54" height="12" viewBox="0 0 54 12" fill="currentColor" aria-hidden="true">
+                  <rect x="0" y="7" width="3" height="5" rx="1" />
+                  <rect x="5" y="5" width="3" height="7" rx="1" />
+                  <rect x="10" y="3" width="3" height="9" rx="1" />
+                  <rect x="15" y="1" width="3" height="11" rx="1" />
+                  <path d="M26 4.2a8 8 0 0 1 9.6 0l-1.3 1.6a6 6 0 0 0-7 0Z" />
+                  <circle cx="30.8" cy="8.6" r="1.6" />
+                  <rect x="40" y="2" width="12" height="8" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.2" />
+                  <rect x="41.4" y="3.4" width="7" height="5.2" rx="1.2" />
+                  <rect x="52.8" y="4.4" width="1.2" height="3.2" rx="0.6" />
+                </svg>
+              </div>
+
+              <div class="workout-head">
+                <button class="icon-btn" type="button" aria-label="Quitter la séance">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+                    <path d="M6 6l12 12M18 6 6 18" />
+                  </svg>
+                </button>
+                <span class="title">Séance 2 · Cardio et renfo</span>
+                <button class="icon-btn" type="button" aria-label="Plus d’options">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <circle cx="6" cy="12" r="1.6" />
+                    <circle cx="12" cy="12" r="1.6" />
+                    <circle cx="18" cy="12" r="1.6" />
+                  </svg>
+                </button>
+              </div>
+
+              <div class="steps" aria-hidden="true">
+                <i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i>
+              </div>
+              <div class="steps-meta">
+                <span>Mouvement 3 sur 8</span>
+                <span>00:11:32</span>
+              </div>
+
+              <div class="body">
+                <div class="exercise">
+                  <p class="label">Abdos · posture</p>
+                  <h1>Gainage planche</h1>
+                  <p class="sub">Série 2 sur 3</p>
+                </div>
+
+                <div class="ring" style="margin-top: 24px; width: 208px; height: 208px">
+                  <svg width="208" height="208" viewBox="0 0 208 208" aria-hidden="true">
+                    <circle cx="104" cy="104" r="98" fill="none" stroke="#1e2125" stroke-width="6" />
+                    <circle
+                      cx="104"
+                      cy="104"
+                      r="98"
+                      fill="none"
+                      stroke="#f5f5f7"
+                      stroke-width="6"
+                      stroke-linecap="round"
+                      stroke-dasharray="616"
+                      stroke-dashoffset="210"
+                    />
+                  </svg>
+                  <div class="ring-center">
+                    <span class="ring-value" style="font-size: 54px">00:23</span>
+                    <span class="ring-label">sur 35 s</span>
+                  </div>
+                </div>
+
+                <p style="margin-top: 26px; font-size: 14px; line-height: 1.55; color: #aeaeb5; text-align: center">
+                  Tiens la position jusqu’à zéro. Le chrono démarre au premier appui.
+                </p>
+
+                <div class="next">
+                  <p class="label">Après</p>
+                  <p class="next-name">Sit up</p>
+                  <p class="next-meta">2 séries · 35 s · pas de charge</p>
+                </div>
+              </div>
+
+              <div class="bottom">
+                <button class="btn btn-primary" type="button">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="m5 12.5 4.2 4.2L19 6.8" />
+                  </svg>
+                  Valider la série
+                </button>
+                <button class="btn btn-quiet" type="button">Passer le tempo</button>
+              </div>
+            </div>
+          </div>
+        </figure>
+
+        <!-- 05 BILAN -->
+        <figure>
+          <figcaption>
+            <b>05</b>
+            <h3>Fin de séance</h3>
+            <p>
+              Le récapitulatif factuel avant le formulaire. Chaque chiffre porte sa comparaison, le record se signale
+              une seule fois.
+            </p>
+          </figcaption>
+          <div class="phone">
+            <div class="screen">
+              <div class="status">
+                <span>9:41</span>
+                <svg width="54" height="12" viewBox="0 0 54 12" fill="currentColor" aria-hidden="true">
+                  <rect x="0" y="7" width="3" height="5" rx="1" />
+                  <rect x="5" y="5" width="3" height="7" rx="1" />
+                  <rect x="10" y="3" width="3" height="9" rx="1" />
+                  <rect x="15" y="1" width="3" height="11" rx="1" />
+                  <path d="M26 4.2a8 8 0 0 1 9.6 0l-1.3 1.6a6 6 0 0 0-7 0Z" />
+                  <circle cx="30.8" cy="8.6" r="1.6" />
+                  <rect x="40" y="2" width="12" height="8" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.2" />
+                  <rect x="41.4" y="3.4" width="7" height="5.2" rx="1.2" />
+                  <rect x="52.8" y="4.4" width="1.2" height="3.2" rx="0.6" />
+                </svg>
+              </div>
+
+              <div class="workout-head">
+                <span class="title">Aujourd’hui · 14:02</span>
+                <span style="width: 44px"></span>
+              </div>
+
+              <div class="body">
+                <div class="summary-top">
+                  <h1 class="page-title">Séance terminée</h1>
+                  <p class="sub">Full body — Spé upper · dimanche 1er novembre</p>
+                </div>
+
+                <p class="duration">1 h 04 <span>de séance</span></p>
+
+                <div class="summary-rows">
+                  <div class="summary-row">
+                    <span>Séries validées</span>
+                    <b>24</b>
+                  </div>
+                  <div class="summary-row">
+                    <span>Volume</span>
+                    <b>4 860 <small>kg·rép.</small></b>
+                  </div>
+                  <div class="summary-row">
+                    <span>Meilleure charge</span>
+                    <b>
+                      67,5 kg
+                      <span class="chip">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                          <path d="m5 12.5 4.2 4.2L19 6.8" />
+                        </svg>
+                        Record
+                      </span>
+                    </b>
+                  </div>
+                </div>
+
+                <p class="delta"><i></i>+ 360 kg·rép. contre la même séance la semaine dernière</p>
+
+                <p class="label" style="margin-top: 18px">Par mouvement</p>
+                <div class="moves">
+                  <div class="move">
+                    <span>Soulevé de terre roumain</span>
+                    <b>4 × 12 <small>· 40 kg</small></b>
+                  </div>
+                  <div class="move">
+                    <span>Développé couché barre</span>
+                    <b>3 × 12 <small>· 67,5 kg</small></b>
+                  </div>
+                  <div class="move">
+                    <span>Tirage horizontal machine</span>
+                    <b>3 × 12 <small>· 50 kg</small></b>
+                  </div>
+                </div>
+
+                <div class="next">
+                  <p class="label">Après</p>
+                  <p class="next-name">3 questions sur ta séance</p>
+                </div>
+              </div>
+
+              <div class="bottom">
+                <button class="btn btn-primary" type="button">Enregistrer la séance</button>
+                <button class="btn btn-quiet" type="button">Voir le détail</button>
+              </div>
+            </div>
+          </div>
+        </figure>
+      </div>
+
+      <div class="section-head">
+        <h2>Ce qui change, écran par écran</h2>
+        <p>Chaque ligne correspond à un constat du vérificateur, reporté sur la version publiée.</p>
+      </div>
+
+      <table class="changes">
+        <thead>
+          <tr>
+            <th>Règle</th>
+            <th>Aujourd’hui</th>
+            <th>Maquette</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>One accent</td>
+            <td>Cinq boutons verts sur l’accueil : quatre pastilles de lecture et le démarrage.</td>
+            <td>Un seul aplat vert, le bouton principal. Les lignes de séance sont neutres.</td>
+          </tr>
+          <tr>
+            <td>Heavy headings</td>
+            <td>Titres en 800 et 900, 24 occurrences dans les feuilles.</td>
+            <td>600 partout, hiérarchie par la taille et l’espace, jamais par la graisse seule.</td>
+          </tr>
+          <tr>
+            <td>Decorative uppercase</td>
+            <td>« SÉANCE DU JOUR », « ÉCHAUFFEMENT · SÉRIE 1 », interlettrage positif.</td>
+            <td>Bas de casse, 13 px, couleur secondaire. On lit le mot, pas sa forme.</td>
+          </tr>
+          <tr>
+            <td>Cards inside cards</td>
+            <td>Carte héro, carte de métrique, carte d’état, carte de série, toutes empilées.</td>
+            <td>Deux niveaux : la carte héro et la prescription. Le reste vit sur le fond, séparé par un filet.</td>
+          </tr>
+          <tr>
+            <td>Glow and gradients</td>
+            <td>Halo vert dans le héro, dégradé dans la barre haute.</td>
+            <td>Aucun. Le relief vient d’un filet d’un pixel et d’un pas de surface.</td>
+          </tr>
+          <tr>
+            <td>Shared components</td>
+            <td>108 boutons, 48 apparences, aucune primitive commune.</td>
+            <td>Trois boutons : principal, discret, icône. Mêmes rayons, mêmes hauteurs (52 / 44).</td>
+          </tr>
+          <tr>
+            <td>Numbers carry comparison</td>
+            <td>« 4 860 kg·rép. » sans point de repère.</td>
+            <td>Chaque chiffre porte sa variation ou sa date : « + 12 % sur 7 jours ».</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="section-head">
+        <h2>Trois choix à valider</h2>
+        <p>Le reste de la maquette en découle ; ces trois points changent le plus de code.</p>
+      </div>
+
+      <div class="questions">
+        <div class="question">
+          <b>01</b>
+          <p>
+            <strong>Le vert uniquement sur le bouton principal.</strong> Les états passent en texte neutre, sauf
+            « Suggérée » qui reste vert. On perd le repérage couleur des lignes, on gagne un écran calme.
+          </p>
+        </div>
+        <div class="question">
+          <b>02</b>
+          <p>
+            <strong>L’anneau de semaine devient quatre segments.</strong> Plus lisible en une seconde, plus honnête
+            sur un objectif de quatre séances. L’anneau reste pour le repos et le tempo.
+          </p>
+        </div>
+        <div class="question">
+          <b>03</b>
+          <p>
+            <strong>Les cartes passent de 28 à 16 px de rayon, sans verre.</strong> À appliquer partout après
+            validation, sinon deux matières cohabitent et la refonte se voit.
+          </p>
+        </div>
+      </div>
+
+      <footer>
+        <span>Maquette statique · aucune logique · à trancher avant implémentation</span>
+        <span>Vérifiée avec @enmera/ai-design-check</span>
+      </footer>
+    </div>
+  </body>
+</html>

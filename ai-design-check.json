@@ -1,0 +1,4 @@
+{
+  "include": ["src"],
+  "ignore": ["src/mustapha/**", "**/*.test.ts", "**/*.test.tsx"]
+}

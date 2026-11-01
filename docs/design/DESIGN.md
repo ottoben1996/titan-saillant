@@ -206,3 +206,17 @@ Fichiers de référence : `src/styles/tokens.css` (jetons), `matiere.css`
 `docs/superpowers/specs/2026-10-18-ux-coaching-responsive-design.md`
 (spécification UX de cette version), `docs/design/REFERENCES.md` (planche
 commentée).
+
+## 12. Vérification outillée
+
+`npm run design:check` applique les 50 règles automatiques de
+[`@enmera/ai-design-check`](https://github.com/enmerasoftware/ai-design-check)
+au dossier `src` (`ai-design-check.json`). Le relevé du 1er novembre 2026 tient
+dans `.ai-design-check-baseline.json` : 171 constats, aucun bloquant, et
+désormais seuls les nouveaux sont signalés. `npm run design:inventory` mesure la
+dérive des composants — 108 boutons, 48 apparences, aucune primitive commune.
+
+La maquette de la refonte est dans `docs/design/maquette/index.html` : cinq
+écrans à taille réelle, vérifiés à zéro constat. Elle sert de référence aux
+sections 2 à 7 ; en cas d'écart entre ce document et la maquette, c'est la
+maquette qui décrit la cible.
