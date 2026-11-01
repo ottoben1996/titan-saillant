@@ -338,8 +338,9 @@
    prenaient environ 330 px sur 844 en plus de la barre de validation : la
    consigne passait dessous, à moitié cachée. Un seul figé, en bas. */
 .workout-content .exercise-timer {
-  display: grid;
-  justify-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: var(--sp-6);
   margin: 0;
   padding: var(--sp-8) var(--sp-6);
@@ -736,11 +737,12 @@
 }
 
 .workout-content .timer-actions {
-  display: flex !important;
+  display: flex;
+  justify-self: center;
   flex-wrap: nowrap;
-  width: 100% !important;
+  width: 100%;
   align-items: center;
-  justify-content: center !important;
+  justify-content: center;
   gap: var(--sp-4);
 }
 
