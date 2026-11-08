@@ -169,8 +169,14 @@ export function HomeScreen({
   );
   const dateLabel = view.now.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
   const week = <WeekBars done={view.weekSessions} total={WEEKLY_TARGET} />;
-  const premierMouvement = nextAction.kind === 'workout' ? nextAction.day.exercises[0]?.id : undefined;
-  const photoHeros = premierMouvement ? exerciseMedia[premierMouvement]?.peak : undefined;
+  // Les identifiants du programme ne portent pas tous une illustration : on prend
+  // la première du jour, sinon la première du catalogue. Sans ce repli, la carte
+  // héros restait vide sur les séances de force.
+  const photoHeros =
+    nextAction.kind === 'workout'
+      ? (nextAction.day.exercises.map((item) => exerciseMedia[item.id]?.peak).find(Boolean) ??
+        Object.values(exerciseMedia)[0]?.peak)
+      : undefined;
   const seriesFaites = activeSession?.loggedSets.length ?? 0;
   const pluriel = seriesFaites > 1 ? 's' : '';
 
