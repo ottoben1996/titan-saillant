@@ -27,6 +27,10 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      # Rien ne part en ligne sans les tests : une régression de calcul de charge
+      # se verrait en salle, pas dans un rapport de build.
+      - run: npm run typecheck
+      - run: npm run test -- --run
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3
         with:
