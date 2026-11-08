@@ -167,7 +167,7 @@
   display: grid;
   align-content: end;
   gap: var(--sp-3);
-  min-height: 280px;
+  min-height: var(--sp-0);
   padding: var(--sp-8);
   border-radius: var(--r-lg);
   background-color: var(--surface-1);
