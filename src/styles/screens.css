@@ -162,12 +162,61 @@
 /* Carte héros : la seule action dominante de l'écran. Surface mate, filet d'un
    pixel, aucun halo — le vert reste réservé au bouton. */
 .hero-card {
+  position: relative;
+  overflow: hidden;
   display: grid;
+  align-content: end;
   gap: var(--sp-3);
+  min-height: 280px;
   padding: var(--sp-8);
   border-radius: var(--r-lg);
-  background: var(--carte-fond);
+  background-color: var(--surface-1);
+  background-size: cover;
+  background-position: center;
   box-shadow: var(--carte-lisere);
+}
+
+/* La photo porte l'effort ; le voile garde le texte lisible jusqu'à 1 m. */
+.hero-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgb(8 9 11 / 0.3) 0%, rgb(8 9 11 / 0.94) 74%);
+}
+
+.hero-card > * {
+  position: relative;
+}
+
+.hero-chip {
+  justify-self: start;
+  margin-bottom: var(--sp-2);
+  padding: var(--sp-1) var(--sp-4);
+  border-radius: var(--r-full);
+  background: rgb(var(--accent-rgb) / 0.16);
+  color: var(--accent);
+  font-size: var(--fs-2);
+  font-weight: 500;
+}
+
+.hero-num {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-3);
+}
+
+.hero-num strong {
+  font-size: var(--fs-11);
+  line-height: 0.9;
+  font-weight: 600;
+  letter-spacing: -0.05em;
+  font-variant-numeric: tabular-nums;
+}
+
+.hero-num span {
+  font-size: var(--fs-3);
+  font-weight: 600;
+  color: var(--accent);
 }
 
 .hero-card .eyebrow {

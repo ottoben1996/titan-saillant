@@ -3,6 +3,7 @@ import type { WeeklyMeasurement } from '../../domain/measurements';
 import { PROGRAM_WEEKS } from '../../domain/programs';
 import type { ProfileId, WorkoutDay, WorkoutPlan, WorkoutSession } from '../../domain/types';
 import type { SerieAssiduite } from '../../workout/assiduite';
+import { exerciseMedia } from '../../domain/media';
 import { getWorkoutExercises } from '../../workout/runner';
 import { type WeekSlotState, weeklyComparison, weekSlots, workoutDayLabel } from '../../workout/summary';
 import { Play, Repeat, Trash } from '../ui/Icons';
@@ -168,6 +169,8 @@ export function HomeScreen({
   );
   const dateLabel = view.now.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
   const week = <WeekBars done={view.weekSessions} total={WEEKLY_TARGET} />;
+  const premierMouvement = nextAction.kind === 'workout' ? nextAction.day.exercises[0]?.id : undefined;
+  const photoHeros = premierMouvement ? exerciseMedia[premierMouvement]?.peak : undefined;
   const seriesFaites = activeSession?.loggedSets.length ?? 0;
   const pluriel = seriesFaites > 1 ? 's' : '';
 
@@ -210,7 +213,13 @@ export function HomeScreen({
 
       {/* Une seule carte, une seule action dominante : ce qu'il y a à faire maintenant. */}
       {!chargement && (
-        <article className="hero-card" aria-labelledby="hero-title">
+        <article
+          className="hero-card"
+          aria-labelledby="hero-title"
+          style={{
+            backgroundImage: photoHeros ? `url(${photoHeros})` : undefined,
+          }}
+        >
           {nextAction.kind === 'resume' && (
             <>
               <p className="eyebrow">Séance en cours</p>
@@ -243,13 +252,16 @@ export function HomeScreen({
           )}
           {nextAction.kind === 'workout' && (
             <>
-              <p className="eyebrow">Séance du jour</p>
+              <span className="hero-chip">
+                {nextAction.day.subtitle} · {nextAction.day.exercises.length} mouvement
+                {nextAction.day.exercises.length > 1 ? 's' : ''}
+              </span>
+              <div className="hero-num" aria-hidden="true">
+                <strong>{estimatedMinutes(nextAction.day)}</strong>
+                <span>MIN</span>
+              </div>
               <h2 id="hero-title">{nextAction.day.name}</h2>
               <p className="hero-sub">{nextAction.description}</p>
-              <p className="hero-meta">
-                {nextAction.day.exercises.length} mouvement{nextAction.day.exercises.length > 1 ? 's' : ''} · ≈{' '}
-                {estimatedMinutes(nextAction.day)} min
-              </p>
               <div className="hero-week">
                 {week}
                 <span>
